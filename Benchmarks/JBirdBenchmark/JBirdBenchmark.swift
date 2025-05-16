@@ -25,7 +25,9 @@
 
 import Benchmark
 import Foundation
+import Freddy
 import JBird
+import SwiftyJSON
 
 func load(benchmark name: String) -> (String, Data) {
     let resource = "benchmark-\(name)"

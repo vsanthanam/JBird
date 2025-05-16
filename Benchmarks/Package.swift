@@ -16,23 +16,24 @@ let package = Package(
         .package(
             name: "JBird",
             path: "../"
+        ),
+        .package(
+            url: "https://github.com/modswift/Freddy.git",
+            exact: "3.0.58"
+        ),
+        .package(
+            url: "https://github.com/SwiftyJSON/SwiftyJSON.git",
+            exact: "5.0.2"
         )
-//        ),
-//        .package(
-//            url: "https://github.com/modswift/Freddy.git",
-//            exact: "3.0.58"
-//        ),
-//        .package(
-//            url: "https://github.com/SwiftyJSON/SwiftyJSON.git",
-//            exact: "5.0.2"
-//        )
     ],
     targets: [
         .executableTarget(
             name: "JBirdBenchmark",
             dependencies: [
                 .product(name: "Benchmark", package: "package-benchmark"),
-                .product(name: "JBird", package: "JBird")
+                .product(name: "JBird", package: "JBird"),
+                "Freddy",
+                "SwiftyJSON"
             ],
             path: "JBirdBenchmark",
             resources: [

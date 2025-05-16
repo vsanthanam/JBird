@@ -7,3 +7,8 @@ DerivedData/
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 .netrc
 Benchmarks/.build
+Benchmarks/Packages
+Benchmarks/xcuserdata/
+Benchmarks/DerivedData/
+Benchmarks/.swiftpm/configuration/registries.json
+Benchmarks/.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata

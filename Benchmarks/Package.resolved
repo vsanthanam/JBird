@@ -1,6 +1,15 @@
 {
-  "originHash" : "1638fc8522573f92c0d61e06bd304ccdbfcd227b1bd668b2abe36ba5961e80a6",
+  "originHash" : "f79445e487799115de65287b611c2c365125f0c20efd0cde18a9e6518fc1bb09",
   "pins" : [
+    {
+      "identity" : "freddy",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/modswift/Freddy.git",
+      "state" : {
+        "revision" : "e8d1f5600d1f72c2159b94dd9916cd15a11f68d3",
+        "version" : "3.0.58"
+      }
+    },
     {
       "identity" : "hdrhistogram-swift",
       "kind" : "remoteSourceControl",
@@ -71,6 +80,15 @@
       "state" : {
         "revision" : "a34201439c74b53f0fd71ef11741af7e7caf01e1",
         "version" : "1.4.2"
+      }
+    },
+    {
+      "identity" : "swiftyjson",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SwiftyJSON/SwiftyJSON.git",
+      "state" : {
+        "revision" : "af76cf3ef710b6ca5f8c05f3a31307d44a3c5828",
+        "version" : "5.0.2"
       }
     },
     {

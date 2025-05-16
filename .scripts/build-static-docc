@@ -4,5 +4,5 @@ swift package --allow-writing-to-directory docs \
     generate-documentation --target JBird \
     --disable-indexing \
     --transform-for-static-hosting \
-    --hosting-base-path JBird/docs \
+    --hosting-base-path docs \
     --output-path docs
