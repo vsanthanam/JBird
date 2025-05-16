@@ -1,0 +1,7 @@
+version: 1
+builder:
+  configs:
+  - platform: macOS
+    scheme: JBird
+  - documentation_targets: [JBird]
+    custom_documentation_parameters: [--include-extended-types]
