@@ -1,0 +1,156 @@
+name: Test (SPM Platforms)
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build-macos-spm:
+    runs-on: macos-15
+    outputs:
+      artifact-name: macos-build
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Select Xcode Version
+      run: ./.scripts/xcode-select
+    - name: Build JBird
+      run: swift build -v --build-path .build
+    - name: Compress Build
+      run: zip -r build.zip .build
+    - name: Upload Build
+      uses: actions/upload-artifact@v4
+      with:
+        name: macos-build
+        path: build.zip
+  test-macos-spm:
+    needs: build-macos-spm
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Xcode Version
+        run: ./.scripts/xcode-select
+      - name: Download Build
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-build
+          path: .
+      - name: Decompress Build
+        run: unzip build.zip
+      - name: Test JBird
+        run: swift test
+  build-ubuntu-spm:
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-name: ubuntu-build
+    container:
+      image: swift:6.1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build JBird
+        run: swift build -v --build-path .build
+      - name: Install `zip`
+        run: apt-get update && apt-get install -y zip
+      - name: Compress Build
+        run: zip -r build.zip .build
+      - name: Upload Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: ubuntu-build
+          path: build.zip
+  test-ubuntu-spm:
+    needs: build-ubuntu-spm
+    runs-on: ubuntu-latest
+    container:
+      image: swift:6.1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Download Build
+        uses: actions/download-artifact@v4
+        with:
+          name: ubuntu-build
+          path: .
+      - name: Install `unzip`
+        run: apt-get update && apt-get install -y unzip
+      - name: Decompress Build
+        run: unzip build.zip
+      - name: Test JBird
+        run: swift test
+  # build-windows-spm:
+  #   runs-on: windows-latest
+  #   outputs:
+  #     artifact-name: windows-build
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #     - name: Setup Swift 6.1
+  #       uses: compnerd/gha-setup-swift@main
+  #       with:
+  #         branch: swift-6.1-release
+  #         tag: 6.1-RELEASE
+  #     - name: Build JBird
+  #       run: swift build -v --build-path .build
+  #     - name: Compress Build
+  #       run: Compress-Archive -Path .build -DestinationPath build.zip
+  #     - name: Upload Build
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: windows-build
+  #         path: build.zip
+  # test-windows-spm:
+  #   needs: build-windows-spm
+  #   runs-on: windows-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #     - name: Setup Swift 6.1
+  #       uses: compnerd/gha-setup-swift@main
+  #       with:
+  #         branch: swift-6.1-release
+  #         tag: 6.1-RELEASE
+  #     - name: Test JBird
+  #       run: swift test
+  # test-android:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Set up Android NDK
+  #       uses: android-actions/setup-android@v3
+  #       with:
+  #         ndk-version: r25c
+  #     - name: Install Swift for Android dependencies
+  #       run: |
+  #         sudo apt-get update
+  #         sudo apt-get install -y clang cmake ninja-build unzip
+  #     - name: Download Swift for Android toolchain
+  #       run: |
+  #         wget https://github.com/readdle/swift-android-toolchain/releases/download/6.0.3-r3/swift-android.zip
+  #         unzip swift-android.zip
+  #         echo "$PWD/swift-android/bin" >> $GITHUB_PATH
+  #     - name: Configure Swift Android environment
+  #       run: |
+  #         export SWIFT_ANDROID_HOME=$PWD/swift-android
+  #         export SWIFT_ANDROID_ARCH=armv7
+  #         export SWIFT_ANDROID_NDK_HOME=$ANDROID_NDK_ROOT
+  #         export PATH=$SWIFT_ANDROID_HOME/bin:$PATH
+  #         export SWIFT_ANDROID_SDK=$ANDROID_SDK_ROOT
+  #         export SWIFT_ANDROID_NDK=$ANDROID_NDK_ROOT
+  #         export SWIFT_ANDROID_TRIPLE=armv7-unknown-linux-androideabi
+  #         echo "SWIFT_ANDROID_HOME=$SWIFT_ANDROID_HOME" >> $GITHUB_ENV
+  #         echo "SWIFT_ANDROID_ARCH=$SWIFT_ANDROID_ARCH" >> $GITHUB_ENV
+  #         echo "SWIFT_ANDROID_NDK_HOME=$SWIFT_ANDROID_NDK_HOME" >> $GITHUB_ENV
+  #         echo "PATH=$PATH" >> $GITHUB_ENV
+  #         echo "SWIFT_ANDROID_SDK=$SWIFT_ANDROID_SDK" >> $GITHUB_ENV
+  #         echo "SWIFT_ANDROID_NDK=$SWIFT_ANDROID_NDK" >> $GITHUB_ENV
+  #     - name: Build for Android
+  #       run: |
+  #         swift build -v --triple armv7-unknown-linux-androideabi
+  #     - name: Test Android
+  #       run: |
+  #         echo "Skipping tests: cross-compilation for Android doesn't support swift test"

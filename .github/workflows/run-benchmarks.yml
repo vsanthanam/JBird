@@ -1,0 +1,19 @@
+name: Run Benchmarks
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  run-benchmarks:
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Select Xcode Version
+        run: ./.scripts/xcode-select
+      - name: Run Benchmarks
+        run: cd Benchmarks && BENCHMARK_DISABLE_JEMALLOC=true swift package benchmark

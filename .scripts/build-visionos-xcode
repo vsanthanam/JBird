@@ -1,0 +1,3 @@
+#!/bin/bash
+
+xcodebuild -scheme JBird-Package -destination "OS=2.4,name=Apple Vision Pro"

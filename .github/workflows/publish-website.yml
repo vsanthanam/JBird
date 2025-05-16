@@ -1,0 +1,65 @@
+name: Publish Website
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+jobs:
+  build-docc:
+    runs-on: macos-15
+    outputs:
+      artifact-name: docs
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Xcode Version
+        run: ./.scripts/xcode-select
+      - name: Build Documentation
+        run: ./.scripts/build-static-docc
+      - name: Compress Documentation
+        run: zip -r docs.zip docs
+      - name: Upload Documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs
+          path: docs.zip
+  build-jekyll:
+    needs: build-docc
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Download Documentation
+        uses: actions/download-artifact@v4
+        with:
+          name: docs
+          path: .
+      - name: Decompress Documentation
+        run: unzip docs.zip
+      - name: Setup Jekyll Configuration
+        run: ./.scripts/setup-theme 
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Build with Jekyll
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./
+          destination: ./_site
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build-jekyll
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

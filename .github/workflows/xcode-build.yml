@@ -1,0 +1,64 @@
+name: Build (Xcode Platforms)
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build-macos-xcode:
+    runs-on: macos-15
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Select Xcode Version
+      run: ./.scripts/xcode-select
+    - name: Build JBird
+      run: ./.scripts/build-macos-xcode
+  build-maccatalyst-xcode:
+    runs-on: macos-15
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Select Xcode Version
+      run: ./.scripts/xcode-select
+    - name: Build JBird
+      run: ./.scripts/build-maccatalyst-xcode
+  build-ios-xcode:
+    runs-on: macos-15
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Select Xcode Version
+      run: ./.scripts/xcode-select
+    - name: Build JBird
+      run: ./.scripts/build-ios-xcode
+  build-watchos-xcode:
+    runs-on: macos-15
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Select Xcode Version
+      run: ./.scripts/xcode-select
+    - name: Build JBird
+      run: ./.scripts/build-watchos-xcode
+  build-tvos-xcode:
+    runs-on: macos-15
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Select Xcode Version
+      run: ./.scripts/xcode-select
+    - name: Build JBird
+      run: ./.scripts/build-tvos-xcode
+  build-visionos-xcode:
+    runs-on: macos-15
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Select Xcode Version
+      run: ./.scripts/xcode-select
+    - name: Build JBird
+      run: ./.scripts/build-visionos-xcode

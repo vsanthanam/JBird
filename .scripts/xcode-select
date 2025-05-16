@@ -1,0 +1,3 @@
+#!/bin/bash
+
+sudo xcode-select --switch /Applications/Xcode_16.3.app

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+cat > _config.yml <<EOF
+remote_theme: pages-themes/architect@v0.2.0
+plugins:
+- jekyll-remote-theme
+EOF
+
+echo "✅ _config.yml created."
