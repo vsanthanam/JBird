@@ -109,5 +109,6 @@ let package = Package(
                 .enableUpcomingFeature("StrictConcurrency=complete")
             ]
         )
-    ]
+    ],
+    cLanguageStandard: .c11
 )
