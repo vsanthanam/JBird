@@ -1,0 +1,44 @@
+name: Create Release Artifacts
+on:
+  release:
+    types: [published]
+permissions:
+  contents: write
+jobs:
+  build-docc-archive:
+    runs-on: macos-15
+    outputs:
+      artifact-name: archive
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Xcode Version
+        run: ./.scripts/xcode-select
+      - name: Build Documentation
+        run: swift package generate-documentation --target JBird
+      - name: Locate DocC Archive
+        run: cd .build/plugins/Swift-DocC/outputs
+      - name: Compress DocC Archive
+        run: |
+          cd .build/plugins/Swift-DocC/outputs
+          zip -r JBird.doccarchive.zip JBird.doccarchive
+      - name: Upload Documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: archive
+          path: .build/plugins/Swift-DocC/outputs/JBird.doccarchive.zip
+  attach-archive:
+    needs: build-docc-archive
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Download DocC Archive
+        uses: actions/download-artifact@v4
+        with:
+          name: archive
+          path: .
+      - name: Attach DocC Archive to Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./JBird.doccarchive.zip
