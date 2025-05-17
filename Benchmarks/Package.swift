@@ -50,6 +50,7 @@ let package = Package(
                 .copy("benchmark-strings.json"),
                 .copy("benchmark-numeric.json"),
                 .copy("benchmark-integers.json"),
+                .copy("benchmark-deeply-nested.json")
             ],
             plugins: [
                 .plugin(name: "BenchmarkPlugin", package: "package-benchmark")
