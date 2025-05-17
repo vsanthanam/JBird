@@ -42,6 +42,19 @@ public protocol JSONEncodable {
 
 }
 
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension Data {
+
+    /// Create a byte buffer from an instance of a ``JSONEncodable`` type.
+    /// - Parameter encodable: The type to encode.
+    public init(
+        from encodable: some JSONEncodable
+    ) throws {
+        self = try JSON(encodable).serialize()
+    }
+
+}
+
 /// A type that can decode itself from an external `JSON` representation.
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 public protocol JSONDecodable {
@@ -49,6 +62,19 @@ public protocol JSONDecodable {
     /// Create an instance of the type from an externaled `JSON` representation.
     /// - Parameter json: The `JSON` value to decode from.
     init(json: JSON) throws
+
+}
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension JSONDecodable {
+
+    /// Create an instance of the type from a byte buffer by deserializing it into a ``JSON`` representation, then decoding it.
+    /// - Parameter data: The byte buffer to decode from.
+    public init(
+        decoding data: Data
+    ) throws {
+        self = try JSON(data).decode()
+    }
 
 }
 
