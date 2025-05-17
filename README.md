@@ -33,7 +33,9 @@ Then, add the dependency to your target:
 ```swift
 .target(
     name: "YourTarget",
-    dependencies: ["JBird"]
+    dependencies: [
+        .product(name: "JBird", package: "JBird")
+    ]
 )
 ```
 
@@ -44,9 +46,24 @@ To add JBird as a dependency to an Xcode Project:
 
 Other distribution mechanisms like CocoaPods or Carthage may be added in the future.
 
+### Optional Macros
+
+To avoid forcing users to depend on `swift-syntax`, JBird does not include its macros by default. If you wish to include them in your project, you can do so by adding the following to your `Package.swift` file:
+
+```swift
+.target(
+    name: "YourTarget",
+    dependencies: [
+        .product(name: "JBirdMacros", package: "JBird")
+    ]
+)
+```
+
+Doing this will add the `@JSONCodable`, `@JSONKey`, and `@OmitIfNil` macros to your project, which can be used to simplify decoding and encoding JSON into your Swift types. For more information on how to use these macros, see the [documentation](https://usejbird.com/docs/documentation/jbird).
+
 ## Performance
 
-JBird is designed for high performance and memory efficiency in mind, with benchmarks showing it to be one of the fastest JSON parsers available for Swift. The core parsing engine is written in C with SIMD acceleration where appropriate, making it significantly faster than pure Swift alternatives.
+JBird is designed for high performance and memory efficiency in mind, with benchmarks showing it to be one of the fastest JSON parsers available for Swift. The core parsing engine is written in C and is heavily optimized, making it significantly faster than pure Swift alternatives.
 
 JBird demonstrates exceptional performance compared to other popular JSON parsing libraries:
 
