@@ -48,7 +48,8 @@ let files = [
     "5mb-pretty",
     "strings",
     "numeric",
-    "integers"
+    "integers",
+    "deeply-nested",
 ]
 .map(load)
 
