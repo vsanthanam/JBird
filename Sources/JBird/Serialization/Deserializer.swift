@@ -40,9 +40,6 @@ extension JSON {
             /// Whether or not null keys should be omitted from JSON objects when parsing
             public static let omitNullKeys = Options(rawValue: 1 << 0)
 
-            /// Whether or not non-root JSON should be allowed to be parsed
-            public static let allowFragments = Options(rawValue: 1 << 1)
-
             /// Whether or not the the deserialized JSON is allowed to contain a UTF-8 byte order mark
             public static let allowByteOrderMark = Options(rawValue: 1 << 2)
 
@@ -50,7 +47,7 @@ extension JSON {
             public static let allowWhitespace = Options(rawValue: 1 << 3)
 
             /// The default set of options
-            public static let `default`: Options = [.allowFragments, .allowByteOrderMark, .allowWhitespace]
+            public static let `default`: Options = [.allowByteOrderMark, .allowWhitespace]
 
             // MARK: - OptionSet
 
@@ -116,7 +113,7 @@ extension JSON {
                     buffer.count,
                     &jsonValue,
                     options.contains(.allowByteOrderMark),
-                    options.contains(.allowFragments)
+                    options.contains(.allowWhitespace)
                 )
             }
 
