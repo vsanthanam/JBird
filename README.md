@@ -6,8 +6,7 @@
 [![Swift Version](https://img.shields.io/badge/swift-6.1-critical)](https://swift.org)
 [![Documentation](https://img.shields.io/badge/Documentation-GitHub-8A2BE2)](https://usejbird.com/docs/documentation/jbird)
 
-
-A high-performance JSON parsing and manipulation library for Swift with a focus on speed, type safety, and a modern Swift API.
+A blazing fast, type-safe library for working with JSON in Swift
 
 ## Features
 

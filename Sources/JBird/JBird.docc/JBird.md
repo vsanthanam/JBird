@@ -1,6 +1,6 @@
 # ``JBird``
 
-A lighting fast, type-safe library for working with JSON in Swift
+A blazing fast, type-safe library for working with JSON in Swift
 
 ## Topics
 
