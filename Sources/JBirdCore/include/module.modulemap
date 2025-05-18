@@ -1,5 +1,0 @@
-module JBirdCore {
-    umbrella header "JBirdCore.h"
-    export *
-    module * { export * }
-} 
