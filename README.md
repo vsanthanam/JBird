@@ -48,7 +48,7 @@ Other distribution mechanisms like CocoaPods or Carthage may be added in the fut
 
 ### Optional Macros
 
-To avoid forcing users to depend on `swift-syntax`, JBird does not include its macros by default. If you wish to include them in your project, you can do so by adding the following to your `Package.swift` file:
+To avoid forcing a dependency `swift-syntax`, JBird does not include its macros by default. If you wish to include them in your project, you can do so by adding the following to your `Package.swift` file:
 
 ```swift
 .target(
