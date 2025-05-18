@@ -44,13 +44,7 @@ let package = Package(
     targets: [
         .target(
             name: "JBirdCore",
-            publicHeadersPath: ".",
-            cSettings: [
-                .headerSearchPath(".")
-            ],
-            swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency=complete")
-            ]
+            publicHeadersPath: "include"
         ),
         .target(
             name: "JBird",

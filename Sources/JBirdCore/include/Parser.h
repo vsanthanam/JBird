@@ -23,8 +23,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef JBirdCore_h
-#define JBirdCore_h
+#ifndef Parser_h
+#define Parser_h
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -179,4 +179,4 @@ const char* json_get_object_key(const json_value_t* object, size_t index);
  */
 json_value_t* json_get_object_value(const json_value_t* object, size_t index);
 
-#endif /* JBirdCore_h */
+#endif /* Parser_h */
