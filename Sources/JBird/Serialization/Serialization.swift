@@ -1,5 +1,5 @@
 // JBird
-// Serializer.swift
+// Serialization.swift
 //
 // MIT License
 //
@@ -29,7 +29,7 @@ import Foundation
 extension JSON {
 
     /// A namespace for JSON serialization functions
-    public enum Serializer {
+    public enum Serialization {
 
         /// The availabile options when serializing a `JSON` value into a byte buffer or Swift string
         public struct Options: OptionSet, Equatable, Hashable, Sendable {
@@ -46,13 +46,22 @@ extension JSON {
             public static let sortedKeys = Options(rawValue: 1 << 2)
 
             /// Whether or not non-root JSON should be allowed
-            public static let allowFragments = Options(rawValue: 1 << 3)
+            public static let fragmentsAllowed = Options(rawValue: 1 << 3)
 
             /// Whether or not the serialized JSON should contain a UTF-8 byte order mark
             public static let includeByteOrderMark = Options(rawValue: 1 << 4)
 
+            /// Whether or not to escape characters outside the ASCII range.
+            public static let escapeNonAscii = Options(rawValue: 1 << 5)
+
+            /// Whether or not characters outside the basic multi-lingual plane should be escaped
+            public static let escapeSpecialCharacters = Options(rawValue: 1 << 6)
+
+            /// Whether or not to escape the forward slash character
+            public static let escapeForwardSlash = Options(rawValue: 1 << 7)
+
             /// The default set of options
-            public static let `default`: Options = [.allowFragments]
+            public static let `default`: Options = [.fragmentsAllowed, .escapeSpecialCharacters]
 
             // MARK: - OptionSet
 
@@ -74,10 +83,7 @@ extension JSON {
             options: Options = .default
         ) throws -> String {
             let data = try data(from: json, options: options)
-            guard let str = String(data: data, encoding: .utf8) else {
-                throw JSONSerializationError.utf8conversionFailure
-            }
-            return str
+            return String(data: data, encoding: .utf8)!
         }
 
         /// Create a byte buffer from a ``JSON`` value
@@ -89,7 +95,7 @@ extension JSON {
             from json: JSON,
             options: Options = .default
         ) throws -> Data {
-            try startSerialization(from: json, options: options, cancellable: false)
+            try startSerialization(from: json, options: options, isAsync: false)
         }
 
         public static func serialize<T>(
@@ -101,7 +107,7 @@ extension JSON {
             return try startSerialization(
                 from: json,
                 options: options,
-                cancellable: true
+                isAsync: true
             )
         }
 
@@ -110,11 +116,7 @@ extension JSON {
             options: Options = .default
         ) async throws -> String where T: JSONEncodable {
             let data = try await serialize(value, options: options)
-            guard let str = String(data: data, encoding: .utf8) else {
-                throw JSONSerializationError.utf8conversionFailure
-            }
-            try Task.checkCancellation()
-            return str
+            return String(data: data, encoding: .utf8)!
         }
 
         // MARK: - Private
@@ -123,21 +125,21 @@ extension JSON {
         private static func startSerialization(
             from json: JSON,
             options: Options,
-            cancellable: Bool
+            isAsync: Bool
         ) throws -> Data {
-            var bytes = [UInt8]()
-            if !options.contains(.allowFragments) {
+            if !options.contains(.fragmentsAllowed) {
                 switch json {
                 case .literal, .numeric, .string:
-                    throw JSONSerializationError.invalidFragment
+                    throw JSONSerializationError.illegalFragment
                 case .array, .object:
                     break
                 }
             }
+            var bytes = [UInt8]()
             if options.contains(.includeByteOrderMark) {
                 serializeBOM(into: &bytes)
             }
-            try serialize(json: json, into: &bytes, level: options.contains(.prettyPrinted) ? 0 : nil, options: options, cancellable: cancellable)
+            try serialize(json: json, into: &bytes, level: options.contains(.prettyPrinted) ? 0 : nil, options: options, isAsync: isAsync)
             return Data(bytes)
         }
 
@@ -154,22 +156,22 @@ extension JSON {
             into bytes: inout [UInt8],
             level: Int?,
             options: Options,
-            cancellable: Bool
+            isAsync: Bool
         ) throws {
-            if cancellable {
+            if isAsync {
                 try Task.checkCancellation()
             }
             switch json {
             case let .literal(literal):
                 serialize(literal: literal, into: &bytes)
             case let .object(object):
-                try serialize(object: object, into: &bytes, level: level, options: options, cancellable: cancellable)
+                try serialize(object: object, into: &bytes, level: level, options: options, isAsync: isAsync)
             case let .array(array):
-                try serialize(array: array, into: &bytes, level: level, options: options, cancellable: cancellable)
+                try serialize(array: array, into: &bytes, level: level, options: options, isAsync: isAsync)
             case let .numeric(numeric):
                 try serialize(numeric: numeric, into: &bytes)
             case let .string(string):
-                serialize(string: string, into: &bytes)
+                serialize(string: string, options: options, into: &bytes)
             }
         }
 
@@ -237,18 +239,12 @@ extension JSON {
         @inline(__always)
         private static func serialize(
             string: String,
+            options: Options,
             into bytes: inout [UInt8]
         ) {
             bytes.append(UInt8(ascii: "\""))
             for scalar in string.unicodeScalars {
                 switch scalar.value {
-                case 0x00...0x1F:
-                    let hex = String(format: "\\u%04X", scalar.value)
-                    bytes.append(contentsOf: hex.utf8)
-                case 0x22:
-                    bytes.append(contentsOf: "\\\"".utf8)
-                case 0x5C:
-                    bytes.append(contentsOf: "\\\\".utf8)
                 case 0x08:
                     bytes.append(contentsOf: "\\b".utf8)
                 case 0x0C:
@@ -259,18 +255,39 @@ extension JSON {
                     bytes.append(contentsOf: "\\r".utf8)
                 case 0x09:
                     bytes.append(contentsOf: "\\t".utf8)
+                case 0x00...0x1F:
+                    let hex = String(format: "\\u%04X", scalar.value)
+                    bytes.append(contentsOf: hex.utf8)
+                case 0x22:
+                    bytes.append(contentsOf: "\\\"".utf8)
+                case 0x2F:
+                    if options.contains(.escapeForwardSlash) {
+                        bytes.append(contentsOf: "\\/".utf8)
+                    } else {
+                        bytes.append(UInt8(scalar.value))
+                    }
+                case 0x5C:
+                    bytes.append(contentsOf: "\\\\".utf8)
                 case 0x20...0x7F:
                     bytes.append(UInt8(scalar.value))
                 case 0x80...0xFFFF:
-                    bytes.append(contentsOf: String(scalar).utf8)
+                    if options.contains(.escapeNonAscii) {
+                        let hex = String(format: "\\u%04X", scalar.value)
+                        bytes.append(contentsOf: hex.utf8)
+                    } else {
+                        bytes.append(contentsOf: String(scalar).utf8)
+                    }
                 default:
-                    let codepoint = scalar.value - 0x10000
-                    let high = 0xD800 + (codepoint >> 10)
-                    let low = 0xDC00 + (codepoint & 0x3FF)
-                    bytes.append(contentsOf: String(format: "\\u%04X\\u%04X", high, low).utf8)
+                    if options.contains(.escapeSpecialCharacters) {
+                        let codepoint = scalar.value - 0x10000
+                        let high = 0xD800 + (codepoint >> 10)
+                        let low = 0xDC00 + (codepoint & 0x3FF)
+                        bytes.append(contentsOf: String(format: "\\u%04X\\u%04X", high, low).utf8)
+                    } else {
+                        bytes.append(contentsOf: String(scalar).utf8)
+                    }
                 }
             }
-
             bytes.append(UInt8(ascii: "\""))
         }
 
@@ -280,7 +297,7 @@ extension JSON {
             into bytes: inout [UInt8],
             level: Int?,
             options: Options,
-            cancellable: Bool
+            isAsync: Bool
         ) throws {
             bytes += [0x5B]
 
@@ -296,10 +313,10 @@ extension JSON {
             for value in array.dropLast() {
                 if let level {
                     addIndentation(level: level + 1, into: &bytes)
-                    try serialize(json: value, into: &bytes, level: level + 1, options: options, cancellable: cancellable)
+                    try serialize(json: value, into: &bytes, level: level + 1, options: options, isAsync: isAsync)
                     bytes += [0x2C, 0x0A]
                 } else {
-                    try serialize(json: value, into: &bytes, level: level, options: options, cancellable: cancellable)
+                    try serialize(json: value, into: &bytes, level: level, options: options, isAsync: isAsync)
                     bytes += [0x2C]
                 }
 
@@ -308,10 +325,10 @@ extension JSON {
             if let lastValue = array.last {
                 if let level {
                     addIndentation(level: level + 1, into: &bytes)
-                    try serialize(json: lastValue, into: &bytes, level: level + 1, options: options, cancellable: cancellable)
+                    try serialize(json: lastValue, into: &bytes, level: level + 1, options: options, isAsync: isAsync)
                     bytes += [0x0A]
                 } else {
-                    try serialize(json: lastValue, into: &bytes, level: 1, options: options, cancellable: cancellable)
+                    try serialize(json: lastValue, into: &bytes, level: 1, options: options, isAsync: isAsync)
                 }
             }
 
@@ -327,7 +344,7 @@ extension JSON {
             into bytes: inout [UInt8],
             level: Int?,
             options: Options,
-            cancellable: Bool
+            isAsync: Bool
         ) throws {
             bytes += [0x7B]
 
@@ -340,20 +357,25 @@ extension JSON {
                 bytes += [0x0A] // Newline
             }
 
-            let keys = options.contains(.sortedKeys) ? Swift.Array(object.keys.sorted()) : Swift.Array(object.keys)
+            let usableObject: Object = if options.contains(.omitNullKeys) {
+                object.compactMapValues { value in value.isNull ? nil : value }
+            } else {
+                object
+            }
+            let keys = options.contains(.sortedKeys) ? Swift.Array(usableObject.keys.sorted()) : Swift.Array(usableObject.keys)
             for key in keys.dropLast() {
-                let value = object[key].unsafelyUnwrapped
+                let value = usableObject[key].unsafelyUnwrapped
                 if value != .null || !options.contains(.omitNullKeys) {
                     if let level {
                         addIndentation(level: level + 1, into: &bytes)
-                        serialize(string: key, into: &bytes)
+                        serialize(string: key, options: options, into: &bytes)
                         bytes += [0x3A, 0x20]
-                        try serialize(json: value, into: &bytes, level: level + 1, options: options, cancellable: cancellable)
+                        try serialize(json: value, into: &bytes, level: level + 1, options: options, isAsync: isAsync)
                         bytes += [0x2C, 0x0A]
                     } else {
-                        serialize(string: key, into: &bytes)
+                        serialize(string: key, options: options, into: &bytes)
                         bytes += [0x3A]
-                        try serialize(json: value, into: &bytes, level: level, options: options, cancellable: cancellable)
+                        try serialize(json: value, into: &bytes, level: level, options: options, isAsync: isAsync)
                         bytes += [0x2C]
                     }
                 }
@@ -364,14 +386,14 @@ extension JSON {
                 if value != .null || !options.contains(.omitNullKeys) {
                     if let level {
                         addIndentation(level: level + 1, into: &bytes)
-                        serialize(string: key, into: &bytes)
+                        serialize(string: key, options: options, into: &bytes)
                         bytes += [0x3A, 0x20]
-                        try serialize(json: value, into: &bytes, level: level + 1, options: options, cancellable: cancellable)
+                        try serialize(json: value, into: &bytes, level: level + 1, options: options, isAsync: isAsync)
                         bytes += [0x0A]
                     } else {
-                        serialize(string: key, into: &bytes)
+                        serialize(string: key, options: options, into: &bytes)
                         bytes += [0x3A]
-                        try serialize(json: value, into: &bytes, level: level, options: options, cancellable: cancellable)
+                        try serialize(json: value, into: &bytes, level: level, options: options, isAsync: isAsync)
                     }
                 }
             }

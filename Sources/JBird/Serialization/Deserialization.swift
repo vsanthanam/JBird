@@ -1,5 +1,5 @@
 // JBird
-// Deserializer.swift
+// Deserialization.swift
 //
 // MIT License
 //
@@ -30,7 +30,7 @@ import JBirdParser
 extension JSON {
 
     /// A namespace for JSON deserialization functions
-    public enum Deserializer {
+    public enum Deserialization {
 
         /// The available options for JSON deserialization
         public struct Options: OptionSet, Equatable, Hashable, Sendable {
@@ -47,10 +47,10 @@ extension JSON {
             public static let allowByteOrderMark = Options(rawValue: 1 << 2)
 
             /// Whether or not the deserialized JSON is allowed to contain insignificant whitespace
-            public static let allowWhitespace = Options(rawValue: 1 << 3)
+            public static let requireMinified = Options(rawValue: 1 << 3)
 
             /// The default set of options
-            public static let `default`: Options = [.fragmentsAllowed, .allowByteOrderMark, .allowWhitespace]
+            public static let `default`: Options = [.fragmentsAllowed, .allowByteOrderMark]
 
             // MARK: - OptionSet
 
@@ -111,7 +111,7 @@ extension JSON {
                     buffer.count,
                     &jsonValue,
                     options.contains(.allowByteOrderMark),
-                    options.contains(.allowWhitespace)
+                    !options.contains(.requireMinified)
                 )
             }
 
@@ -136,26 +136,19 @@ extension JSON {
                 if isAsync {
                     try Task.checkCancellation()
                 }
-
                 let type = json_get_type(value)
-
                 switch type {
                 case JSON_NULL:
                     return .literal(.null)
-
                 case JSON_BOOLEAN:
                     return .literal(json_get_boolean(value) ? .true : .false)
-
                 case JSON_NUMBER_INT:
                     return .numeric(.int(Int(json_get_int(value))))
-
                 case JSON_NUMBER_DOUBLE:
                     return .numeric(.double(json_get_double(value)))
-
                 case JSON_STRING:
                     let str = String(cString: json_get_string(value))
                     return .string(str)
-
                 case JSON_ARRAY:
                     let count = json_get_array_size(value)
                     var array = Array()
@@ -167,7 +160,6 @@ extension JSON {
                     }
 
                     return .array(array)
-
                 case JSON_OBJECT:
                     let count = json_get_object_size(value)
                     var dict = Object()
@@ -182,7 +174,6 @@ extension JSON {
                         }
                     }
                     return .object(dict)
-
                 default:
                     throw JSONDeserializationError.unknown
                 }

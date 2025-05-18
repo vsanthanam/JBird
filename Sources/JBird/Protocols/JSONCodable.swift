@@ -48,7 +48,7 @@ extension Data {
     /// Create a byte buffer from an instance of a ``JSONEncodable`` type.
     /// - Parameter encodable: The type to encode.
     public init(
-        from encodable: some JSONEncodable
+        encodingJSON encodable: some JSONEncodable
     ) throws {
         self = try JSON(encodable).serialize()
     }
@@ -71,7 +71,7 @@ extension JSONDecodable {
     /// Create an instance of the type from a byte buffer by deserializing it into a ``JSON`` representation, then decoding it.
     /// - Parameter data: The byte buffer to decode from.
     public init(
-        decoding data: Data
+        decodingJSON data: Data
     ) throws {
         self = try JSON(data).decode()
     }

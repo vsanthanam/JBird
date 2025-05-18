@@ -1,5 +1,5 @@
 // JBird
-// SerializerTests.swift
+// SerializationTests.swift
 //
 // MIT License
 //
@@ -23,11 +23,56 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import Foundation
 import JBird
 import Testing
 
-@Suite("Serializer Tests")
-struct SerializerTests {
+@Suite("Serialization Tests")
+struct SerializationTests {
+
+    @Test("Fragment Serialization Rules")
+    func fragmentSerializationRules() throws {
+        let fragment: JSON = true
+        let data = try fragment.serialize()
+        let str = try #require(String(data: data, encoding: .utf8))
+        let expected = #"""
+        true
+        """#
+        #expect(str == expected)
+        #expect(throws: JSONSerializationError.illegalFragment) {
+            try JSON.Serialization.data(from: fragment, options: [])
+        }
+    }
+
+    @Test("Byte Order Mark Serialzation")
+    func byteOrderMarkSerialization() throws {
+        let json: JSON = true
+        let data = try JSON.Serialization.data(from: json, options: .default)
+        #expect(data == Data([0x74, 0x72, 0x75, 0x65]))
+        let withBom = try JSON.Serialization.data(from: json, options: .default.union(.includeByteOrderMark))
+        #expect(withBom == Data([0xEF, 0xBB, 0xBF, 0x74, 0x72, 0x75, 0x65]))
+    }
+
+    @Test("Invalid Float Serialization")
+    func invalidFloatSerialization() {
+        let json: JSON = .numeric(.double(.infinity))
+        #expect(throws: JSONSerializationError.invalidFloat) {
+            try json.serialize()
+        }
+    }
+
+    @Test("Omit Null Keys")
+    func omitNullKeys() throws {
+        let json: JSON = ["a": nil, "b": 1]
+        let data = try JSON.Serialization.data(from: json, options: .omitNullKeys)
+        let str = try #require(String(data: data, encoding: .utf8))
+        let expected = #"""
+        {"b":1}
+        """#
+        #expect(str == expected)
+        let stringified = try JSON.Serialization.string(from: json, options: .omitNullKeys)
+        #expect(stringified == expected)
+    }
 
     @Suite("Literal Value Serialization Tests")
     struct LiteralTests {
@@ -41,6 +86,8 @@ struct SerializerTests {
             true
             """#
             #expect(str == expected)
+            let stringified = try json.stringify()
+            #expect(stringified == expected)
         }
 
         @Test("`false` Serialization")
@@ -52,6 +99,8 @@ struct SerializerTests {
             false
             """#
             #expect(str == expected)
+            let stringified = try json.stringify()
+            #expect(stringified == expected)
         }
 
         @Test("`null` Serialization")
@@ -63,6 +112,8 @@ struct SerializerTests {
             null
             """#
             #expect(str == expected)
+            let stringified = try json.stringify()
+            #expect(stringified == expected)
         }
 
     }
@@ -82,6 +133,8 @@ struct SerializerTests {
                 1231421
                 """#
                 #expect(str == expected)
+                let stringified = try json.stringify()
+                #expect(stringified == expected)
             }
 
             @Test("Negative Integer Serialization")
@@ -93,6 +146,8 @@ struct SerializerTests {
                 -1231421
                 """#
                 #expect(str == expected)
+                let stringified = try json.stringify()
+                #expect(stringified == expected)
             }
 
         }
@@ -109,6 +164,8 @@ struct SerializerTests {
                 123.12
                 """#
                 #expect(str == expected)
+                let stringified = try json.stringify()
+                #expect(stringified == expected)
             }
 
             @Test("Negative Double Serialization")
@@ -120,6 +177,8 @@ struct SerializerTests {
                 -123.12
                 """#
                 #expect(str == expected)
+                let stringified = try json.stringify()
+                #expect(stringified == expected)
             }
 
             @Test("Scientific Double Serialization")
@@ -131,6 +190,8 @@ struct SerializerTests {
                 1.23E-9
                 """#
                 #expect(str == expected)
+                let stringified = try json.stringify()
+                #expect(stringified == expected)
             }
 
         }
@@ -149,6 +210,8 @@ struct SerializerTests {
             []
             """#
             #expect(str == expected)
+            let stringified = try json.stringify()
+            #expect(stringified == expected)
         }
 
     }
@@ -165,6 +228,8 @@ struct SerializerTests {
             {}
             """#
             #expect(str == expected)
+            let stringified = try json.stringify()
+            #expect(stringified == expected)
         }
 
         @Test("Single Field Object Serialization")
@@ -176,6 +241,8 @@ struct SerializerTests {
             {"hello":"world"}
             """#
             #expect(str == expected)
+            let stringified = try json.stringify()
+            #expect(stringified == expected)
         }
 
         @Test("Multiple Field Object Serialization")
@@ -185,12 +252,14 @@ struct SerializerTests {
                 "bar": false,
                 "baz": nil
             ]
-            let data = try JSON.Serializer.data(from: json, options: .sortedKeys)
+            let data = try JSON.Serialization.data(from: json, options: .sortedKeys)
             let str = try #require(String(data: data, encoding: .utf8))
             let expected = #"""
             {"bar":false,"baz":null,"foo":true}
             """#
             #expect(str == expected)
+            let stringified = try JSON.Serialization.string(from: json, options: .sortedKeys)
+            #expect(stringified == expected)
         }
 
         @Test("Pretty Printed Object Serialization")
@@ -204,7 +273,7 @@ struct SerializerTests {
                     "b": [1, 2, 3]
                 ]
             ]
-            let data = try JSON.Serializer.data(from: json, options: [.sortedKeys, .prettyPrinted])
+            let data = try JSON.Serialization.data(from: json, options: [.sortedKeys, .prettyPrinted])
             let str = try #require(String(data: data, encoding: .utf8))
             let expected = #"""
             {
@@ -222,6 +291,8 @@ struct SerializerTests {
             }
             """#
             #expect(str == expected)
+            let stringified = try JSON.Serialization.string(from: json, options: [.sortedKeys, .prettyPrinted])
+            #expect(stringified == expected)
         }
 
         @Test("Object Serialization Without Null Keys")
@@ -235,12 +306,107 @@ struct SerializerTests {
                     "b": [1, 2, 3]
                 ]
             ]
-            let data = try JSON.Serializer.data(from: json, options: [.sortedKeys, .omitNullKeys])
+            let data = try JSON.Serialization.data(from: json, options: [.sortedKeys, .omitNullKeys])
             let str = try #require(String(data: data, encoding: .utf8))
             let expected = #"""
             {"bar":false,"foo":true,"qux":{"b":[1,2,3]}}
             """#
             #expect(str == expected)
+            let stringified = try JSON.Serialization.string(from: json, options: [.sortedKeys, .omitNullKeys])
+            #expect(stringified == expected)
+        }
+
+    }
+
+    @Suite("String Serialization Tests")
+    struct StringTests {
+
+        @Test("Normal String Serialization")
+        func normal() throws {
+            let json: JSON = "abcdefghijklmnopqrstuvwxyz"
+            let data = try json.serialize()
+            let str = try #require(String(data: data, encoding: .utf8))
+            let expect = #"""
+            "abcdefghijklmnopqrstuvwxyz"
+            """#
+            #expect(str == expect)
+        }
+
+        @Test("Escaped Quite Serialization")
+        func escapedQuote() throws {
+            let json: JSON = "\""
+            let data = try json.serialize()
+            let str = try #require(String(data: data, encoding: .utf8))
+            let expect = #"""
+            "\""
+            """#
+            #expect(str == expect)
+        }
+
+        @Test("Escaped Backslash Serialization")
+        func reverseSolidus() throws {
+            let json: JSON = "\\"
+            let data = try json.serialize()
+            let str = try #require(String(data: data, encoding: .utf8))
+            let expect = #"""
+            "\\"
+            """#
+            #expect(str == expect)
+        }
+
+        @Test("Escaped Backslash Serialization")
+        func backslash() throws {
+            let json: JSON = "\u{0008}"
+            let data = try json.serialize()
+            let str = try #require(String(data: data, encoding: .utf8))
+            let expect = #"""
+            "\b"
+            """#
+            #expect(str == expect)
+        }
+
+        @Test("Escaped Tab Serialization")
+        func tab() throws {
+            let json: JSON = "\u{0009}"
+            let data = try json.serialize()
+            let str = try #require(String(data: data, encoding: .utf8))
+            let expect = #"""
+            "\t"
+            """#
+            #expect(str == expect)
+        }
+
+        @Test("Escaped Formfeed Serialization")
+        func formfeed() throws {
+            let json: JSON = "\u{000C}"
+            let data = try json.serialize()
+            let str = try #require(String(data: data, encoding: .utf8))
+            let expect = #"""
+            "\f"
+            """#
+            #expect(str == expect)
+        }
+
+        @Test("Escaped Newline Serialization")
+        func newLine() throws {
+            let json: JSON = "\n"
+            let data = try json.serialize()
+            let str = try #require(String(data: data, encoding: .utf8))
+            let expect = #"""
+            "\n"
+            """#
+            #expect(str == expect)
+        }
+
+        @Test("Escaped Carriage Return Serialization")
+        func carriageReturn() throws {
+            let json: JSON = "\u{000D}"
+            let data = try json.serialize()
+            let str = try #require(String(data: data, encoding: .utf8))
+            let expect = #"""
+            "\r"
+            """#
+            #expect(str == expect)
         }
 
     }

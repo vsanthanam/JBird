@@ -1,5 +1,5 @@
 // JBird
-// DeserializerTests.swift
+// DeserializationTests.swift
 //
 // MIT License
 //
@@ -27,8 +27,8 @@ import Foundation
 import JBird
 import Testing
 
-@Suite("Deserializer Tests")
-struct DeserializerTests {
+@Suite("Deserialization Tests")
+struct DeserializationTests {
 
     @Suite("Byte Order Mark Tests")
     struct BOMTests {
@@ -40,11 +40,11 @@ struct DeserializerTests {
             #expect(json == [:])
         }
 
-        @Test("Byte Order Mark Deserialization")
+        @Test("Illegal Byte Order Mark Deserialization")
         func testNoBom() {
             let data = Data([0xEF, 0xBB, 0xBF, 0x7B, 0x7D])
             #expect(throws: JSONDeserializationError.parseFailure("Invalid character")) {
-                _ = try JSON.Deserializer.object(from: data, options: [.fragmentsAllowed, .allowWhitespace])
+                _ = try JSON.Deserialization.object(from: data, options: .default.subtracting(.allowByteOrderMark))
             }
         }
 
@@ -59,7 +59,7 @@ struct DeserializerTests {
             {"foo":true}
             """#
             let data = try #require(raw.data(using: .utf8))
-            let json = try JSON.Deserializer.object(from: data, options: [])
+            let json = try JSON.Deserialization.object(from: data, options: .default.union(.requireMinified))
             #expect(json == ["foo": true])
         }
 
@@ -72,7 +72,7 @@ struct DeserializerTests {
             """#
             let data = try #require(raw.data(using: .utf8))
             #expect(throws: JSONDeserializationError.parseFailure("Missing object key")) {
-                _ = try JSON.Deserializer.object(from: data, options: [])
+                _ = try JSON.Deserialization.object(from: data, options: .default.union(.requireMinified))
             }
         }
 
@@ -87,7 +87,7 @@ struct DeserializerTests {
             {"foo":true}
             """#
             let data = try #require(raw.data(using: .utf8))
-            let json = try JSON.Deserializer.object(from: data, options: [])
+            let json = try JSON.Deserialization.object(from: data, options: [])
             #expect(json == ["foo": true])
         }
 
@@ -97,7 +97,7 @@ struct DeserializerTests {
             [1,2,3]
             """#
             let data = try #require(raw.data(using: .utf8))
-            let json = try JSON.Deserializer.object(from: data, options: [])
+            let json = try JSON.Deserialization.object(from: data, options: [])
             #expect(json == [1, 2, 3])
         }
 
@@ -108,7 +108,7 @@ struct DeserializerTests {
             """#
             let data = try #require(raw.data(using: .utf8))
             #expect(throws: JSONDeserializationError.illegalFragment) {
-                _ = try JSON.Deserializer.object(from: data, options: [])
+                _ = try JSON.Deserialization.object(from: data, options: [])
             }
         }
 
@@ -119,7 +119,7 @@ struct DeserializerTests {
             """#
             let data = try #require(raw.data(using: .utf8))
             #expect(throws: JSONDeserializationError.illegalFragment) {
-                _ = try JSON.Deserializer.object(from: data, options: [])
+                _ = try JSON.Deserialization.object(from: data, options: [])
             }
         }
 
@@ -130,7 +130,7 @@ struct DeserializerTests {
             """#
             let data = try #require(raw.data(using: .utf8))
             #expect(throws: JSONDeserializationError.illegalFragment) {
-                _ = try JSON.Deserializer.object(from: data, options: [])
+                _ = try JSON.Deserialization.object(from: data, options: [])
             }
         }
 
@@ -149,9 +149,9 @@ struct DeserializerTests {
             #expect(json == true)
             let fromString = try JSON(deserializing: raw)
             #expect(fromString == json)
-            let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data)
             #expect(fromAsyncData == json)
-            let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
             #expect(fromAsyncString == json)
         }
 
@@ -165,9 +165,9 @@ struct DeserializerTests {
             #expect(json == false)
             let fromString = try JSON(deserializing: raw)
             #expect(fromString == json)
-            let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data)
             #expect(fromAsyncData == json)
-            let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
             #expect(fromAsyncString == json)
         }
 
@@ -181,9 +181,9 @@ struct DeserializerTests {
             #expect(json == nil)
             let fromString = try JSON(deserializing: raw)
             #expect(fromString == json)
-            let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data)
             #expect(fromAsyncData == json)
-            let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
             #expect(fromAsyncString == json)
         }
 
@@ -205,9 +205,9 @@ struct DeserializerTests {
                 #expect(json == 1231)
                 let fromString = try JSON(deserializing: raw)
                 #expect(fromString == json)
-                let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+                let fromAsyncData = try await JSON.Deserialization.deserialize(data)
                 #expect(fromAsyncData == json)
-                let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+                let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
                 #expect(fromAsyncString == json)
             }
 
@@ -221,9 +221,9 @@ struct DeserializerTests {
                 #expect(json == -1231)
                 let fromString = try JSON(deserializing: raw)
                 #expect(fromString == json)
-                let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+                let fromAsyncData = try await JSON.Deserialization.deserialize(data)
                 #expect(fromAsyncData == json)
-                let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+                let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
                 #expect(fromAsyncString == json)
             }
 
@@ -242,9 +242,9 @@ struct DeserializerTests {
                 #expect(json == 123.12)
                 let fromString = try JSON(deserializing: raw)
                 #expect(fromString == json)
-                let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+                let fromAsyncData = try await JSON.Deserialization.deserialize(data)
                 #expect(fromAsyncData == json)
-                let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+                let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
                 #expect(fromAsyncString == json)
             }
 
@@ -258,9 +258,9 @@ struct DeserializerTests {
                 #expect(json == -123.12)
                 let fromString = try JSON(deserializing: raw)
                 #expect(fromString == json)
-                let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+                let fromAsyncData = try await JSON.Deserialization.deserialize(data)
                 #expect(fromAsyncData == json)
-                let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+                let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
                 #expect(fromAsyncString == json)
             }
 
@@ -274,9 +274,9 @@ struct DeserializerTests {
                 #expect(json == 13000.0)
                 let fromString = try JSON(deserializing: raw)
                 #expect(fromString == json)
-                let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+                let fromAsyncData = try await JSON.Deserialization.deserialize(data)
                 #expect(fromAsyncData == json)
-                let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+                let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
                 #expect(fromAsyncString == json)
             }
 
@@ -290,9 +290,9 @@ struct DeserializerTests {
                 #expect(json == 0.012)
                 let fromString = try JSON(deserializing: raw)
                 #expect(fromString == json)
-                let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+                let fromAsyncData = try await JSON.Deserialization.deserialize(data)
                 #expect(fromAsyncData == json)
-                let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+                let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
                 #expect(fromAsyncString == json)
             }
 
@@ -313,9 +313,9 @@ struct DeserializerTests {
             #expect(json == "abcdefghijklmnopqrstuvwxyz")
             let fromString = try JSON(deserializing: raw)
             #expect(fromString == json)
-            let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data)
             #expect(fromAsyncData == json)
-            let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
             #expect(fromAsyncString == json)
         }
 
@@ -329,9 +329,9 @@ struct DeserializerTests {
             #expect(json == #"""#)
             let fromString = try JSON(deserializing: raw)
             #expect(fromString == json)
-            let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data)
             #expect(fromAsyncData == json)
-            let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
             #expect(fromAsyncString == json)
         }
 
@@ -345,9 +345,9 @@ struct DeserializerTests {
             #expect(json == #"\"#)
             let fromString = try JSON(deserializing: raw)
             #expect(fromString == json)
-            let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data)
             #expect(fromAsyncData == json)
-            let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
             #expect(fromAsyncString == json)
         }
 
@@ -361,9 +361,9 @@ struct DeserializerTests {
             #expect(json == "/")
             let fromString = try JSON(deserializing: raw)
             #expect(fromString == json)
-            let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data)
             #expect(fromAsyncData == json)
-            let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
             #expect(fromAsyncString == json)
         }
 
@@ -377,9 +377,25 @@ struct DeserializerTests {
             #expect(json == "\u{0008}")
             let fromString = try JSON(deserializing: raw)
             #expect(fromString == json)
-            let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data)
             #expect(fromAsyncData == json)
-            let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
+            #expect(fromAsyncString == json)
+        }
+
+        @Test("Escaped Tab Deserialization")
+        func tab() async throws {
+            let raw = #"""
+            "\t"
+            """#
+            let data = try #require(raw.data(using: .utf8))
+            let json = try JSON(data)
+            #expect(json == "\u{0009}")
+            let fromString = try JSON(deserializing: raw)
+            #expect(fromString == json)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data)
+            #expect(fromAsyncData == json)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
             #expect(fromAsyncString == json)
         }
 
@@ -393,9 +409,9 @@ struct DeserializerTests {
             #expect(json == "\u{000C}")
             let fromString = try JSON(deserializing: raw)
             #expect(fromString == json)
-            let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data)
             #expect(fromAsyncData == json)
-            let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
             #expect(fromAsyncString == json)
         }
 
@@ -409,9 +425,9 @@ struct DeserializerTests {
             #expect(json == "\n")
             let fromString = try JSON(deserializing: raw)
             #expect(fromString == json)
-            let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data)
             #expect(fromAsyncData == json)
-            let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
             #expect(fromAsyncString == json)
         }
 
@@ -425,9 +441,9 @@ struct DeserializerTests {
             #expect(json == "\u{000D}")
             let fromString = try JSON(deserializing: raw)
             #expect(fromString == json)
-            let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data)
             #expect(fromAsyncData == json)
-            let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
             #expect(fromAsyncString == json)
         }
 
@@ -441,9 +457,9 @@ struct DeserializerTests {
             #expect(json == "é")
             let fromString = try JSON(deserializing: raw)
             #expect(fromString == json)
-            let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data)
             #expect(fromAsyncData == json)
-            let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
             #expect(fromAsyncString == json)
         }
 
@@ -457,9 +473,9 @@ struct DeserializerTests {
             #expect(json == "🚗")
             let fromString = try JSON(deserializing: raw)
             #expect(fromString == json)
-            let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data)
             #expect(fromAsyncData == json)
-            let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
             #expect(fromAsyncString == json)
         }
 
@@ -478,9 +494,9 @@ struct DeserializerTests {
             #expect(json == [])
             let fromString = try JSON(deserializing: raw)
             #expect(fromString == json)
-            let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data)
             #expect(fromAsyncData == json)
-            let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
             #expect(fromAsyncString == json)
         }
 
@@ -494,9 +510,9 @@ struct DeserializerTests {
             #expect(json == ["a"])
             let fromString = try JSON(deserializing: raw)
             #expect(fromString == json)
-            let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data)
             #expect(fromAsyncData == json)
-            let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
             #expect(fromAsyncString == json)
         }
 
@@ -510,9 +526,9 @@ struct DeserializerTests {
             #expect(json == ["a", "b", "c"])
             let fromString = try JSON(deserializing: raw)
             #expect(fromString == json)
-            let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data)
             #expect(fromAsyncData == json)
-            let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
             #expect(fromAsyncString == json)
         }
 
@@ -530,9 +546,9 @@ struct DeserializerTests {
             #expect(json == ["a", "b", "c"])
             let fromString = try JSON(deserializing: raw)
             #expect(fromString == json)
-            let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data)
             #expect(fromAsyncData == json)
-            let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
             #expect(fromAsyncString == json)
         }
 
@@ -551,9 +567,9 @@ struct DeserializerTests {
             #expect(json == [:])
             let fromString = try JSON(deserializing: raw)
             #expect(fromString == json)
-            let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data)
             #expect(fromAsyncData == json)
-            let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
             #expect(fromAsyncString == json)
         }
 
@@ -567,9 +583,9 @@ struct DeserializerTests {
             #expect(json == ["foo": true])
             let fromString = try JSON(deserializing: raw)
             #expect(fromString == json)
-            let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data)
             #expect(fromAsyncData == json)
-            let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
             #expect(fromAsyncString == json)
         }
 
@@ -583,9 +599,9 @@ struct DeserializerTests {
             #expect(json == ["foo": true, "bar": nil])
             let fromString = try JSON(deserializing: raw)
             #expect(fromString == json)
-            let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data)
             #expect(fromAsyncData == json)
-            let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
             #expect(fromAsyncString == json)
         }
 
@@ -595,13 +611,13 @@ struct DeserializerTests {
             {"foo":true,"bar":null}
             """#
             let data = try #require(raw.data(using: .utf8))
-            let json = try JSON.Deserializer.object(from: data, options: .omitNullKeys)
+            let json = try JSON.Deserialization.object(from: data, options: .omitNullKeys)
             #expect(json == ["foo": true])
-            let fromString = try JSON.Deserializer.object(from: raw, options: .omitNullKeys)
+            let fromString = try JSON.Deserialization.object(from: raw, options: .omitNullKeys)
             #expect(fromString == json)
-            let fromAsyncData = try await JSON.Deserializer.deserialize(data, options: .omitNullKeys)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data, options: .omitNullKeys)
             #expect(fromAsyncData == json)
-            let fromAsyncString = try await JSON.Deserializer.deserialize(raw, options: .omitNullKeys)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw, options: .omitNullKeys)
             #expect(fromAsyncString == json)
         }
 
@@ -618,9 +634,9 @@ struct DeserializerTests {
             #expect(json == ["foo": true, "bar": false])
             let fromString = try JSON(deserializing: raw)
             #expect(fromString == json)
-            let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data)
             #expect(fromAsyncData == json)
-            let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
             #expect(fromAsyncString == json)
         }
 
@@ -671,9 +687,9 @@ struct DeserializerTests {
         ])
         let fromString = try JSON(deserializing: raw)
         #expect(fromString == json)
-        let fromAsyncData = try await JSON.Deserializer.deserialize(data)
+        let fromAsyncData = try await JSON.Deserialization.deserialize(data)
         #expect(fromAsyncData == json)
-        let fromAsyncString = try await JSON.Deserializer.deserialize(raw)
+        let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
         #expect(fromAsyncString == json)
     }
 
@@ -684,7 +700,7 @@ struct DeserializerTests {
         func unsupportedBOM() throws {
             let data = Data([0xEF, 0xBB, 0xBF, 0x7B, 0x7D])
             #expect(throws: JSONDeserializationError.parseFailure("Invalid character")) {
-                _ = try JSON.Deserializer.object(from: data, options: [])
+                _ = try JSON.Deserialization.object(from: data, options: [])
             }
         }
 

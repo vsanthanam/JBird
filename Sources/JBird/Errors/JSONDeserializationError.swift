@@ -29,9 +29,6 @@ public enum JSONDeserializationError: Error, Equatable, Sendable, CustomStringCo
 
     // MARK: - Cases
 
-    /// Thrown when attempting to deserialize a Swift string that cannot be encoded in UTF-8
-    case invalidUTF8String
-
     /// Thrown when a malformed JSON payload is deserialized
     case parseFailure(String)
 
@@ -45,8 +42,6 @@ public enum JSONDeserializationError: Error, Equatable, Sendable, CustomStringCo
 
     public var description: String {
         switch self {
-        case .invalidUTF8String:
-            "Invalid UTF-8 string"
         case let .parseFailure(message):
             "JSON Parse error: \(message)"
         case .illegalFragment:
