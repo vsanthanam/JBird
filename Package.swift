@@ -43,13 +43,13 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "JBirdCore",
+            name: "JBirdParser",
             publicHeadersPath: "include"
         ),
         .target(
             name: "JBird",
             dependencies: [
-                "JBirdCore"
+                "JBirdParser"
             ]
         ),
         .testTarget(
