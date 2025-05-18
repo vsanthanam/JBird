@@ -1,5 +1,5 @@
 // JBird
-// Serializer.swift
+// Serialization.swift
 //
 // MIT License
 //
@@ -29,7 +29,7 @@ import Foundation
 extension JSON {
 
     /// A namespace for JSON serialization functions
-    public enum Serializer {
+    public enum Serialization {
 
         /// The availabile options when serializing a `JSON` value into a byte buffer or Swift string
         public struct Options: OptionSet, Equatable, Hashable, Sendable {
@@ -89,7 +89,7 @@ extension JSON {
             from json: JSON,
             options: Options = .default
         ) throws -> Data {
-            try startSerialization(from: json, options: options, cancellable: false)
+            try startSerialization(from: json, options: options, isAsync: false)
         }
 
         public static func serialize<T>(
@@ -101,7 +101,7 @@ extension JSON {
             return try startSerialization(
                 from: json,
                 options: options,
-                cancellable: true
+                isAsync: true
             )
         }
 
@@ -123,7 +123,7 @@ extension JSON {
         private static func startSerialization(
             from json: JSON,
             options: Options,
-            cancellable: Bool
+            isAsync: Bool
         ) throws -> Data {
             var bytes = [UInt8]()
             if !options.contains(.allowFragments) {
@@ -135,48 +135,48 @@ extension JSON {
                 }
             }
             if options.contains(.includeByteOrderMark) {
-                serializeBOM(into: &bytes)
+                writeBOM(&bytes)
             }
-            try serialize(json: json, into: &bytes, level: options.contains(.prettyPrinted) ? 0 : nil, options: options, cancellable: cancellable)
+            try write(json: json, options: options, isAsync: isAsync, options.contains(.prettyPrinted) ? 0 : nil, &bytes)
             return Data(bytes)
         }
 
         @inline(__always)
-        private static func serializeBOM(
-            into bytes: inout [UInt8]
+        private static func writeBOM(
+            _ bytes: inout [UInt8]
         ) {
             bytes += [0xEF, 0xBB, 0xBF]
         }
 
         @inline(__always)
-        private static func serialize(
+        private static func write(
             json: JSON,
-            into bytes: inout [UInt8],
-            level: Int?,
             options: Options,
-            cancellable: Bool
+            isAsync: Bool,
+            _ level: Int?,
+            _ bytes: inout [UInt8]
         ) throws {
-            if cancellable {
+            if isAsync {
                 try Task.checkCancellation()
             }
             switch json {
             case let .literal(literal):
-                serialize(literal: literal, into: &bytes)
+                write(literal: literal, &bytes)
             case let .object(object):
-                try serialize(object: object, into: &bytes, level: level, options: options, cancellable: cancellable)
+                try write(object: object, options: options, isAsync: isAsync, level, &bytes)
             case let .array(array):
-                try serialize(array: array, into: &bytes, level: level, options: options, cancellable: cancellable)
+                try write(array: array, options: options, isAsync: isAsync, level, &bytes)
             case let .numeric(numeric):
-                try serialize(numeric: numeric, into: &bytes)
+                try write(numeric: numeric, &bytes)
             case let .string(string):
-                serialize(string: string, into: &bytes)
+                write(string: string, &bytes)
             }
         }
 
         @inline(__always)
-        private static func serialize(
+        private static func write(
             literal: Literal,
-            into bytes: inout [UInt8]
+            _ bytes: inout [UInt8]
         ) {
             switch literal {
             case .true:
@@ -189,31 +189,31 @@ extension JSON {
         }
 
         @inline(__always)
-        private static func serialize(
+        private static func write(
             numeric: Numeric,
-            into bytes: inout [UInt8]
+            _ bytes: inout [UInt8]
         ) throws {
             switch numeric {
             case let .int(value):
-                serialize(integer: value, into: &bytes)
+                write(integer: value, &bytes)
             case let .double(value):
-                try serialize(double: value, into: &bytes)
+                try write(double: value, &bytes)
             }
         }
 
         @inline(__always)
-        private static func serialize(
+        private static func write(
             integer: Int,
-            into bytes: inout [UInt8]
+            _ bytes: inout [UInt8]
         ) {
             let str = String(integer)
             bytes += Swift.Array(str.utf8)
         }
 
         @inline(__always)
-        private static func serialize(
+        private static func write(
             double: Double,
-            into bytes: inout [UInt8]
+            _ bytes: inout [UInt8]
         ) throws {
             guard double == double,
                   double != .infinity,
@@ -235,9 +235,9 @@ extension JSON {
         }
 
         @inline(__always)
-        private static func serialize(
+        private static func write(
             string: String,
-            into bytes: inout [UInt8]
+            _ bytes: inout [UInt8]
         ) {
             bytes.append(UInt8(ascii: "\""))
             for scalar in string.unicodeScalars {
@@ -275,12 +275,12 @@ extension JSON {
         }
 
         @inline(__always)
-        private static func serialize(
+        private static func write(
             array: Array,
-            into bytes: inout [UInt8],
-            level: Int?,
             options: Options,
-            cancellable: Bool
+            isAsync: Bool,
+            _ level: Int?,
+            _ bytes: inout [UInt8]
         ) throws {
             bytes += [0x5B]
 
@@ -295,11 +295,11 @@ extension JSON {
 
             for value in array.dropLast() {
                 if let level {
-                    addIndentation(level: level + 1, into: &bytes)
-                    try serialize(json: value, into: &bytes, level: level + 1, options: options, cancellable: cancellable)
+                    writeIndentation(level + 1, &bytes)
+                    try write(json: value, options: options, isAsync: isAsync, level + 1, &bytes)
                     bytes += [0x2C, 0x0A]
                 } else {
-                    try serialize(json: value, into: &bytes, level: level, options: options, cancellable: cancellable)
+                    try write(json: value, options: options, isAsync: isAsync, level, &bytes)
                     bytes += [0x2C]
                 }
 
@@ -307,27 +307,27 @@ extension JSON {
 
             if let lastValue = array.last {
                 if let level {
-                    addIndentation(level: level + 1, into: &bytes)
-                    try serialize(json: lastValue, into: &bytes, level: level + 1, options: options, cancellable: cancellable)
+                    writeIndentation(level + 1, &bytes)
+                    try write(json: lastValue, options: options, isAsync: isAsync, level + 1, &bytes)
                     bytes += [0x0A]
                 } else {
-                    try serialize(json: lastValue, into: &bytes, level: 1, options: options, cancellable: cancellable)
+                    try write(json: lastValue, options: options, isAsync: isAsync, level, &bytes)
                 }
             }
 
             if let level {
-                addIndentation(level: level, into: &bytes)
+                writeIndentation(level, &bytes)
             }
 
             bytes += [0x5D]
         }
 
-        static func serialize(
+        static func write(
             object: Object,
-            into bytes: inout [UInt8],
-            level: Int?,
             options: Options,
-            cancellable: Bool
+            isAsync: Bool,
+            _ level: Int?,
+            _ bytes: inout [UInt8]
         ) throws {
             bytes += [0x7B]
 
@@ -345,15 +345,15 @@ extension JSON {
                 let value = object[key].unsafelyUnwrapped
                 if value != .null || !options.contains(.omitNullKeys) {
                     if let level {
-                        addIndentation(level: level + 1, into: &bytes)
-                        serialize(string: key, into: &bytes)
+                        writeIndentation(level + 1, &bytes)
+                        write(string: key, &bytes)
                         bytes += [0x3A, 0x20]
-                        try serialize(json: value, into: &bytes, level: level + 1, options: options, cancellable: cancellable)
+                        try write(json: value, options: options, isAsync: isAsync, level + 1, &bytes)
                         bytes += [0x2C, 0x0A]
                     } else {
-                        serialize(string: key, into: &bytes)
+                        write(string: key, &bytes)
                         bytes += [0x3A]
-                        try serialize(json: value, into: &bytes, level: level, options: options, cancellable: cancellable)
+                        try write(json: value, options: options, isAsync: isAsync, level, &bytes)
                         bytes += [0x2C]
                     }
                 }
@@ -363,29 +363,29 @@ extension JSON {
                 let value = object[key].unsafelyUnwrapped
                 if value != .null || !options.contains(.omitNullKeys) {
                     if let level {
-                        addIndentation(level: level + 1, into: &bytes)
-                        serialize(string: key, into: &bytes)
+                        writeIndentation(level + 1, &bytes)
+                        write(string: key, &bytes)
                         bytes += [0x3A, 0x20]
-                        try serialize(json: value, into: &bytes, level: level + 1, options: options, cancellable: cancellable)
+                        try write(json: value, options: options, isAsync: isAsync, level + 1, &bytes)
                         bytes += [0x0A]
                     } else {
-                        serialize(string: key, into: &bytes)
+                        write(string: key, &bytes)
                         bytes += [0x3A]
-                        try serialize(json: value, into: &bytes, level: level, options: options, cancellable: cancellable)
+                        try write(json: value, options: options, isAsync: isAsync, level, &bytes)
                     }
                 }
             }
 
             if let level {
-                addIndentation(level: level, into: &bytes)
+                writeIndentation(level, &bytes)
             }
 
             bytes += [0x7D]
         }
 
-        private static func addIndentation(
-            level: Int,
-            into bytes: inout [UInt8]
+        private static func writeIndentation(
+            _ level: Int,
+            _ bytes: inout [UInt8]
         ) {
             for _ in 0..<(level * 2) {
                 bytes += [0x20]

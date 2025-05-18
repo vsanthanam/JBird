@@ -116,13 +116,13 @@
 
 - ``init(_:)-(Data)``
 - ``init(deserializing:)``
-- ``Deserializer``
+- ``Deserialization``
 
 ### Serialization
 
 - ``serialize()``
 - ``stringify()``
-- ``Serializer``
+- ``Serialization``
 
 ### Result Builders
 

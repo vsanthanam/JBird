@@ -44,7 +44,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     public init(
         _ data: Data
     ) throws {
-        self = try Deserializer.object(from: data)
+        self = try Deserialization.object(from: data)
     }
 
     /// Create a `JSON` value by deserializing a Swift string
@@ -52,7 +52,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     public init(
         deserializing string: String
     ) throws {
-        self = try Deserializer.object(from: string)
+        self = try Deserialization.object(from: string)
     }
 
     /// Create a JSON object declaratively
@@ -953,13 +953,13 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Serialize the JSON object to a byte buffer
     /// - Returns: The serialized byte buffe
     public func serialize() throws -> Data {
-        try Serializer.data(from: self)
+        try Serialization.data(from: self)
     }
 
     /// Produce a string representation of the JSON object
     /// - Returns: The serialized string
     public func stringify() throws -> String {
-        try Serializer.string(from: self)
+        try Serialization.string(from: self)
     }
 
     /// Write the JSON model to disk
@@ -971,7 +971,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     @discardableResult
     public func write(
         fileURL: URL,
-        options: JSON.Serializer.Options = .default,
+        options: JSON.Serialization.Options = .default,
         shouldOverwrite: Bool = false
     ) async throws -> Data {
         if FileManager.default.fileExists(atPath: fileURL.path()) {
@@ -983,7 +983,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             }
         }
 
-        let data = try await Serializer.serialize(self, options: options)
+        let data = try Serialization.data(from: self, options: options)
         try data.write(to: fileURL, options: .withoutOverwriting)
         try Task.checkCancellation()
         return data
