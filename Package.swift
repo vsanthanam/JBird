@@ -44,19 +44,22 @@ let package = Package(
     targets: [
         .target(
             name: "JBirdParser",
+            path: "JBirdParser",
             publicHeadersPath: "include"
         ),
         .target(
             name: "JBird",
             dependencies: [
                 "JBirdParser"
-            ]
+            ],
+            path: "JBird"
         ),
         .testTarget(
             name: "JBirdTests",
             dependencies: [
                 "JBird"
-            ]
+            ],
+            path: "JBirdTests"
         ),
         .target(
             name: "JBirdMacros",
@@ -64,6 +67,7 @@ let package = Package(
                 "JBirdCompilerPlugin",
                 "JBird"
             ],
+            path: "JBirdMacros",
             swiftSettings: [
                 .enableUpcomingFeature("StrictConcurrency=complete")
             ]
@@ -73,6 +77,7 @@ let package = Package(
             dependencies: [
                 "JBirdMacros"
             ],
+            path: "JBirdMacrosTests",
             swiftSettings: [
                 .enableUpcomingFeature("StrictConcurrency=complete")
             ]
@@ -89,6 +94,7 @@ let package = Package(
                     package: "swift-syntax"
                 )
             ],
+            path: "JBirdCompilerPlugin",
             swiftSettings: [
                 .enableUpcomingFeature("StrictConcurrency=complete")
             ]
@@ -102,6 +108,7 @@ let package = Package(
                     package: "swift-syntax"
                 )
             ],
+            path: "JBirdCompilerPluginTests",
             swiftSettings: [
                 .enableUpcomingFeature("StrictConcurrency=complete")
             ]
