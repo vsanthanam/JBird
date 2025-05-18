@@ -186,12 +186,7 @@ extension JSON {
                             dict[key] = value
                         }
                     }
-
-                    if options.contains(.omitNullKeys) {
-                        return .object(dict.filter { $0.value != nil })
-                    } else {
-                        return .object(dict)
-                    }
+                    return .object(dict)
 
                 default:
                     throw JSONDeserializationError.unknown
