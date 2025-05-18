@@ -25,14 +25,24 @@
 
 /// An error thrown when serializing ``JSON`` into a Swift string or UTF-8 encoded byte buffer
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-public enum JSONSerializationError: Error {
+public enum JSONSerializationError: Error, CustomStringConvertible {
+
+    // MARK: - Cases
 
     /// Thrown when serializing an invalid floating point value, e.g. infinity
     case invalidFloat
 
-    /// Thrown when serialized byte buffer cannot be expressed as a Swift string
-    case utf8conversionFailure
-
     /// Thrown when attempting to serialize a leaf JSON fragment without options that allow it
-    case invalidFragment
+    case illegalFragment
+
+    // MARK: - CustomStringConvertible
+
+    public var description: String {
+        switch self {
+        case .invalidFloat:
+            "Invalid floating point value"
+        case .illegalFragment:
+            "Attemped to serialize a JSON fragment without required `fragmentsAllowed` option"
+        }
+    }
 }

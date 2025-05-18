@@ -1,5 +1,5 @@
 // JBird
-// JSONDeserializationError.swift
+// JSONDeserializationErrorTests.swift
 //
 // MIT License
 //
@@ -23,32 +23,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-/// An error thrown when deserialzing a Swift string or UTF-8 encoded byte buffer
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-public enum JSONDeserializationError: Error, Equatable, Sendable, CustomStringConvertible {
+import JBird
+import Testing
 
-    // MARK: - Cases
-
-    /// Thrown when a malformed JSON payload is deserialized
-    case parseFailure(String)
-
-    /// Thrown when an unknown error occurs during deserialization
-    case illegalFragment
-
-    /// An unknown deserialization error
-    case unknown
-
-    // MARK: - API
-
-    public var description: String {
-        switch self {
-        case let .parseFailure(message):
-            "JSON Parse error: \(message)"
-        case .illegalFragment:
-            "JSON fragment cannot be deserialized"
-        case .unknown:
-            "Unknown deserialization error"
-        }
-    }
-
+@Test("JSONDeserializationError Descriptions")
+func testJSONDeserializationErrorDescriptions() {
+    let parseFailure = JSONDeserializationError.parseFailure("My Foo Message!")
+    #expect(parseFailure.description == "JSON Parse error: My Foo Message!")
+    let illegalFragment = JSONDeserializationError.illegalFragment
+    #expect(illegalFragment.description == "JSON fragment cannot be deserialized")
+    let unknown = JSONDeserializationError.unknown
+    #expect(unknown.description == "Unknown deserialization error")
 }
