@@ -992,30 +992,52 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Retreive a value from the JSON object using a specified subscript
     /// - Parameter subscript: A subscript to use for lookup
     /// - Returns: The JSON value at the specified subscript
-    /// - Warning: This subscript is unsafe and should only be used when you are sure the subscript exists. A missing subscript will result in a runtime failure.
     public subscript(
         _ subscript: Subscript
     ) -> JSON {
-        get {
-            try! value(forSubscript: `subscript`)
-        }
-        set {
-            try! setValue(newValue, forSubscript: `subscript`)
+        get throws {
+            try value(forSubscript: `subscript`)
         }
     }
 
     /// Retreive a value from the JSON object using a specified subscript
     /// - Parameter subscript: A subscript to use for lookup
     /// - Returns: The JSON value at the specified subscript
-    /// - Warning: This subscript is unsafe and should only be used when you are sure the subscript exists. A missing subscript will result in a runtime failure.
     public subscript(
         _ subscript: some JSONSubscriptConvertible
     ) -> JSON {
-        get {
-            try! value(forSubscript: `subscript`)
+        get throws {
+            try value(forSubscript: `subscript`)
         }
-        set {
-            try! setValue(newValue, forSubscript: `subscript`)
+    }
+
+    /// Retreive a value from the JSON object using a specified subscript
+    /// - Parameters:
+    ///   - subscript: A subscript to use for lookup
+    ///   - type: The Swift type to decode into
+    /// - Returns: The value at the specified subscript
+    @_disfavoredOverload
+    public subscript<T>(
+        _ subscript: Subscript,
+        as type: T.Type = T.self
+    ) -> T where T: JSONDecodable {
+        get throws {
+            try self[`subscript`].decode(into: type)
+        }
+    }
+
+    /// Retreive a value from the JSON object using a specified subscript
+    /// - Parameters:
+    ///   - subscript: A subscript to use for lookup
+    ///   - type: The Swift type to decode into
+    /// - Returns: The value at the specified subscript
+    @_disfavoredOverload
+    public subscript<T>(
+        _ subscript: some JSONSubscriptConvertible,
+        as type: T.Type = T.self
+    ) -> T where T: JSONDecodable {
+        get throws {
+            try self[`subscript`].decode(into: type)
         }
     }
 

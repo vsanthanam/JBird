@@ -202,11 +202,11 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
             .map { name, key, omitIfNil in
                 if omitIfNil {
                     """
-                    self.\(name) = try (try? json.value(forSubscript: \"\(key)\"))?.decode() ?? nil
+                    self.\(name) = try? json[\"\(key)\"]
                     """
                 } else {
                     """
-                    self.\(name) = try json.value(forSubscript: \"\(key)\").decode()
+                    self.\(name) = try json[\"\(key)\"]
                     """
                 }
             }

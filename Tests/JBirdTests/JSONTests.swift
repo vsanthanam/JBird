@@ -405,19 +405,18 @@ struct JSONTests {
     }
 
     @Test("Subcript Tests")
-    func subscriptAccess() {
-        var json: JSON = [
+    func subscriptAccess() throws {
+        let json: JSON = [
             "foo": [1, 2, 3]
         ]
 
-        #expect(json["foo"][1] == 2)
-        #expect(json[.key("foo")][.index(1)] == 2)
+        #expect(try json["foo"][1] == 2)
+        #expect(try json[.key("foo")][.index(1)] == 2)
 
-        json["foo"][1] = 4
-        #expect(json == ["foo": [1, 4, 3]])
-
-        json[.key("foo")][.index(1)] = 5
-        #expect(json == ["foo": [1, 5, 3]])
+        let convertibleInt: Int = try json["foo"][1]
+        let subscriptInt: Int = try json[.key("foo")][.index(1)]
+        #expect(convertibleInt == 2)
+        #expect(subscriptInt == 2)
     }
 
     @Suite("Introspection Tests")

@@ -55,6 +55,8 @@
 - ``removeValue(forSubscript:)-(JSONSubscriptConvertible)``
 - ``subscript(_:)-(Subscript)``
 - ``subscript(_:)-(JSONSubscriptConvertible)``
+- ``subscript(_:as:)-(Subscript,_)``
+- ``subscript(_:as:)-(JSONSubscriptConvertible,_)``
 
 ### Working with JSON objects
 
