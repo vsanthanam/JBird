@@ -106,7 +106,7 @@ extension JSON {
         @inline(__always)
         private static func parse(
             _ data: Data,
-            _ cancellable: Bool,
+            _ isAsync: Bool,
             _ options: Options
         ) throws -> JSON {
             var jsonValue: OpaquePointer?
@@ -133,12 +133,12 @@ extension JSON {
             }
 
             @inline(__always)
-            func convertToJSON(
+            func materialize(
                 _ value: OpaquePointer,
-                _ cancellable: Bool,
+                _ isAsync: Bool,
                 _ options: Options
             ) throws -> JSON {
-                if cancellable {
+                if isAsync {
                     try Task.checkCancellation()
                 }
 
@@ -167,9 +167,8 @@ extension JSON {
                     array.reserveCapacity(count)
 
                     for i in 0..<count {
-                        if let element = json_get_array_element(value, i) {
-                            try array.append(convertToJSON(element, cancellable, options))
-                        }
+                        let element = json_get_array_element(value, i).unsafelyUnwrapped
+                        try array.append(materialize(element, isAsync, options))
                     }
 
                     return .array(array)
@@ -181,11 +180,10 @@ extension JSON {
 
                     for i in 0..<count {
                         let key = String(cString: json_get_object_key(value, i))
-                        if let objValue = json_get_object_value(value, i) {
-                            let value = try convertToJSON(objValue, cancellable, options)
-                            if !options.contains(.omitNullKeys) || !value.isNull {
-                                dict[key] = value
-                            }
+                        let objValue = json_get_object_value(value, i).unsafelyUnwrapped
+                        let value = try materialize(objValue, isAsync, options)
+                        if !options.contains(.omitNullKeys) || !value.isNull {
+                            dict[key] = value
                         }
                     }
 
@@ -200,7 +198,7 @@ extension JSON {
                 }
             }
 
-            let json = try convertToJSON(jsonValue, cancellable, options)
+            let json = try materialize(jsonValue, isAsync, options)
             if !options.contains(.fragmentsAllowed) {
                 switch json {
                 case .array, .object:
