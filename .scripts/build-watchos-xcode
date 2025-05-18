@@ -1,3 +1,13 @@
 #!/bin/bash
 
-xcodebuild -scheme JBird-Package -destination "OS=11.4,name=Apple Watch Series 10 (46mm)"
+xcodebuild \
+  -scheme JBird \
+  -configuration Release \
+  -sdk watchos \
+  -destination 'generic/platform=watchOS' \
+  BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
+  SKIP_INSTALL=NO \
+  CODE_SIGN_IDENTITY="" \
+  CODE_SIGNING_REQUIRED=NO \
+  CODE_SIGNING_ALLOWED=NO \
+  clean build

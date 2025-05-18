@@ -1,3 +1,13 @@
 #!/bin/bash
 
-xcodebuild -scheme JBird-Package -destination 'platform=macOS'
+xcodebuild \
+  -scheme JBird \
+  -configuration Release \
+  -sdk macosx \
+  -destination 'generic/platform=macOS' \
+  BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
+  SKIP_INSTALL=NO \
+  CODE_SIGN_IDENTITY="" \
+  CODE_SIGNING_REQUIRED=NO \
+  CODE_SIGNING_ALLOWED=NO \
+  clean build

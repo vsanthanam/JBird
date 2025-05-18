@@ -1,3 +1,13 @@
 #!/bin/bash
 
-xcodebuild -scheme JBird-Package -destination "OS=18.4,name=Apple TV 4K (3rd Generation)"
+xcodebuild \
+  -scheme JBird \
+  -configuration Release \
+  -sdk appletvos \
+  -destination 'generic/platform=tvOS' \
+  BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
+  SKIP_INSTALL=NO \
+  CODE_SIGN_IDENTITY="" \
+  CODE_SIGNING_REQUIRED=NO \
+  CODE_SIGNING_ALLOWED=NO \
+  clean build

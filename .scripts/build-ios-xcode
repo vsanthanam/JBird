@@ -1,3 +1,13 @@
 #!/bin/bash
 
-xcodebuild -scheme JBird-Package -sdk iphonesimulator -destination "OS=18.4,name=iPhone 16"
+xcodebuild \
+  -scheme JBird \
+  -configuration Release \
+  -sdk iphoneos \
+  -destination 'generic/platform=iOS' \
+  BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
+  SKIP_INSTALL=NO \
+  CODE_SIGN_IDENTITY="" \
+  CODE_SIGNING_REQUIRED=NO \
+  CODE_SIGNING_ALLOWED=NO \
+  clean build
