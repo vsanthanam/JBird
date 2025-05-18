@@ -66,11 +66,8 @@ extension JSON {
             from string: String,
             options: Options = .default
         ) throws -> JSON {
-            guard let data = string.data(using: .utf8) else {
-                throw JSONDeserializationError.invalidUTF8String
-            }
-            return try object(
-                from: data,
+            try object(
+                from: string.data(using: .utf8)!,
                 options: options
             )
         }
@@ -86,19 +83,17 @@ extension JSON {
             _ data: Data,
             options: Options = .default
         ) async throws -> JSON {
-            let json = try parse(data, true, options)
-            try Task.checkCancellation()
-            return json
+            try parse(data, true, options)
         }
 
         public static func deserialize(
             _ string: String,
             options: Options = .default
         ) async throws -> JSON {
-            guard let data = string.data(using: .utf8) else {
-                throw JSONDeserializationError.invalidUTF8String
-            }
-            return try await deserialize(data, options: options)
+            try await deserialize(
+                string.data(using: .utf8)!,
+                options: options
+            )
         }
 
         // MARK: - Private
@@ -186,12 +181,7 @@ extension JSON {
                             dict[key] = value
                         }
                     }
-
-                    if options.contains(.omitNullKeys) {
-                        return .object(dict.filter { $0.value != nil })
-                    } else {
-                        return .object(dict)
-                    }
+                    return .object(dict)
 
                 default:
                     throw JSONDeserializationError.unknown
