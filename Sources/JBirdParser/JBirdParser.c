@@ -310,23 +310,6 @@ static const char* json_string_get(const json_string_t* str) {
     return str->is_small ? str->data.buf : str->data.ptr;
 }
 
-static void json_string_init_interned(json_string_t* str, const char* text, size_t len) {
-    if (!str) return;
-    
-    str->length = len;
-    
-    if (len < SMALL_STRING_SIZE) {
-        str->is_small = true;
-        if (text && len > 0) {
-            memcpy(str->data.buf, text, len);
-        }
-        str->data.buf[len] = '\0';
-    } else {
-        str->is_small = false;
-        str->data.ptr = (char*)text;
-    }
-}
-
 static bool json_scan_simple_string(json_parser_t* parser, const char** str_start, size_t* str_len) {
     size_t start_index = parser->index;
     size_t length = 0;
@@ -453,10 +436,6 @@ static json_value_t* json_create_object(json_memory_arena_t* arena) {
     }
     
     return value;
-}
-
-static void json_store_key(json_value_t* object, size_t index, const char* key, size_t key_len, json_memory_arena_t* arena) {
-    json_string_init(&object->data.object.keys[index], key, key_len, arena);
 }
 
 static json_error_t json_array_push(json_value_t* array, json_value_t* element, json_memory_arena_t* arena) {
@@ -798,16 +777,6 @@ static json_error_t json_parse_string_into_temp_buffer(json_parser_t* parser) {
         }
     }
     return JSON_UNEXPECTED_END_OF_INPUT;
-}
-
-static json_value_t* json_create_string_direct(json_memory_arena_t* arena, const uint8_t* str_data, size_t len) {
-    json_value_t* value = json_create_value_from_arena(arena);
-    if (!value) return NULL;
-    
-    value->type = JSON_STRING;
-    json_string_init(&value->data.string, (const char*)str_data, len, arena);
-    
-    return value;
 }
 
 static json_error_t json_parse_number(json_parser_t* parser, json_value_t** out_value) {
