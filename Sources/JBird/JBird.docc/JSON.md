@@ -24,6 +24,7 @@
 - ``stringValue``
 - ``arrayValue``
 - ``objectValue``
+- ``untyped``
 - ``decode(into:)``
 
 ### Inspecting JSON values
