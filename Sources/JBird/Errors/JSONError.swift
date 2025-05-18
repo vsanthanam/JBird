@@ -25,41 +25,58 @@
 
 import Foundation
 
+/// An error thrown when working with ``JSON`` types
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 public enum JSONError: Error, Equatable, Sendable, CustomStringConvertible {
 
     // MARK: - Cases
 
+    /// Thrown when a subscript is incompatible with a JSON model
     case invalidSubscript(JSON.Subscript)
 
+    /// Thrown when a key cannot be found in a JSON object
     case keyNotFound(String)
 
+    /// Thrown when an index is out of bounds of JSON array
     case indexOutOfBounds(Int)
 
+    /// Thrown when a JSON object cannot be converted into a Boolean value
     case illegalBoolConversion
 
+    /// Thrown when a JSON object cannot be converted into an array
     case illegalArrayConversion
 
+    /// Thrown when a JSON object cannot be converted into an object
     case illegalObjectConversion
 
+    /// Thrown when a JSON object cannot be converted into a literal
     case illegalLiteralConversion
 
+    /// Thrown when a JSON object cannot be converted into a numeric value
     case illegalNumericConversion
 
+    /// Thrown when a JSON object cannot be converted into a string
     case illegalStringConversion
 
+    /// Thrown when a JSON object cannot be converted into an integer
     case illegalIntConversion
 
+    /// Thrown when a JSON object cannot be converted into a double
     case illegalDoubleConversion
 
+    /// Thrown when a JSON object cannot be converted into a collection
     case illegalCollectionConversion
 
+    /// Thrown when a JSON object cannot be converted into a `RawRepresentable`
     case invalidRawRepresentable
 
+    /// Thrown when attempting to write a file to a URL which already contains a file or folder
     case fileExists(URL)
 
+    /// Thrown when a URL cannot be decoded from a JSON string
     case urlDecodingFailure(String)
 
+    /// Thrown when a UUID cannot be decoded from a JSON string
     case uuidDecodingFailure(String)
 
     // MARK: - CustomStringConvertible
