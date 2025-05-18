@@ -45,6 +45,9 @@ let package = Package(
         .target(
             name: "JBirdCore",
             publicHeadersPath: ".",
+            cSettings: [
+                .headerSearchPath(".")
+            ],
             swiftSettings: [
                 .enableUpcomingFeature("StrictConcurrency=complete")
             ]

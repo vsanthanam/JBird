@@ -292,6 +292,43 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         }
     }
 
+    /// The untyped representation of the JSON value
+    ///
+    /// This property returns the JSON value as a native Swift type:
+    /// - `true` and `false` literals are represented as `Bool`
+    /// - `null` literals are represented as `nil`
+    /// - Strings are represented as `String`
+    /// - Integers are represented as `Int`
+    /// - Floating point numbers are represented as `Double`
+    /// - Arrays are represented as `[Any?]`
+    /// - Objects are represented as `[String: Any?]`
+    public var untyped: Any? {
+        switch self {
+        case let .literal(literal):
+            switch literal {
+            case .true:
+                true
+            case .false:
+                false
+            case .null:
+                nil
+            }
+        case let .string(string):
+            string
+        case let .numeric(numeric):
+            switch numeric {
+            case let .int(int):
+                int
+            case let .double(double):
+                double
+            }
+        case let .array(array):
+            array.map(\.untyped)
+        case let .object(object):
+            object.mapValues(\.untyped)
+        }
+    }
+
     /// Decode the JSON value into a `JSONDecodable` type
     /// - Parameter type: The type to decode into
     /// - Returns: The decoded value
