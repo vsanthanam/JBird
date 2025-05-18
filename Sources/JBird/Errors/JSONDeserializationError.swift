@@ -35,6 +35,9 @@ public enum JSONDeserializationError: Error, Equatable, Sendable, CustomStringCo
     /// Thrown when a malformed JSON payload is deserialized
     case parseFailure(String)
 
+    /// Thrown when an unknown error occurs during deserialization
+    case illegalFragment
+
     /// An unknown deserialization error
     case unknown
 
@@ -46,6 +49,8 @@ public enum JSONDeserializationError: Error, Equatable, Sendable, CustomStringCo
             "Invalid UTF-8 string"
         case let .parseFailure(message):
             "JSON Parse error: \(message)"
+        case .illegalFragment:
+            "JSON fragment cannot be deserialized"
         case .unknown:
             "Unknown deserialization error"
         }

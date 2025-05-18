@@ -40,6 +40,9 @@ extension JSON {
             /// Whether or not null keys should be omitted from JSON objects when parsing
             public static let omitNullKeys = Options(rawValue: 1 << 0)
 
+            /// Whether or not the root value is allowed to be a fragment
+            public static let fragmentsAllowed = Options(rawValue: 1 << 1)
+
             /// Whether or not the the deserialized JSON is allowed to contain a UTF-8 byte order mark
             public static let allowByteOrderMark = Options(rawValue: 1 << 2)
 
@@ -47,7 +50,7 @@ extension JSON {
             public static let allowWhitespace = Options(rawValue: 1 << 3)
 
             /// The default set of options
-            public static let `default`: Options = [.allowByteOrderMark, .allowWhitespace]
+            public static let `default`: Options = [.fragmentsAllowed, .allowByteOrderMark, .allowWhitespace]
 
             // MARK: - OptionSet
 
@@ -197,8 +200,17 @@ extension JSON {
                 }
             }
 
-            return try convertToJSON(jsonValue, cancellable, options)
-
+            let json = try convertToJSON(jsonValue, cancellable, options)
+            if !options.contains(.fragmentsAllowed) {
+                switch json {
+                case .array, .object:
+                    return json
+                case .literal, .numeric, .string:
+                    throw JSONDeserializationError.illegalFragment
+                }
+            } else {
+                return json
+            }
         }
 
     }
