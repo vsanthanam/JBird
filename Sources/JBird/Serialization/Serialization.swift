@@ -52,7 +52,7 @@ extension JSON {
             public static let includeByteOrderMark = Options(rawValue: 1 << 4)
 
             /// Whether or not to escape characters outside the ASCII range.
-            public static let escapeNonAscii = Options(rawValue: 1 << 5)
+            public static let escapeNonASCII = Options(rawValue: 1 << 5)
 
             /// Whether or not characters outside the basic multi-lingual plane should be escaped
             public static let escapeSpecialCharacters = Options(rawValue: 1 << 6)
@@ -271,14 +271,14 @@ extension JSON {
                 case 0x20...0x7F:
                     bytes.append(UInt8(scalar.value))
                 case 0x80...0xFFFF:
-                    if options.contains(.escapeNonAscii) {
+                    if options.contains(.escapeNonASCII) {
                         let hex = String(format: "\\u%04X", scalar.value)
                         bytes.append(contentsOf: hex.utf8)
                     } else {
                         bytes.append(contentsOf: String(scalar).utf8)
                     }
                 default:
-                    if options.contains(.escapeSpecialCharacters) {
+                    if options.contains(.escapeSpecialCharacters) || options.contains(.escapeNonASCII) {
                         let codepoint = scalar.value - 0x10000
                         let high = 0xD800 + (codepoint >> 10)
                         let low = 0xDC00 + (codepoint & 0x3FF)
@@ -328,7 +328,7 @@ extension JSON {
                     try serialize(json: lastValue, into: &bytes, level: level + 1, options: options, isAsync: isAsync)
                     bytes += [0x0A]
                 } else {
-                    try serialize(json: lastValue, into: &bytes, level: 1, options: options, isAsync: isAsync)
+                    try serialize(json: lastValue, into: &bytes, level: nil, options: options, isAsync: isAsync)
                 }
             }
 
@@ -358,43 +358,43 @@ extension JSON {
             }
 
             let usableObject: Object = if options.contains(.omitNullKeys) {
-                object.compactMapValues { value in value.isNull ? nil : value }
+                object.compactMapValues { value in value.isNull ? JSON?.none : value }
             } else {
                 object
+            }
+            if usableObject.isEmpty {
+                bytes += [0x7D]
+                return
             }
             let keys = options.contains(.sortedKeys) ? Swift.Array(usableObject.keys.sorted()) : Swift.Array(usableObject.keys)
             for key in keys.dropLast() {
                 let value = usableObject[key].unsafelyUnwrapped
-                if value != .null || !options.contains(.omitNullKeys) {
-                    if let level {
-                        addIndentation(level: level + 1, into: &bytes)
-                        serialize(string: key, options: options, into: &bytes)
-                        bytes += [0x3A, 0x20]
-                        try serialize(json: value, into: &bytes, level: level + 1, options: options, isAsync: isAsync)
-                        bytes += [0x2C, 0x0A]
-                    } else {
-                        serialize(string: key, options: options, into: &bytes)
-                        bytes += [0x3A]
-                        try serialize(json: value, into: &bytes, level: level, options: options, isAsync: isAsync)
-                        bytes += [0x2C]
-                    }
+                if let level {
+                    addIndentation(level: level + 1, into: &bytes)
+                    serialize(string: key, options: options, into: &bytes)
+                    bytes += [0x3A, 0x20]
+                    try serialize(json: value, into: &bytes, level: level + 1, options: options, isAsync: isAsync)
+                    bytes += [0x2C, 0x0A]
+                } else {
+                    serialize(string: key, options: options, into: &bytes)
+                    bytes += [0x3A]
+                    try serialize(json: value, into: &bytes, level: level, options: options, isAsync: isAsync)
+                    bytes += [0x2C]
                 }
             }
 
             if let key = keys.last {
-                let value = object[key].unsafelyUnwrapped
-                if value != .null || !options.contains(.omitNullKeys) {
-                    if let level {
-                        addIndentation(level: level + 1, into: &bytes)
-                        serialize(string: key, options: options, into: &bytes)
-                        bytes += [0x3A, 0x20]
-                        try serialize(json: value, into: &bytes, level: level + 1, options: options, isAsync: isAsync)
-                        bytes += [0x0A]
-                    } else {
-                        serialize(string: key, options: options, into: &bytes)
-                        bytes += [0x3A]
-                        try serialize(json: value, into: &bytes, level: level, options: options, isAsync: isAsync)
-                    }
+                let value = usableObject[key].unsafelyUnwrapped
+                if let level {
+                    addIndentation(level: level + 1, into: &bytes)
+                    serialize(string: key, options: options, into: &bytes)
+                    bytes += [0x3A, 0x20]
+                    try serialize(json: value, into: &bytes, level: level + 1, options: options, isAsync: isAsync)
+                    bytes += [0x0A]
+                } else {
+                    serialize(string: key, options: options, into: &bytes)
+                    bytes += [0x3A]
+                    try serialize(json: value, into: &bytes, level: nil, options: options, isAsync: isAsync)
                 }
             }
 

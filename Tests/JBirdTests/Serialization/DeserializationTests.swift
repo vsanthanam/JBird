@@ -463,7 +463,7 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
         }
 
-        @Test("Multi-lingual Plane External Escaped Unicode Scalar Deserialization")
+        @Test("Basic Multi-lingual Plane External Escaped Unicode Scalar Deserialization")
         func bmpExternalEscape() async throws {
             let raw = #"""
             "\uD83D\uDE97"
@@ -479,6 +479,37 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
         }
 
+        @Test("Ascii External Deserialization")
+        func asciiExternalEscape() async throws {
+            let raw = #"""
+            "café"
+            """#
+            let data = try #require(raw.data(using: .utf8))
+            let json = try JSON(data)
+            #expect(json == "café")
+            let fromString = try JSON(deserializing: raw)
+            #expect(fromString == json)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data)
+            #expect(fromAsyncData == json)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
+            #expect(fromAsyncString == json)
+        }
+
+        @Test("Basic Multi-lingual Plane External Deserialization")
+        func specialCharaceter() async throws {
+            let raw = #"""
+            {"key":"💨"}
+            """#
+            let data = try #require(raw.data(using: .utf8))
+            let json = try JSON(data)
+            #expect(json == ["key": "💨"])
+            let fromString = try JSON(deserializing: raw)
+            #expect(fromString == json)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data)
+            #expect(fromAsyncData == json)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
+            #expect(fromAsyncString == json)
+        }
     }
 
     @Suite("Array Deserialization Tests")
