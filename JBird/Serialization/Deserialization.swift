@@ -41,17 +41,20 @@ extension JSON {
 
             // MARK: - API
 
-            /// Whether or not null keys should be omitted from JSON objects when parsing
+            /// Whether or not JSON keys with `null` values should be omitted from JSON objects when parsing
             public static let omitNullKeys = Options(rawValue: 1 << 0)
 
+            /// Whether or not `null` values should be omitted when parsing
+            public static let omitNullValues = Options(rawValue: 1 << 1)
+
             /// Whether or not the root value is allowed to be a fragment
-            public static let fragmentsAllowed = Options(rawValue: 1 << 1)
+            public static let fragmentsAllowed = Options(rawValue: 1 << 2)
 
             /// Whether or not the the deserialized JSON is allowed to contain a UTF-8 byte order mark
-            public static let allowByteOrderMark = Options(rawValue: 1 << 2)
+            public static let allowByteOrderMark = Options(rawValue: 1 << 3)
 
             /// Whether or not the deserialized JSON is allowed to contain insignificant whitespace
-            public static let requireMinified = Options(rawValue: 1 << 3)
+            public static let requireMinified = Options(rawValue: 1 << 4)
 
             /// The default set of options
             public static let `default`: Options = [.fragmentsAllowed, .allowByteOrderMark]
@@ -160,7 +163,10 @@ extension JSON {
 
                     for i in 0..<count {
                         let element = json_get_array_element(value, i).unsafelyUnwrapped
-                        try array.append(materialize(element, isAsync, options))
+                        let value = try materialize(element, isAsync, options)
+                        if !options.contains(.omitNullValues) || !value.isNull {
+                            array.append(value)
+                        }
                     }
 
                     return .array(array)
@@ -173,7 +179,7 @@ extension JSON {
                         let key = String(cString: json_get_object_key(value, i))
                         let objValue = json_get_object_value(value, i).unsafelyUnwrapped
                         let value = try materialize(objValue, isAsync, options)
-                        if !options.contains(.omitNullKeys) || !value.isNull {
+                        if (!options.contains(.omitNullKeys) && !options.contains(.omitNullValues)) || !value.isNull {
                             dict[key] = value
                         }
                     }

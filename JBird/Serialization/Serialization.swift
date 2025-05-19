@@ -39,26 +39,29 @@ extension JSON {
             /// Whether or not the serialized JSON should include additional whitespace to improve readability
             public static let prettyPrinted = Options(rawValue: 1 << 0)
 
-            /// Whether or not null keys should be omitted from JSON objects
+            /// Whether or not JSON keys with `null` values should be omitted from the resulting JSON
             public static let omitNullKeys = Options(rawValue: 1 << 1)
 
+            /// Whether or not `null` values should be omitted from the resulting JSON
+            public static let omitNullValues = Options(rawValue: 1 << 2)
+
             /// Whether or not JSON keys should be sorted alphabetically
-            public static let sortedKeys = Options(rawValue: 1 << 2)
+            public static let sortedKeys = Options(rawValue: 1 << 3)
 
             /// Whether or not non-root JSON should be allowed
-            public static let fragmentsAllowed = Options(rawValue: 1 << 3)
+            public static let fragmentsAllowed = Options(rawValue: 1 << 4)
 
             /// Whether or not the serialized JSON should contain a UTF-8 byte order mark
-            public static let includeByteOrderMark = Options(rawValue: 1 << 4)
+            public static let includeByteOrderMark = Options(rawValue: 1 << 5)
 
             /// Whether or not to escape characters outside the ASCII range.
-            public static let escapeNonASCII = Options(rawValue: 1 << 5)
+            public static let escapeNonASCII = Options(rawValue: 1 << 6)
 
             /// Whether or not characters outside the basic multi-lingual plane should be escaped
-            public static let escapeSpecialCharacters = Options(rawValue: 1 << 6)
+            public static let escapeSpecialCharacters = Options(rawValue: 1 << 7)
 
             /// Whether or not to escape the forward slash character
-            public static let escapeForwardSlash = Options(rawValue: 1 << 7)
+            public static let escapeForwardSlash = Options(rawValue: 1 << 8)
 
             /// The default set of options
             public static let `default`: Options = [.fragmentsAllowed, .escapeSpecialCharacters]
@@ -134,6 +137,9 @@ extension JSON {
                 case .array, .object:
                     break
                 }
+            }
+            if options.contains(.omitNullValues), json.isNull {
+                throw JSONSerializationError.illegalFragment
             }
             var bytes = [UInt8]()
             if options.contains(.includeByteOrderMark) {
@@ -301,6 +307,12 @@ extension JSON {
         ) throws {
             bytes += [0x5B]
 
+            let realArray: [JSON] = if options.contains(.omitNullValues) {
+                array.compactMap { value in value.isNull ? JSON?.none : value }
+            } else {
+                array
+            }
+
             if array.isEmpty {
                 bytes += [0x5D]
                 return
@@ -310,7 +322,7 @@ extension JSON {
                 bytes += [0x0A] // Newline
             }
 
-            for value in array.dropLast() {
+            for value in realArray.dropLast() {
                 if let level {
                     addIndentation(level: level + 1, into: &bytes)
                     try serialize(json: value, into: &bytes, level: level + 1, options: options, isAsync: isAsync)
@@ -322,7 +334,7 @@ extension JSON {
 
             }
 
-            if let lastValue = array.last {
+            if let lastValue = realArray.last {
                 if let level {
                     addIndentation(level: level + 1, into: &bytes)
                     try serialize(json: lastValue, into: &bytes, level: level + 1, options: options, isAsync: isAsync)
@@ -357,7 +369,7 @@ extension JSON {
                 bytes += [0x0A] // Newline
             }
 
-            let usableObject: [String: JSON] = if options.contains(.omitNullKeys) {
+            let usableObject: [String: JSON] = if options.contains(.omitNullKeys) || options.contains(.omitNullValues) {
                 object.compactMapValues { value in value.isNull ? JSON?.none : value }
             } else {
                 object
