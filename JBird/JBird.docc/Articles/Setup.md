@@ -1,5 +1,10 @@
 # Project Setup
 
+@Metadata {
+    @PageKind(article)
+    @CallToAction(url: "https://www.github.com/vsanthanam/JBird", purpose: link, label: "View on GitHub")
+}
+
 Add JBird to an existing project
 
 ## Add to an Xcode Project via SPM
