@@ -11,6 +11,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   build-macos-spm:
+    name: Build JBird (macOS)
     runs-on: macos-15
     outputs:
       artifact-name: macos-build
@@ -29,6 +30,7 @@ jobs:
         name: macos-build
         path: build.zip
   test-macos-spm:
+    name: Test JBird (macOS)
     needs: build-macos-spm
     runs-on: macos-15
     steps:
@@ -46,6 +48,7 @@ jobs:
       - name: Test JBird
         run: swift test
   build-ubuntu-spm:
+    name: Build JBird (Ubuntu)
     runs-on: ubuntu-latest
     outputs:
       artifact-name: ubuntu-build
@@ -66,6 +69,7 @@ jobs:
           name: ubuntu-build
           path: build.zip
   test-ubuntu-spm:
+    name: Test JBird (Ubuntu)
     needs: build-ubuntu-spm
     runs-on: ubuntu-latest
     container:
