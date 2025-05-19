@@ -73,20 +73,14 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
 
     // MARK: - API
 
-    /// A JSON array
-    public typealias Array = [JSON]
-
-    /// A JSON object
-    public typealias Object = [String: JSON]
-
     /// A JSON literal value
     case literal(Literal)
 
     /// A JSON object
-    case object(Object)
+    case object([String: JSON])
 
     /// A JSON array
-    case array(Array)
+    case array([JSON])
 
     /// A JSON numeric value
     case numeric(Numeric)
@@ -141,7 +135,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// The JSON value as an object
-    public var objectValue: Object {
+    public var objectValue: [String: JSON] {
         get throws {
             switch self {
             case let .object(object):
@@ -153,7 +147,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// The JSON value as an array
-    public var arrayValue: Array {
+    public var arrayValue: [JSON] {
         get throws {
             switch self {
             case let .array(array):
@@ -670,7 +664,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameter predicate: A closure that takes a key-value pair of the JSON object as its argument and returns a Boolean value that indicates whether the passed element satisfies a condition.
     /// - Returns: `true` if the JSON object contains only key-value pairs that satisfy `predicate`; otherwise, `false`.
     public func allSatisfy(
-        _ predicate: (Object.Element) throws -> Bool
+        _ predicate: (Dictionary<String, JSON>.Element) throws -> Bool
     ) throws -> Bool {
         try objectValue.allSatisfy(predicate)
     }
@@ -702,7 +696,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameter transform: A mapping closure. `transform` accepts a JSON key-value pair as its parameter and returns a transformed value of the same or of a different type.
     /// - Returns: An array containing the transformed key-value pairs of this JSON object.
     public func map<T>(
-        _ transform: (Object.Element
+        _ transform: (Dictionary<String, JSON>.Element
         ) throws -> T) throws -> [T] {
         try objectValue.map(transform)
     }
@@ -729,7 +723,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameter transform: A closure that accepts a key-value pair of this JSON object as its argument and returns an optional value.
     /// - Returns: An array of the non-`nil` results of calling `transform` with each key-value pair of the JSON object.
     public func compactMap<ElementOfResult>(
-        _ transform: (Object.Element
+        _ transform: (Dictionary<String, JSON>.Element
         ) throws -> ElementOfResult?) throws -> [ElementOfResult] {
         try objectValue.compactMap(transform)
     }
@@ -759,14 +753,14 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
 
     public func reduce<Result>(
         _ initialResult: Result,
-        _ nextPartialResult: (Result, Object.Element) throws -> Result
+        _ nextPartialResult: (Result, Dictionary<String, JSON>.Element) throws -> Result
     ) throws -> Result {
         try objectValue.reduce(initialResult, nextPartialResult)
     }
 
     public func reduce<Result>(
         into initialResult: Result,
-        _ updateAccumulatingResult: (inout Result, Object.Element) throws -> Void
+        _ updateAccumulatingResult: (inout Result, Dictionary<String, JSON>.Element) throws -> Void
     ) throws -> Result {
         try objectValue.reduce(into: initialResult, updateAccumulatingResult)
     }
@@ -782,7 +776,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Calls the given closure on each key-value pair in the JSON object in the same order as a for-in loop.
     /// - Parameter body: The closure to call on each JSON key-value pair
     public func forEach(
-        _ body: (Object.Element) throws -> Void
+        _ body: (Dictionary<String, JSON>.Element) throws -> Void
     ) throws {
         try objectValue.forEach(body)
     }
@@ -927,7 +921,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameter isIncluded: A closure that takes a key-value pair as its argument and returns a Boolean value indicating whether the pair should be included in the returned JSON object.
     /// - Returns: The filtered JSON object
     public func filter(
-        _ isIncluded: (Object.Element) throws -> Bool
+        _ isIncluded: (Dictionary<String, JSON>.Element) throws -> Bool
     ) throws -> JSON {
         try .object(objectValue.filter(isIncluded))
     }

@@ -11,8 +11,6 @@
 
 - ``Literal``
 - ``Numeric``
-- ``Object``
-- ``Array``
 
 ### Decoding JSON values into Swift types
 
@@ -72,15 +70,15 @@
 - ``removeValue(forKey:)-(Key)``
 - ``merge(_:uniquingKeysWith:)``
 - ``merging(_:uniquingKeysWith:)``
-- ``filter(_:)-((Object.Element)->Bool)``
-- ``allSatisfy(_:)-((Object.Element)->Bool)``
-- ``map(_:)-((Object.Element)->T)``
+- ``filter(_:)-(([String:JSON].Element)->Bool)``
+- ``allSatisfy(_:)-(([String:JSON].Element)->Bool)``
+- ``map(_:)-(([String:JSON].Element)->T)``
 - ``mapValues(_:)``
-- ``compactMap(_:)-((Object.Element)->ElementOfResult?)``
+- ``compactMap(_:)-(([String:JSON].Element)->ElementOfResult?)``
 - ``compactMapValues(_:)``
-- ``reduce(into:_:)-(_,(Result,Object.Element)->Void)``
-- ``reduce(_:_:)-(_,(Result,Object.Element)->Result)``
-- ``forEach(_:)-((Object.Element)->Void)``
+- ``reduce(into:_:)-(_,(Result,[String:JSON].Element)->Void)``
+- ``reduce(_:_:)-(_,(Result,[String:JSON].Element)->Result)``
+- ``forEach(_:)-(([String:JSON].Element)->Void)``
 
 ### Working with JSON arrays
 
