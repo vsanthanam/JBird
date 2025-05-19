@@ -41,7 +41,7 @@ Then, add the dependency to your target:
 
 ### Optional Macros
 
-To avoid forcing a dependency [`swift-syntax`](https://github.com/swiftlang/swift-syntax), JBird does not include its macros by default. If you wish to include them in your project, you can do so by adding the following to your `Package.swift` file:
+To avoid forcing a dependency on [`swift-syntax`](https://github.com/swiftlang/swift-syntax), JBird does not include its macros by default. If you wish to include them in your project, you can do so by adding the following to your `Package.swift` file:
 
 ```swift
 .target(
@@ -52,7 +52,7 @@ To avoid forcing a dependency [`swift-syntax`](https://github.com/swiftlang/swif
 )
 ```
 
-Doing this will add the `@JSONCodable`, `@JSONKey`, and `@OmitIfNil` macros to your project, which can be used automatically add conformance to ``JSONCodable`` to your Swift types. For more information on how to use these macros, see the [documentation](https://usejbird.com/docs/documentation/jbird).
+Doing this will add the `@JSONCodable`, `@JSONKey`, and `@OmitIfNil` macros to your project, which can be used automatically add conformance to ``JSONCodable`` to your Swift types. For more information on how to use these macros, see the <doc:Macros>.
 
 ## Binary Distribution via XCFramework
 
