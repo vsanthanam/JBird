@@ -1,4 +1,6 @@
 name: Run Benchmarks
+permissions:
+  contents: read
 on:
   push:
     branches: [ "main" ]
