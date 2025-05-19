@@ -147,6 +147,9 @@ struct SerializationTests {
             #expect(asyncData == data)
             let asyncString = try await JSON.Serialization.stringify(json)
             #expect(asyncString == expected)
+            #expect(throws: JSONSerializationError.illegalFragment) {
+                try JSON.Serialization.data(from: json, options: [.omitNullValues, .fragmentsAllowed])
+            }
         }
 
     }
@@ -376,13 +379,13 @@ struct SerializationTests {
                 "baz": nil,
                 "qux": [
                     "a": nil,
-                    "b": [1, 2, 3]
+                    "b": [1, nil, 3]
                 ]
             ]
             let data = try JSON.Serialization.data(from: json, options: [.sortedKeys, .omitNullKeys])
             let str = try #require(String(data: data, encoding: .utf8))
             let expected = #"""
-            {"bar":false,"foo":true,"qux":{"b":[1,2,3]}}
+            {"bar":false,"foo":true,"qux":{"b":[1,null,3]}}
             """#
             #expect(str == expected)
             let stringified = try JSON.Serialization.string(from: json, options: [.sortedKeys, .omitNullKeys])
@@ -390,6 +393,31 @@ struct SerializationTests {
             let asyncData = try await JSON.Serialization.serialize(json, options: [.sortedKeys, .omitNullKeys])
             #expect(asyncData == data)
             let asyncString = try await JSON.Serialization.stringify(json, options: [.sortedKeys, .omitNullKeys])
+            #expect(asyncString == expected)
+        }
+
+        @Test("Object Serialization Without Null Values")
+        func omitNullValues() async throws {
+            let json: JSON = [
+                "foo": true,
+                "bar": false,
+                "baz": nil,
+                "qux": [
+                    "a": nil,
+                    "b": [1, nil, 3]
+                ]
+            ]
+            let data = try JSON.Serialization.data(from: json, options: [.sortedKeys, .omitNullValues])
+            let str = try #require(String(data: data, encoding: .utf8))
+            let expected = #"""
+            {"bar":false,"foo":true,"qux":{"b":[1,3]}}
+            """#
+            #expect(str == expected)
+            let stringified = try JSON.Serialization.string(from: json, options: [.sortedKeys, .omitNullValues])
+            #expect(stringified == expected)
+            let asyncData = try await JSON.Serialization.serialize(json, options: [.sortedKeys, .omitNullValues])
+            #expect(asyncData == data)
+            let asyncString = try await JSON.Serialization.stringify(json, options: [.sortedKeys, .omitNullValues])
             #expect(asyncString == expected)
         }
 
