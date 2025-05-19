@@ -12,6 +12,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   build-docc:
+    name: Build Documentation
     runs-on: macos-15
     outputs:
       artifact-name: docs
@@ -30,6 +31,7 @@ jobs:
           name: docs
           path: docs.zip
   build-jekyll:
+    name: Build Website
     needs: build-docc
     runs-on: ubuntu-latest
     steps:
@@ -54,6 +56,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
   deploy:
+    name: Deploy Website
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

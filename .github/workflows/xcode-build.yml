@@ -11,6 +11,10 @@ concurrency:
   cancel-in-progress: true
 jobs:
   build-macos-xcode:
+    strategy:
+      matrix:
+        platform: [macos, maccatalyst, ios, watchos, tvos, visionos]
+    name: Build JBird (${{ matrix.platform }})
     runs-on: macos-15
     steps:
     - name: Checkout
@@ -18,49 +22,4 @@ jobs:
     - name: Select Xcode Version
       run: ./.scripts/xcode-select
     - name: Build JBird
-      run: ./.scripts/build-macos-xcode
-  build-maccatalyst-xcode:
-    runs-on: macos-15
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Select Xcode Version
-      run: ./.scripts/xcode-select
-    - name: Build JBird
-      run: ./.scripts/build-maccatalyst-xcode
-  build-ios-xcode:
-    runs-on: macos-15
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Select Xcode Version
-      run: ./.scripts/xcode-select
-    - name: Build JBird
-      run: ./.scripts/build-ios-xcode
-  build-watchos-xcode:
-    runs-on: macos-15
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Select Xcode Version
-      run: ./.scripts/xcode-select
-    - name: Build JBird
-      run: ./.scripts/build-watchos-xcode
-  build-tvos-xcode:
-    runs-on: macos-15
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Select Xcode Version
-      run: ./.scripts/xcode-select
-    - name: Build JBird
-      run: ./.scripts/build-tvos-xcode
-  build-visionos-xcode:
-    runs-on: macos-15
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Select Xcode Version
-      run: ./.scripts/xcode-select
-    - name: Build JBird
-      run: ./.scripts/build-visionos-xcode
+      run: ./.scripts/build-${{ matrix.platform }}-xcode

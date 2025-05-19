@@ -6,6 +6,7 @@ permissions:
   contents: write
 jobs:
   build-xcframework:
+    name: Build XCFramework
     runs-on: macos-15
     outputs:
         artifact-name: JBird.xcframework.zip
@@ -22,6 +23,7 @@ jobs:
           name: JBird.xcframework.zip
           path: Products/JBird.xcframework.zip
   attach-xcframework:
+    name: Attach XCFramework to Release
     needs: build-xcframework
     runs-on: ubuntu-latest
     steps:
@@ -37,6 +39,7 @@ jobs:
         with:
           files: ./JBird.xcframework.zip
   build-docc-archive:
+    name: Build DocC Archive
     runs-on: macos-15
     outputs:
       artifact-name: archive
@@ -59,6 +62,7 @@ jobs:
           name: archive
           path: .build/plugins/Swift-DocC/outputs/JBird.doccarchive.zip
   attach-docc-archive:
+    name: Attach DocC Archive to Release
     needs: build-docc-archive
     runs-on: ubuntu-latest
     steps:

@@ -11,6 +11,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   run-benchmarks:
+    name: Run Benchmarks
     runs-on: macos-15
     steps:
       - name: Checkout

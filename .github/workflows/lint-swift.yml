@@ -11,6 +11,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   swiftformat:
+    name: Run SwiftFormat
     runs-on: macos-15
     steps:
     - name: Checkout
