@@ -25,56 +25,56 @@
 
 extension JSON {
 
-    /// A result builder for JSON Arrays
+    /// A result builder for JSON [JSON]s
     @resultBuilder
     public enum ArrayBuilder {
 
         public static func buildExpression(
             _ expression: JSON
-        ) -> Array {
+        ) -> [JSON] {
             [expression]
         }
 
         public static func buildExpression(
             _ expression: some JSONEncodable
-        ) -> Array {
+        ) -> [JSON] {
             [JSON(expression)]
         }
 
         public static func buildBlock(
-            _ components: Array...
-        ) -> Array {
+            _ components: [JSON]...
+        ) -> [JSON] {
             components
                 .flatMap(\.self)
         }
 
         public static func buildEither(
-            first component: Array
-        ) -> Array {
+            first component: [JSON]
+        ) -> [JSON] {
             component
         }
 
         public static func buildEither(
-            second component: Array
-        ) -> Array {
+            second component: [JSON]
+        ) -> [JSON] {
             component
         }
 
         public static func buildOptional(
-            _ component: Array?
-        ) -> Array {
+            _ component: [JSON]?
+        ) -> [JSON] {
             component ?? []
         }
 
         public static func buildArray(
-            _ components: [Array]
-        ) -> Array {
+            _ components: [[JSON]]
+        ) -> [JSON] {
             components
                 .flatMap(\.self)
         }
 
         public static func buildFinalResult(
-            _ component: Array
+            _ component: [JSON]
         ) -> JSON {
             .array(component)
         }

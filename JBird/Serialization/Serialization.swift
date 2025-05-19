@@ -293,7 +293,7 @@ extension JSON {
 
         @inline(__always)
         private static func serialize(
-            array: Array,
+            array: [JSON],
             into bytes: inout [UInt8],
             level: Int?,
             options: Options,
@@ -340,7 +340,7 @@ extension JSON {
         }
 
         static func serialize(
-            object: Object,
+            object: [String: JSON],
             into bytes: inout [UInt8],
             level: Int?,
             options: Options,
@@ -357,7 +357,7 @@ extension JSON {
                 bytes += [0x0A] // Newline
             }
 
-            let usableObject: Object = if options.contains(.omitNullKeys) {
+            let usableObject: [String: JSON] = if options.contains(.omitNullKeys) {
                 object.compactMapValues { value in value.isNull ? JSON?.none : value }
             } else {
                 object

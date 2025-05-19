@@ -155,7 +155,7 @@ extension JSON {
                     return .string(str)
                 case JSON_ARRAY:
                     let count = json_get_array_size(value)
-                    var array = Array()
+                    var array = [JSON]()
                     array.reserveCapacity(count)
 
                     for i in 0..<count {
@@ -166,7 +166,7 @@ extension JSON {
                     return .array(array)
                 case JSON_OBJECT:
                     let count = json_get_object_size(value)
-                    var dict = Object()
+                    var dict = [String: JSON]()
                     dict.reserveCapacity(count)
 
                     for i in 0..<count {
