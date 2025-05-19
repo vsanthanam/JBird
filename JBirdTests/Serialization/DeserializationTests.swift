@@ -185,6 +185,9 @@ struct DeserializationTests {
             #expect(fromAsyncData == json)
             let fromAsyncString = try await JSON.Deserialization.deserialize(raw)
             #expect(fromAsyncString == json)
+            #expect(throws: JSONDeserializationError.illegalFragment) {
+                try JSON.Deserialization.object(from: data, options: [.omitNullValues, .fragmentsAllowed])
+            }
         }
 
     }
@@ -636,19 +639,35 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
         }
 
-        @Test("Omit Null Keys")
+        @Test("Object Omit Null Keys")
         func omitNullKeys() async throws {
             let raw = #"""
-            {"foo":true,"bar":null}
+            {"foo":[1,null,2],"bar":null}
             """#
             let data = try #require(raw.data(using: .utf8))
             let json = try JSON.Deserialization.object(from: data, options: .omitNullKeys)
-            #expect(json == ["foo": true])
+            #expect(json == ["foo": [1, nil, 2]])
             let fromString = try JSON.Deserialization.object(from: raw, options: .omitNullKeys)
             #expect(fromString == json)
             let fromAsyncData = try await JSON.Deserialization.deserialize(data, options: .omitNullKeys)
             #expect(fromAsyncData == json)
             let fromAsyncString = try await JSON.Deserialization.deserialize(raw, options: .omitNullKeys)
+            #expect(fromAsyncString == json)
+        }
+
+        @Test("Object Omit Null Values")
+        func omitNullValues() async throws {
+            let raw = #"""
+            {"foo":[1,null,2],"bar":null}
+            """#
+            let data = try #require(raw.data(using: .utf8))
+            let json = try JSON.Deserialization.object(from: data, options: .omitNullValues)
+            #expect(json == ["foo": [1, 2]])
+            let fromString = try JSON.Deserialization.object(from: raw, options: .omitNullValues)
+            #expect(fromString == json)
+            let fromAsyncData = try await JSON.Deserialization.deserialize(data, options: .omitNullValues)
+            #expect(fromAsyncData == json)
+            let fromAsyncString = try await JSON.Deserialization.deserialize(raw, options: .omitNullValues)
             #expect(fromAsyncString == json)
         }
 

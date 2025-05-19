@@ -38,11 +38,6 @@ Then, add the dependency to your target:
 )
 ```
 
-To add JBird as a dependency to an Xcode Project: 
-
-- Choose `File` → `Add Packages...`
-- Enter package URL `https://github.com/vsanthanam/JBird.git` and select your release and of choice.
-
 For additional installation instructions, including installation methods without the Swift Package Manager, see the [documentation](https://www.usejbird.com/docs/documentation/jbird/setup).
 
 ## Performance

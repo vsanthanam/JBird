@@ -197,9 +197,11 @@ extension JSON {
                 case .literal, .numeric, .string:
                     throw JSONDeserializationError.illegalFragment
                 }
-            } else {
-                return json
             }
+            if options.contains(.omitNullValues), json.isNull {
+                throw JSONDeserializationError.illegalFragment
+            }
+            return json
         }
 
     }
