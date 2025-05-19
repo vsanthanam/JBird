@@ -55,3 +55,10 @@ xcodebuild -create-xcframework \
   -output "$OUTPUT_DIR/$XCFRAMEWORK_NAME"
 
 echo "🎉 XCFramework created at $OUTPUT_DIR/$XCFRAMEWORK_NAME"
+
+echo "📦 Compressing XCFramework..."
+
+cd "$OUTPUT_DIR"
+zip -r "$XCFRAMEWORK_NAME.zip" "$XCFRAMEWORK_NAME"
+
+echo "✨ XCFramework compressed at $OUTPUT_DIR/$XCFRAMEWORK_NAME.zip"
