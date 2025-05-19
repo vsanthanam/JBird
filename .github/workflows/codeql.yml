@@ -46,7 +46,7 @@ jobs:
         - language: actions
           build-mode: none
         - language: c-cpp
-          build-mode: none
+          build-mode: manual
         - language: swift
           build-mode: manual
         # CodeQL supports the following values keywords for 'language': 'actions', 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'swift'
@@ -86,16 +86,21 @@ jobs:
     # to build your code.
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
-    - if: matrix.build-mode == 'manual'
+    - if: matrix.build-mode == 'manual' && matrix.language == 'swift'
       name: Xcode Select
       shell: bash
       run: |
         sudo xcode-select --switch /Applications/Xcode_16.3.app
-    - if: matrix.build-mode == 'manual'
+    - if: matrix.build-mode == 'manual' && matrix.language == 'swift'
       name: Build JBird
       shell: bash
       run: |
         /usr/bin/swift build -v --package-path /Users/runner/work/JBird/JBird/
+    - if: matrix.build-mode == 'manual' && matrix.language == 'c-cpp'
+      name: Build JBirdParser
+      shell: bash
+      run: |
+        cd JBirdParser && clang -Iinclude -c JBirdParser.c -o JBirdParser.o
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
