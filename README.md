@@ -8,6 +8,43 @@
 
 A blazing fast, type-safe library for working with JSON in Swift
 
+## Why JBird?
+
+JBird brings type safety to unstructured JSON with an elegant, ergonomic API that dramatically improves developer experience compared to Foundation's JSONSerialization:
+
+```swift
+// Foundation approach - verbose casting and optional chaining
+if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+   let user = json["user"] as? [String: Any],
+   let name = user["name"] as? String,
+   let isActive = user["isActive"] as? Bool {
+   // Finally use the values after multiple casts
+}
+
+// JBird approach - clean and type-safe
+let json = try JSON(data)
+let name = try json["user"]["name"].stringValue
+let isActive = try json["user"]["isActive"].boolValue
+let user = try json["user"].decode(into: User.self)
+```
+
+JBird also simplifies mutation, which is cumbersome with Foundation:
+
+```swift
+// Modifying JSON with Foundation requires recreating structures
+var jsonDict = json as? [String: Any] ?? [:]
+if var user = jsonDict["user"] as? [String: Any] {
+    user["status"] = "active" 
+    jsonDict["user"] = user
+}
+
+// Simple modification with JBird
+var mutableJSON = try JSON(data)
+try mutableJSON["user"]["status"].setValue("active")
+```
+
+JBird eliminates the verbosity of type casting chains and nested optional unwrapping, providing a statically typed interface for efficient JSON traversal and modification. For more information see [the documentation](https://www.usejbird.com/docs/documentation/jbird/whyjbird)
+
 ## Features
 
 - ⚡️ **High Performance**: Built with a [C11](https://en.wikipedia.org/wiki/C11_(C_standard_revision)) core for optimized parsing with SIMD acceleration where appropriate.
@@ -38,7 +75,7 @@ Then, add the dependency to your target:
 )
 ```
 
-For additional installation instructions, including installation methods without the Swift Package Manager, see the [documentation](https://www.usejbird.com/docs/documentation/jbird/setup).
+For additional installation instructions, including installation methods without the Swift Package Manager, see [the documentation](https://www.usejbird.com/docs/documentation/jbird/setup).
 
 ## Performance
 

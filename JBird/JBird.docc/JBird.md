@@ -4,8 +4,9 @@ A blazing fast, type-safe library for working with JSON in Swift
 
 ## Topics
 
-### Articles
+### Get Started
 
+- <doc:WhyJBird>
 - <doc:Setup>
 
 ### Models
