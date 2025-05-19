@@ -52,14 +52,20 @@ let package = Package(
             dependencies: [
                 "JBirdParser"
             ],
-            path: "JBird"
+            path: "JBird",
+            swiftSettings: [
+                .enableUpcomingFeature("StrictConcurrency=complete")
+            ]
         ),
         .testTarget(
             name: "JBirdTests",
             dependencies: [
                 "JBird"
             ],
-            path: "JBirdTests"
+            path: "JBirdTests",
+            swiftSettings: [
+                .enableUpcomingFeature("StrictConcurrency=complete")
+            ]
         ),
         .target(
             name: "JBirdMacros",
