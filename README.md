@@ -17,7 +17,7 @@ A blazing fast, type-safe library for working with JSON in Swift
 
 ## Installation
 
-JBird is currently primarily distributed through the [Swift Package Manager](https://www.swift.org/package-manager/). 
+JBird is primarily distributed through the [Swift Package Manager](https://www.swift.org/package-manager/). 
 
 To add JBird as a dependency to an existing Swift package, add the following line of code to the `dependencies` parameter of your `Package.swift` file:
 
@@ -43,7 +43,7 @@ To add JBird as a dependency to an Xcode Project:
 - Choose `File` → `Add Packages...`
 - Enter package URL `https://github.com/vsanthanam/JBird.git` and select your release and of choice.
 
-For additional installation instructions, including installation without the Swift Package Manager, see the [documentation](https://usejbird.com/docs/documentation/jbird).
+For additional installation instructions, including installation methods without the Swift Package Manager, see the [documentation](https://usejbird.com/docs/documentation/jbird).
 
 ## Performance
 
