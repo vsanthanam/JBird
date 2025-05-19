@@ -1009,46 +1009,6 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         }
     }
 
-//    /// Retreive a value from the JSON object using a specified subscript
-//    /// - Parameters:
-//    ///   - subscript: A subscript to use for lookup
-//    ///   - type: The Swift type to decode into
-//    /// - Returns: The value at the specified subscript
-//    @_disfavoredOverload
-//    public subscript<T>(
-//        _ subscript: Subscript...,
-//        as type: T.Type = T.self
-//    ) -> T where T: JSONDecodable {
-//        get throws {
-//            var json = self
-//            try `subscript`
-//                .forEach { `subscript` in
-//                    json = try json.value(forSubscript: `subscript`)
-//                }
-//            return try json.decode(into: type)
-//        }
-//    }
-//
-//    /// Retreive a value from the JSON object using a specified subscript
-//    /// - Parameters:
-//    ///   - subscript: A subscript to use for lookup
-//    ///   - type: The Swift type to decode into
-//    /// - Returns: The value at the specified subscript
-//    @available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 1.0, *)
-//    @_disfavoredOverload
-//    public subscript<each PathComponent, T>(
-//        _ subscript: repeat each PathComponent,
-//        as type: T.Type = T.self
-//    ) -> T where repeat each PathComponent: JSONSubscriptConvertible, T: JSONDecodable {
-//        get throws {
-//            var json = self
-//            for component in repeat each `subscript` {
-//                json = try json.value(forSubscript: component)
-//            }
-//            return try json.decode(into: type)
-//        }
-//    }
-
     // MARK: - ExpressibleByBooleanLiteral
 
     /// A type that represents a Boolean literal.
