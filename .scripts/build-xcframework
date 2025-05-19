@@ -1,0 +1,57 @@
+#!/bin/bash
+set -euo pipefail
+
+FRAMEWORK_NAME="JBird"
+OUTPUT_DIR="Products"
+ARCHIVE_DIR="$OUTPUT_DIR/archives"
+XCFRAMEWORK_NAME="$FRAMEWORK_NAME.xcframework"
+
+rm -rf "$OUTPUT_DIR"
+mkdir -p "$ARCHIVE_DIR"
+
+build_archive() {
+  local name="$1"
+  local destination="$2"
+  local sdk="$3"
+
+  echo "📦 Archiving $name ($sdk) → $destination"
+
+  xcodebuild archive \
+    -scheme "$FRAMEWORK_NAME" \
+    -destination "$destination" \
+    -archivePath "$ARCHIVE_DIR/$name.xcarchive" \
+    -sdk "$sdk" \
+    SKIP_INSTALL=NO \
+    BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
+    CODE_SIGNING_ALLOWED=NO \
+    CODE_SIGN_IDENTITY="" \
+    ONLY_ACTIVE_ARCH=NO
+}
+
+echo "🚧 Starting archives..."
+
+build_archive "macos" "generic/platform=macOS" macosx
+build_archive "ios" "generic/platform=iOS" iphoneos
+build_archive "ios-simulator" "platform=iOS Simulator,name=iPhone 16" iphonesimulator
+build_archive "tvos" "generic/platform=tvOS" appletvos
+build_archive "tvos-simulator" "platform=tvOS Simulator,name=Apple TV 4K (3rd generation)" appletvsimulator
+build_archive "watchos" "generic/platform=watchOS" watchos
+build_archive "watchos-simulator" "platform=watchOS Simulator,name=Apple Watch Series 10 (46mm)" watchsimulator
+build_archive "xros" "generic/platform=visionOS" xros
+build_archive "xros-simulator" "platform=visionOS Simulator,name=Apple Vision Pro" xrsimulator
+
+echo "🧬 Creating XCFramework..."
+
+xcodebuild -create-xcframework \
+  -framework "$ARCHIVE_DIR/macos.xcarchive/Products/Library/Frameworks/$FRAMEWORK_NAME.framework" \
+  -framework "$ARCHIVE_DIR/ios.xcarchive/Products/Library/Frameworks/$FRAMEWORK_NAME.framework" \
+  -framework "$ARCHIVE_DIR/ios-simulator.xcarchive/Products/Library/Frameworks/$FRAMEWORK_NAME.framework" \
+  -framework "$ARCHIVE_DIR/tvos.xcarchive/Products/Library/Frameworks/$FRAMEWORK_NAME.framework" \
+  -framework "$ARCHIVE_DIR/tvos-simulator.xcarchive/Products/Library/Frameworks/$FRAMEWORK_NAME.framework" \
+  -framework "$ARCHIVE_DIR/watchos.xcarchive/Products/Library/Frameworks/$FRAMEWORK_NAME.framework" \
+  -framework "$ARCHIVE_DIR/watchos-simulator.xcarchive/Products/Library/Frameworks/$FRAMEWORK_NAME.framework" \
+  -framework "$ARCHIVE_DIR/xros.xcarchive/Products/Library/Frameworks/$FRAMEWORK_NAME.framework" \
+  -framework "$ARCHIVE_DIR/xros-simulator.xcarchive/Products/Library/Frameworks/$FRAMEWORK_NAME.framework" \
+  -output "$OUTPUT_DIR/$XCFRAMEWORK_NAME"
+
+echo "🎉 XCFramework created at $OUTPUT_DIR/$XCFRAMEWORK_NAME"
