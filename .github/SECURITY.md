@@ -36,7 +36,7 @@ When reporting a vulnerability, please include:
 
 After receiving a security vulnerability report:
 
-1. The maintainer will acknowledge receipt of the report within 48 hours.
+1. Wait for the maintainer to acknowledge receipt of the report.
 2. An initial assessment will be conducted to confirm the vulnerability and determine its severity.
 3. The maintainer will work on a fix and aim to release a patch as quickly as possible, depending on the complexity of the issue.
 4. Once a fix is ready, it will be released as a new version, and credit will be given to the reporter (unless anonymity is requested).
@@ -45,7 +45,7 @@ After receiving a security vulnerability report:
 
 As JBird is a library for parsing JSON (which may come from untrusted sources), users should be aware of the following:
 
-1. **Input Validation**: Always validate JSON input before passing it to JBird, especially if it comes from external sources.
+1. **Input Validation**: While JBird performs input validations of its own, always perform additional payload validation, potentially on the server, whenever possible.
 
 2. **Memory Usage**: Be aware that parsing very large JSON documents can consume significant memory. Consider implementing size limits for JSON input in your application.
 
@@ -57,13 +57,11 @@ As JBird is a library for parsing JSON (which may come from untrusted sources), 
 
 JBird is designed with the following security principles in mind:
 
-1. **Memory Safety**: The C core implementation uses careful memory management to prevent buffer overflows and other memory-related vulnerabilities.
+1. **Memory Safety**: The C core implementation uses careful memory management to prevent buffer overflows, memory corruption, and other memory-related vulnerabilities.
 
-2. **RFC Compliance**: JBird aims to strictly follow the JSON RFC 8259 specification, rejecting invalid JSON that might be used in attacks.
+2. **RFC Compliance**: JBird aims to strictly follow the JSON RFC 8259 specification, rejecting invalid JSON that might be used in attacks. JBird prefers correctness over self-healing, and rejects any payload that does not strictly adhere.
 
-3. **Error Handling**: Robust error handling is implemented to ensure that malformed JSON is rejected and doesn't lead to undefined behavior.
-
-4. **Type Safety**: The Swift API is designed to be type-safe, helping to prevent misuse.
+3. **Error Handling**: Robust error handling is implemented to ensure that malformed JSON is rejected explicitly with clear error messages to avoid undefined behavior in client applications. Errors are never swallowed.
 
 ## Acknowledgements
 
