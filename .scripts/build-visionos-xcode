@@ -1,3 +1,13 @@
 #!/bin/bash
 
-xcodebuild -scheme JBird-Package -destination "OS=2.4,name=Apple Vision Pro"
+xcodebuild \
+  -scheme JBird \
+  -configuration Release \
+  -sdk xros \
+  -destination 'generic/platform=visionOS' \
+  BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
+  SKIP_INSTALL=NO \
+  CODE_SIGN_IDENTITY="" \
+  CODE_SIGNING_REQUIRED=NO \
+  CODE_SIGNING_ALLOWED=NO \
+  clean build

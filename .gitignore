@@ -1,4 +1,7 @@
+# MacOS
 .DS_Store
+
+# Swift Package
 /.build
 /Packages
 xcuserdata/
@@ -6,9 +9,20 @@ DerivedData/
 .swiftpm/configuration/registries.json
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 .netrc
+
+# Benchmark Package
 Benchmarks/.build
 Benchmarks/Packages
 Benchmarks/xcuserdata/
 Benchmarks/DerivedData/
 Benchmarks/.swiftpm/configuration/registries.json
 Benchmarks/.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+
+# Xcode
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+*.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+/*.gcno
+**/xcshareddata/WorkspaceSettings.xcsettings
