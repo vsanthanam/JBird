@@ -1,4 +1,3 @@
-
 # JBird vs. Foundation
 
 ### Parse (1mb) metrics

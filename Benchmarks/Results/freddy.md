@@ -1,4 +1,4 @@
-# # JBird vs. Freddy
+# JBird vs. Freddy
 
 ### Parse (1mb) metrics
 
