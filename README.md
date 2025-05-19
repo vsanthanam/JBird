@@ -17,7 +17,7 @@ A blazing fast, type-safe library for working with JSON in Swift
 
 ## Installation
 
-JBird is currently distributed exclusively through the [Swift Package Manager](https://www.swift.org/package-manager/). 
+JBird is currently primarily distributed through the [Swift Package Manager](https://www.swift.org/package-manager/). 
 
 To add JBird as a dependency to an existing Swift package, add the following line of code to the `dependencies` parameter of your `Package.swift` file:
 
@@ -43,22 +43,7 @@ To add JBird as a dependency to an Xcode Project:
 - Choose `File` → `Add Packages...`
 - Enter package URL `https://github.com/vsanthanam/JBird.git` and select your release and of choice.
 
-Other distribution mechanisms like CocoaPods or Carthage may be added in the future.
-
-### Optional Macros
-
-To avoid forcing a dependency `swift-syntax`, JBird does not include its macros by default. If you wish to include them in your project, you can do so by adding the following to your `Package.swift` file:
-
-```swift
-.target(
-    name: "YourTarget",
-    dependencies: [
-        .product(name: "JBirdMacros", package: "JBird")
-    ]
-)
-```
-
-Doing this will add the `@JSONCodable`, `@JSONKey`, and `@OmitIfNil` macros to your project, which can be used to simplify decoding and encoding JSON into your Swift types. For more information on how to use these macros, see the [documentation](https://usejbird.com/docs/documentation/jbird).
+For additional installation instructions, including installation without the Swift Package Manager, see the [documentation](https://usejbird.com/docs/documentation/jbird).
 
 ## Performance
 
