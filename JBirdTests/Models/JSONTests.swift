@@ -412,11 +412,6 @@ struct JSONTests {
 
         #expect(try json["foo"][1] == 2)
         #expect(try json[.key("foo")][.index(1)] == 2)
-
-        let convertibleInt: Int = try json["foo"][1]
-        let subscriptInt: Int = try json[.key("foo")][.index(1)]
-        #expect(convertibleInt == 2)
-        #expect(subscriptInt == 2)
     }
 
     @Suite("Introspection Tests")

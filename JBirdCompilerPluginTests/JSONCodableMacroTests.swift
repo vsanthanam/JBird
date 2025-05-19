@@ -62,7 +62,7 @@ final class JSONCodableMacroTests: XCTestCase {
                     }
 
                     public init(json: JSON) throws {
-                        self.name = try json["name"]
+                        self.name = try json["name"].decode()
                     }
 
                 }
@@ -105,7 +105,7 @@ final class JSONCodableMacroTests: XCTestCase {
                     }
 
                     public init(json: JSON) throws {
-                        self.name = try json["custom_name"]
+                        self.name = try json["custom_name"].decode()
                     }
 
                 }
@@ -148,7 +148,7 @@ final class JSONCodableMacroTests: XCTestCase {
                     }
 
                     public init(json: JSON) throws {
-                        self.fooBar = try json["foo_bar"]
+                        self.fooBar = try json["foo_bar"].decode()
                     }
 
                 }
@@ -193,7 +193,11 @@ final class JSONCodableMacroTests: XCTestCase {
                     }
 
                     public init(json: JSON) throws {
-                        self.name = try? json["name"]
+                        if let name = try? json["name"] {
+                        self.name = try name.decode()
+                        } else {
+                        self.name = nil
+                        }
                     }
 
                 }
