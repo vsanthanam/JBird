@@ -6,11 +6,10 @@ Thank you for your interest in contributing to JBird! This document outlines the
 
 JBird is built on these foundational principles:
 
-1. **Performance**: JBird is a high-performance JSON library with a C11 core and SIMD acceleration. Performance is a critical feature.
+1. **Performance**: JBird is a high-performance JSON library with a C11 core. Performance is a critical feature.
 2. **Swift-First API**: While the core is in C, the public APIs are designed to feel natural and idiomatic in Swift.
 3. **Type Safety**: All APIs enforce proper type checking and provide clear error handling.
-4. **Comprehensive Documentation**: All public APIs must be fully documented.
-5. **Complete Test Coverage**: All code must be thoroughly tested.
+4. **Complete Test Coverage**: All code must be thoroughly tested to ensure strict compliance with the JSON RFC 8259 specification.
 
 ## Performance Requirements
 
