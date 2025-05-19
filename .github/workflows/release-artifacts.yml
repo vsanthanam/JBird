@@ -5,6 +5,22 @@ on:
 permissions:
   contents: write
 jobs:
+  build-xcframework:
+    runs-on: macos-15
+    outputs:
+        artifact-name: JBird.xcframework.zip
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Xcode Version
+        run: ./.scripts/xcode-select
+      - name: Build XCFramework
+        run: ./.scripts/build-framework.sh
+      - name: Upload XCFramework
+        uses: actions/upload-artifact@v4
+        with:
+          name: JBird.xcframework.zip
+          path: Products/JBird.xcframework.zip
   build-docc-archive:
     runs-on: macos-15
     outputs:
@@ -27,7 +43,7 @@ jobs:
         with:
           name: archive
           path: .build/plugins/Swift-DocC/outputs/JBird.doccarchive.zip
-  attach-archive:
+  attach-docc-archive:
     needs: build-docc-archive
     runs-on: ubuntu-latest
     steps:
