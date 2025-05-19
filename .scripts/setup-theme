@@ -1,10 +1,11 @@
 #!/bin/bash
 
 cat > _config.yml <<EOF
-remote_theme: pages-themes/architect@v0.2.0
+remote_theme: vsanthanam/aviary@v0.1.0
 plugins:
 - jekyll-remote-theme
-show_downloads: true
+documentation_url: "https://www.usejbird.com/docs/documentation/jbird"
+copyright_owner: "Varun Santhanam"
 EOF
 
 echo "✅ _config.yml created."
