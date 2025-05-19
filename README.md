@@ -11,7 +11,7 @@ A blazing fast, type-safe library for working with JSON in Swift
 ## Features
 
 - ⚡️ **High Performance**: Built with a [C11](https://en.wikipedia.org/wiki/C11_(C_standard_revision)) core for optimized parsing with SIMD acceleration where appropriate.
-- 🛡️ **Ergonomic, Type Safe APIs**: Rich Swift API with proper type checking and error handling. Easily and safely convert between serialized JSON, type-safe JSON, and native Swift types.
+- 🛡️ **Ergonomic, Type Safe APIs**: Rich, Swift-first API with proper type checking and error handling. Easily and safely convert between serialized JSON, type-safe JSON, and native Swift types.
 - 🧪 **Well Tested**: Comprehensive test suite ensures correct adherence to the [JSON RFC 8259](https://datatracker.ietf.org/doc/html/rfc8259)
 - 📝 **Fully Documented**: Thorough documentation with detailed API references and code samples, available on GitHub Pages.
 
@@ -43,7 +43,7 @@ To add JBird as a dependency to an Xcode Project:
 - Choose `File` → `Add Packages...`
 - Enter package URL `https://github.com/vsanthanam/JBird.git` and select your release and of choice.
 
-For additional installation instructions, including installation methods without the Swift Package Manager, see the [documentation](https://usejbird.com/docs/documentation/jbird).
+For additional installation instructions, including installation methods without the Swift Package Manager, see the [documentation](https://www.usejbird.com/docs/documentation/jbird/setup).
 
 ## Performance
 
