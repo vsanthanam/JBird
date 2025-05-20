@@ -6,7 +6,7 @@
 
 Preserve type safety when manipulating unstructured JSON
 
-## Working with Uustructured JSON
+## Working with unstructured JSON
 
 Swift application developers often need to consume JSON data from an endpoint in their applications. If you know the shape of data ahead of time, Swift provides you `Codable`, which is a fast and convenient to use JSON data in a type-safe manner. But what about instructured data?
 
