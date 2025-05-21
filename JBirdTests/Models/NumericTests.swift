@@ -41,7 +41,7 @@ struct NumericTests {
     }
 
     @Test("Mismatched Equivalence")
-    func testMismatchedEquivalence() {
+    func mismatchedEquivalence() {
         #expect(JSON.Numeric.int(42) == JSON.Numeric.double(42.0))
         #expect(JSON.Numeric.double(42.0) == JSON.Numeric.int(42))
         #expect(JSON.Numeric.int(42) != JSON.Numeric.double(42.1))

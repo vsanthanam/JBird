@@ -63,7 +63,7 @@ private struct Foo: Equatable {
 }
 
 @Test("Test @JSONCodable Sample")
-func testJSONCodableSample() throws {
+func jsonCodableSample() throws {
 
     let model = Foo(fooBar: 12, nested: nil, id: "123")
     let json = JSON(model)
