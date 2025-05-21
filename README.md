@@ -48,9 +48,8 @@ JBird eliminates the verbosity of type casting chains and nested optional unwrap
 ## Features
 
 - ⚡️ **High Performance**: Built with a [C11](https://en.wikipedia.org/wiki/C11_(C_standard_revision)) core for optimized parsing with SIMD acceleration where appropriate.
-- 🛡️ **Ergonomic, Type Safe APIs**: Rich, Swift-first API with proper type checking and error handling. Easily and safely convert between serialized JSON, type-safe JSON, and native Swift types.
-- 🧪 **Well Tested**: Comprehensive test suite ensures correct adherence to the [JSON RFC 8259](https://datatracker.ietf.org/doc/html/rfc8259)
-- 📝 **Fully Documented**: Thorough documentation with detailed API references and code samples, available on GitHub Pages.
+- 🛡️ **Ergonomic, Type-safe APIs**: Rich, Swift-first API with proper type checking and error handling. Easily and safely convert between serialized JSON, type-safe JSON, and native Swift types.
+- 🧪 **Well Tested**: Comprehensive test suite ensures thorough correctness and strict adherence to the [JSON RFC 8259](https://datatracker.ietf.org/doc/html/rfc8259).
 
 ## Installation
 
@@ -64,7 +63,7 @@ dependencies: [
 ]
 ```
 
-Then, add the dependency to your target:
+Then, add the `JBird` dependency to your target or targets of choice:
 
 ```swift
 .target(
@@ -92,10 +91,11 @@ These benchmarks were run on a variety of JSON files ranging from 64KB to 5MB, i
 
 ## Usage & Documentation
 
-JBird's documentation is built with [DocC](https://developer.apple.com/documentation/docc) and included in the repository as a DocC archive. The latest version is hosted on [GitHub Pages](https://pages.github.com) and is available [here](https://usejbird.com/docs/documentation/jbird).
+JBird's documentation is built with [DocC](https://developer.apple.com/documentation/docc) and included wich each release as a DocC archive. The latest version is hosted on [GitHub Pages](https://pages.github.com) and is available [here](https://usejbird.com/docs/documentation/jbird).
 
-Additional installation instructions are available on the [Swift Package Index](https://swiftpackageindex.com/vsanthanam/JBird)
+Additional information is available on the [Swift Package Index](https://swiftpackageindex.com/vsanthanam/JBird)
 
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fvsanthanam%2FJBird%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/vsanthanam/JBird)
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fvsanthanam%2FJBird%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/vsanthanam/JBird)
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fvsanthanam%2FJBird%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/vsanthanam/JBird)
 

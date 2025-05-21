@@ -983,6 +983,9 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         return data
     }
 
+    /// Retrieve a value from the JSON object using a specified subscript
+    /// - Parameter subscript: A subscript to use for lookup
+    /// - Returns: The JSON value at the specified subscript
     public subscript(
         _ subscript: Subscript...
     ) -> JSON {
@@ -996,6 +999,9 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         }
     }
 
+    /// Retrieve a value from the JSON object using a specified subscript
+    /// - Parameter subscript: A subscript to use for lookup
+    /// - Returns: The JSON value at the specified subscript
     @available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 1.0, *)
     public subscript<each PathComponent>(
         _ subscript: repeat each PathComponent
@@ -1006,6 +1012,45 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
                 json = try json.value(forSubscript: component)
             }
             return json
+        }
+    }
+
+    /// Retrieve a value from the JSON object using a specified subscript
+    /// - Parameters:
+    ///   - subscript: A subscript to use for lookup
+    ///   - type: The type to decode into. This type can be inferred from the callsite.
+    /// - Returns: The JSON value at the specified subscript
+    @_disfavoredOverload
+    public subscript<T>(
+        _ subscript: Subscript...,
+        as type: T.Type = T.self
+    ) -> T where T: JSONDecodable {
+        get throws {
+            var json = self
+            try `subscript`.forEach { `subscript` in
+                json = try json[`subscript`]
+            }
+            return try json.decode(into: type)
+        }
+    }
+
+    /// Retrieve a value from the JSON object using a specified subscript
+    /// - Parameters:
+    ///   - subscript: A subscript to use for lookup
+    ///   - type: The type to decode into. This type can be inferred from the callsite.
+    /// - Returns: The JSON value at the specified subscript
+    @available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 1.0, *)
+    @_disfavoredOverload
+    public subscript<each PathComponent, T>(
+        _ subscript: repeat each PathComponent,
+        as type: T.Type = T.self
+    ) -> T where repeat each PathComponent: JSONSubscriptConvertible, T: JSONDecodable {
+        get throws {
+            var json = self
+            for component in repeat each `subscript` {
+                json = try json[component]
+            }
+            return try json.decode(into: type)
         }
     }
 

@@ -62,7 +62,7 @@ final class JSONCodableMacroTests: XCTestCase {
                     }
 
                     public init(json: JSON) throws {
-                        self.name = try json["name"].decode()
+                        self.name = try json["name"]
                     }
 
                 }
@@ -105,7 +105,7 @@ final class JSONCodableMacroTests: XCTestCase {
                     }
 
                     public init(json: JSON) throws {
-                        self.name = try json["custom_name"].decode()
+                        self.name = try json["custom_name"]
                     }
 
                 }
@@ -148,7 +148,7 @@ final class JSONCodableMacroTests: XCTestCase {
                     }
 
                     public init(json: JSON) throws {
-                        self.fooBar = try json["foo_bar"].decode()
+                        self.fooBar = try json["foo_bar"]
                     }
 
                 }
