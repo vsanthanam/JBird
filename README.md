@@ -40,7 +40,7 @@ if var user = jsonDict["user"] as? [String: Any] {
 
 // Simple modification with JBird
 var mutableJSON = try JSON(data)
-try mutableJSON["user"]["status"].setValue("active")
+try mutableJSON["user"].setValue(true, forKey: "isActive")
 ```
 
 JBird eliminates the verbosity of type casting chains and nested optional unwrapping, providing a statically typed interface for efficient JSON traversal and modification. For more information see [the documentation](https://www.usejbird.com/docs/documentation/jbird/whyjbird)
