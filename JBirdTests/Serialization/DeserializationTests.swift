@@ -34,14 +34,14 @@ struct DeserializationTests {
     struct BOMTests {
 
         @Test("Byte Order Mark Deserialization")
-        func testBom() throws {
+        func bom() throws {
             let data = Data([0xEF, 0xBB, 0xBF, 0x7B, 0x7D])
             let json = try JSON(data)
             #expect(json == [:])
         }
 
         @Test("Illegal Byte Order Mark Deserialization")
-        func testNoBom() {
+        func noBom() {
             let data = Data([0xEF, 0xBB, 0xBF, 0x7B, 0x7D])
             #expect(throws: JSONDeserializationError.parseFailure("Invalid character")) {
                 _ = try JSON.Deserialization.object(from: data, options: .default.subtracting(.allowByteOrderMark))
@@ -54,7 +54,7 @@ struct DeserializationTests {
     struct WhitespaceTests {
 
         @Test("Without Whitespace")
-        func testWithoutWhitespace() throws {
+        func withoutWhitespace() throws {
             let raw = #"""
             {"foo":true}
             """#

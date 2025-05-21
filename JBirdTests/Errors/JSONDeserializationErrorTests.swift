@@ -27,7 +27,7 @@ import JBird
 import Testing
 
 @Test("JSONDeserializationError Descriptions")
-func testJSONDeserializationErrorDescriptions() {
+func jSONDeserializationErrorDescriptions() {
     let parseFailure = JSONDeserializationError.parseFailure("My Foo Message!")
     #expect(parseFailure.description == "JSON Parse error: My Foo Message!")
     let illegalFragment = JSONDeserializationError.illegalFragment
