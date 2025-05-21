@@ -32,7 +32,7 @@ extension JSON {
     public enum Numeric: Equatable, Hashable, Sendable, ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral, CustomStringConvertible {
 
         // MARK: - Initializers
-        
+
         public init(
             _ convertible: some JSONNumericConvertible
         ) {
@@ -40,13 +40,13 @@ extension JSON {
         }
 
         // MARK: - Cases
-        
+
         case int(Int)
 
         case double(Double)
 
         // MARK: - API
-        
+
         public var intValue: Int {
             get throws {
                 switch self {
@@ -68,7 +68,7 @@ extension JSON {
                 }
             }
         }
-        
+
         // MARK: - ExpressibleByIntegerLiteral
 
         public typealias IntegerLiteralType = Int
@@ -78,7 +78,7 @@ extension JSON {
         ) {
             self = .int(value)
         }
-        
+
         // MARK: - ExpressibleByFloatLiteral
 
         public typealias FloatLiteralType = Double
@@ -88,7 +88,7 @@ extension JSON {
         ) {
             self = .double(value)
         }
-        
+
         // MARK: - Equatable
 
         public static func == (lhs: Numeric, rhs: Numeric) -> Bool {
@@ -111,9 +111,9 @@ extension JSON {
                 }
             }
         }
-        
+
         // MARK: - CustomStringConvertible
-        
+
         public var description: String {
             switch self {
             case let .int(int):

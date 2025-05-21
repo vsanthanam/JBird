@@ -32,13 +32,13 @@ extension JSON {
     public enum Literal: String, Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, ExpressibleByNilLiteral, CustomStringConvertible {
 
         // MARK: - Initializers
-        
+
         public init(
             _ convertible: some JSONLiteralConvertible
         ) {
             self = convertible.jsonLiteral
         }
-        
+
         // MARK: - Cases
 
         case `true`
@@ -46,7 +46,7 @@ extension JSON {
         case `false`
 
         case null
-        
+
         // MARK: - API
 
         public var boolValue: Bool {
@@ -70,7 +70,7 @@ extension JSON {
                 true
             }
         }
-        
+
         // MARK: - ExpressibleByBooleanLiteral
 
         public typealias BooleanLiteralType = Bool
@@ -80,7 +80,7 @@ extension JSON {
         ) {
             self.init(value)
         }
-        
+
         // MARK: - ExpressiblebyNilLiteral
 
         public init(
@@ -90,7 +90,7 @@ extension JSON {
         }
 
         // MARK: - CustomStringConvertible
-        
+
         public var description: String {
             switch self {
             case .false:

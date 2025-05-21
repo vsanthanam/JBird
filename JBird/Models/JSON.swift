@@ -1202,9 +1202,9 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ) {
         self = .literal(.null)
     }
-    
+
     // MARK: - CustomStringConvertible
-    
+
     public var description: String {
         switch self {
         case let .literal(literal):
