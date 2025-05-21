@@ -53,6 +53,8 @@
 - ``removeValue(forSubscript:)-(JSONSubscriptConvertible)``
 - ``subscript(_:)-(Subscript...)``
 - ``subscript(_:)-(PathComponent)``
+- ``subscript(_:as:)-(Subscript...,_)``
+- ``subscript(_:as:)-(PathComponent,_)``
 
 ### Working with JSON objects
 

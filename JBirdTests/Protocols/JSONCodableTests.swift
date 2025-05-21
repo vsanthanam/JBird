@@ -397,7 +397,7 @@ struct JSONCodableTests {
     }
 
     @Test("Codable onvenience extensions")
-    func testCodableExtensions() throws {
+    func codableExtensions() throws {
         let uuid = UUID()
         let data = try Data(encodingJSON: uuid)
         let decoded = try UUID(decodingJSON: data)

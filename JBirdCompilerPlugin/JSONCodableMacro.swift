@@ -210,7 +210,7 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
                     """
                 } else {
                     """
-                    self.\(name) = try json[\"\(key)\"].decode()
+                    self.\(name) = try json[\"\(key)\"]
                     """
                 }
             }

@@ -8,13 +8,13 @@ Preserve type safety when manipulating unstructured JSON
 
 ## Working with unstructured JSON
 
-Swift application developers often need to consume JSON data from an endpoint in their applications. If you know the shape of data ahead of time, Swift provides you `Codable`, which is a fast and convenient to use JSON data in a type-safe manner. But what about instructured data?
+Swift application developers often need to consume JSON data from an endpoint. If you know the shape of data ahead of time, Swift provides you with `Codable`, which is a fast and convenient to use JSON data in your application a type-safe manner. But what about instructured data?
 
-Apple's Foundation framework provides `JSONSerialization` for working with unstructered JSON in Swift, but it comes with several significant limitations that can impact developer productivity and code quality:
+Apple's Foundation framework provides `JSONSerialization` for working with unstructered JSON in Swift, but it comes with several significant limitations that can impact developer productivity and runtime safety:
 
-#### Untyped APIs leads to excessive casting
+#### Untyped APIs lead to excessive casting
 
-Foundation's JSONSerialization returns ambiguous `Any` types that require extensive type checking and casting:
+Foundation's `JSONSerialization` returns ambiguous `Any` types that require extensive type checking and casting:
 
 ```swift
 // Foundation approach
@@ -26,7 +26,7 @@ if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
 }
 ```
 
-This leads to verbose, error-prone code with numerous conditionals or casts.
+This leads to verbose, error-prone code with numerous conditionals and/or casts.
 
 #### Cumbersome error handling
 
