@@ -47,9 +47,9 @@ JBird eliminates the verbosity of type casting chains and nested optional unwrap
 
 ## Features
 
-- ⚡️ **High Performance**: Built with a [C11](https://en.wikipedia.org/wiki/C11_(C_standard_revision)) core for optimized parsing with SIMD acceleration where appropriate.
-- 🛡️ **Ergonomic, Type-safe APIs**: Rich, Swift-first API with proper type checking and error handling. Easily and safely convert between serialized JSON, type-safe JSON, and native Swift types.
-- 🧪 **Well Tested**: Comprehensive test suite ensures thorough correctness and strict adherence to the [JSON RFC 8259](https://datatracker.ietf.org/doc/html/rfc8259).
+- ⚡️ **Blazing fast performance**: Built with a [C11](https://en.wikipedia.org/wiki/C11_(C_standard_revision)) core for optimized parsing with SIMD acceleration where appropriate.
+- 🛡️ **Ergonomic, type-safe APIs**: Rich, Swift-first API with proper type checking and error handling. Easily and safely convert between serialized JSON, type-safe JSON, and native Swift types.
+- 🧪 **Thoroughly tested**: Comprehensive test suite ensures thorough correctness and strict adherence to the [JSON RFC 8259](https://datatracker.ietf.org/doc/html/rfc8259).
 
 ## Installation
 
