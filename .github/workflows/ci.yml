@@ -121,3 +121,20 @@ jobs:
         run: ./.scripts/xcode-select
       - name: Run Benchmarks
         run: cd Benchmarks && BENCHMARK_DISABLE_JEMALLOC=true swift package benchmark
+  clang-format:
+    name: Run clang-format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install clang-format
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-format
+
+      - name: Validate formatting
+        # --dry-run + --Werror makes clang-format exit non-zero if there are any diffs
+        run: |
+          find . -type f \( -name "*.c" -o -name "*.h" \) \
+            -exec clang-format --style=file --dry-run --Werror {} +

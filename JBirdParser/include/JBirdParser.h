@@ -26,29 +26,29 @@
 #ifndef JBirdParser_h
 #define JBirdParser_h
 
-#include <stdio.h>
 #include <stdbool.h>
-#include <stdlib.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 /**
  * @brief Error codes for JSON parsing operations
  */
 typedef enum {
-    JSON_NO_ERROR = 0,                /**< No error occurred */
-    JSON_UNEXPECTED_END_OF_INPUT,     /**< Unexpected end of input while parsing */
-    JSON_INVALID_JSON,                /**< Input is not valid JSON */
-    JSON_INVALID_CHARACTER,           /**< Invalid character encountered */
-    JSON_EXPECTED_COLON,              /**< Expected a colon */
-    JSON_EXPECTED_COMMA_OR_BRACE,     /**< Expected a comma or a closing brace */
-    JSON_EXPECTED_COMMA_OR_BRACKET,   /**< Expected a comma or a closing bracket */
-    JSON_INVALID_LITERAL,             /**< Invalid literal (null, true, false) */
-    JSON_INVALID_NUMBER,              /**< Invalid number format */
-    JSON_INVALID_STRING,              /**< Invalid string format */
-    JSON_MISSING_OBJECT_KEY,          /**< Object is missing a key */
-    JSON_INVALID_UNICODE,             /**< Invalid Unicode character in string */
-    JSON_INVALID_ESCAPE,              /**< Invalid escape sequence in string */
-    JSON_OUT_OF_MEMORY                /**< Memory allocation failed */
+    JSON_NO_ERROR = 0,              /**< No error occurred */
+    JSON_UNEXPECTED_END_OF_INPUT,   /**< Unexpected end of input while parsing */
+    JSON_INVALID_JSON,              /**< Input is not valid JSON */
+    JSON_INVALID_CHARACTER,         /**< Invalid character encountered */
+    JSON_EXPECTED_COLON,            /**< Expected a colon */
+    JSON_EXPECTED_COMMA_OR_BRACE,   /**< Expected a comma or a closing brace */
+    JSON_EXPECTED_COMMA_OR_BRACKET, /**< Expected a comma or a closing bracket */
+    JSON_INVALID_LITERAL,           /**< Invalid literal (null, true, false) */
+    JSON_INVALID_NUMBER,            /**< Invalid number format */
+    JSON_INVALID_STRING,            /**< Invalid string format */
+    JSON_MISSING_OBJECT_KEY,        /**< Object is missing a key */
+    JSON_INVALID_UNICODE,           /**< Invalid Unicode character in string */
+    JSON_INVALID_ESCAPE,            /**< Invalid escape sequence in string */
+    JSON_OUT_OF_MEMORY              /**< Memory allocation failed */
 } json_error_t;
 
 /**
@@ -75,7 +75,7 @@ typedef struct json_value json_value_t;
  * @param error The error code
  * @return A string describing the error
  */
-const char* json_get_error_message(json_error_t error);
+const char *json_get_error_message(json_error_t error);
 
 /**
  * @brief Parse JSON data into a value structure
@@ -87,14 +87,14 @@ const char* json_get_error_message(json_error_t error);
  * @param allow_whitespace Whether to allow insignificant whitespace in the data
  * @return Error code indicating success or failure
  */
-json_error_t json_parse(const uint8_t* data, size_t length, json_value_t** out_value, bool allow_bom, bool allow_whitespace);
+json_error_t json_parse(const uint8_t *data, size_t length, json_value_t **out_value, bool allow_bom, bool allow_whitespace);
 
 /**
  * @brief Free memory allocated for a JSON value
  *
  * @param value The JSON value to free
  */
-void json_free(json_value_t* value);
+void json_free(json_value_t *value);
 
 /**
  * @brief Get the type of a JSON value
@@ -102,7 +102,7 @@ void json_free(json_value_t* value);
  * @param value The JSON value
  * @return The type of the JSON value
  */
-json_type_t json_get_type(const json_value_t* value);
+json_type_t json_get_type(const json_value_t *value);
 
 /**
  * @brief Get the boolean value from a JSON value
@@ -110,7 +110,7 @@ json_type_t json_get_type(const json_value_t* value);
  * @param value The JSON value (must be of type JSON_BOOLEAN)
  * @return The boolean value
  */
-bool json_get_boolean(const json_value_t* value);
+bool json_get_boolean(const json_value_t *value);
 
 /**
  * @brief Get the integer value from a JSON value
@@ -118,7 +118,7 @@ bool json_get_boolean(const json_value_t* value);
  * @param value The JSON value (must be of type JSON_NUMBER_INT)
  * @return The integer value
  */
-int64_t json_get_int(const json_value_t* value);
+int64_t json_get_int(const json_value_t *value);
 
 /**
  * @brief Get the double value from a JSON value
@@ -126,7 +126,7 @@ int64_t json_get_int(const json_value_t* value);
  * @param value The JSON value (must be of type JSON_NUMBER_DOUBLE)
  * @return The double value
  */
-double json_get_double(const json_value_t* value);
+double json_get_double(const json_value_t *value);
 
 /**
  * @brief Get the string value from a JSON value
@@ -134,7 +134,7 @@ double json_get_double(const json_value_t* value);
  * @param value The JSON value (must be of type JSON_STRING)
  * @return The string value
  */
-const char* json_get_string(const json_value_t* value);
+const char *json_get_string(const json_value_t *value);
 
 /**
  * @brief Get the size of a JSON array
@@ -142,7 +142,7 @@ const char* json_get_string(const json_value_t* value);
  * @param array The JSON value (must be of type JSON_ARRAY)
  * @return The number of elements in the array
  */
-size_t json_get_array_size(const json_value_t* array);
+size_t json_get_array_size(const json_value_t *array);
 
 /**
  * @brief Get an element from a JSON array by index
@@ -151,7 +151,7 @@ size_t json_get_array_size(const json_value_t* array);
  * @param index The index of the element to retrieve
  * @return The JSON value at the specified index
  */
-json_value_t* json_get_array_element(const json_value_t* array, size_t index);
+json_value_t *json_get_array_element(const json_value_t *array, size_t index);
 
 /**
  * @brief Get the number of key-value pairs in a JSON object
@@ -159,7 +159,7 @@ json_value_t* json_get_array_element(const json_value_t* array, size_t index);
  * @param object The JSON value (must be of type JSON_OBJECT)
  * @return The number of key-value pairs
  */
-size_t json_get_object_size(const json_value_t* object);
+size_t json_get_object_size(const json_value_t *object);
 
 /**
  * @brief Get the key at a specific index in a JSON object
@@ -168,7 +168,7 @@ size_t json_get_object_size(const json_value_t* object);
  * @param index The index of the key to retrieve
  * @return The key string at the specified index
  */
-const char* json_get_object_key(const json_value_t* object, size_t index);
+const char *json_get_object_key(const json_value_t *object, size_t index);
 
 /**
  * @brief Get the value at a specific index in a JSON object
@@ -177,6 +177,6 @@ const char* json_get_object_key(const json_value_t* object, size_t index);
  * @param index The index of the value to retrieve
  * @return The JSON value at the specified index
  */
-json_value_t* json_get_object_value(const json_value_t* object, size_t index);
+json_value_t *json_get_object_value(const json_value_t *object, size_t index);
 
 #endif /* JBirdParser_h */
