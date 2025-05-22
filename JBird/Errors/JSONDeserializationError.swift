@@ -23,9 +23,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import Foundation
+
 /// An error thrown when deserialzing a Swift string or UTF-8 encoded byte buffer
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-public enum JSONDeserializationError: Error, Equatable, Sendable, CustomStringConvertible {
+public enum JSONDeserializationError: Error, LocalizedError, Equatable, Sendable, CustomStringConvertible {
 
     // MARK: - Cases
 
@@ -38,7 +40,7 @@ public enum JSONDeserializationError: Error, Equatable, Sendable, CustomStringCo
     /// An unknown deserialization error
     case unknown
 
-    // MARK: - API
+    // MARK: - CustomStringConvertible
 
     public var description: String {
         switch self {
@@ -49,6 +51,12 @@ public enum JSONDeserializationError: Error, Equatable, Sendable, CustomStringCo
         case .unknown:
             "Unknown deserialization error"
         }
+    }
+
+    // MARK: - LocalizedError
+
+    public var errorDescription: String? {
+        description
     }
 
 }

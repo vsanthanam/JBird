@@ -45,4 +45,11 @@ public enum JSONSerializationError: Error, CustomStringConvertible {
             "Attemped to serialize a JSON fragment without required `fragmentsAllowed` option"
         }
     }
+
+    // MARK: - LocalizedError
+
+    public var errorDescription: String? {
+        description
+    }
+
 }

@@ -27,7 +27,7 @@ import Foundation
 
 /// An error thrown when working with ``JSON`` types
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-public enum JSONError: Error, Equatable, Sendable, CustomStringConvertible {
+public enum JSONError: Error, LocalizedError, Equatable, Sendable, CustomStringConvertible {
 
     // MARK: - Cases
 
@@ -116,6 +116,12 @@ public enum JSONError: Error, Equatable, Sendable, CustomStringConvertible {
         case let .uuidDecodingFailure(string):
             "Cannot decode UUID from '\(string)'"
         }
+    }
+
+    // MARK: - LocalizedError
+
+    public var errorDescription: String? {
+        description
     }
 
 }
