@@ -76,7 +76,19 @@ extension JSON {
 
         }
 
-        /// Create a Swift string from a ``JSON`` value
+        /// Create a byte buffer from a typed `JSON` value
+        /// - Parameters:
+        ///   - json: The JSON value to serialize
+        ///   - options: The serialization options
+        /// - Returns: The byte buffer containing a UTF-8 encoded string representing the provided JSON value
+        public static func data(
+            from json: JSON,
+            options: Options = .default
+        ) throws -> Data {
+            try startSerialization(from: json, options: options, isAsync: false)
+        }
+
+        /// Create a Swift string from a typed `JSON` value
         /// - Parameters:
         ///   - json: The JSON value to serialize
         ///   - options: The serialization options
@@ -89,18 +101,11 @@ extension JSON {
             return String(data: data, encoding: .utf8)!
         }
 
-        /// Create a byte buffer from a ``JSON`` value
+        /// Create a byte buffer from a typed `JSON` value
         /// - Parameters:
-        ///   - json: The JSON value to serialize
+        ///   - value: The JSON value to serialize
         ///   - options: The serialization options
         /// - Returns: The byte buffer containing a UTF-8 encoded string representing the provided JSON value
-        public static func data(
-            from json: JSON,
-            options: Options = .default
-        ) throws -> Data {
-            try startSerialization(from: json, options: options, isAsync: false)
-        }
-
         public static func serialize<T>(
             _ value: T,
             options: Options = .default
@@ -114,6 +119,11 @@ extension JSON {
             )
         }
 
+        /// Create a Swift string from a typed `JSON` value
+        /// - Parameters:
+        ///   - value: The JSON value to serialize
+        ///   - options: The serialization options
+        /// - Returns: A Swift string representing the provided JSON value
         public static func stringify<T>(
             _ value: T,
             options: Options = .default

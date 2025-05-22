@@ -33,6 +33,8 @@ extension JSON {
 
         // MARK: - Initializers
 
+        /// Create a literal from a `JSONLiteralConvertible`-conforming tyoe
+        /// - Parameter convertible: The convertible type
         public init(
             _ convertible: some JSONLiteralConvertible
         ) {
@@ -41,14 +43,18 @@ extension JSON {
 
         // MARK: - Cases
 
+        /// A `true` literal
         case `true`
 
+        /// A `false` literal
         case `false`
 
+        /// A `null` literal
         case null
 
         // MARK: - API
 
+        /// The value as a Swift `bool`
         public var boolValue: Bool {
             get throws {
                 switch self {
@@ -62,6 +68,17 @@ extension JSON {
             }
         }
 
+        /// Whether or not the literal value is a Boolean value.
+        public var isBool: Bool {
+            switch self {
+            case .false, .true:
+                true
+            case .null:
+                false
+            }
+        }
+
+        /// Whether or not the literal value is `null`.
         public var isNull: Bool {
             switch self {
             case .true, .false:
