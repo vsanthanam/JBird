@@ -27,7 +27,7 @@ import Foundation
 
 /// A typed API for working with JSON values in Swift.
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral, ExpressibleByStringLiteral, ExpressibleByArrayLiteral, ExpressibleByDictionaryLiteral, ExpressibleByNilLiteral {
+public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral, ExpressibleByStringLiteral, ExpressibleByArrayLiteral, ExpressibleByDictionaryLiteral, ExpressibleByNilLiteral, CustomStringConvertible {
 
     // MARK: - Initializers
 
@@ -1201,6 +1201,23 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         nilLiteral: Void
     ) {
         self = .literal(.null)
+    }
+
+    // MARK: - CustomStringConvertible
+
+    public var description: String {
+        switch self {
+        case let .literal(literal):
+            literal.description
+        case let .numeric(numeric):
+            numeric.description
+        case let .array(array):
+            array.description
+        case let .object(object):
+            object.description
+        case let .string(string):
+            string.description
+        }
     }
 
 }

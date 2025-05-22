@@ -29,7 +29,9 @@ import Foundation
 extension JSON {
 
     /// A JSON number
-    public enum Numeric: Equatable, Hashable, Sendable, ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral {
+    public enum Numeric: Equatable, Hashable, Sendable, ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral, CustomStringConvertible {
+
+        // MARK: - Initializers
 
         public init(
             _ convertible: some JSONNumericConvertible
@@ -37,9 +39,13 @@ extension JSON {
             self = convertible.jsonNumeric
         }
 
+        // MARK: - Cases
+
         case int(Int)
 
         case double(Double)
+
+        // MARK: - API
 
         public var intValue: Int {
             get throws {
@@ -63,6 +69,8 @@ extension JSON {
             }
         }
 
+        // MARK: - ExpressibleByIntegerLiteral
+
         public typealias IntegerLiteralType = Int
 
         public init(
@@ -71,6 +79,8 @@ extension JSON {
             self = .int(value)
         }
 
+        // MARK: - ExpressibleByFloatLiteral
+
         public typealias FloatLiteralType = Double
 
         public init(
@@ -78,6 +88,8 @@ extension JSON {
         ) {
             self = .double(value)
         }
+
+        // MARK: - Equatable
 
         public static func == (lhs: Numeric, rhs: Numeric) -> Bool {
             switch (lhs, rhs) {
@@ -97,6 +109,17 @@ extension JSON {
                 } else {
                     false
                 }
+            }
+        }
+
+        // MARK: - CustomStringConvertible
+
+        public var description: String {
+            switch self {
+            case let .int(int):
+                int.description
+            case let .double(double):
+                double.description
             }
         }
 

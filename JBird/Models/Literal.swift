@@ -29,7 +29,9 @@ import Foundation
 extension JSON {
 
     /// A JSON literal
-    public enum Literal: String, Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, ExpressibleByNilLiteral {
+    public enum Literal: String, Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, ExpressibleByNilLiteral, CustomStringConvertible {
+
+        // MARK: - Initializers
 
         public init(
             _ convertible: some JSONLiteralConvertible
@@ -37,11 +39,15 @@ extension JSON {
             self = convertible.jsonLiteral
         }
 
+        // MARK: - Cases
+
         case `true`
 
         case `false`
 
         case null
+
+        // MARK: - API
 
         public var boolValue: Bool {
             get throws {
@@ -65,6 +71,8 @@ extension JSON {
             }
         }
 
+        // MARK: - ExpressibleByBooleanLiteral
+
         public typealias BooleanLiteralType = Bool
 
         public init(
@@ -73,12 +81,26 @@ extension JSON {
             self.init(value)
         }
 
+        // MARK: - ExpressiblebyNilLiteral
+
         public init(
             nilLiteral: Void
         ) {
             self = .null
         }
 
+        // MARK: - CustomStringConvertible
+
+        public var description: String {
+            switch self {
+            case .false:
+                "false"
+            case .true:
+                "true"
+            case .null:
+                "null"
+            }
+        }
     }
 
 }
