@@ -69,23 +69,40 @@ extension JSON {
 
         }
 
-        public static func object(
+        /// Create a typed JSON value from a JSON string
+        /// - Parameters:
+        ///   - string: The JSON string
+        ///   - options: The deserialization options
+        /// - Returns: The typed JSON value
+        public static func value(
             from string: String,
             options: Options = .default
         ) throws -> JSON {
-            try object(
+            try value(
                 from: string.data(using: .utf8)!,
                 options: options
             )
         }
 
-        public static func object(
+        /// Create a typed JSON value from a UTF-8 encoded byte buffer
+        /// - Parameters:
+        ///   - data: The byte buffer
+        ///   - options: The deserialization options
+        /// - Returns: The typed JSON value
+        public static func value(
             from data: Data,
             options: Options = .default
         ) throws -> JSON {
             try parse(data, false, options)
         }
 
+        /// Create a typed JSON value from a JSON string, asynchronously
+        ///
+        /// Use this method if you need to be able to cancel the deserialization after you start it. This can be useful whe ndeserializing arge payloads.
+        /// - Parameters:
+        ///   - data: The JSON string
+        ///   - options: The deserialization options
+        /// - Returns: The typed JSON value
         public static func deserialize(
             _ data: Data,
             options: Options = .default
@@ -93,6 +110,13 @@ extension JSON {
             try parse(data, true, options)
         }
 
+        /// Create a typed JSON value from a UTF-8 encoded byte buffer, asynchronously
+        ///
+        /// Use this method if you need to be able to cancel the deserialization after you start it. This can be useful whe ndeserializing arge payloads.
+        /// - Parameters:
+        ///   - string: The byte buffer
+        ///   - options: The deserialization options
+        /// - Returns: The typed JSON value
         public static func deserialize(
             _ string: String,
             options: Options = .default

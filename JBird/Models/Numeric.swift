@@ -47,6 +47,7 @@ extension JSON {
 
         // MARK: - API
 
+        /// The numeric value as a Swift integer
         public var intValue: Int {
             get throws {
                 switch self {
@@ -58,6 +59,7 @@ extension JSON {
             }
         }
 
+        /// The numeric value as a Swift double
         public var doubleValue: Double {
             get throws {
                 switch self {
@@ -66,6 +68,26 @@ extension JSON {
                 case .int:
                     throw JSONError.illegalDoubleConversion
                 }
+            }
+        }
+
+        /// Whether or not the numeric value is an integer
+        public var isInt: Bool {
+            switch self {
+            case .int:
+                true
+            case .double:
+                false
+            }
+        }
+
+        /// Whether or not the numeric value is a double
+        public var isDouble: Bool {
+            switch self {
+            case .int:
+                false
+            case .double:
+                true
             }
         }
 
