@@ -48,6 +48,107 @@
 #define SMALL_STRING_SIZE 16
 #define STRING_POOL_INITIAL_SIZE 64
 
+typedef enum {
+    CHAR_CLASS_NONE = 0,
+    CHAR_CLASS_DIGIT = 1,
+    CHAR_CLASS_WHITESPACE = 2,
+    CHAR_CLASS_QUOTE = 3,
+    CHAR_CLASS_BACKSLASH = 4,
+    CHAR_CLASS_LBRACE = 5,
+    CHAR_CLASS_RBRACE = 6,
+    CHAR_CLASS_LBRACKET = 7,
+    CHAR_CLASS_RBRACKET = 8,
+    CHAR_CLASS_COLON = 9,
+    CHAR_CLASS_COMMA = 10,
+    CHAR_CLASS_TRUE_START = 11,
+    CHAR_CLASS_FALSE_START = 12,
+    CHAR_CLASS_NULL_START = 13,
+    CHAR_CLASS_MINUS = 14,
+    CHAR_CLASS_PLUS = 15,
+    CHAR_CLASS_DOT = 16,
+    CHAR_CLASS_E = 17,
+    CHAR_CLASS_CONTROL = 18
+} char_class_t;
+
+static const uint8_t char_class[256] = {
+    [0x00] = CHAR_CLASS_CONTROL,
+    [0x01] = CHAR_CLASS_CONTROL,
+    [0x02] = CHAR_CLASS_CONTROL,
+    [0x03] = CHAR_CLASS_CONTROL,
+    [0x04] = CHAR_CLASS_CONTROL,
+    [0x05] = CHAR_CLASS_CONTROL,
+    [0x06] = CHAR_CLASS_CONTROL,
+    [0x07] = CHAR_CLASS_CONTROL,
+    [0x08] = CHAR_CLASS_CONTROL,
+    [0x0B] = CHAR_CLASS_CONTROL,
+    [0x0C] = CHAR_CLASS_CONTROL,
+    [0x0E] = CHAR_CLASS_CONTROL,
+    [0x0F] = CHAR_CLASS_CONTROL,
+    [0x10] = CHAR_CLASS_CONTROL,
+    [0x11] = CHAR_CLASS_CONTROL,
+    [0x12] = CHAR_CLASS_CONTROL,
+    [0x13] = CHAR_CLASS_CONTROL,
+    [0x14] = CHAR_CLASS_CONTROL,
+    [0x15] = CHAR_CLASS_CONTROL,
+    [0x16] = CHAR_CLASS_CONTROL,
+    [0x17] = CHAR_CLASS_CONTROL,
+    [0x18] = CHAR_CLASS_CONTROL,
+    [0x19] = CHAR_CLASS_CONTROL,
+    [0x1A] = CHAR_CLASS_CONTROL,
+    [0x1B] = CHAR_CLASS_CONTROL,
+    [0x1C] = CHAR_CLASS_CONTROL,
+    [0x1D] = CHAR_CLASS_CONTROL,
+    [0x1E] = CHAR_CLASS_CONTROL,
+    [0x1F] = CHAR_CLASS_CONTROL,
+
+    [' '] = CHAR_CLASS_WHITESPACE,
+    ['\t'] = CHAR_CLASS_WHITESPACE,
+    ['\n'] = CHAR_CLASS_WHITESPACE,
+    ['\r'] = CHAR_CLASS_WHITESPACE,
+
+    ['"'] = CHAR_CLASS_QUOTE,
+    ['\\'] = CHAR_CLASS_BACKSLASH,
+    ['{'] = CHAR_CLASS_LBRACE,
+    ['}'] = CHAR_CLASS_RBRACE,
+    ['['] = CHAR_CLASS_LBRACKET,
+    [']'] = CHAR_CLASS_RBRACKET,
+    [':'] = CHAR_CLASS_COLON,
+    [','] = CHAR_CLASS_COMMA,
+
+    ['0'] = CHAR_CLASS_DIGIT,
+    ['1'] = CHAR_CLASS_DIGIT,
+    ['2'] = CHAR_CLASS_DIGIT,
+    ['3'] = CHAR_CLASS_DIGIT,
+    ['4'] = CHAR_CLASS_DIGIT,
+    ['5'] = CHAR_CLASS_DIGIT,
+    ['6'] = CHAR_CLASS_DIGIT,
+    ['7'] = CHAR_CLASS_DIGIT,
+    ['8'] = CHAR_CLASS_DIGIT,
+    ['9'] = CHAR_CLASS_DIGIT,
+    ['-'] = CHAR_CLASS_MINUS,
+    ['+'] = CHAR_CLASS_PLUS,
+    ['.'] = CHAR_CLASS_DOT,
+    ['e'] = CHAR_CLASS_E,
+    ['E'] = CHAR_CLASS_E,
+
+    // Literal starts
+    ['t'] = CHAR_CLASS_TRUE_START,
+    ['f'] = CHAR_CLASS_FALSE_START,
+    ['n'] = CHAR_CLASS_NULL_START,
+};
+
+static inline bool is_digit(uint8_t c) {
+    return char_class[c] == CHAR_CLASS_DIGIT;
+}
+
+static inline bool is_whitespace(uint8_t c) {
+    return char_class[c] == CHAR_CLASS_WHITESPACE;
+}
+
+static inline bool is_control(uint8_t c) {
+    return char_class[c] == CHAR_CLASS_CONTROL;
+}
+
 typedef struct {
     const char **strings;
     size_t *lengths;
@@ -322,12 +423,12 @@ static bool json_scan_simple_string(json_parser_t *parser, const char **str_star
     while (parser->index < parser->length) {
         uint8_t c = parser->input[parser->index];
 
-        if (c == '"') {
+        if (char_class[c] == CHAR_CLASS_QUOTE) {
             *str_start = (const char *)(parser->input + start_index);
             *str_len = length;
             parser->index++;
             return true;
-        } else if (c == '\\' || c < 0x20) {
+        } else if (char_class[c] == CHAR_CLASS_BACKSLASH || c < 0x20) {
             parser->index = start_index;
             return false;
         } else {
@@ -632,7 +733,7 @@ static inline void json_consume_whitespace(json_parser_t *parser) {
     while (index < length) {
         uint8_t c = input[index];
 
-        if (c == ' ' || c == '\t' || c == '\n' || c == '\r') {
+        if (is_whitespace(c)) {
             index++;
         } else {
             break;
@@ -840,13 +941,13 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
     if (!json_has_more(parser))
         return JSON_INVALID_NUMBER;
     uint8_t c = json_peek(parser);
-    if (!isdigit(c))
+    if (!is_digit(c))
         return JSON_INVALID_NUMBER;
 
     if (c == '0') {
         digit_count = 1;
         json_next(parser);
-        if (json_has_more(parser) && isdigit(json_peek(parser))) {
+        if (json_has_more(parser) && is_digit(json_peek(parser))) {
             return JSON_INVALID_NUMBER;
         }
     } else {
@@ -866,9 +967,9 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
 
                 __m128i gt_or_eq_zero = _mm_cmpgt_epi8(input, _mm_sub_epi8(zero_char, _mm_set1_epi8(1)));
                 __m128i lt_or_eq_nine = _mm_cmplt_epi8(input, _mm_add_epi8(nine, _mm_set1_epi8(1)));
-                __m128i is_digit = _mm_and_si128(gt_or_eq_zero, lt_or_eq_nine);
+                __m128i is_digit_vec = _mm_and_si128(gt_or_eq_zero, lt_or_eq_nine);
 
-                uint16_t mask = _mm_movemask_epi8(is_digit);
+                uint16_t mask = _mm_movemask_epi8(is_digit_vec);
 
                 if (mask != 0xFFFF) {
                     unsigned int trailing_zeros = __builtin_ctz(~mask);
@@ -888,14 +989,14 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
 
                 uint8x16_t gt_or_eq_zero = vcgeq_u8(input, zero_char);
                 uint8x16_t lt_or_eq_nine = vcleq_u8(input, nine);
-                uint8x16_t is_digit = vandq_u8(gt_or_eq_zero, lt_or_eq_nine);
+                uint8x16_t is_digit_vec = vandq_u8(gt_or_eq_zero, lt_or_eq_nine);
 
-                uint64_t high = vgetq_lane_u64(vreinterpretq_u64_u8(is_digit), 1);
-                uint64_t low = vgetq_lane_u64(vreinterpretq_u64_u8(is_digit), 0);
+                uint64_t high = vgetq_lane_u64(vreinterpretq_u64_u8(is_digit_vec), 1);
+                uint64_t low = vgetq_lane_u64(vreinterpretq_u64_u8(is_digit_vec), 0);
 
                 if (high != 0xFFFFFFFFFFFFFFFF || low != 0xFFFFFFFFFFFFFFFF) {
                     uint8_t bytes[16];
-                    vst1q_u8(bytes, is_digit);
+                    vst1q_u8(bytes, is_digit_vec);
                     int i;
                     for (i = 0; i < 16; i++) {
                         if (bytes[i] == 0)
@@ -910,7 +1011,7 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
 #else
             size_t i = 0;
             while (parser->index + digit_run_length < parser->length &&
-                   isdigit(parser->input[parser->index + digit_run_length])) {
+                   is_digit(parser->input[parser->index + digit_run_length])) {
                 digit_run_length++;
             }
 #endif
@@ -947,7 +1048,7 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
                 }
             }
 
-            while (json_has_more(parser) && isdigit(json_peek(parser))) {
+            while (json_has_more(parser) && is_digit(json_peek(parser))) {
                 uint8_t digit = json_next(parser) - '0';
                 digit_count++;
 
@@ -966,7 +1067,7 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
                 }
             }
         } else {
-            while (json_has_more(parser) && isdigit(json_peek(parser))) {
+            while (json_has_more(parser) && is_digit(json_peek(parser))) {
                 uint8_t digit = json_next(parser) - '0';
                 digit_count++;
 
@@ -996,7 +1097,7 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
         is_double = true;
         json_next(parser);
 
-        if (!json_has_more(parser) || !isdigit(json_peek(parser))) {
+        if (!json_has_more(parser) || !is_digit(json_peek(parser))) {
             return JSON_INVALID_NUMBER;
         }
 
@@ -1006,7 +1107,7 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
 
         double fraction = 0.0;
         double divisor = 1.0;
-        while (json_has_more(parser) && isdigit(json_peek(parser))) {
+        while (json_has_more(parser) && is_digit(json_peek(parser))) {
             uint8_t digit = json_next(parser) - '0';
             divisor *= 10.0;
             fraction += (double)digit / divisor;
@@ -1023,7 +1124,7 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
             exp_negative = (json_next(parser) == '-');
         }
 
-        if (!json_has_more(parser) || !isdigit(json_peek(parser))) {
+        if (!json_has_more(parser) || !is_digit(json_peek(parser))) {
             return JSON_INVALID_NUMBER;
         }
 
@@ -1032,7 +1133,7 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
         }
 
         int exp_value = 0;
-        while (json_has_more(parser) && isdigit(json_peek(parser))) {
+        while (json_has_more(parser) && is_digit(json_peek(parser))) {
             uint8_t digit = json_next(parser) - '0';
             if (exp_value <= 308) {
                 exp_value = exp_value * 10 + digit;
@@ -1063,6 +1164,83 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
 }
 
 static json_error_t json_parse_value(json_parser_t *parser, json_value_t **out_value);
+
+static json_error_t json_parse_array(json_parser_t *parser, json_value_t **out_value);
+
+static json_error_t json_parse_object(json_parser_t *parser, json_value_t **out_value);
+
+static json_error_t json_parse_true(json_parser_t *parser, json_value_t **out_value);
+
+static json_error_t json_parse_false(json_parser_t *parser, json_value_t **out_value);
+
+static json_error_t json_parse_null(json_parser_t *parser, json_value_t **out_value);
+
+static json_error_t json_parse_value(json_parser_t *parser, json_value_t **out_value) {
+    json_consume_whitespace(parser);
+
+    if (!json_has_more(parser)) {
+        return JSON_UNEXPECTED_END_OF_INPUT;
+    }
+
+    uint8_t c = json_peek(parser);
+    uint8_t char_type = char_class[c];
+
+    // Handle string
+    if (char_type == CHAR_CLASS_QUOTE) {
+        parser->index++;
+
+        const char *str_start;
+        size_t str_length;
+
+        if (json_scan_simple_string(parser, &str_start, &str_length)) {
+            json_value_t *value = json_create_value_from_arena(parser->arena);
+            if (!value)
+                return JSON_OUT_OF_MEMORY;
+
+            value->type = JSON_STRING;
+            json_string_init(&value->data.string, str_start, str_length, parser->arena);
+
+            *out_value = value;
+            return JSON_NO_ERROR;
+        }
+
+        json_error_t err = json_parse_string_into_temp_buffer(parser);
+        if (err != JSON_NO_ERROR) {
+            return err;
+        }
+
+        *out_value = json_create_string(parser->arena, parser->temp_buffer, parser->temp_size);
+
+        json_temp_buffer_clear(parser);
+
+        return *out_value ? JSON_NO_ERROR : JSON_OUT_OF_MEMORY;
+    }
+
+    // Handle structural characters and literals
+    switch (char_type) {
+    case CHAR_CLASS_LBRACE:
+        return json_parse_object(parser, out_value);
+
+    case CHAR_CLASS_LBRACKET:
+        return json_parse_array(parser, out_value);
+
+    case CHAR_CLASS_TRUE_START:
+        return json_parse_true(parser, out_value);
+
+    case CHAR_CLASS_FALSE_START:
+        return json_parse_false(parser, out_value);
+
+    case CHAR_CLASS_NULL_START:
+        return json_parse_null(parser, out_value);
+
+    case CHAR_CLASS_MINUS:
+    case CHAR_CLASS_DIGIT:
+        return json_parse_number(parser, out_value);
+
+    default:
+        return JSON_INVALID_CHARACTER;
+    }
+}
 
 static json_error_t json_parse_array(json_parser_t *parser, json_value_t **out_value) {
     json_error_t err = json_expect(parser, '[');
@@ -1354,77 +1532,34 @@ static json_error_t json_parse_null(json_parser_t *parser, json_value_t **out_va
     return *out_value ? JSON_NO_ERROR : JSON_OUT_OF_MEMORY;
 }
 
-static json_error_t json_parse_value(json_parser_t *parser, json_value_t **out_value) {
-    json_consume_whitespace(parser);
+static bool try_parse_simple_string(json_parser_t *parser, const char **out_str, size_t *out_len) {
+    size_t start_idx = parser->index;
+    const uint8_t *input = parser->input;
+    size_t length = parser->length;
 
-    if (!json_has_more(parser)) {
-        return JSON_UNEXPECTED_END_OF_INPUT;
-    }
+    if (char_class[input[start_idx]] != CHAR_CLASS_QUOTE)
+        return false;
+    start_idx++;
 
-    uint8_t c = json_peek(parser);
+    size_t curr_idx = start_idx;
+    while (curr_idx < length) {
+        uint8_t c = input[curr_idx];
 
-    switch (c) {
-    case '"': {
-        parser->index++;
-
-        const char *str_start;
-        size_t str_length;
-
-        if (json_scan_simple_string(parser, &str_start, &str_length)) {
-            json_value_t *value = json_create_value_from_arena(parser->arena);
-            if (!value)
-                return JSON_OUT_OF_MEMORY;
-
-            value->type = JSON_STRING;
-            json_string_init(&value->data.string, str_start, str_length, parser->arena);
-
-            *out_value = value;
-            return JSON_NO_ERROR;
+        if (char_class[c] == CHAR_CLASS_QUOTE) {
+            *out_str = (const char *)(input + start_idx);
+            *out_len = curr_idx - start_idx;
+            parser->index = curr_idx + 1;
+            return true;
         }
 
-        json_error_t err = json_parse_string_into_temp_buffer(parser);
-        if (err != JSON_NO_ERROR) {
-            return err;
+        if (char_class[c] == CHAR_CLASS_BACKSLASH || c < 0x20) {
+            return false;
         }
 
-        *out_value = json_create_string(parser->arena, parser->temp_buffer, parser->temp_size);
-
-        json_temp_buffer_clear(parser);
-
-        return *out_value ? JSON_NO_ERROR : JSON_OUT_OF_MEMORY;
+        curr_idx++;
     }
 
-    case '{':
-        return json_parse_object(parser, out_value);
-
-    case '[':
-        return json_parse_array(parser, out_value);
-
-    case 't':
-        return json_parse_true(parser, out_value);
-
-    case 'f':
-        return json_parse_false(parser, out_value);
-
-    case 'n':
-        return json_parse_null(parser, out_value);
-
-    case '-':
-    case '0':
-    case '1':
-    case '2':
-    case '3':
-    case '4':
-    case '5':
-    case '6':
-    case '7':
-    case '8':
-    case '9':
-        return json_parse_number(parser, out_value);
-
-    default:
-        return JSON_INVALID_CHARACTER;
-    }
+    return false;
 }
 
 json_error_t json_parse(const uint8_t *data, size_t length, json_value_t **out_value, bool allow_bom, bool allow_whitespace) {
@@ -1465,34 +1600,4 @@ json_error_t json_parse(const uint8_t *data, size_t length, json_value_t **out_v
     }
 
     return err;
-}
-
-static bool try_parse_simple_string(json_parser_t *parser, const char **out_str, size_t *out_len) {
-    size_t start_idx = parser->index;
-    const uint8_t *input = parser->input;
-    size_t length = parser->length;
-
-    if (input[start_idx] != '"')
-        return false;
-    start_idx++;
-
-    size_t curr_idx = start_idx;
-    while (curr_idx < length) {
-        uint8_t c = input[curr_idx];
-
-        if (c == '"') {
-            *out_str = (const char *)(input + start_idx);
-            *out_len = curr_idx - start_idx;
-            parser->index = curr_idx + 1;
-            return true;
-        }
-
-        if (c == '\\' || c < 0x20) {
-            return false;
-        }
-
-        curr_idx++;
-    }
-
-    return false;
 }
