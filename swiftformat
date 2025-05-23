@@ -1,3 +1,10 @@
 #!/bin/bash
 
+echo "✨ Formatting Swift files"
 swift package --allow-writing-to-package-directory swiftformat . --cache ignore
+if [ $? -eq 0 ]; then
+  echo "✅ Formatting complete."
+else
+  echo "❌ Formatting failed!"
+  exit 1
+fi

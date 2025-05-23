@@ -6,6 +6,53 @@ OUTPUT_DIR="Products"
 ARCHIVE_DIR="$OUTPUT_DIR/archives"
 XCFRAMEWORK_NAME="$FRAMEWORK_NAME.xcframework"
 
+# Check if xcbeautify is available
+XCBEAUTIFY_AVAILABLE=false
+if command -v xcbeautify >/dev/null 2>&1; then
+  XCBEAUTIFY_AVAILABLE=true
+  echo "🧰 xcbeautify detected, will use for nicer output"
+fi
+
+# Parse arguments
+BUILD_STATIC=false
+PLATFORMS=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --static)
+      BUILD_STATIC=true
+      shift
+      ;;
+    --platforms)
+      PLATFORMS="$2"
+      shift 2
+      ;;
+    *)
+      echo "Unknown option: $1"
+      echo "Usage: $0 [--static] [--platforms \"platform1,platform2,...\"]"
+      exit 1
+      ;;
+  esac
+done
+
+if [ "$BUILD_STATIC" = true ]; then
+  echo "🔨 Building STATIC XCFramework"
+else
+  echo "🔨 Building DYNAMIC XCFramework"
+fi
+
+# Available platforms
+ALL_PLATFORMS=("macos" "ios" "ios-simulator" "tvos" "tvos-simulator" "watchos" "watchos-simulator" "xros" "xros-simulator")
+
+# If platforms are specified, use them; otherwise use all platforms
+if [ -n "$PLATFORMS" ]; then
+  IFS=',' read -ra SELECTED_PLATFORMS <<< "$PLATFORMS"
+  echo "🎯 Building for platforms: ${PLATFORMS}"
+else
+  SELECTED_PLATFORMS=("${ALL_PLATFORMS[@]}")
+  echo "🎯 Building for all platforms"
+fi
+
 rm -rf "$OUTPUT_DIR"
 mkdir -p "$ARCHIVE_DIR"
 
@@ -16,44 +63,126 @@ build_archive() {
 
   echo "📦 Archiving $name ($sdk) → $destination"
 
-  xcodebuild archive \
-    -scheme "$FRAMEWORK_NAME" \
-    -destination "$destination" \
-    -archivePath "$ARCHIVE_DIR/$name.xcarchive" \
-    -sdk "$sdk" \
-    SKIP_INSTALL=NO \
-    BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
-    CODE_SIGNING_ALLOWED=NO \
-    CODE_SIGN_IDENTITY="" \
-    OTHER_SWIFT_FLAGS="-DBUILD_XCFRAMEWORK" \
+  # Base build settings
+  build_settings=(
+    -scheme "$FRAMEWORK_NAME"
+    -destination "$destination"
+    -archivePath "$ARCHIVE_DIR/$name.xcarchive"
+    -sdk "$sdk"
+    SKIP_INSTALL=NO
+    BUILD_LIBRARY_FOR_DISTRIBUTION=YES
+    CODE_SIGNING_ALLOWED=NO
+    CODE_SIGN_IDENTITY=""
+    OTHER_SWIFT_FLAGS="-DBUILD_XCFRAMEWORK"
     ONLY_ACTIVE_ARCH=NO
+  )
+  
+  # Add static lib setting if --static flag was provided
+  if [ "$BUILD_STATIC" = true ]; then
+    build_settings+=(MACH_O_TYPE=staticlib)
+  fi
+
+  if [ "$XCBEAUTIFY_AVAILABLE" = true ]; then
+    set -o pipefail
+    xcodebuild archive "${build_settings[@]}" | xcbeautify
+    local status=${PIPESTATUS[0]}
+    if [ $status -ne 0 ]; then
+      exit $status
+    fi
+  else
+    xcodebuild archive "${build_settings[@]}"
+  fi
+}
+
+# Function to check if an item exists in an array
+contains() {
+  local item="$1"
+  shift
+  local array=("$@")
+  for element in "${array[@]}"; do
+    if [[ "$element" == "$item" ]]; then
+      return 0
+    fi
+  done
+  return 1
 }
 
 echo "🚧 Starting archives..."
 
-build_archive "macos" "generic/platform=macOS" macosx
-build_archive "ios" "generic/platform=iOS" iphoneos
-build_archive "ios-simulator" "platform=iOS Simulator,name=iPhone 16" iphonesimulator
-build_archive "tvos" "generic/platform=tvOS" appletvos
-build_archive "tvos-simulator" "platform=tvOS Simulator,name=Apple TV 4K (3rd generation)" appletvsimulator
-build_archive "watchos" "generic/platform=watchOS" watchos
-build_archive "watchos-simulator" "platform=watchOS Simulator,name=Apple Watch Series 10 (46mm)" watchsimulator
-build_archive "xros" "generic/platform=visionOS" xros
-build_archive "xros-simulator" "platform=visionOS Simulator,name=Apple Vision Pro" xrsimulator
+# Build archives only for selected platforms
+declare -a BUILT_PLATFORMS=()
+
+if contains "macos" "${SELECTED_PLATFORMS[@]}"; then
+  build_archive "macos" "generic/platform=macOS" macosx
+  BUILT_PLATFORMS+=("macos")
+fi
+
+if contains "ios" "${SELECTED_PLATFORMS[@]}"; then
+  build_archive "ios" "generic/platform=iOS" iphoneos
+  BUILT_PLATFORMS+=("ios")
+fi
+
+if contains "ios-simulator" "${SELECTED_PLATFORMS[@]}"; then
+  build_archive "ios-simulator" "platform=iOS Simulator,name=iPhone 16" iphonesimulator
+  BUILT_PLATFORMS+=("ios-simulator")
+fi
+
+if contains "tvos" "${SELECTED_PLATFORMS[@]}"; then
+  build_archive "tvos" "generic/platform=tvOS" appletvos
+  BUILT_PLATFORMS+=("tvos")
+fi
+
+if contains "tvos-simulator" "${SELECTED_PLATFORMS[@]}"; then
+  build_archive "tvos-simulator" "platform=tvOS Simulator,name=Apple TV 4K (3rd generation)" appletvsimulator
+  BUILT_PLATFORMS+=("tvos-simulator")
+fi
+
+if contains "watchos" "${SELECTED_PLATFORMS[@]}"; then
+  build_archive "watchos" "generic/platform=watchOS" watchos
+  BUILT_PLATFORMS+=("watchos")
+fi
+
+if contains "watchos-simulator" "${SELECTED_PLATFORMS[@]}"; then
+  build_archive "watchos-simulator" "platform=watchOS Simulator,name=Apple Watch Series 10 (46mm)" watchsimulator
+  BUILT_PLATFORMS+=("watchos-simulator")
+fi
+
+if contains "xros" "${SELECTED_PLATFORMS[@]}"; then
+  build_archive "xros" "generic/platform=visionOS" xros
+  BUILT_PLATFORMS+=("xros")
+fi
+
+if contains "xros-simulator" "${SELECTED_PLATFORMS[@]}"; then
+  build_archive "xros-simulator" "platform=visionOS Simulator,name=Apple Vision Pro" xrsimulator
+  BUILT_PLATFORMS+=("xros-simulator")
+fi
+
+if [ ${#BUILT_PLATFORMS[@]} -eq 0 ]; then
+  echo "❌ Error: No valid platforms selected. Exiting."
+  exit 1
+fi
 
 echo "🧬 Creating XCFramework..."
 
-xcodebuild -create-xcframework \
-  -framework "$ARCHIVE_DIR/macos.xcarchive/Products/Library/Frameworks/$FRAMEWORK_NAME.framework" \
-  -framework "$ARCHIVE_DIR/ios.xcarchive/Products/Library/Frameworks/$FRAMEWORK_NAME.framework" \
-  -framework "$ARCHIVE_DIR/ios-simulator.xcarchive/Products/Library/Frameworks/$FRAMEWORK_NAME.framework" \
-  -framework "$ARCHIVE_DIR/tvos.xcarchive/Products/Library/Frameworks/$FRAMEWORK_NAME.framework" \
-  -framework "$ARCHIVE_DIR/tvos-simulator.xcarchive/Products/Library/Frameworks/$FRAMEWORK_NAME.framework" \
-  -framework "$ARCHIVE_DIR/watchos.xcarchive/Products/Library/Frameworks/$FRAMEWORK_NAME.framework" \
-  -framework "$ARCHIVE_DIR/watchos-simulator.xcarchive/Products/Library/Frameworks/$FRAMEWORK_NAME.framework" \
-  -framework "$ARCHIVE_DIR/xros.xcarchive/Products/Library/Frameworks/$FRAMEWORK_NAME.framework" \
-  -framework "$ARCHIVE_DIR/xros-simulator.xcarchive/Products/Library/Frameworks/$FRAMEWORK_NAME.framework" \
-  -output "$OUTPUT_DIR/$XCFRAMEWORK_NAME"
+# Prepare xcframework command with only built platforms
+CMD_ARGS=()
+
+for platform in "${BUILT_PLATFORMS[@]}"; do
+  CMD_ARGS+=(-framework "$ARCHIVE_DIR/$platform.xcarchive/Products/Library/Frameworks/$FRAMEWORK_NAME.framework")
+done
+
+CMD_ARGS+=(-output "$OUTPUT_DIR/$XCFRAMEWORK_NAME")
+
+if [ "$XCBEAUTIFY_AVAILABLE" = true ]; then
+  set -o pipefail
+  xcodebuild -create-xcframework "${CMD_ARGS[@]}" | xcbeautify
+  status=${PIPESTATUS[0]}
+  if [ $status -ne 0 ]; then
+    exit $status
+  fi
+else
+  xcodebuild -create-xcframework "${CMD_ARGS[@]}"
+fi
 
 echo "🎉 XCFramework created at $OUTPUT_DIR/$XCFRAMEWORK_NAME"
 

@@ -63,7 +63,9 @@ $ path/to/jbird/repo
 $ ./.scripts/build-xcframework
 ```
 
-*Note: the XCFramework does not include any of the JBird macros*
+By default, the script creates a dynamic framework that builds for all Apple platforms. You can force a static framework by using the `--static` flag. You can specifiy specific platforms to include with the `--platforms` flag.
+
+*Note: the XCFramework does not include any of the JBird macros. You must have Xcode and the SDKs of the target platforms installed on your machine.*
 
 ## Clone from Source
 
