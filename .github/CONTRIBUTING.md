@@ -65,9 +65,8 @@ JBird maintains 100% test coverage for its codebase:
 
 ## Code Style
 
-- Use SwiftFormat for formatting Swift code (config in `.swiftformat`).
-- Maintain C11 compliance for the parser core.
-- Use `StrictConcurrency=complete` for all Swift code.
+- Use SwiftFormat for formatting Swift code. You can run SwiftFormat with `$ ./swiftformat`
+- Maintain C11 compliance for the parser core. You can run the clang-format with `$ ./clang-format`
 
 ## Legal Requirements
 
