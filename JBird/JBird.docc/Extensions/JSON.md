@@ -41,19 +41,19 @@
 
 ### Subscripting
 
-- ``value(forSubscript:)-(Subscript)``
+- ``value(forSubscript:)-(JSON.Subscript)``
 - ``value(forSubscript:)-(JSONSubscriptConvertible)``
-- ``value(atPath:)-([Subscript])``
+- ``value(atPath:)-([JSON.Subscript])``
 - ``value(atPath:)-(PathComponent)``
-- ``containsValue(forSubscript:)-(Subscript)``
+- ``containsValue(forSubscript:)-(JSON.Subscript)``
 - ``containsValue(forSubscript:)-(JSONSubscriptConvertible)``
-- ``setValue(_:forSubscript:)-(_,Subscript)``
+- ``setValue(_:forSubscript:)-(_,JSON.Subscript)``
 - ``setValue(_:forSubscript:)-(_,JSONSubscriptConvertible)``
-- ``removeValue(forSubscript:)-(Subscript)``
+- ``removeValue(forSubscript:)-(JSON.Subscript)``
 - ``removeValue(forSubscript:)-(JSONSubscriptConvertible)``
-- ``subscript(_:)-(Subscript...)``
+- ``subscript(_:)-(JSON.Subscript...)``
 - ``subscript(_:)-(PathComponent)``
-- ``subscript(_:as:)-(Subscript...,_)``
+- ``subscript(_:as:)-(JSON.Subscript...,_)``
 - ``subscript(_:as:)-(PathComponent,_)``
 
 ### Working with JSON objects
