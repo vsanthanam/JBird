@@ -85,7 +85,11 @@ extension JSON {
             from json: JSON,
             options: Options = .default
         ) throws -> Data {
-            try startSerialization(from: json, options: options, isAsync: false)
+            try startSerialization(
+                from: json,
+                options: options,
+                isCancellable: false
+            )
         }
 
         /// Create a Swift string from a typed `JSON` value
@@ -115,7 +119,7 @@ extension JSON {
             return try startSerialization(
                 from: json,
                 options: options,
-                isAsync: true
+                isCancellable: true
             )
         }
 
@@ -138,7 +142,7 @@ extension JSON {
         private static func startSerialization(
             from json: JSON,
             options: Options,
-            isAsync: Bool
+            isCancellable: Bool
         ) throws -> Data {
             if !options.contains(.fragmentsAllowed) {
                 switch json {
@@ -155,7 +159,7 @@ extension JSON {
             if options.contains(.includeByteOrderMark) {
                 serializeBOM(into: &bytes)
             }
-            try serialize(json: json, into: &bytes, level: options.contains(.prettyPrinted) ? 0 : nil, options: options, isAsync: isAsync)
+            try serialize(json: json, into: &bytes, level: options.contains(.prettyPrinted) ? 0 : nil, options: options, isCancellable: isCancellable)
             return Data(bytes)
         }
 
@@ -172,18 +176,18 @@ extension JSON {
             into bytes: inout [UInt8],
             level: Int?,
             options: Options,
-            isAsync: Bool
+            isCancellable: Bool
         ) throws {
-            if isAsync {
+            if isCancellable {
                 try Task.checkCancellation()
             }
             switch json {
             case let .literal(literal):
                 serialize(literal: literal, into: &bytes)
             case let .object(object):
-                try serialize(object: object, into: &bytes, level: level, options: options, isAsync: isAsync)
+                try serialize(object: object, into: &bytes, level: level, options: options, isAsync: isCancellable)
             case let .array(array):
-                try serialize(array: array, into: &bytes, level: level, options: options, isAsync: isAsync)
+                try serialize(array: array, into: &bytes, level: level, options: options, isAsync: isCancellable)
             case let .numeric(numeric):
                 try serialize(numeric: numeric, into: &bytes)
             case let .string(string):
@@ -335,10 +339,10 @@ extension JSON {
             for value in realArray.dropLast() {
                 if let level {
                     addIndentation(level: level + 1, into: &bytes)
-                    try serialize(json: value, into: &bytes, level: level + 1, options: options, isAsync: isAsync)
+                    try serialize(json: value, into: &bytes, level: level + 1, options: options, isCancellable: isAsync)
                     bytes += [0x2C, 0x0A]
                 } else {
-                    try serialize(json: value, into: &bytes, level: level, options: options, isAsync: isAsync)
+                    try serialize(json: value, into: &bytes, level: level, options: options, isCancellable: isAsync)
                     bytes += [0x2C]
                 }
 
@@ -347,10 +351,10 @@ extension JSON {
             if let lastValue = realArray.last {
                 if let level {
                     addIndentation(level: level + 1, into: &bytes)
-                    try serialize(json: lastValue, into: &bytes, level: level + 1, options: options, isAsync: isAsync)
+                    try serialize(json: lastValue, into: &bytes, level: level + 1, options: options, isCancellable: isAsync)
                     bytes += [0x0A]
                 } else {
-                    try serialize(json: lastValue, into: &bytes, level: nil, options: options, isAsync: isAsync)
+                    try serialize(json: lastValue, into: &bytes, level: nil, options: options, isCancellable: isAsync)
                 }
             }
 
@@ -395,12 +399,12 @@ extension JSON {
                     addIndentation(level: level + 1, into: &bytes)
                     serialize(string: key, options: options, into: &bytes)
                     bytes += [0x3A, 0x20]
-                    try serialize(json: value, into: &bytes, level: level + 1, options: options, isAsync: isAsync)
+                    try serialize(json: value, into: &bytes, level: level + 1, options: options, isCancellable: isAsync)
                     bytes += [0x2C, 0x0A]
                 } else {
                     serialize(string: key, options: options, into: &bytes)
                     bytes += [0x3A]
-                    try serialize(json: value, into: &bytes, level: level, options: options, isAsync: isAsync)
+                    try serialize(json: value, into: &bytes, level: level, options: options, isCancellable: isAsync)
                     bytes += [0x2C]
                 }
             }
@@ -411,12 +415,12 @@ extension JSON {
                     addIndentation(level: level + 1, into: &bytes)
                     serialize(string: key, options: options, into: &bytes)
                     bytes += [0x3A, 0x20]
-                    try serialize(json: value, into: &bytes, level: level + 1, options: options, isAsync: isAsync)
+                    try serialize(json: value, into: &bytes, level: level + 1, options: options, isCancellable: isAsync)
                     bytes += [0x0A]
                 } else {
                     serialize(string: key, options: options, into: &bytes)
                     bytes += [0x3A]
-                    try serialize(json: value, into: &bytes, level: nil, options: options, isAsync: isAsync)
+                    try serialize(json: value, into: &bytes, level: nil, options: options, isCancellable: isAsync)
                 }
             }
 

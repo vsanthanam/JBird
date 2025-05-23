@@ -30,8 +30,10 @@ import Testing
 func jSONDeserializationErrorDescriptions() {
     let parseFailure = JSONDeserializationError.parseFailure("My Foo Message!")
     #expect(parseFailure.description == "JSON Parse error: My Foo Message!")
+
     let illegalFragment = JSONDeserializationError.illegalFragment
     #expect(illegalFragment.description == "JSON fragment cannot be deserialized")
+
     let unknown = JSONDeserializationError.unknown
     #expect(unknown.description == "Unknown deserialization error")
 }

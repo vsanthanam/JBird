@@ -61,4 +61,45 @@ struct NumericTests {
         let double: JSON.Numeric = 4.2
         #expect(double == .double(4.2))
     }
+
+    @Test("Untyped Numeric")
+    func untypedNumeric() throws {
+        let int: JSON.Numeric = 12
+        let untypedInt = try #require(int.untyped as? Int)
+        #expect(untypedInt == 12)
+
+        let double: JSON.Numeric = 12.34
+        let untypedDouble = try #require(double.untyped as? Double)
+        #expect(untypedDouble == 12.34)
+    }
+
+    @Test("Numeric Description")
+    func numericDescription() {
+        let int: JSON.Numeric = 12
+        let intDescription = 12.description
+        #expect(int.description == intDescription)
+
+        let double: JSON.Numeric = 12.34
+        let doubledescription = 12.34.description
+        #expect(double.description == doubledescription)
+    }
+
+    @Test("Numeric isInt")
+    func isInt() {
+        let int: JSON.Numeric = 12
+        #expect(int.isInt)
+
+        let double: JSON.Numeric = 12.34
+        #expect(!double.isInt)
+    }
+
+    @Test("Numeric isDouble")
+    func isDouble() {
+        let int: JSON.Numeric = 12
+        #expect(!int.isDouble)
+
+        let double: JSON.Numeric = 12.34
+        #expect(double.isDouble)
+    }
+
 }

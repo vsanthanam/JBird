@@ -399,7 +399,7 @@ struct JSONTests {
         @Test("Initialize from String")
         func stringInit() throws {
             let jsonString = "{\"foo\":\"bar\"}"
-            let json = try JSON(deserializing: jsonString)
+            let json = try JSON(jsonString: jsonString)
             #expect(json == ["foo": "bar"])
         }
     }

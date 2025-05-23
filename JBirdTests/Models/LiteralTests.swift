@@ -51,11 +51,32 @@ struct LiteralTests {
         }
     }
 
-    @Test("isNull Tests")
+    @Test("Literal isNull Tests")
     func isNullTests() {
         #expect(JSON.Literal.true.isNull == false)
         #expect(JSON.Literal.false.isNull == false)
         #expect(JSON.Literal.null.isNull == true)
+    }
+
+    @Test("Literal isBool Tests")
+    func isBoolTests() {
+        #expect(JSON.Literal.true.isBool == true)
+        #expect(JSON.Literal.false.isBool == true)
+        #expect(JSON.Literal.null.isBool == false)
+    }
+
+    @Test("Literal Untyped Tests")
+    func untypeTests() throws {
+        let `true` = JSON.Literal.true
+        let trueUntyped = try #require(`true`.untyped as? Bool)
+        #expect(trueUntyped)
+
+        let `false` = JSON.Literal.false
+        let falseUntyped = try #require(`false`.untyped as? Bool)
+        #expect(!falseUntyped)
+
+        let null = JSON.Literal.null
+        #expect(null.untyped == nil)
     }
 
     @Test("Literal Expression Tests")
@@ -67,6 +88,13 @@ struct LiteralTests {
         #expect(`true` == .true)
         #expect(`false` == .false)
         #expect(null == .null)
+    }
+
+    @Test("Literal Description Tests")
+    func descriptionTests() {
+        #expect(JSON.Literal.true.description == "true")
+        #expect(JSON.Literal.false.description == "false")
+        #expect(JSON.Literal.null.description == "null")
     }
 
 }

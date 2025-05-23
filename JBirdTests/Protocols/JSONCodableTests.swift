@@ -404,4 +404,194 @@ struct JSONCodableTests {
         #expect(uuid == decoded)
     }
 
+    @Suite("Int8 Conformance Tests")
+    struct Int8Tests {
+
+        @Test("Int8 Encode")
+        func int8Encode() {
+            let int: Int8 = 21
+            let json = int.encodeToJSON()
+            #expect(json == .numeric(.int(21)))
+        }
+
+        @Test("Int8 Decode")
+        func int8Decode() throws {
+            let json = JSON.numeric(.int(21))
+            let int = try json.decode(into: Int8.self)
+            #expect(int == 21)
+        }
+
+    }
+
+    @Suite("Int16 Conformance Tests")
+    struct Int16Tests {
+
+        @Test("Int16 Encode")
+        func int16Encode() {
+            let int: Int16 = 21
+            let json = int.encodeToJSON()
+            #expect(json == .numeric(.int(21)))
+        }
+
+        @Test("Int16 Decode")
+        func int16Decode() throws {
+            let json = JSON.numeric(.int(21))
+            let int = try json.decode(into: Int16.self)
+            #expect(int == 21)
+        }
+
+    }
+
+    @Suite("Int32 Conformance Tests")
+    struct Int32Tests {
+
+        @Test("Int32 Encode")
+        func int32Encode() {
+            let int: Int32 = 21
+            let json = int.encodeToJSON()
+            #expect(json == .numeric(.int(21)))
+        }
+
+        @Test("Int32 Decode")
+        func int32Decode() throws {
+            let json = JSON.numeric(.int(21))
+            let int = try json.decode(into: Int32.self)
+            #expect(int == 21)
+        }
+
+    }
+
+    @Suite("Int64 Conformance Tests")
+    struct Int64Tests {
+
+        @Test("Int64 Encode")
+        func int64Encode() {
+            let int: Int64 = 21
+            let json = int.encodeToJSON()
+            #expect(json == .numeric(.int(21)))
+        }
+
+        @Test("Int64 Decode")
+        func int64Decode() throws {
+            let json = JSON.numeric(.int(21))
+            let int = try json.decode(into: Int64.self)
+            #expect(int == 21)
+        }
+
+    }
+
+    @Suite("UInt Conformance Tests")
+    struct UIntTests {
+
+        @Test("UInt Encode")
+        func uintEncode() {
+            let int: UInt = 21
+            let json = int.encodeToJSON()
+            #expect(json == .numeric(.int(21)))
+        }
+
+        @Test("UInt Decode")
+        func uintDecode() throws {
+            let json = JSON.numeric(.int(21))
+            let int = try json.decode(into: UInt.self)
+            #expect(int == 21)
+        }
+
+    }
+
+    @Suite("UInt8 Conformance Tests")
+    struct UInt8Tests {
+
+        @Test("UInt8 Encode")
+        func uint8Encode() {
+            let int: UInt8 = 21
+            let json = int.encodeToJSON()
+            #expect(json == .numeric(.int(21)))
+        }
+
+        @Test("UInt Decode")
+        func uint9Decode() throws {
+            let json = JSON.numeric(.int(21))
+            let int = try json.decode(into: UInt8.self)
+            #expect(int == 21)
+        }
+
+    }
+
+    @Suite("UInt16 Conformance Tests")
+    struct UInt16Tests {
+
+        @Test("UInt Encode")
+        func uint16Encode() {
+            let int: UInt16 = 21
+            let json = int.encodeToJSON()
+            #expect(json == .numeric(.int(21)))
+        }
+
+        @Test("UInt Decode")
+        func uint16Decode() throws {
+            let json = JSON.numeric(.int(21))
+            let int = try json.decode(into: UInt16.self)
+            #expect(int == 21)
+        }
+
+    }
+
+    @Suite("UInt32 Conformance Tests")
+    struct UInt32Tests {
+
+        @Test("UInt32 Encode")
+        func uint32Encode() {
+            let int: UInt32 = 21
+            let json = int.encodeToJSON()
+            #expect(json == .numeric(.int(21)))
+        }
+
+        @Test("UInt Decode")
+        func uint32Decode() throws {
+            let json = JSON.numeric(.int(21))
+            let int = try json.decode(into: UInt32.self)
+            #expect(int == 21)
+        }
+
+    }
+
+    @Suite("UInt64 Conformance Tests")
+    struct UInt64Tests {
+
+        @Test("UInt Encode")
+        func uint64Encode() {
+            let int: UInt64 = 21
+            let json = int.encodeToJSON()
+            #expect(json == .numeric(.int(21)))
+        }
+
+        @Test("UInt64 Decode")
+        func uint64Decode() throws {
+            let json = JSON.numeric(.int(21))
+            let int = try json.decode(into: UInt64.self)
+            #expect(int == 21)
+        }
+
+    }
+
+    @Suite("Float Conformance Tests")
+    struct FloatTests {
+
+        @Test("Float Encode")
+        func doubleEncode() {
+            let float: Float = 0.5
+            let json = float.encodeToJSON()
+            #expect(json == .numeric(.double(0.5)))
+        }
+
+        @Test("Float Decode")
+        func floatDecode() throws {
+            let json = JSON.numeric(.double(0.5))
+            let float = try json.decode(into: Float.self)
+            #expect(float == 0.5)
+        }
+
+    }
+
 }

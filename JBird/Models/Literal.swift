@@ -88,6 +88,22 @@ extension JSON {
             }
         }
 
+        /// The untyped representation of the JSON literal
+        ///
+        /// This property returns the JSON literal as a native Swift type:
+        /// - `true` and `false` literals are represented as `Bool`
+        /// - `null` literals are represented as `nil`
+        public var untyped: Any? {
+            switch self {
+            case .true:
+                true
+            case .false:
+                false
+            case .null:
+                nil
+            }
+        }
+
         // MARK: - ExpressibleByBooleanLiteral
 
         public typealias BooleanLiteralType = Bool
