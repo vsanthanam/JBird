@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cat > _config.yml <<EOF
-remote_theme: vsanthanam/aviary@v0.1.0
+remote_theme: vsanthanam/aviary@v0.2.0
 plugins:
 - jekyll-remote-theme
 documentation_url: "https://www.usejbird.com/docs/documentation/jbird"
