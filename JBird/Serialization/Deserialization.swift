@@ -93,7 +93,7 @@ extension JSON {
             from data: Data,
             options: Options = .default
         ) throws -> JSON {
-            try parse(data, false, options)
+            try parse(data, options)
         }
 
         /// Create a typed JSON value from a JSON string, asynchronously
@@ -107,7 +107,7 @@ extension JSON {
             _ data: Data,
             options: Options = .default
         ) async throws -> JSON {
-            try parse(data, true, options)
+            try await parseAsync(data, options)
         }
 
         /// Create a typed JSON value from a UTF-8 encoded byte buffer, asynchronously
@@ -132,7 +132,6 @@ extension JSON {
         @inline(__always)
         private static func parse(
             _ data: Data,
-            _ isAsync: Bool,
             _ options: Options
         ) throws -> JSON {
             var jsonValue: OpaquePointer?
@@ -161,12 +160,8 @@ extension JSON {
             @inline(__always)
             func materialize(
                 _ value: OpaquePointer,
-                _ isAsync: Bool,
                 _ options: Options
             ) throws -> JSON {
-                if isAsync {
-                    try Task.checkCancellation()
-                }
                 let type = json_get_type(value)
                 switch type {
                 case JSON_NULL:
@@ -187,7 +182,7 @@ extension JSON {
 
                     for i in 0..<count {
                         let element = json_get_array_element(value, i).unsafelyUnwrapped
-                        let value = try materialize(element, isAsync, options)
+                        let value = try materialize(element, options)
                         if !options.contains(.omitNullValues) || !value.isNull {
                             array.append(value)
                         }
@@ -202,7 +197,7 @@ extension JSON {
                     for i in 0..<count {
                         let key = String(cString: json_get_object_key(value, i))
                         let objValue = json_get_object_value(value, i).unsafelyUnwrapped
-                        let value = try materialize(objValue, isAsync, options)
+                        let value = try materialize(objValue, options)
                         if (!options.contains(.omitNullKeys) && !options.contains(.omitNullValues)) || !value.isNull {
                             dict[key] = value
                         }
@@ -213,7 +208,7 @@ extension JSON {
                 }
             }
 
-            let json = try materialize(jsonValue, isAsync, options)
+            let json = try materialize(jsonValue, options)
             if !options.contains(.fragmentsAllowed) {
                 switch json {
                 case .array, .object:
@@ -228,6 +223,153 @@ extension JSON {
             return json
         }
 
+        @inline(__always)
+        private static func parseAsync(
+            _ data: Data,
+            _ options: Options
+        ) async throws -> JSON {
+            var jsonValue: OpaquePointer?
+            let result = data.withUnsafeBytes { buffer in
+                json_parse(
+                    buffer.baseAddress?.assumingMemoryBound(to: UInt8.self),
+                    buffer.count,
+                    &jsonValue,
+                    options.contains(.allowByteOrderMark),
+                    !options.contains(.requireMinified)
+                )
+            }
+
+            defer {
+                json_free(jsonValue)
+            }
+
+            guard result == JSON_NO_ERROR else {
+                throw JSONDeserializationError.parseFailure(String(cString: json_get_error_message(result)))
+            }
+
+            guard let jsonValue else {
+                throw JSONDeserializationError.unknown
+            }
+
+            @inline(__always)
+            func materialize(
+                _ value: OpaquePointer,
+                _ options: Options
+            ) async throws -> JSON {
+                let type = json_get_type(value)
+                switch type {
+                case JSON_NULL:
+                    return .literal(.null)
+                case JSON_BOOLEAN:
+                    return .literal(json_get_boolean(value) ? .true : .false)
+                case JSON_NUMBER_INT:
+                    return .numeric(.int(Int(json_get_int(value))))
+                case JSON_NUMBER_DOUBLE:
+                    return .numeric(.double(json_get_double(value)))
+                case JSON_STRING:
+                    let str = String(cString: json_get_string(value))
+                    return .string(str)
+                case JSON_ARRAY:
+                    let count = json_get_array_size(value)
+                    let array = try await withThrowingTaskGroup { group in
+                        for i in 0..<count {
+                            let getElement = UnsafeClosure {
+                                json_get_array_element(value, i).unsafelyUnwrapped
+                            }
+                            group.addTask {
+                                let element = getElement()
+                                let value = try await materialize(element, options)
+                                return (value, i)
+                            }
+                        }
+                        do {
+                            var results: [(JSON, Int)] = []
+                            results.reserveCapacity(count)
+                            for try await result in group {
+                                results.append(result)
+                            }
+                            return results
+                                .sorted { $0.1 < $1.1 }
+                                .map(\.0)
+                                .filter { value in
+                                    !options.contains(.omitNullValues) || !value.isNull
+                                }
+                        } catch {
+                            group.cancelAll()
+                            throw error
+                        }
+                    }
+                    return .array(array)
+                case JSON_OBJECT:
+                    let count = json_get_object_size(value)
+                    let object = try await withThrowingTaskGroup { group in
+                        for i in 0..<count {
+                            let getKey = UnsafeClosure {
+                                String(cString: json_get_object_key(value, i))
+                            }
+                            let getObjValue = UnsafeClosure {
+                                json_get_object_value(value, i).unsafelyUnwrapped
+                            }
+                            group.addTask {
+                                let key = getKey()
+                                let objValue = getObjValue()
+                                let value = try await materialize(objValue, options)
+                                return (key, value)
+                            }
+                        }
+                        do {
+                            var object: [String: JSON] = [:]
+                            object.reserveCapacity(count)
+                            for try await (key, value) in group {
+                                if (!options.contains(.omitNullKeys) && !options.contains(.omitNullValues)) || !value.isNull {
+                                    object[key] = value
+                                }
+                            }
+                            return object
+                        } catch {
+                            group.cancelAll()
+                            throw error
+                        }
+                    }
+                    return .object(object)
+                default:
+                    throw JSONDeserializationError.unknown
+                }
+            }
+
+            let json = try await materialize(jsonValue, options)
+            if !options.contains(.fragmentsAllowed) {
+                switch json {
+                case .array, .object:
+                    return json
+                case .literal, .numeric, .string:
+                    throw JSONDeserializationError.illegalFragment
+                }
+            }
+            if options.contains(.omitNullValues), json.isNull {
+                throw JSONDeserializationError.illegalFragment
+            }
+            return json
+        }
+
+    }
+
+}
+
+struct UnsafeClosure<T, U, Failure: Error>: @unchecked Sendable {
+
+    init(closure: @escaping (T) throws(Failure) -> U) {
+        self.closure = closure
+    }
+
+    private let closure: (T) throws(Failure) -> U
+
+    func callAsFunction(_ argument: T) throws(Failure) -> U {
+        try closure(argument)
+    }
+
+    func callAsFunction() throws(Failure) -> U where T == Void {
+        try closure(())
     }
 
 }

@@ -91,6 +91,21 @@ extension JSON {
             }
         }
 
+        /// The untyped representation of the JSON numeric value
+        ///
+        /// This property returns the JSON numeric value as a native Swift type:
+        /// - Strings are represented as `String`
+        /// - Integers are represented as `Int`
+        /// - Floating point numbers are represented as `Double`
+        public var untyped: Any? {
+            switch self {
+            case let .int(int):
+                int
+            case let .double(double):
+                double
+            }
+        }
+
         // MARK: - ExpressibleByIntegerLiteral
 
         public typealias IntegerLiteralType = Int

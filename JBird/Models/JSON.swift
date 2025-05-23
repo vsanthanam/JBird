@@ -48,11 +48,11 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// Create a `JSON` value by deserializing a Swift string
-    /// - Parameter string: The string to deserialize
+    /// - Parameter jsonString: The string to deserialize
     public init(
-        deserializing string: String
+        jsonString: String
     ) throws {
-        self = try Deserialization.value(from: string)
+        self = try Deserialization.value(from: jsonString)
     }
 
     /// Create a JSON object declaratively
@@ -199,9 +199,9 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Whether or not the JSON value is a Boolean
     public var isBool: Bool {
         switch self {
-        case .literal(.true), .literal(.false):
-            true
-        case .literal, .object, .array, .numeric, .string:
+        case let .literal(literal):
+            literal.isBool
+        case .object, .array, .numeric, .string:
             false
         }
     }
@@ -209,9 +209,9 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Whether or not the JSON value is a null value
     public var isNull: Bool {
         switch self {
-        case .literal(.null):
-            true
-        case .literal, .object, .array, .numeric, .string:
+        case let .literal(literal):
+            literal.isNull
+        case .object, .array, .numeric, .string:
             false
         }
     }
@@ -259,9 +259,9 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Whether or not the JSON value is an int
     public var isInt: Bool {
         switch self {
-        case .numeric(.int):
-            true
-        case .literal, .object, .array, .numeric, .string:
+        case let .numeric(numeric):
+            numeric.isInt
+        case .literal, .object, .array, .string:
             false
         }
     }
@@ -269,9 +269,9 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Whether or not the JSON value is a double
     public var isDouble: Bool {
         switch self {
-        case .numeric(.double):
-            true
-        case .literal, .object, .array, .numeric, .string:
+        case let .numeric(numeric):
+            numeric.isDouble
+        case .literal, .object, .array, .string:
             false
         }
     }
@@ -299,23 +299,11 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     public var untyped: Any? {
         switch self {
         case let .literal(literal):
-            switch literal {
-            case .true:
-                true
-            case .false:
-                false
-            case .null:
-                nil
-            }
+            literal.untyped
         case let .string(string):
             string
         case let .numeric(numeric):
-            switch numeric {
-            case let .int(int):
-                int
-            case let .double(double):
-                double
-            }
+            numeric.untyped
         case let .array(array):
             array.map(\.untyped)
         case let .object(object):

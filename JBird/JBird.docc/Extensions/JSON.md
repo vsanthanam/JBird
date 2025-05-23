@@ -113,7 +113,7 @@
 ### Deserialization
 
 - ``init(_:)-(Data)``
-- ``init(deserializing:)``
+- ``init(jsonString:)``
 - ``Deserialization``
 
 ### Serialization

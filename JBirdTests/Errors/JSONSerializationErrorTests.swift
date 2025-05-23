@@ -1,5 +1,5 @@
 // JBird
-// JSONDeserializationError.swift
+// JSONSerializationErrorTests.swift
 //
 // MIT License
 //
@@ -23,34 +23,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Foundation
+import JBird
+import Testing
 
-/// An error thrown when deserialzing a Swift string or UTF-8 encoded byte buffer
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-public enum JSONDeserializationError: Error, Equatable, Sendable, CustomStringConvertible {
+@Test("JSONSerializationError Descriptions")
+func jSONSerializationErrorDescriptions() {
 
-    // MARK: - Cases
+    let invalidFloat = JSONSerializationError.invalidFloat
+    #expect(invalidFloat.description == "Invalid floating point value")
 
-    /// Thrown when a malformed JSON payload is deserialized
-    case parseFailure(String)
-
-    /// Thrown when an unknown error occurs during deserialization
-    case illegalFragment
-
-    /// An unknown deserialization error
-    case unknown
-
-    // MARK: - CustomStringConvertible
-
-    public var description: String {
-        switch self {
-        case let .parseFailure(message):
-            "JSON Parse error: \(message)"
-        case .illegalFragment:
-            "JSON fragment cannot be deserialized"
-        case .unknown:
-            "Unknown deserialization error"
-        }
-    }
+    let illegalFragment = JSONSerializationError.illegalFragment
+    #expect(illegalFragment.description == "Attemped to serialize a JSON fragment without required `fragmentsAllowed` option")
 
 }
