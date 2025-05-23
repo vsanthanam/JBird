@@ -30,5 +30,9 @@ fi
 # Format all .c and .h files recursively
 echo "✨ Formatting .c and .h files"
 find . -path ./\.build -prune -o -type f \( -name "*.c" -o -name "*.h" \) -exec clang-format -i "{}" +
-
-echo "✅ Formatting complete."
+if [ $? -eq 0 ]; then
+  echo "✅ Formatting complete."
+else
+  echo "❌ Formatting failed!"
+  exit 1
+fi
