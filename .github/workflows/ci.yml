@@ -134,7 +134,4 @@ jobs:
           sudo apt-get install -y clang-format
 
       - name: Validate formatting
-        # --dry-run + --Werror makes clang-format exit non-zero if there are any diffs
-        run: |
-          find . -type f \( -name "*.c" -o -name "*.h" \) \
-            -exec clang-format --style=file --dry-run --Werror {} +
+        run: ./.scripts/lint-clang-format

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+find . -path ./\.build -prune -o -type f \( -name "*.c" -o -name "*.h" \) \
+    -exec clang-format --style=file --dry-run --Werror "{}" +

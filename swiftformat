@@ -1,0 +1,3 @@
+#!/bin/bash
+
+swift package --allow-writing-to-package-directory swiftformat .
