@@ -120,7 +120,7 @@ jobs:
       - name: Select Xcode Version
         run: ./.scripts/xcode-select
       - name: Run Benchmarks
-        run: cd Benchmarks && BENCHMARK_DISABLE_JEMALLOC=true swift package benchmark
+        run: ./.scripts/check-benchmark-baselines
   clang-format:
     name: Run clang-format
     runs-on: ubuntu-latest
