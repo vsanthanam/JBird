@@ -1,5 +1,5 @@
 // JBird
-// JBirdCompilerPlugin.swift
+// JBirdCompilerPluginTests.swift
 //
 // MIT License
 //
@@ -23,47 +23,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import SwiftCompilerPlugin
-import SwiftSyntax
-import SwiftSyntaxBuilder
-import SwiftSyntaxMacros
+import Testing
 
-@main
-struct JBirdCompilerPlugin: CompilerPlugin {
+// Macro implementations build for the host, so the corresponding module is not available when cross-compiling. Cross-compiled tests may still make use of the macro itself in end-to-end tests.
+#if canImport(JBirdCompilerPlugin)
+    @testable import JBirdCompilerPlugin
+#endif
 
-    let providingMacros: [Macro.Type] = [
-        JSONCodableMacro.self,
-        JSONKeyMacro.self,
-        OmitIfNilMacro.self
-    ]
-
-}
-
-extension Optional {
-
-    func mustExist(
-        _ message: @autoclosure () -> String = "Macro Expansion Failed"
-    ) throws -> Wrapped {
-        switch self {
-        case let .some(value):
-            return value
-        case .none:
-            throw MacroError(message())
-        }
-    }
-
-}
-
-struct MacroError: Error, CustomStringConvertible {
-
-    init(
-        _ message: String = "Macro Expansion Failed"
-    ) {
-        self.message = message
-    }
-
-    let message: String
-
-    var description: String { message }
-
+@Test("testMacors")
+func jbirdCompilerPluginTests() {
+    #if canImport(JBirdCompilerPlugin)
+        let plugin = JBirdCompilerPlugin()
+        #expect(plugin.providingMacros.count == 3)
+        #expect(plugin.providingMacros[0] is JSONCodableMacro.Type)
+        #expect(plugin.providingMacros[1] is JSONKeyMacro.Type)
+        #expect(plugin.providingMacros[2] is OmitIfNilMacro.Type)
+    #else
+        Issue.record("macros are only supported when running tests for the host platform")
+    #endif
 }

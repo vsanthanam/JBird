@@ -64,6 +64,8 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
         return [encodable, decodable]
     }
 
+    // MARK: - MemberMacro
+
     public static func expansion(
         of node: AttributeSyntax,
         providingMembersOf declaration: some DeclGroupSyntax,
@@ -226,6 +228,8 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
 
         return [encodable, decodable]
     }
+
+    // MARK: - Private
 
     private static func snakeCase(_ name: String) -> String {
         let regex = Regex {
