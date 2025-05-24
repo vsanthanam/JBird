@@ -55,13 +55,18 @@ let files = [
 
 nonisolated(unsafe) let benchmarks = {
     for (name, data) in files {
-        Benchmark.defaultConfiguration.maxIterations = 1_000_000_000
+        Benchmark.defaultConfiguration.maxIterations = 1_000_000_000_000
         Benchmark("Parse (\(name))") { benchmark in
             for _ in benchmark.scaledIterations {
-                _ = try JBird.JSON(data)
-//                _ = try JSONSerialization.jsonObject(with: data)
-//                _ = try Freddy.JSON(data: data)
-//                _ = try SwiftyJSON.JSON(data: data)
+                #if USE_FOUNDATION
+                    _ = try JSONSerialization.jsonObject(with: data)
+                #elseif USE_FREDDY
+                    _ = try Freddy.JSON(data: data)
+                #elseif USE_SWIFTY_JSON
+                    _ = try SwiftyJSON.JSON(data: data)
+                #else
+                    _ = try JBird.JSON(data)
+                #endif
             }
         }
     }
