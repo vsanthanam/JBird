@@ -44,7 +44,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     public init(
         _ data: Data
     ) throws {
-        self = try Deserialization.value(from: data)
+        self = try JSON.value(from: data)
     }
 
     /// Create a `JSON` value by deserializing a Swift string
@@ -52,7 +52,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     public init(
         jsonString: String
     ) throws {
-        self = try Deserialization.value(from: jsonString)
+        self = try JSON.value(from: jsonString)
     }
 
     /// Create a JSON object declaratively
@@ -935,13 +935,13 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Serialize the JSON object to a byte buffer
     /// - Returns: The serialized byte buffe
     public func serialize() throws -> Data {
-        try Serialization.data(from: self)
+        try JSON.data(from: self)
     }
 
     /// Produce a string representation of the JSON object
     /// - Returns: The serialized string
     public func stringify() throws -> String {
-        try Serialization.string(from: self)
+        try JSON.string(from: self)
     }
 
     /// Write the JSON model to disk
@@ -953,7 +953,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     @discardableResult
     public func write(
         fileURL: URL,
-        options: JSON.Serialization.Options = .default,
+        options: JSON.SerializationOptions = .default,
         shouldOverwrite: Bool = false
     ) async throws -> Data {
         if FileManager.default.fileExists(atPath: fileURL.path()) {
@@ -965,7 +965,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             }
         }
 
-        let data = try Serialization.data(from: self, options: options)
+        let data = try await JSON.serialize(self, options: options)
         try data.write(to: fileURL, options: .withoutOverwriting)
         try Task.checkCancellation()
         return data

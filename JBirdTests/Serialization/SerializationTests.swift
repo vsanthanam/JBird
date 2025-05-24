@@ -40,16 +40,16 @@ struct SerializationTests {
         """#
         #expect(str == expected)
         #expect(throws: JSONSerializationError.illegalFragment) {
-            try JSON.Serialization.data(from: fragment, options: [])
+            try JSON.data(from: fragment, options: [])
         }
     }
 
     @Test("Byte Order Mark Serialzation")
     func byteOrderMarkSerialization() throws {
         let json: JSON = true
-        let data = try JSON.Serialization.data(from: json, options: .default)
+        let data = try JSON.data(from: json, options: .default)
         #expect(data == Data([0x74, 0x72, 0x75, 0x65]))
-        let withBom = try JSON.Serialization.data(from: json, options: .default.union(.includeByteOrderMark))
+        let withBom = try JSON.data(from: json, options: .default.union(.includeByteOrderMark))
         #expect(withBom == Data([0xEF, 0xBB, 0xBF, 0x74, 0x72, 0x75, 0x65]))
     }
 
@@ -64,34 +64,34 @@ struct SerializationTests {
     @Test("Omit Single Null Key")
     func omitSingleNullKey() async throws {
         let json: JSON = ["a": nil]
-        let data = try JSON.Serialization.data(from: json, options: .omitNullKeys)
+        let data = try JSON.data(from: json, options: .omitNullKeys)
         let str = try #require(String(data: data, encoding: .utf8))
         let expected = #"""
         {}
         """#
         #expect(str == expected)
-        let stringified = try JSON.Serialization.string(from: json, options: .omitNullKeys)
+        let stringified = try JSON.string(from: json, options: .omitNullKeys)
         #expect(stringified == expected)
-        let asyncData = try await JSON.Serialization.serialize(json, options: .omitNullKeys)
+        let asyncData = try await JSON.serialize(json, options: .omitNullKeys)
         #expect(asyncData == data)
-        let asyncString = try await JSON.Serialization.stringify(json, options: .omitNullKeys)
+        let asyncString = try await JSON.stringify(json, options: .omitNullKeys)
         #expect(asyncString == expected)
     }
 
     @Test("Omit Multiple Null Keys")
     func omitNullKeys() async throws {
         let json: JSON = ["a": nil, "b": 1]
-        let data = try JSON.Serialization.data(from: json, options: .omitNullKeys)
+        let data = try JSON.data(from: json, options: .omitNullKeys)
         let str = try #require(String(data: data, encoding: .utf8))
         let expected = #"""
         {"b":1}
         """#
         #expect(str == expected)
-        let stringified = try JSON.Serialization.string(from: json, options: .omitNullKeys)
+        let stringified = try JSON.string(from: json, options: .omitNullKeys)
         #expect(stringified == expected)
-        let asyncData = try await JSON.Serialization.serialize(json, options: .omitNullKeys)
+        let asyncData = try await JSON.serialize(json, options: .omitNullKeys)
         #expect(asyncData == data)
-        let asyncString = try await JSON.Serialization.stringify(json, options: .omitNullKeys)
+        let asyncString = try await JSON.stringify(json, options: .omitNullKeys)
         #expect(asyncString == expected)
     }
 
@@ -109,9 +109,9 @@ struct SerializationTests {
             #expect(str == expected)
             let stringified = try json.stringify()
             #expect(stringified == expected)
-            let asyncData = try await JSON.Serialization.serialize(json)
+            let asyncData = try await JSON.serialize(json)
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json)
+            let asyncString = try await JSON.stringify(json)
             #expect(asyncString == expected)
         }
 
@@ -126,9 +126,9 @@ struct SerializationTests {
             #expect(str == expected)
             let stringified = try json.stringify()
             #expect(stringified == expected)
-            let asyncData = try await JSON.Serialization.serialize(json)
+            let asyncData = try await JSON.serialize(json)
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json)
+            let asyncString = try await JSON.stringify(json)
             #expect(asyncString == expected)
         }
 
@@ -143,12 +143,12 @@ struct SerializationTests {
             #expect(str == expected)
             let stringified = try json.stringify()
             #expect(stringified == expected)
-            let asyncData = try await JSON.Serialization.serialize(json)
+            let asyncData = try await JSON.serialize(json)
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json)
+            let asyncString = try await JSON.stringify(json)
             #expect(asyncString == expected)
             #expect(throws: JSONSerializationError.illegalFragment) {
-                try JSON.Serialization.data(from: json, options: [.omitNullValues, .fragmentsAllowed])
+                try JSON.data(from: json, options: [.omitNullValues, .fragmentsAllowed])
             }
         }
 
@@ -171,9 +171,9 @@ struct SerializationTests {
                 #expect(str == expected)
                 let stringified = try json.stringify()
                 #expect(stringified == expected)
-                let asyncData = try await JSON.Serialization.serialize(json)
+                let asyncData = try await JSON.serialize(json)
                 #expect(asyncData == data)
-                let asyncString = try await JSON.Serialization.stringify(json)
+                let asyncString = try await JSON.stringify(json)
                 #expect(asyncString == expected)
             }
 
@@ -188,9 +188,9 @@ struct SerializationTests {
                 #expect(str == expected)
                 let stringified = try json.stringify()
                 #expect(stringified == expected)
-                let asyncData = try await JSON.Serialization.serialize(json)
+                let asyncData = try await JSON.serialize(json)
                 #expect(asyncData == data)
-                let asyncString = try await JSON.Serialization.stringify(json)
+                let asyncString = try await JSON.stringify(json)
                 #expect(asyncString == expected)
             }
 
@@ -210,9 +210,9 @@ struct SerializationTests {
                 #expect(str == expected)
                 let stringified = try json.stringify()
                 #expect(stringified == expected)
-                let asyncData = try await JSON.Serialization.serialize(json)
+                let asyncData = try await JSON.serialize(json)
                 #expect(asyncData == data)
-                let asyncString = try await JSON.Serialization.stringify(json)
+                let asyncString = try await JSON.stringify(json)
                 #expect(asyncString == expected)
             }
 
@@ -227,9 +227,9 @@ struct SerializationTests {
                 #expect(str == expected)
                 let stringified = try json.stringify()
                 #expect(stringified == expected)
-                let asyncData = try await JSON.Serialization.serialize(json)
+                let asyncData = try await JSON.serialize(json)
                 #expect(asyncData == data)
-                let asyncString = try await JSON.Serialization.stringify(json)
+                let asyncString = try await JSON.stringify(json)
                 #expect(asyncString == expected)
             }
 
@@ -244,9 +244,9 @@ struct SerializationTests {
                 #expect(str == expected)
                 let stringified = try json.stringify()
                 #expect(stringified == expected)
-                let asyncData = try await JSON.Serialization.serialize(json)
+                let asyncData = try await JSON.serialize(json)
                 #expect(asyncData == data)
-                let asyncString = try await JSON.Serialization.stringify(json)
+                let asyncString = try await JSON.stringify(json)
                 #expect(asyncString == expected)
             }
 
@@ -268,9 +268,9 @@ struct SerializationTests {
             #expect(str == expected)
             let stringified = try json.stringify()
             #expect(stringified == expected)
-            let asyncData = try await JSON.Serialization.serialize(json)
+            let asyncData = try await JSON.serialize(json)
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json)
+            let asyncString = try await JSON.stringify(json)
             #expect(asyncString == expected)
         }
 
@@ -290,9 +290,9 @@ struct SerializationTests {
             #expect(str == expected)
             let stringified = try json.stringify()
             #expect(stringified == expected)
-            let asyncData = try await JSON.Serialization.serialize(json)
+            let asyncData = try await JSON.serialize(json)
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json)
+            let asyncString = try await JSON.stringify(json)
             #expect(asyncString == expected)
         }
 
@@ -307,9 +307,9 @@ struct SerializationTests {
             #expect(str == expected)
             let stringified = try json.stringify()
             #expect(stringified == expected)
-            let asyncData = try await JSON.Serialization.serialize(json)
+            let asyncData = try await JSON.serialize(json)
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json)
+            let asyncString = try await JSON.stringify(json)
             #expect(asyncString == expected)
         }
 
@@ -320,17 +320,17 @@ struct SerializationTests {
                 "bar": false,
                 "baz": nil
             ]
-            let data = try JSON.Serialization.data(from: json, options: .sortedKeys)
+            let data = try JSON.data(from: json, options: .sortedKeys)
             let str = try #require(String(data: data, encoding: .utf8))
             let expected = #"""
             {"bar":false,"baz":null,"foo":true}
             """#
             #expect(str == expected)
-            let stringified = try JSON.Serialization.string(from: json, options: .sortedKeys)
+            let stringified = try JSON.string(from: json, options: .sortedKeys)
             #expect(stringified == expected)
-            let asyncData = try await JSON.Serialization.serialize(json, options: .sortedKeys)
+            let asyncData = try await JSON.serialize(json, options: .sortedKeys)
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json, options: .sortedKeys)
+            let asyncString = try await JSON.stringify(json, options: .sortedKeys)
             #expect(asyncString == expected)
         }
 
@@ -345,7 +345,7 @@ struct SerializationTests {
                     "b": [1, 2, 3]
                 ]
             ]
-            let data = try JSON.Serialization.data(from: json, options: [.sortedKeys, .prettyPrinted])
+            let data = try JSON.data(from: json, options: [.sortedKeys, .prettyPrinted])
             let str = try #require(String(data: data, encoding: .utf8))
             let expected = #"""
             {
@@ -363,11 +363,11 @@ struct SerializationTests {
             }
             """#
             #expect(str == expected)
-            let stringified = try JSON.Serialization.string(from: json, options: [.sortedKeys, .prettyPrinted])
+            let stringified = try JSON.string(from: json, options: [.sortedKeys, .prettyPrinted])
             #expect(stringified == expected)
-            let asyncData = try await JSON.Serialization.serialize(json, options: [.sortedKeys, .prettyPrinted])
+            let asyncData = try await JSON.serialize(json, options: [.sortedKeys, .prettyPrinted])
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json, options: [.sortedKeys, .prettyPrinted])
+            let asyncString = try await JSON.stringify(json, options: [.sortedKeys, .prettyPrinted])
             #expect(asyncString == expected)
         }
 
@@ -382,17 +382,17 @@ struct SerializationTests {
                     "b": [1, nil, 3]
                 ]
             ]
-            let data = try JSON.Serialization.data(from: json, options: [.sortedKeys, .omitNullKeys])
+            let data = try JSON.data(from: json, options: [.sortedKeys, .omitNullKeys])
             let str = try #require(String(data: data, encoding: .utf8))
             let expected = #"""
             {"bar":false,"foo":true,"qux":{"b":[1,null,3]}}
             """#
             #expect(str == expected)
-            let stringified = try JSON.Serialization.string(from: json, options: [.sortedKeys, .omitNullKeys])
+            let stringified = try JSON.string(from: json, options: [.sortedKeys, .omitNullKeys])
             #expect(stringified == expected)
-            let asyncData = try await JSON.Serialization.serialize(json, options: [.sortedKeys, .omitNullKeys])
+            let asyncData = try await JSON.serialize(json, options: [.sortedKeys, .omitNullKeys])
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json, options: [.sortedKeys, .omitNullKeys])
+            let asyncString = try await JSON.stringify(json, options: [.sortedKeys, .omitNullKeys])
             #expect(asyncString == expected)
         }
 
@@ -407,17 +407,17 @@ struct SerializationTests {
                     "b": [1, nil, 3]
                 ]
             ]
-            let data = try JSON.Serialization.data(from: json, options: [.sortedKeys, .omitNullValues])
+            let data = try JSON.data(from: json, options: [.sortedKeys, .omitNullValues])
             let str = try #require(String(data: data, encoding: .utf8))
             let expected = #"""
             {"bar":false,"foo":true,"qux":{"b":[1,3]}}
             """#
             #expect(str == expected)
-            let stringified = try JSON.Serialization.string(from: json, options: [.sortedKeys, .omitNullValues])
+            let stringified = try JSON.string(from: json, options: [.sortedKeys, .omitNullValues])
             #expect(stringified == expected)
-            let asyncData = try await JSON.Serialization.serialize(json, options: [.sortedKeys, .omitNullValues])
+            let asyncData = try await JSON.serialize(json, options: [.sortedKeys, .omitNullValues])
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json, options: [.sortedKeys, .omitNullValues])
+            let asyncString = try await JSON.stringify(json, options: [.sortedKeys, .omitNullValues])
             #expect(asyncString == expected)
         }
 
@@ -435,9 +435,9 @@ struct SerializationTests {
             "abcdefghijklmnopqrstuvwxyz"
             """#
             #expect(str == expected)
-            let asyncData = try await JSON.Serialization.serialize(json)
+            let asyncData = try await JSON.serialize(json)
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json)
+            let asyncString = try await JSON.stringify(json)
             #expect(asyncString == expected)
         }
 
@@ -450,9 +450,9 @@ struct SerializationTests {
             "\""
             """#
             #expect(str == expected)
-            let asyncData = try await JSON.Serialization.serialize(json)
+            let asyncData = try await JSON.serialize(json)
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json)
+            let asyncString = try await JSON.stringify(json)
             #expect(asyncString == expected)
         }
 
@@ -465,9 +465,9 @@ struct SerializationTests {
             "\\"
             """#
             #expect(str == expected)
-            let asyncData = try await JSON.Serialization.serialize(json)
+            let asyncData = try await JSON.serialize(json)
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json)
+            let asyncString = try await JSON.stringify(json)
             #expect(asyncString == expected)
         }
 
@@ -480,24 +480,24 @@ struct SerializationTests {
             "\b"
             """#
             #expect(str == expected)
-            let asyncData = try await JSON.Serialization.serialize(json)
+            let asyncData = try await JSON.serialize(json)
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json)
+            let asyncString = try await JSON.stringify(json)
             #expect(asyncString == expected)
         }
 
         @Test("Escaped Slash Serialization")
         func escapedSlash() async throws {
             let json: JSON = "/"
-            let data = try JSON.Serialization.data(from: json, options: [.escapeForwardSlash, .fragmentsAllowed])
+            let data = try JSON.data(from: json, options: [.escapeForwardSlash, .fragmentsAllowed])
             let str = try #require(String(data: data, encoding: .utf8))
             let expected = #"""
             "\/"
             """#
             #expect(str == expected)
-            let asyncData = try await JSON.Serialization.serialize(json, options: [.escapeForwardSlash, .fragmentsAllowed])
+            let asyncData = try await JSON.serialize(json, options: [.escapeForwardSlash, .fragmentsAllowed])
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json, options: [.escapeForwardSlash, .fragmentsAllowed])
+            let asyncString = try await JSON.stringify(json, options: [.escapeForwardSlash, .fragmentsAllowed])
             #expect(asyncString == expected)
         }
 
@@ -510,9 +510,9 @@ struct SerializationTests {
             "/"
             """#
             #expect(str == expected)
-            let asyncData = try await JSON.Serialization.serialize(json)
+            let asyncData = try await JSON.serialize(json)
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json)
+            let asyncString = try await JSON.stringify(json)
             #expect(asyncString == expected)
         }
 
@@ -525,9 +525,9 @@ struct SerializationTests {
             "\t"
             """#
             #expect(str == expected)
-            let asyncData = try await JSON.Serialization.serialize(json)
+            let asyncData = try await JSON.serialize(json)
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json)
+            let asyncString = try await JSON.stringify(json)
             #expect(asyncString == expected)
         }
 
@@ -540,9 +540,9 @@ struct SerializationTests {
             "\f"
             """#
             #expect(str == expected)
-            let asyncData = try await JSON.Serialization.serialize(json)
+            let asyncData = try await JSON.serialize(json)
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json)
+            let asyncString = try await JSON.stringify(json)
             #expect(asyncString == expected)
         }
 
@@ -555,9 +555,9 @@ struct SerializationTests {
             "\n"
             """#
             #expect(str == expected)
-            let asyncData = try await JSON.Serialization.serialize(json)
+            let asyncData = try await JSON.serialize(json)
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json)
+            let asyncString = try await JSON.stringify(json)
             #expect(asyncString == expected)
         }
 
@@ -570,9 +570,9 @@ struct SerializationTests {
             "\r"
             """#
             #expect(str == expected)
-            let asyncData = try await JSON.Serialization.serialize(json)
+            let asyncData = try await JSON.serialize(json)
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json)
+            let asyncString = try await JSON.stringify(json)
             #expect(asyncString == expected)
         }
 
@@ -585,24 +585,24 @@ struct SerializationTests {
             "\u001F"
             """#
             #expect(str == expected)
-            let asyncData = try await JSON.Serialization.serialize(json)
+            let asyncData = try await JSON.serialize(json)
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json)
+            let asyncString = try await JSON.stringify(json)
             #expect(asyncString == expected)
         }
 
         @Test("Escaped Non-ASCII Character Serialization")
         func escapedNonASCII() async throws {
             let json: JSON = "é"
-            let data = try JSON.Serialization.data(from: json, options: [.escapeNonASCII, .fragmentsAllowed])
+            let data = try JSON.data(from: json, options: [.escapeNonASCII, .fragmentsAllowed])
             let str = try #require(String(data: data, encoding: .utf8))
             let expected = #"""
             "\u00E9"
             """#
             #expect(str == expected)
-            let asyncData = try await JSON.Serialization.serialize(json, options: [.escapeNonASCII, .fragmentsAllowed])
+            let asyncData = try await JSON.serialize(json, options: [.escapeNonASCII, .fragmentsAllowed])
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json, options: [.escapeNonASCII, .fragmentsAllowed])
+            let asyncString = try await JSON.stringify(json, options: [.escapeNonASCII, .fragmentsAllowed])
             #expect(asyncString == expected)
         }
 
@@ -615,54 +615,54 @@ struct SerializationTests {
             "é"
             """#
             #expect(str == expected)
-            let asyncData = try await JSON.Serialization.serialize(json)
+            let asyncData = try await JSON.serialize(json)
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json)
+            let asyncString = try await JSON.stringify(json)
             #expect(asyncString == expected)
         }
 
         @Test("Escaped Basic Multilingual Plane External Character Serialization")
         func escapedBMP() async throws {
             let json: JSON = "😀"
-            let data = try JSON.Serialization.data(from: json, options: [.escapeSpecialCharacters, .fragmentsAllowed])
+            let data = try JSON.data(from: json, options: [.escapeSpecialCharacters, .fragmentsAllowed])
             let str = try #require(String(data: data, encoding: .utf8))
             let expected = #"""
             "\uD83D\uDE00"
             """#
             #expect(str == expected)
-            let asyncData = try await JSON.Serialization.serialize(json)
+            let asyncData = try await JSON.serialize(json)
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json)
+            let asyncString = try await JSON.stringify(json)
             #expect(asyncString == expected)
         }
 
         @Test("Escaped Basic Multilingual Plane External Character Serialization due to ASCII")
         func escapedBMPFromASCII() async throws {
             let json: JSON = "😀"
-            let data = try JSON.Serialization.data(from: json, options: [.escapeNonASCII, .fragmentsAllowed])
+            let data = try JSON.data(from: json, options: [.escapeNonASCII, .fragmentsAllowed])
             let str = try #require(String(data: data, encoding: .utf8))
             let expected = #"""
             "\uD83D\uDE00"
             """#
             #expect(str == expected)
-            let asyncData = try await JSON.Serialization.serialize(json)
+            let asyncData = try await JSON.serialize(json)
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json)
+            let asyncString = try await JSON.stringify(json)
             #expect(asyncString == expected)
         }
 
         @Test("Regular Basic Multilingual Plane External Character Serialization")
         func bmp() async throws {
             let json: JSON = "😀"
-            let data = try JSON.Serialization.data(from: json, options: [.fragmentsAllowed])
+            let data = try JSON.data(from: json, options: [.fragmentsAllowed])
             let str = try #require(String(data: data, encoding: .utf8))
             let expected = #"""
             "😀"
             """#
             #expect(str == expected)
-            let asyncData = try await JSON.Serialization.serialize(json, options: [.fragmentsAllowed])
+            let asyncData = try await JSON.serialize(json, options: [.fragmentsAllowed])
             #expect(asyncData == data)
-            let asyncString = try await JSON.Serialization.stringify(json, options: [.fragmentsAllowed])
+            let asyncString = try await JSON.stringify(json, options: [.fragmentsAllowed])
             #expect(asyncString == expected)
         }
     }
