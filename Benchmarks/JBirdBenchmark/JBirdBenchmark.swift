@@ -55,7 +55,7 @@ let files = [
 
 nonisolated(unsafe) let benchmarks = {
     for (name, data) in files {
-        Benchmark.defaultConfiguration.maxIterations = 1_000_000_000_000
+        Benchmark.defaultConfiguration.maxIterations = 1_000_000_000_000_000
         Benchmark("Parse (\(name))") { benchmark in
             for _ in benchmark.scaledIterations {
                 #if USE_FOUNDATION
