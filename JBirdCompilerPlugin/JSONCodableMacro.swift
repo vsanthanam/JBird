@@ -23,7 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Foundation
+import RegexBuilder
 import SwiftCompilerPlugin
 import SwiftSyntax
 import SwiftSyntaxBuilder
@@ -228,11 +228,42 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
     }
 
     private static func snakeCase(_ name: String) -> String {
-        let pattern = "([a-z0-9])([A-Z])|([A-Z])([A-Z][a-z])"
-        let regex = try! NSRegularExpression(pattern: pattern, options: [])
-        let range = NSRange(name.startIndex..., in: name)
-        var result = regex.stringByReplacingMatches(in: name, options: [], range: range, withTemplate: "$1$3_$2$4")
-        result = result.replacingOccurrences(of: " ", with: "_")
+        let regex = Regex {
+            ChoiceOf {
+                Regex {
+                    Capture {
+                        ChoiceOf {
+                            CharacterClass.generalCategory(.lowercaseLetter)
+                            CharacterClass.generalCategory(.decimalNumber)
+                        }
+                    }
+                    Capture {
+                        CharacterClass.generalCategory(.uppercaseLetter)
+                    }
+                }
+                Regex {
+                    Capture {
+                        CharacterClass.generalCategory(.uppercaseLetter)
+                    }
+                    Capture {
+                        CharacterClass.generalCategory(.uppercaseLetter)
+                        CharacterClass.generalCategory(.lowercaseLetter)
+                    }
+                }
+            }
+        }
+
+        var result = name
+
+        result = result.replacing(regex) { match in
+            if let first = match.output.1 {
+                return "\(first)_\(match.output.2!)"
+            } else if let third = match.output.3 {
+                return "\(third)_\(match.output.4!)"
+            }
+            return String(match.output.0)
+        }
+
         return result.lowercased()
     }
 
