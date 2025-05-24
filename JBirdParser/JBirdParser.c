@@ -144,10 +144,6 @@ static inline bool is_whitespace(uint8_t c) {
     return char_class[c] == CHAR_CLASS_WHITESPACE;
 }
 
-static inline bool is_control(uint8_t c) {
-    return char_class[c] == CHAR_CLASS_CONTROL;
-}
-
 typedef struct {
     const char **strings;
     size_t *lengths;
@@ -957,7 +953,6 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
 
 #if defined(JBird_USE_SSE2)
             // Constants for SSE2
-            const __m128i zero = _mm_setzero_si128();
             const __m128i nine = _mm_set1_epi8('9');
             const __m128i zero_char = _mm_set1_epi8('0');
 
