@@ -114,13 +114,21 @@
 
 - ``init(_:)-(Data)``
 - ``init(jsonString:)``
-- ``Deserialization``
+- ``value(from:options:)-(Data,_)``
+- ``value(from:options:)-(String,_)``
+- ``deserialize(_:options:)-(Data,_)``
+- ``deserialize(_:options:)-(String,_)``
+- ``DeserializationOptions``
 
 ### Serialization
 
 - ``serialize()``
 - ``stringify()``
-- ``Serialization``
+- ``data(from:options:)``
+- ``string(from:options:)``
+- ``serialize(_:options:)``
+- ``stringify(_:options:)``
+- ``SerializationOptions``
 
 ### Result Builders
 
