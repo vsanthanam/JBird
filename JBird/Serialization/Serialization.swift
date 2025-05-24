@@ -30,7 +30,6 @@ import Foundation
     import JBirdParser
 #endif
 
-
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON {
 
@@ -78,7 +77,7 @@ extension JSON {
         public let rawValue: Int
 
     }
-    
+
     /// The available options for JSON deserialization
     public struct DeserializationOptions: OptionSet, Equatable, Hashable, Sendable {
 
@@ -111,7 +110,7 @@ extension JSON {
         public let rawValue: Int
 
     }
-    
+
     // MARK: - API
 
     /// Create a typed JSON value from a JSON string
@@ -171,7 +170,7 @@ extension JSON {
             options: options
         )
     }
-    
+
     /// Create a byte buffer from a typed `JSON` value
     /// - Parameters:
     ///   - json: The JSON value to serialize
@@ -762,7 +761,7 @@ extension JSON {
 
 }
 
-fileprivate struct UnsafeClosure<T, U, Failure: Error>: @unchecked Sendable {
+private struct UnsafeClosure<T, U, Failure: Error>: @unchecked Sendable {
 
     init(
         closure: @escaping (T) throws(Failure) -> U
@@ -779,7 +778,7 @@ fileprivate struct UnsafeClosure<T, U, Failure: Error>: @unchecked Sendable {
     func callAsFunction() throws(Failure) -> U where T == Void {
         try closure(())
     }
-    
+
     private let closure: (T) throws(Failure) -> U
 
 }
