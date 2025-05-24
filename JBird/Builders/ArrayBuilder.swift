@@ -25,7 +25,7 @@
 
 extension JSON {
 
-    /// A result builder for JSON [JSON]s
+    /// A result builder for JSON arrays
     @resultBuilder
     public enum ArrayBuilder {
 
