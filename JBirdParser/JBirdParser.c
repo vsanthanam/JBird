@@ -131,7 +131,6 @@ static const uint8_t char_class[256] = {
     ['e'] = CHAR_CLASS_E,
     ['E'] = CHAR_CLASS_E,
 
-    // Literal starts
     ['t'] = CHAR_CLASS_TRUE_START,
     ['f'] = CHAR_CLASS_FALSE_START,
     ['n'] = CHAR_CLASS_NULL_START,
