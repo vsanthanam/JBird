@@ -113,14 +113,14 @@ jobs:
         run: swift test
   run-benchmarks:
     name: Validate Performance
-    runs-on: ubuntu-latest
-    container:
-      image: swift:6.1
+    runs-on: macos-15
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Run Benchmarks
-        run: ./.scripts/check-benchmark-baselines
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Select Xcode Version
+      run: ./.scripts/xcode-select
+    - name: Run Benchmarks
+      run: ./.scripts/check-benchmark-baselines
   clang-format:
     name: Run clang-format
     runs-on: ubuntu-latest

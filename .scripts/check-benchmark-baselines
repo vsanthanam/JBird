@@ -5,5 +5,4 @@ cd Benchmarks
 BENCHMARK_TARGET="remote" BENCHMARK_DISABLE_JEMALLOC=true swift package -Xswiftc -DCI -Xswiftc -DUSE_REMOTE --allow-writing-to-package-directory benchmark baseline update remote
 rm -rf .build
 rm Package.resolved
-BENCHMARK_TARGET="local" swift package resolve --reset
 BENCHMARK_TARGET="local" BENCHMARK_DISABLE_JEMALLOC=true swift package -Xswiftc -DCI benchmark baseline check remote
