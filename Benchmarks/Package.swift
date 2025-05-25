@@ -3,6 +3,48 @@
 
 import PackageDescription
 
+enum BenchmarkTarget: String {
+    case release
+    case remote
+    case local
+}
+
+let benchmarkTarget: BenchmarkTarget?
+
+if Context.environment["BENCHMARK_TARGET"] == "release" {
+    benchmarkTarget = .release
+} else if Context.environment["BENCHMARK_TARGET"] == "remote" {
+    benchmarkTarget = .remote
+} else if Context.environment["BENCHMARK_TARGET"] == "local" {
+    benchmarkTarget = .local
+} else {
+    benchmarkTarget = nil
+}
+
+if let benchmarkTarget {
+    print("Benchmark target: \(benchmarkTarget.rawValue)")
+}
+
+let jbird: PackageDescription.Package.Dependency
+
+switch benchmarkTarget {
+case .release:
+    jbird = .package(
+        url: "https://github.com/vsanthanam/JBird.git",
+        from: "0.0.0"
+    )
+case .remote:
+    jbird = .package(
+        url: "https://github.com/vsanthanam/JBird.git",
+        branch: "main"
+    )
+case .local, .none:
+    jbird = .package(
+        name: "JBird",
+        path: "../"
+    )
+}
+
 let package = Package(
     name: "Benchmarks",
     platforms: [
@@ -13,10 +55,7 @@ let package = Package(
             url: "https://github.com/ordo-one/package-benchmark",
             from: "1.0.0"
         ),
-        .package(
-            name: "JBird",
-            path: "../"
-        ),
+        jbird,
         .package(
             url: "https://github.com/modswift/Freddy.git",
             exact: "3.0.58"

@@ -25,9 +25,13 @@
 
 import Benchmark
 import Foundation
-import Freddy
-import JBird
-import SwiftyJSON
+#if USE_FREDDY
+    import Freddy
+#elseif USE_SWIFTYJSON
+    import SwiftyJSON
+#else
+    import JBird
+#endif
 
 func load(benchmark name: String) -> (String, Data) {
     let resource = "benchmark-\(name)"
@@ -55,7 +59,10 @@ let files = [
 
 nonisolated(unsafe) let benchmarks = {
     for (name, data) in files {
-        Benchmark.defaultConfiguration.maxIterations = 1_000_000_000_000
+        Benchmark.defaultConfiguration.maxIterations = 1_000_000_000_000_000
+        #if CI
+            Benchmark.defaultConfiguration.metrics = [.wallClock, .cpuTotal, .instructions]
+        #endif
         Benchmark("Parse (\(name))") { benchmark in
             for _ in benchmark.scaledIterations {
                 #if USE_FOUNDATION
