@@ -70,14 +70,6 @@ typedef enum {
 typedef struct json_value json_value_t;
 
 /**
- * @brief Get a human-readable description of a JSON error code
- *
- * @param error The error code
- * @return A string describing the error
- */
-const char *json_get_error_message(json_error_t error);
-
-/**
  * @brief Parse JSON data into a value structure
  *
  * @param data The UTF-8 encoded JSON data to parse

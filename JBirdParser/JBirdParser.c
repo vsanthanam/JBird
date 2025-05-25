@@ -151,29 +151,6 @@ typedef struct {
     size_t capacity;
 } string_pool_t;
 
-static const char *error_messages[] = {
-    "No error",
-    "Unexpected end of input",
-    "Invalid JSON",
-    "Invalid character",
-    "Expected ':' after key in object",
-    "Expected ',' or '}' in object",
-    "Expected ',' or ']' in array",
-    "Invalid literal",
-    "Invalid number",
-    "Invalid string",
-    "Missing object key",
-    "Invalid unicode sequence",
-    "Invalid escape sequence",
-    "Out of memory"};
-
-const char *json_get_error_message(json_error_t error) {
-    if (error < 0 || error >= sizeof(error_messages) / sizeof(error_messages[0])) {
-        return "Unknown error";
-    }
-    return error_messages[error];
-}
-
 typedef struct json_memory_block {
     char *memory;
     size_t size;

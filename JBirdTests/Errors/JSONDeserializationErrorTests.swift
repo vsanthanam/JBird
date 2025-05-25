@@ -27,13 +27,46 @@ import JBird
 import Testing
 
 @Test("JSONDeserializationError Descriptions")
-func jSONDeserializationErrorDescriptions() {
-    let parseFailure = JSONDeserializationError.parseFailure("My Foo Message!")
-    #expect(parseFailure.description == "JSON Parse error: My Foo Message!")
-
+func jsonDeserializationErrorDescriptions() {
     let illegalFragment = JSONDeserializationError.illegalFragment
     #expect(illegalFragment.description == "JSON fragment cannot be deserialized")
 
     let unknown = JSONDeserializationError.unknown
     #expect(unknown.description == "Unknown deserialization error")
+
+    let unexpectedEndOfInput = JSONDeserializationError.unexpectedEndOfInput
+    #expect(unexpectedEndOfInput.description == "Unexpected end of input")
+
+    let invalidJSON = JSONDeserializationError.invalidJSON
+    #expect(invalidJSON.description == "Invalid JSON")
+
+    let invalidCharacter = JSONDeserializationError.invalidCharacter
+    #expect(invalidCharacter.description == "Invalid character")
+
+    let expectedColon = JSONDeserializationError.expectedColon
+    #expect(expectedColon.description == "Expected ':' after key in object")
+
+    let expectedCommaOrBrace = JSONDeserializationError.expectedCommaOrBrace
+    #expect(expectedCommaOrBrace.description == "Expected ',' or '}'")
+
+    let expectedCommaOrBracket = JSONDeserializationError.expectedCommaOrBracket
+    #expect(expectedCommaOrBracket.description == "Expected ',' or ']'")
+
+    let invalidLiteral = JSONDeserializationError.invalidLiteral
+    #expect(invalidLiteral.description == "Invalid literal")
+
+    let invalidNumeric = JSONDeserializationError.invalidNumeric
+    #expect(invalidNumeric.description == "Invalid number")
+
+    let invalidString = JSONDeserializationError.invalidString
+    #expect(invalidString.description == "Invalid string")
+
+    let invalidUnicode = JSONDeserializationError.invalidUnicode
+    #expect(invalidUnicode.description == "Invalid unicode sequence")
+
+    let invalidEscape = JSONDeserializationError.invalidEscape
+    #expect(invalidEscape.description == "Invalid escape sequence")
+
+    let outOfMemory = JSONDeserializationError.outOfMemory
+    #expect(outOfMemory.description == "Out of memory")
 }

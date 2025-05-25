@@ -43,7 +43,7 @@ struct DeserializationTests {
         @Test("Illegal Byte Order Mark Deserialization")
         func noBom() {
             let data = Data([0xEF, 0xBB, 0xBF, 0x7B, 0x7D])
-            #expect(throws: JSONDeserializationError.parseFailure("Invalid character")) {
+            #expect(throws: JSONDeserializationError.invalidCharacter) {
                 _ = try JSON.value(from: data, options: .default.subtracting(.allowByteOrderMark))
             }
         }
@@ -71,7 +71,7 @@ struct DeserializationTests {
             }
             """#
             let data = try #require(raw.data(using: .utf8))
-            #expect(throws: JSONDeserializationError.parseFailure("Missing object key")) {
+            #expect(throws: JSONDeserializationError.missingObjectKey) {
                 _ = try JSON.value(from: data, options: .default.union(.requireMinified))
             }
         }
@@ -749,7 +749,7 @@ struct DeserializationTests {
         @Test("Unsupported byte order mark")
         func unsupportedBOM() throws {
             let data = Data([0xEF, 0xBB, 0xBF, 0x7B, 0x7D])
-            #expect(throws: JSONDeserializationError.parseFailure("Invalid character")) {
+            #expect(throws: JSONDeserializationError.invalidCharacter) {
                 _ = try JSON.value(from: data, options: [])
             }
         }
@@ -760,7 +760,7 @@ struct DeserializationTests {
 
             """#
             let data = try #require(raw.data(using: .utf8))
-            #expect(throws: JSONDeserializationError.parseFailure("Unexpected end of input")) {
+            #expect(throws: JSONDeserializationError.unexpectedEndOfInput) {
                 _ = try JSON(data)
             }
         }
@@ -771,7 +771,7 @@ struct DeserializationTests {
             [1, 2, 3
             """#
             let data = try #require(raw.data(using: .utf8))
-            #expect(throws: JSONDeserializationError.parseFailure("Unexpected end of input")) {
+            #expect(throws: JSONDeserializationError.unexpectedEndOfInput) {
                 _ = try JSON(data)
             }
         }
@@ -784,7 +784,7 @@ struct DeserializationTests {
             }
             """#
             let data = try #require(raw.data(using: .utf8))
-            #expect(throws: JSONDeserializationError.parseFailure("Expected ',' or ']' in array")) {
+            #expect(throws: JSONDeserializationError.expectedCommaOrBracket) {
                 _ = try JSON(data)
             }
         }
@@ -797,7 +797,7 @@ struct DeserializationTests {
             }
             """#
             let data = try #require(raw.data(using: .utf8))
-            #expect(throws: JSONDeserializationError.parseFailure("Expected ',' or ']' in array")) {
+            #expect(throws: JSONDeserializationError.expectedCommaOrBracket) {
                 _ = try JSON(data)
             }
         }
@@ -808,7 +808,7 @@ struct DeserializationTests {
             {"foo": 0100}
             """#
             let data = try #require(raw.data(using: .utf8))
-            #expect(throws: JSONDeserializationError.parseFailure("Invalid number")) {
+            #expect(throws: JSONDeserializationError.invalidNumeric) {
                 _ = try JSON(data)
             }
         }
@@ -820,7 +820,7 @@ struct DeserializationTests {
             World"}
             """#
             let data = try #require(raw.data(using: .utf8))
-            #expect(throws: JSONDeserializationError.parseFailure("Invalid string")) {
+            #expect(throws: JSONDeserializationError.invalidString) {
                 _ = try JSON(data)
             }
         }
@@ -831,7 +831,7 @@ struct DeserializationTests {
             {"foo\x": 100}
             """#
             let data = try #require(raw.data(using: .utf8))
-            #expect(throws: JSONDeserializationError.parseFailure("Invalid escape sequence")) {
+            #expect(throws: JSONDeserializationError.invalidEscape) {
                 _ = try JSON(data)
             }
         }
@@ -842,7 +842,7 @@ struct DeserializationTests {
             {"key": nul}
             """#
             let data = try #require(raw.data(using: .utf8))
-            #expect(throws: JSONDeserializationError.parseFailure("Invalid literal")) {
+            #expect(throws: JSONDeserializationError.invalidLiteral) {
                 _ = try JSON(data)
             }
         }
@@ -853,7 +853,7 @@ struct DeserializationTests {
             {"key": "\uXYZ"}
             """#
             let data = try #require(raw.data(using: .utf8))
-            #expect(throws: JSONDeserializationError.parseFailure("Invalid unicode sequence")) {
+            #expect(throws: JSONDeserializationError.invalidUnicode) {
                 _ = try JSON(data)
             }
         }

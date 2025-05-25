@@ -557,7 +557,7 @@ extension JSON {
         }
 
         guard result == JSON_NO_ERROR else {
-            throw JSONDeserializationError.parseFailure(String(cString: json_get_error_message(result)))
+            throw JSONDeserializationError(result)
         }
 
         guard let jsonValue else {
@@ -651,7 +651,7 @@ extension JSON {
         }
 
         guard result == JSON_NO_ERROR else {
-            throw JSONDeserializationError.parseFailure(String(cString: json_get_error_message(result)))
+            throw JSONDeserializationError(result)
         }
 
         guard let jsonValue else {

@@ -24,6 +24,11 @@
 // SOFTWARE.
 
 import Foundation
+#if BUILD_XCFRAMEWORK
+    @_implementationOnly import JBirdParser
+#else
+    import JBirdParser
+#endif
 
 /// An error thrown when deserialzing a Swift string or UTF-8 encoded byte buffer
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
@@ -31,26 +36,106 @@ public enum JSONDeserializationError: Error, Equatable, Sendable, CustomStringCo
 
     // MARK: - Cases
 
-    /// Thrown when a malformed JSON payload is deserialized
-    case parseFailure(String)
-
-    /// Thrown when an unknown error occurs during deserialization
     case illegalFragment
 
-    /// An unknown deserialization error
     case unknown
+
+    case unexpectedEndOfInput
+
+    case invalidJSON
+
+    case invalidCharacter
+
+    case expectedColon
+
+    case expectedCommaOrBrace
+
+    case expectedCommaOrBracket
+
+    case invalidLiteral
+
+    case invalidNumeric
+
+    case invalidString
+
+    case missingObjectKey
+
+    case invalidUnicode
+
+    case invalidEscape
+
+    case outOfMemory
 
     // MARK: - CustomStringConvertible
 
     public var description: String {
         switch self {
-        case let .parseFailure(message):
-            "JSON Parse error: \(message)"
         case .illegalFragment:
             "JSON fragment cannot be deserialized"
         case .unknown:
             "Unknown deserialization error"
+        case .unexpectedEndOfInput:
+            "Unexpected end of input"
+        case .invalidJSON:
+            "Invalid JSON"
+        case .invalidCharacter:
+            "Invalid character"
+        case .expectedColon:
+            "Expected ':' after key in object"
+        case .expectedCommaOrBrace:
+            "Expected ',' or '}'"
+        case .expectedCommaOrBracket:
+            "Expected ',' or ']'"
+        case .invalidLiteral:
+            "Invalid literal"
+        case .invalidNumeric:
+            "Invalid number"
+        case .invalidString:
+            "Invalid string"
+        case .missingObjectKey:
+            "Missing object key"
+        case .invalidUnicode:
+            "Invalid unicode sequence"
+        case .invalidEscape:
+            "Invalid escape sequence"
+        case .outOfMemory:
+            "Out of memory"
         }
     }
 
+    // MARK: - Private
+
+    @inline(__always)
+    init(_ result: json_error_t) {
+        switch result {
+        case JSON_UNEXPECTED_END_OF_INPUT:
+            self = .unexpectedEndOfInput
+        case JSON_INVALID_JSON:
+            self = .invalidJSON
+        case JSON_INVALID_CHARACTER:
+            self = .invalidCharacter
+        case JSON_EXPECTED_COLON:
+            self = .expectedColon
+        case JSON_EXPECTED_COMMA_OR_BRACE:
+            self = .expectedCommaOrBrace
+        case JSON_EXPECTED_COMMA_OR_BRACKET:
+            self = .expectedCommaOrBracket
+        case JSON_INVALID_LITERAL:
+            self = .invalidLiteral
+        case JSON_INVALID_NUMBER:
+            self = .invalidNumeric
+        case JSON_INVALID_STRING:
+            self = .invalidString
+        case JSON_MISSING_OBJECT_KEY:
+            self = .missingObjectKey
+        case JSON_INVALID_UNICODE:
+            self = .invalidUnicode
+        case JSON_INVALID_ESCAPE:
+            self = .invalidEscape
+        case JSON_OUT_OF_MEMORY:
+            self = .outOfMemory
+        default:
+            self = .unknown
+        }
+    }
 }
