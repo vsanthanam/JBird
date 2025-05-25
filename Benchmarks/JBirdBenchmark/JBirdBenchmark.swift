@@ -25,8 +25,13 @@
 
 import Benchmark
 import Foundation
-import Freddy
-import JBird
+#if USE_FREDDY
+    import Freddy
+#elseif USE_SWIFTYJSON
+    import SwiftyJSON
+#else
+    import JBird
+#endif
 import SwiftyJSON
 
 func load(benchmark name: String) -> (String, Data) {
