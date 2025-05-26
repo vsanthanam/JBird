@@ -55,8 +55,8 @@ func jsonDeserializationErrorDescriptions() {
     let invalidLiteral = JSONDeserializationError.invalidLiteral
     #expect(invalidLiteral.description == "Invalid literal")
 
-    let invalidNumeric = JSONDeserializationError.invalidNumeric
-    #expect(invalidNumeric.description == "Invalid number")
+    let invalidNumber = JSONDeserializationError.invalidNumber
+    #expect(invalidNumber.description == "Invalid number")
 
     let invalidString = JSONDeserializationError.invalidString
     #expect(invalidString.description == "Invalid string")

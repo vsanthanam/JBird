@@ -13,7 +13,7 @@ A blazing fast, type-safe library for working with JSON in Swift
 
 - ``JSON``
 - ``JSON/Literal``
-- ``JSON/Numeric``
+- ``JSON/Number``
 
 ### Subscripting
 
@@ -26,7 +26,7 @@ A blazing fast, type-safe library for working with JSON in Swift
 - ``JSONDecodable``
 - ``JSONCodable``
 - ``JSONLiteralConvertible``
-- ``JSONNumericConvertible``
+- ``JSONNumberConvertible``
 
 ### Result Builders
 

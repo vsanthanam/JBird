@@ -112,8 +112,8 @@ struct DeserializationTests {
             }
         }
 
-        @Test("Numeric")
-        func numeric() throws {
+        @Test("Number")
+        func number() throws {
             let raw = #"""
             123
             """#
@@ -192,8 +192,8 @@ struct DeserializationTests {
 
     }
 
-    @Suite("Numeric Value Deserialization Tests")
-    struct NumericTests {
+    @Suite("Number Value Deserialization Tests")
+    struct NumberTests {
 
         @Suite("Integer Deserialization Tests")
         struct IntegerTests {
@@ -808,7 +808,7 @@ struct DeserializationTests {
             {"foo": 0100}
             """#
             let data = try #require(raw.data(using: .utf8))
-            #expect(throws: JSONDeserializationError.invalidNumeric) {
+            #expect(throws: JSONDeserializationError.invalidNumber) {
                 _ = try JSON(data)
             }
         }

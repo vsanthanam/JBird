@@ -52,8 +52,8 @@ public enum JSONError: Error, Equatable, Sendable, CustomStringConvertible {
     /// Thrown when a JSON object cannot be converted into a literal
     case illegalLiteralConversion
 
-    /// Thrown when a JSON object cannot be converted into a numeric value
-    case illegalNumericConversion
+    /// Thrown when a JSON object cannot be converted into a number value
+    case illegalNumberConversion
 
     /// Thrown when a JSON object cannot be converted into a string
     case illegalStringConversion
@@ -79,6 +79,8 @@ public enum JSONError: Error, Equatable, Sendable, CustomStringConvertible {
     /// Thrown when a UUID cannot be decoded from a JSON string
     case uuidDecodingFailure(String)
 
+    case illegalAddition
+
     // MARK: - CustomStringConvertible
 
     public var description: String {
@@ -97,8 +99,8 @@ public enum JSONError: Error, Equatable, Sendable, CustomStringConvertible {
             "JSON cannot be represented as an object"
         case .illegalLiteralConversion:
             "JSON cannot be represented as a literal value"
-        case .illegalNumericConversion:
-            "JSON cannot be represented as a numeric value"
+        case .illegalNumberConversion:
+            "JSON cannot be represented as a number value"
         case .illegalStringConversion:
             "JSON cannot be represented as a string"
         case .illegalIntConversion:
@@ -115,6 +117,8 @@ public enum JSONError: Error, Equatable, Sendable, CustomStringConvertible {
             "Cannot decode URL from '\(string)'"
         case let .uuidDecodingFailure(string):
             "Cannot decode UUID from '\(string)'"
+        case .illegalAddition:
+            "Illegal addition of JSON values"
         }
     }
 

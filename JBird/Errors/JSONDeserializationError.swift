@@ -54,7 +54,7 @@ public enum JSONDeserializationError: Error, Equatable, Sendable, CustomStringCo
 
     case invalidLiteral
 
-    case invalidNumeric
+    case invalidNumber
 
     case invalidString
 
@@ -90,7 +90,7 @@ public enum JSONDeserializationError: Error, Equatable, Sendable, CustomStringCo
             "Expected ',' or ']'"
         case .invalidLiteral:
             "Invalid literal"
-        case .invalidNumeric:
+        case .invalidNumber:
             "Invalid number"
         case .invalidString:
             "Invalid string"
@@ -127,7 +127,7 @@ public enum JSONDeserializationError: Error, Equatable, Sendable, CustomStringCo
         case JSON_INVALID_LITERAL:
             self = .invalidLiteral
         case JSON_INVALID_NUMBER:
-            self = .invalidNumeric
+            self = .invalidNumber
         case JSON_INVALID_STRING:
             self = .invalidString
         case JSON_MISSING_OBJECT_KEY:

@@ -10,13 +10,13 @@
 ### Subtypes
 
 - ``Literal``
-- ``Numeric``
+- ``Number``
 
 ### Decoding JSON values into Swift types
 
 - ``literalValue``
 - ``boolValue``
-- ``numericValue``
+- ``numberValue``
 - ``intValue``
 - ``doubleValue``
 - ``stringValue``
@@ -34,7 +34,7 @@
 - ``isLiteral``
 - ``isObject``
 - ``isArray``
-- ``isNumeric``
+- ``isNumber``
 - ``isInt``
 - ``isDouble``
 - ``isString``

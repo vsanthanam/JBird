@@ -1,5 +1,5 @@
 // JBird
-// Numeric.swift
+// Number.swift
 //
 // MIT License
 //
@@ -29,14 +29,14 @@ import Foundation
 extension JSON {
 
     /// A JSON number
-    public enum Numeric: Equatable, Hashable, Sendable, ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral, CustomStringConvertible {
+    public enum Number: Equatable, Hashable, Sendable, ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral, CustomStringConvertible {
 
         // MARK: - Initializers
 
         public init(
-            _ convertible: some JSONNumericConvertible
+            _ convertible: some JSONNumberConvertible
         ) {
-            self = convertible.jsonNumeric
+            self = convertible.jsonNumber
         }
 
         // MARK: - Cases
@@ -47,7 +47,7 @@ extension JSON {
 
         // MARK: - API
 
-        /// The numeric value as a Swift integer
+        /// The number value as a Swift integer
         public var intValue: Int {
             get throws {
                 switch self {
@@ -59,7 +59,7 @@ extension JSON {
             }
         }
 
-        /// The numeric value as a Swift double
+        /// The number value as a Swift double
         public var doubleValue: Double {
             get throws {
                 switch self {
@@ -71,7 +71,7 @@ extension JSON {
             }
         }
 
-        /// Whether or not the numeric value is an integer
+        /// Whether or not the number value is an integer
         public var isInt: Bool {
             switch self {
             case .int:
@@ -81,7 +81,7 @@ extension JSON {
             }
         }
 
-        /// Whether or not the numeric value is a double
+        /// Whether or not the number value is a double
         public var isDouble: Bool {
             switch self {
             case .int:
@@ -91,9 +91,9 @@ extension JSON {
             }
         }
 
-        /// The untyped representation of the JSON numeric value
+        /// The untyped representation of the JSON number value
         ///
-        /// This property returns the JSON numeric value as a native Swift type:
+        /// This property returns the JSON number value as a native Swift type:
         /// - Strings are represented as `String`
         /// - Integers are represented as `Int`
         /// - Floating point numbers are represented as `Double`
@@ -128,7 +128,7 @@ extension JSON {
 
         // MARK: - Equatable
 
-        public static func == (lhs: Numeric, rhs: Numeric) -> Bool {
+        public static func == (lhs: Number, rhs: Number) -> Bool {
             switch (lhs, rhs) {
             case let (.int(lhs), .int(rhs)):
                 lhs == rhs
@@ -162,4 +162,21 @@ extension JSON {
 
     }
 
+}
+
+public func + (lhs: JSON.Number, rhs: JSON.Number) -> JSON.Number {
+    switch (lhs, rhs) {
+    case let (.int(lhs), .int(rhs)):
+        .int(lhs + rhs)
+    case let (.double(lhs), .double(rhs)):
+        .double(lhs + rhs)
+    case let (.int(lhs), .double(rhs)):
+        .double(Double(lhs) + rhs)
+    case let (.double(lhs), .int(rhs)):
+        .double(lhs + Double(rhs))
+    }
+}
+
+public func += (lhs: inout JSON.Number, rhs: JSON.Number) {
+    lhs = lhs + rhs
 }

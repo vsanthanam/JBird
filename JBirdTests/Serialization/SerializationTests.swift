@@ -55,7 +55,7 @@ struct SerializationTests {
 
     @Test("Invalid Float Serialization")
     func invalidFloatSerialization() {
-        let json: JSON = .numeric(.double(.infinity))
+        let json: JSON = .number(.double(.infinity))
         #expect(throws: JSONSerializationError.invalidFloat) {
             try json.serialize()
         }
@@ -154,8 +154,8 @@ struct SerializationTests {
 
     }
 
-    @Suite("Numeric Value Serialization Tests")
-    struct NumericTests {
+    @Suite("Number Value Serialization Tests")
+    struct NumberTests {
 
         @Suite("Integer Serialization Tests")
         struct IntegerTests {
