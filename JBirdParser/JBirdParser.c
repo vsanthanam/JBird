@@ -241,6 +241,8 @@ typedef struct {
     size_t temp_capacity;
     json_memory_arena_t *arena;
     bool allow_whitespace;
+    size_t max_depth;
+    size_t current_depth;
 } json_parser_t;
 
 static json_memory_block_t *json_arena_add_block(json_memory_arena_t *arena, size_t min_size);
@@ -586,7 +588,7 @@ static json_error_t json_array_push(json_value_t *array, json_value_t *element, 
     return JSON_NO_ERROR;
 }
 
-static void json_parser_init(json_parser_t *parser, const uint8_t *input, size_t length, bool allow_whitespace) {
+static void json_parser_init(json_parser_t *parser, const uint8_t *input, size_t length, bool allow_whitespace, size_t max_depth) {
     parser->input = input;
     parser->length = length;
     parser->index = 0;
@@ -595,6 +597,8 @@ static void json_parser_init(json_parser_t *parser, const uint8_t *input, size_t
     parser->temp_capacity = 0;
     parser->arena = json_arena_init(length);
     parser->allow_whitespace = allow_whitespace;
+    parser->max_depth = max_depth;
+    parser->current_depth = 0;
 }
 
 static void json_parser_cleanup(json_parser_t *parser) {
@@ -1195,6 +1199,11 @@ static json_error_t json_parse_value(json_parser_t *parser, json_value_t **out_v
         return JSON_UNEXPECTED_END_OF_INPUT;
     }
 
+    // Check recursion depth limit
+    if (parser->max_depth > 0 && parser->current_depth >= parser->max_depth) {
+        return JSON_MAX_DEPTH_EXCEEDED;
+    }
+
     uint8_t c = json_peek(parser);
     uint8_t char_type = char_class[c];
 
@@ -1261,6 +1270,8 @@ static json_error_t json_parse_array(json_parser_t *parser, json_value_t **out_v
         return err;
     }
 
+    parser->current_depth++;
+
     json_value_t *array = json_create_array(parser->arena);
     if (!array) {
         return JSON_OUT_OF_MEMORY;
@@ -1270,6 +1281,7 @@ static json_error_t json_parse_array(json_parser_t *parser, json_value_t **out_v
 
     if (json_has_more(parser) && json_peek(parser) == ']') {
         json_next(parser);
+        parser->current_depth--;
         *out_value = array;
         return JSON_NO_ERROR;
     }
@@ -1278,17 +1290,20 @@ static json_error_t json_parse_array(json_parser_t *parser, json_value_t **out_v
         json_value_t *element = NULL;
         err = json_parse_value(parser, &element);
         if (err != JSON_NO_ERROR) {
+            parser->current_depth--;
             return err;
         }
 
         err = json_array_push(array, element, parser->arena);
         if (err != JSON_NO_ERROR) {
+            parser->current_depth--;
             return err;
         }
 
         json_consume_whitespace(parser);
 
         if (!json_has_more(parser)) {
+            parser->current_depth--;
             return JSON_UNEXPECTED_END_OF_INPUT;
         }
 
@@ -1299,10 +1314,12 @@ static json_error_t json_parse_array(json_parser_t *parser, json_value_t **out_v
             json_consume_whitespace(parser);
             continue;
         } else {
+            parser->current_depth--;
             return JSON_EXPECTED_COMMA_OR_BRACKET;
         }
     }
 
+    parser->current_depth--;
     *out_value = array;
     return JSON_NO_ERROR;
 }
@@ -1313,14 +1330,19 @@ static json_error_t json_parse_object(json_parser_t *parser, json_value_t **out_
     if (err != JSON_NO_ERROR)
         return err;
 
+    parser->current_depth++;
+
     json_value_t *object = json_create_object(parser->arena);
-    if (!object)
+    if (!object) {
+        parser->current_depth--;
         return JSON_OUT_OF_MEMORY;
+    }
 
     json_consume_whitespace(parser);
 
     if (json_has_more(parser) && json_peek(parser) == '}') {
         json_next(parser);
+        parser->current_depth--;
         *out_value = object;
         return JSON_NO_ERROR;
     }
@@ -1328,6 +1350,7 @@ static json_error_t json_parse_object(json_parser_t *parser, json_value_t **out_
     while (1) {
         json_consume_whitespace(parser);
         if (!json_has_more(parser) || json_peek(parser) != '"') {
+            parser->current_depth--;
             return JSON_MISSING_OBJECT_KEY;
         }
 
@@ -1336,8 +1359,10 @@ static json_error_t json_parse_object(json_parser_t *parser, json_value_t **out_
         if (try_parse_simple_string(parser, &key, &key_len)) {
             const char *interned_key = json_string_pool_get_or_add(&parser->arena->string_pool,
                                                                    key, key_len, parser->arena);
-            if (!interned_key)
+            if (!interned_key) {
+                parser->current_depth--;
                 return JSON_OUT_OF_MEMORY;
+            }
 
             if (object->data.object.count >= object->data.object.capacity) {
                 size_t new_capacity = object->data.object.capacity * 2;
@@ -1347,8 +1372,10 @@ static json_error_t json_parse_object(json_parser_t *parser, json_value_t **out_
                 json_key_t *new_keys = (json_key_t *)json_arena_alloc(parser->arena, new_capacity * sizeof(json_key_t));
                 struct json_value **new_values = (struct json_value **)json_arena_alloc(parser->arena, new_capacity * sizeof(struct json_value *));
 
-                if (!new_keys || !new_values)
+                if (!new_keys || !new_values) {
+                    parser->current_depth--;
                     return JSON_OUT_OF_MEMORY;
+                }
 
                 if (object->data.object.count > 0) {
                     memcpy(new_keys, object->data.object.keys, object->data.object.count * sizeof(json_key_t));
@@ -1374,14 +1401,17 @@ static json_error_t json_parse_object(json_parser_t *parser, json_value_t **out_
             json_next(parser);
             err = json_parse_string_into_temp_buffer(parser);
             if (err != JSON_NO_ERROR) {
+                parser->current_depth--;
                 return err;
             }
 
             const char *interned_key = json_string_pool_get_or_add(&parser->arena->string_pool,
                                                                    parser->temp_buffer, parser->temp_size,
                                                                    parser->arena);
-            if (!interned_key)
+            if (!interned_key) {
+                parser->current_depth--;
                 return JSON_OUT_OF_MEMORY;
+            }
 
             if (object->data.object.count >= object->data.object.capacity) {
                 size_t new_capacity = object->data.object.capacity * 2;
@@ -1391,8 +1421,10 @@ static json_error_t json_parse_object(json_parser_t *parser, json_value_t **out_
                 json_key_t *new_keys = (json_key_t *)json_arena_alloc(parser->arena, new_capacity * sizeof(json_key_t));
                 struct json_value **new_values = (struct json_value **)json_arena_alloc(parser->arena, new_capacity * sizeof(struct json_value *));
 
-                if (!new_keys || !new_values)
+                if (!new_keys || !new_values) {
+                    parser->current_depth--;
                     return JSON_OUT_OF_MEMORY;
+                }
 
                 if (object->data.object.count > 0) {
                     memcpy(new_keys, object->data.object.keys, object->data.object.count * sizeof(json_key_t));
@@ -1420,6 +1452,7 @@ static json_error_t json_parse_object(json_parser_t *parser, json_value_t **out_
 
         json_consume_whitespace(parser);
         if (!json_has_more(parser) || json_next(parser) != ':') {
+            parser->current_depth--;
             return JSON_EXPECTED_COLON;
         }
         json_consume_whitespace(parser);
@@ -1427,6 +1460,7 @@ static json_error_t json_parse_object(json_parser_t *parser, json_value_t **out_
         json_value_t *value = NULL;
         err = json_parse_value(parser, &value);
         if (err != JSON_NO_ERROR) {
+            parser->current_depth--;
             return err;
         }
 
@@ -1436,8 +1470,10 @@ static json_error_t json_parse_object(json_parser_t *parser, json_value_t **out_
 
         json_consume_whitespace(parser);
 
-        if (!json_has_more(parser))
+        if (!json_has_more(parser)) {
+            parser->current_depth--;
             return JSON_UNEXPECTED_END_OF_INPUT;
+        }
 
         uint8_t c = json_next(parser);
         if (c == '}') {
@@ -1446,10 +1482,12 @@ static json_error_t json_parse_object(json_parser_t *parser, json_value_t **out_
             json_consume_whitespace(parser);
             continue;
         } else {
+            parser->current_depth--;
             return JSON_EXPECTED_COMMA_OR_BRACE;
         }
     }
 
+    parser->current_depth--;
     *out_value = object;
     return JSON_NO_ERROR;
 }
@@ -1575,7 +1613,7 @@ static bool try_parse_simple_string(json_parser_t *parser, const char **out_str,
     return false;
 }
 
-json_error_t json_parse(const uint8_t *data, size_t length, json_value_t **out_value, bool allow_bom, bool allow_whitespace) {
+json_error_t json_parse(const uint8_t *data, size_t length, json_value_t **out_value, bool allow_bom, bool allow_whitespace, size_t max_depth) {
     if (!data || !out_value) {
         return JSON_INVALID_JSON;
     }
@@ -1583,7 +1621,7 @@ json_error_t json_parse(const uint8_t *data, size_t length, json_value_t **out_v
     *out_value = NULL;
 
     json_parser_t parser;
-    json_parser_init(&parser, data, length, allow_whitespace);
+    json_parser_init(&parser, data, length, allow_whitespace, max_depth);
 
     if (!parser.arena) {
         json_parser_cleanup(&parser);
