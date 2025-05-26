@@ -121,7 +121,7 @@ extension JSON.Literal: JSONCodable {
 extension Int: JSONCodable {
 
     public func encodeToJSON() -> JSON {
-        .numeric(.int(self))
+        .number(.int(self))
     }
 
     public init(json: JSON) throws {
@@ -134,7 +134,7 @@ extension Int: JSONCodable {
 extension Double: JSONCodable {
 
     public func encodeToJSON() -> JSON {
-        .numeric(.double(self))
+        .number(.double(self))
     }
 
     public init(json: JSON) throws {
@@ -144,14 +144,14 @@ extension Double: JSONCodable {
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension JSON.Numeric: JSONCodable {
+extension JSON.Number: JSONCodable {
 
     public func encodeToJSON() -> JSON {
-        .numeric(self)
+        .number(self)
     }
 
     public init(json: JSON) throws {
-        self = try json.numericValue
+        self = try json.numberValue
     }
 
 }

@@ -82,8 +82,8 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// A JSON array
     case array([JSON])
 
-    /// A JSON numeric value
-    case numeric(Numeric)
+    /// A JSON number value
+    case number(Number)
 
     /// A JSON string
     case string(String)
@@ -102,7 +102,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
                 object.count
             case let .array(array):
                 array.count
-            case .literal, .numeric, .string:
+            case .literal, .number, .string:
                 throw JSONError.illegalCollectionConversion
             }
         }
@@ -121,7 +121,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             switch self {
             case let .literal(literal):
                 literal
-            case .object, .array, .numeric, .string:
+            case .object, .array, .number, .string:
                 throw JSONError.illegalLiteralConversion
             }
         }
@@ -140,7 +140,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             switch self {
             case let .object(object):
                 object
-            case .literal, .array, .numeric, .string:
+            case .literal, .array, .number, .string:
                 throw JSONError.illegalObjectConversion
             }
         }
@@ -152,20 +152,20 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             switch self {
             case let .array(array):
                 array
-            case .literal, .object, .numeric, .string:
+            case .literal, .object, .number, .string:
                 throw JSONError.illegalArrayConversion
             }
         }
     }
 
-    /// The JSON value as a numeric
-    public var numericValue: Numeric {
+    /// The JSON value as a number
+    public var numberValue: Number {
         get throws {
             switch self {
-            case let .numeric(numeric):
-                numeric
+            case let .number(number):
+                number
             case .literal, .object, .array, .string:
-                throw JSONError.illegalNumericConversion
+                throw JSONError.illegalNumberConversion
             }
         }
     }
@@ -173,14 +173,14 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// The JSON value as a Swift integer
     public var intValue: Int {
         get throws {
-            try numericValue.intValue
+            try numberValue.intValue
         }
     }
 
     /// The JSON value as a Swift double
     public var doubleValue: Double {
         get throws {
-            try numericValue.doubleValue
+            try numberValue.doubleValue
         }
     }
 
@@ -190,7 +190,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             switch self {
             case let .string(string):
                 string
-            case .literal, .object, .array, .numeric:
+            case .literal, .object, .array, .number:
                 throw JSONError.illegalStringConversion
             }
         }
@@ -201,7 +201,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         switch self {
         case let .literal(literal):
             literal.isBool
-        case .object, .array, .numeric, .string:
+        case .object, .array, .number, .string:
             false
         }
     }
@@ -211,7 +211,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         switch self {
         case let .literal(literal):
             literal.isNull
-        case .object, .array, .numeric, .string:
+        case .object, .array, .number, .string:
             false
         }
     }
@@ -221,7 +221,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         switch self {
         case .literal:
             true
-        case .object, .array, .numeric, .string:
+        case .object, .array, .number, .string:
             false
         }
     }
@@ -231,7 +231,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         switch self {
         case .object:
             true
-        case .literal, .array, .numeric, .string:
+        case .literal, .array, .number, .string:
             false
         }
     }
@@ -241,15 +241,15 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         switch self {
         case .array:
             true
-        case .literal, .object, .numeric, .string:
+        case .literal, .object, .number, .string:
             false
         }
     }
 
-    /// Whether or not the JSON value is a numeric
-    public var isNumeric: Bool {
+    /// Whether or not the JSON value is a number
+    public var isNumber: Bool {
         switch self {
-        case .numeric:
+        case .number:
             true
         case .literal, .object, .array, .string:
             false
@@ -259,8 +259,8 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Whether or not the JSON value is an int
     public var isInt: Bool {
         switch self {
-        case let .numeric(numeric):
-            numeric.isInt
+        case let .number(number):
+            number.isInt
         case .literal, .object, .array, .string:
             false
         }
@@ -269,8 +269,8 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Whether or not the JSON value is a double
     public var isDouble: Bool {
         switch self {
-        case let .numeric(numeric):
-            numeric.isDouble
+        case let .number(number):
+            number.isDouble
         case .literal, .object, .array, .string:
             false
         }
@@ -281,7 +281,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         switch self {
         case .string:
             true
-        case .literal, .object, .array, .numeric:
+        case .literal, .object, .array, .number:
             false
         }
     }
@@ -302,8 +302,8 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             literal.untyped
         case let .string(string):
             string
-        case let .numeric(numeric):
-            numeric.untyped
+        case let .number(number):
+            number.untyped
         case let .array(array):
             array.map(\.untyped)
         case let .object(object):
@@ -472,7 +472,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         case (.array, _),
              (.object, _),
              (.string, _),
-             (.numeric, _),
+             (.number, _),
              (.literal, _):
             false
         }
@@ -553,7 +553,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         case (.array, _),
              (.object, _),
              (.string, _),
-             (.numeric, _),
+             (.number, _),
              (.literal, _):
             throw JSONError.invalidSubscript(`subscript`)
         }
@@ -876,7 +876,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         case (.array, _),
              (.object, _),
              (.string, _),
-             (.numeric, _),
+             (.number, _),
              (.literal, _):
             throw JSONError.invalidSubscript(`subscript`)
         }
@@ -1197,8 +1197,8 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         switch self {
         case let .literal(literal):
             literal.description
-        case let .numeric(numeric):
-            numeric.description
+        case let .number(number):
+            number.description
         case let .array(array):
             array.description
         case let .object(object):
@@ -1208,4 +1208,21 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         }
     }
 
+}
+
+public func + (lhs: JSON, rhs: JSON) throws -> JSON {
+    switch (lhs, rhs) {
+    case let (.array(lhs), .array(rhs)):
+        .array(lhs + rhs)
+    case let (.number(lhs), .number(rhs)):
+        .number(lhs + rhs)
+    case let (.string(lhs), .string(rhs)):
+        .string(lhs + rhs)
+    case (.object, _), (.array, _), (.number, _), (.string, _), (.literal, _):
+        throw JSONError.illegalAddition
+    }
+}
+
+public func += (lhs: inout JSON, rhs: JSON) throws {
+    lhs = try lhs + rhs
 }

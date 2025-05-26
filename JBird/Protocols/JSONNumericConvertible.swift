@@ -25,26 +25,26 @@
 
 /// A type that can be represented as a JSON number
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-public protocol JSONNumericConvertible {
+public protocol JSONNumberConvertible {
 
-    /// The JSON decimal numeric representation of the value
-    var jsonNumeric: JSON.Numeric { get }
+    /// The JSON decimal number representation of the value
+    var jsonNumber: JSON.Number { get }
 
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension Int: JSONNumericConvertible {
+extension Int: JSONNumberConvertible {
 
-    public var jsonNumeric: JSON.Numeric {
+    public var jsonNumber: JSON.Number {
         .int(self)
     }
 
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension Double: JSONNumericConvertible {
+extension Double: JSONNumberConvertible {
 
-    public var jsonNumeric: JSON.Numeric {
+    public var jsonNumber: JSON.Number {
         .double(self)
     }
 

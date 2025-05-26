@@ -136,12 +136,12 @@ struct JSONCodableTests {
         func intEncode() {
             let int = 21
             let json = int.encodeToJSON()
-            #expect(json == .numeric(.int(21)))
+            #expect(json == .number(.int(21)))
         }
 
         @Test("Int Decode")
         func intDecode() throws {
-            let json = JSON.numeric(.int(21))
+            let json = JSON.number(.int(21))
             let int = try json.decode(into: Int.self)
             #expect(int == 21)
         }
@@ -155,47 +155,47 @@ struct JSONCodableTests {
         func doubleEncode() {
             let double = 2.1
             let json = double.encodeToJSON()
-            #expect(json == .numeric(.double(2.1)))
+            #expect(json == .number(.double(2.1)))
         }
 
         @Test("Double Decode")
         func doubleDecode() throws {
-            let json = JSON.numeric(.double(2.1))
+            let json = JSON.number(.double(2.1))
             let double = try json.decode(into: Double.self)
             #expect(double == 2.1)
         }
 
     }
 
-    @Suite("Numeric Conformance Tests")
-    struct NumericTests {
+    @Suite("Number Conformance Tests")
+    struct NumberTests {
 
-        @Test("Int Numeric Encode")
+        @Test("Int Number Encode")
         func intEncode() {
-            let numeric = JSON.Numeric.int(21)
-            let json = numeric.encodeToJSON()
-            #expect(json == .numeric(.int(21)))
+            let number = JSON.Number.int(21)
+            let json = number.encodeToJSON()
+            #expect(json == .number(.int(21)))
         }
 
-        @Test("Int Numeric Decode")
+        @Test("Int Number Decode")
         func intDecode() throws {
-            let json = JSON.numeric(.int(21))
-            let numeric = try json.decode(into: JSON.Numeric.self)
-            #expect(numeric == .int(21))
+            let json = JSON.number(.int(21))
+            let number = try json.decode(into: JSON.Number.self)
+            #expect(number == .int(21))
         }
 
-        @Test("Double Numeric Encode")
+        @Test("Double Number Encode")
         func doubleEncode() {
-            let numeric = JSON.Numeric.double(2.1)
-            let json = numeric.encodeToJSON()
-            #expect(json == .numeric(.double(2.1)))
+            let number = JSON.Number.double(2.1)
+            let json = number.encodeToJSON()
+            #expect(json == .number(.double(2.1)))
         }
 
-        @Test("Double Numeric Decode")
+        @Test("Double Number Decode")
         func doubleDecode() throws {
-            let json = JSON.numeric(.double(2.1))
-            let numeric = try json.decode(into: JSON.Numeric.self)
-            #expect(numeric == .double(2.1))
+            let json = JSON.number(.double(2.1))
+            let number = try json.decode(into: JSON.Number.self)
+            #expect(number == .double(2.1))
         }
 
     }
@@ -411,12 +411,12 @@ struct JSONCodableTests {
         func int8Encode() {
             let int: Int8 = 21
             let json = int.encodeToJSON()
-            #expect(json == .numeric(.int(21)))
+            #expect(json == .number(.int(21)))
         }
 
         @Test("Int8 Decode")
         func int8Decode() throws {
-            let json = JSON.numeric(.int(21))
+            let json = JSON.number(.int(21))
             let int = try json.decode(into: Int8.self)
             #expect(int == 21)
         }
@@ -430,12 +430,12 @@ struct JSONCodableTests {
         func int16Encode() {
             let int: Int16 = 21
             let json = int.encodeToJSON()
-            #expect(json == .numeric(.int(21)))
+            #expect(json == .number(.int(21)))
         }
 
         @Test("Int16 Decode")
         func int16Decode() throws {
-            let json = JSON.numeric(.int(21))
+            let json = JSON.number(.int(21))
             let int = try json.decode(into: Int16.self)
             #expect(int == 21)
         }
@@ -449,12 +449,12 @@ struct JSONCodableTests {
         func int32Encode() {
             let int: Int32 = 21
             let json = int.encodeToJSON()
-            #expect(json == .numeric(.int(21)))
+            #expect(json == .number(.int(21)))
         }
 
         @Test("Int32 Decode")
         func int32Decode() throws {
-            let json = JSON.numeric(.int(21))
+            let json = JSON.number(.int(21))
             let int = try json.decode(into: Int32.self)
             #expect(int == 21)
         }
@@ -468,12 +468,12 @@ struct JSONCodableTests {
         func int64Encode() {
             let int: Int64 = 21
             let json = int.encodeToJSON()
-            #expect(json == .numeric(.int(21)))
+            #expect(json == .number(.int(21)))
         }
 
         @Test("Int64 Decode")
         func int64Decode() throws {
-            let json = JSON.numeric(.int(21))
+            let json = JSON.number(.int(21))
             let int = try json.decode(into: Int64.self)
             #expect(int == 21)
         }
@@ -487,12 +487,12 @@ struct JSONCodableTests {
         func uintEncode() {
             let int: UInt = 21
             let json = int.encodeToJSON()
-            #expect(json == .numeric(.int(21)))
+            #expect(json == .number(.int(21)))
         }
 
         @Test("UInt Decode")
         func uintDecode() throws {
-            let json = JSON.numeric(.int(21))
+            let json = JSON.number(.int(21))
             let int = try json.decode(into: UInt.self)
             #expect(int == 21)
         }
@@ -506,12 +506,12 @@ struct JSONCodableTests {
         func uint8Encode() {
             let int: UInt8 = 21
             let json = int.encodeToJSON()
-            #expect(json == .numeric(.int(21)))
+            #expect(json == .number(.int(21)))
         }
 
         @Test("UInt Decode")
         func uint9Decode() throws {
-            let json = JSON.numeric(.int(21))
+            let json = JSON.number(.int(21))
             let int = try json.decode(into: UInt8.self)
             #expect(int == 21)
         }
@@ -525,12 +525,12 @@ struct JSONCodableTests {
         func uint16Encode() {
             let int: UInt16 = 21
             let json = int.encodeToJSON()
-            #expect(json == .numeric(.int(21)))
+            #expect(json == .number(.int(21)))
         }
 
         @Test("UInt Decode")
         func uint16Decode() throws {
-            let json = JSON.numeric(.int(21))
+            let json = JSON.number(.int(21))
             let int = try json.decode(into: UInt16.self)
             #expect(int == 21)
         }
@@ -544,12 +544,12 @@ struct JSONCodableTests {
         func uint32Encode() {
             let int: UInt32 = 21
             let json = int.encodeToJSON()
-            #expect(json == .numeric(.int(21)))
+            #expect(json == .number(.int(21)))
         }
 
         @Test("UInt Decode")
         func uint32Decode() throws {
-            let json = JSON.numeric(.int(21))
+            let json = JSON.number(.int(21))
             let int = try json.decode(into: UInt32.self)
             #expect(int == 21)
         }
@@ -563,12 +563,12 @@ struct JSONCodableTests {
         func uint64Encode() {
             let int: UInt64 = 21
             let json = int.encodeToJSON()
-            #expect(json == .numeric(.int(21)))
+            #expect(json == .number(.int(21)))
         }
 
         @Test("UInt64 Decode")
         func uint64Decode() throws {
-            let json = JSON.numeric(.int(21))
+            let json = JSON.number(.int(21))
             let int = try json.decode(into: UInt64.self)
             #expect(int == 21)
         }
@@ -582,12 +582,12 @@ struct JSONCodableTests {
         func doubleEncode() {
             let float: Float = 0.5
             let json = float.encodeToJSON()
-            #expect(json == .numeric(.double(0.5)))
+            #expect(json == .number(.double(0.5)))
         }
 
         @Test("Float Decode")
         func floatDecode() throws {
-            let json = JSON.numeric(.double(0.5))
+            let json = JSON.number(.double(0.5))
             let float = try json.decode(into: Float.self)
             #expect(float == 0.5)
         }
