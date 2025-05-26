@@ -142,7 +142,7 @@ extension JSON {
 
     /// Create a typed JSON value from a JSON string, asynchronously
     ///
-    /// Use this method if you need to be able to cancel the deserialization after you start it. This can be useful whe ndeserializing arge payloads.
+    /// Use this method if you need to be able to cancel the deserialization after you start it. This can be useful when deserializing large payloads.
     /// - Parameters:
     ///   - data: The JSON string
     ///   - options: The deserialization options
@@ -156,7 +156,7 @@ extension JSON {
 
     /// Create a typed JSON value from a UTF-8 encoded byte buffer, asynchronously
     ///
-    /// Use this method if you need to be able to cancel the deserialization after you start it. This can be useful whe ndeserializing arge payloads.
+    /// Use this method if you need to be able to cancel the deserialization after you start it. This can be useful when deserializing large payloads.
     /// - Parameters:
     ///   - string: The byte buffer
     ///   - options: The deserialization options
@@ -536,6 +536,8 @@ extension JSON {
         }
     }
 
+    private static let defaultRecursionDepthLimit: Int = 256
+
     @inline(__always)
     private static func parse(
         _ data: Data,
@@ -548,7 +550,8 @@ extension JSON {
                 buffer.count,
                 &jsonValue,
                 options.contains(.allowByteOrderMark),
-                !options.contains(.requireMinified)
+                !options.contains(.requireMinified),
+                defaultRecursionDepthLimit
             )
         }
 
@@ -642,7 +645,8 @@ extension JSON {
                 buffer.count,
                 &jsonValue,
                 options.contains(.allowByteOrderMark),
-                !options.contains(.requireMinified)
+                !options.contains(.requireMinified),
+                defaultRecursionDepthLimit
             )
         }
 

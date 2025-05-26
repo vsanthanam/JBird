@@ -48,7 +48,8 @@ typedef enum {
     JSON_MISSING_OBJECT_KEY,        /**< Object is missing a key */
     JSON_INVALID_UNICODE,           /**< Invalid Unicode character in string */
     JSON_INVALID_ESCAPE,            /**< Invalid escape sequence in string */
-    JSON_OUT_OF_MEMORY              /**< Memory allocation failed */
+    JSON_OUT_OF_MEMORY,             /**< Memory allocation failed */
+    JSON_MAX_DEPTH_EXCEEDED         /**< Maximum recursion depth exceeded */
 } json_error_t;
 
 /**
@@ -77,9 +78,10 @@ typedef struct json_value json_value_t;
  * @param out_value Pointer to store the resulting parsed value
  * @param allow_bom Whether to allow BOM (Byte Order Mark) at the beginning of the data
  * @param allow_whitespace Whether to allow insignificant whitespace in the data
+ * @param max_depth Maximum recursion depth (0 for unlimited)
  * @return Error code indicating success or failure
  */
-json_error_t json_parse(const uint8_t *data, size_t length, json_value_t **out_value, bool allow_bom, bool allow_whitespace);
+json_error_t json_parse(const uint8_t *data, size_t length, json_value_t **out_value, bool allow_bom, bool allow_whitespace, size_t max_depth);
 
 /**
  * @brief Free memory allocated for a JSON value

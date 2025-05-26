@@ -66,6 +66,8 @@ public enum JSONDeserializationError: Error, Equatable, Sendable, CustomStringCo
 
     case outOfMemory
 
+    case depthLimitExceeded
+
     // MARK: - CustomStringConvertible
 
     public var description: String {
@@ -100,6 +102,8 @@ public enum JSONDeserializationError: Error, Equatable, Sendable, CustomStringCo
             "Invalid escape sequence"
         case .outOfMemory:
             "Out of memory"
+        case .depthLimitExceeded:
+            "Depth limit exceeded"
         }
     }
 
@@ -134,6 +138,8 @@ public enum JSONDeserializationError: Error, Equatable, Sendable, CustomStringCo
             self = .invalidEscape
         case JSON_OUT_OF_MEMORY:
             self = .outOfMemory
+        case JSON_MAX_DEPTH_EXCEEDED:
+            self = .depthLimitExceeded
         default:
             self = .unknown
         }
