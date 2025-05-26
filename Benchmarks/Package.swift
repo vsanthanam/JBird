@@ -9,37 +9,33 @@ enum BenchmarkTarget: String {
     case local
 }
 
-let benchmarkTarget: BenchmarkTarget?
-
-if Context.environment["BENCHMARK_TARGET"] == "release" {
-    benchmarkTarget = .release
+let benchmarkTarget: BenchmarkTarget? = if Context.environment["BENCHMARK_TARGET"] == "release" {
+    .release
 } else if Context.environment["BENCHMARK_TARGET"] == "remote" {
-    benchmarkTarget = .remote
+    .remote
 } else if Context.environment["BENCHMARK_TARGET"] == "local" {
-    benchmarkTarget = .local
+    .local
 } else {
-    benchmarkTarget = nil
+    nil
 }
 
 if let benchmarkTarget {
     print("Benchmark target: \(benchmarkTarget.rawValue)")
 }
 
-let jbird: PackageDescription.Package.Dependency
-
-switch benchmarkTarget {
+let jbird: PackageDescription.Package.Dependency = switch benchmarkTarget {
 case .release:
-    jbird = .package(
+    .package(
         url: "https://github.com/vsanthanam/JBird.git",
         from: "0.0.0"
     )
 case .remote:
-    jbird = .package(
+    .package(
         url: "https://github.com/vsanthanam/JBird.git",
         branch: "main"
     )
 case .local, .none:
-    jbird = .package(
+    .package(
         name: "JBird",
         path: "../"
     )
