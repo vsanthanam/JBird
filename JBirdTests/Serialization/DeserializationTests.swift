@@ -860,4 +860,60 @@ struct DeserializationTests {
 
     }
 
+    @Test("Deserialization Recursion Depth Limit")
+    func depthLimit() async throws {
+        let raw = #"""
+        {
+            "foo": [1, 2, 3],
+            "bar": null
+        }
+        """#
+        let data = try #require(raw.data(using: .utf8))
+        let json = try JSON.withRecursionDepthLimit(3) {
+            try JSON(data)
+        }
+        #expect(json == ["foo": [1, 2, 3], "bar": nil])
+        #expect(throws: JSONDeserializationError.depthLimitExceeded) {
+            try JSON.withRecursionDepthLimit(2) {
+                try JSON(data)
+            }
+        }
+        await #expect(throws: JSONDeserializationError.depthLimitExceeded) {
+            try await JSON.withRecursionDepthLimit(2) {
+                try await JSON.deserialize(data)
+            }
+        }
+        _ = try await JSON.withRecursionDepthLimit(2) {
+            try await JSON.deserialize(data, options: .ignoreRecursionDepthLimit)
+        }
+    }
+
+    @Test("Deserialization Input Size Limit")
+    func inputSizeLimit() async throws {
+        let raw = #"""
+        {
+            "foo": [1, 2, 3],
+            "bar": null
+        }
+        """#
+        let data = try #require(raw.data(using: .utf8))
+        let json = try JSON.withInputSizeLimit(50) {
+            try JSON(data)
+        }
+        #expect(json == ["foo": [1, 2, 3], "bar": nil])
+        #expect(throws: JSONDeserializationError.inputSizeLimitExceeded) {
+            try JSON.withInputSizeLimit(12) {
+                try JSON(data)
+            }
+        }
+        await #expect(throws: JSONDeserializationError.inputSizeLimitExceeded) {
+            try await JSON.withInputSizeLimit(12) {
+                try await JSON.deserialize(data)
+            }
+        }
+        _ = try await JSON.withInputSizeLimit(12) {
+            try await JSON.deserialize(data, options: .ignoreInputSizeLimit)
+        }
+    }
+
 }

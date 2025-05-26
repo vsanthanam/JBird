@@ -23,7 +23,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import JBird
+@testable import JBird
+import JBirdParser
 import Testing
 
 @Test("JSONDeserializationError Descriptions")
@@ -69,4 +70,28 @@ func jsonDeserializationErrorDescriptions() {
 
     let outOfMemory = JSONDeserializationError.outOfMemory
     #expect(outOfMemory.description == "Out of memory")
+
+    let depthLimitExceeded = JSONDeserializationError.depthLimitExceeded
+    #expect(depthLimitExceeded.description == "Depth limit exceeded")
+
+    let inputSizeLimitExceeded = JSONDeserializationError.inputSizeLimitExceeded
+    #expect(inputSizeLimitExceeded.description == "Input size limit exceeded")
+}
+
+@Test("Deserialiation error C initializer")
+func cInitializer() {
+    #expect(JSONDeserializationError(JSON_UNEXPECTED_END_OF_INPUT) == .unexpectedEndOfInput)
+    #expect(JSONDeserializationError(JSON_INVALID_JSON) == .invalidJSON)
+    #expect(JSONDeserializationError(JSON_INVALID_CHARACTER) == .invalidCharacter)
+    #expect(JSONDeserializationError(JSON_EXPECTED_COLON) == .expectedColon)
+    #expect(JSONDeserializationError(JSON_EXPECTED_COMMA_OR_BRACE) == .expectedCommaOrBrace)
+    #expect(JSONDeserializationError(JSON_EXPECTED_COMMA_OR_BRACKET) == .expectedCommaOrBracket)
+    #expect(JSONDeserializationError(JSON_INVALID_LITERAL) == .invalidLiteral)
+    #expect(JSONDeserializationError(JSON_INVALID_NUMBER) == .invalidNumber)
+    #expect(JSONDeserializationError(JSON_INVALID_STRING) == .invalidString)
+    #expect(JSONDeserializationError(JSON_MISSING_OBJECT_KEY) == .missingObjectKey)
+    #expect(JSONDeserializationError(JSON_INVALID_UNICODE) == .invalidUnicode)
+    #expect(JSONDeserializationError(JSON_INVALID_ESCAPE) == .invalidEscape)
+    #expect(JSONDeserializationError(JSON_OUT_OF_MEMORY) == .outOfMemory)
+    #expect(JSONDeserializationError(JSON_MAX_DEPTH_EXCEEDED) == .depthLimitExceeded)
 }

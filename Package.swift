@@ -60,7 +60,8 @@ let package = Package(
         .testTarget(
             name: "JBirdTests",
             dependencies: [
-                "JBird"
+                "JBird",
+                "JBirdParser"
             ],
             path: "JBirdTests",
             swiftSettings: [

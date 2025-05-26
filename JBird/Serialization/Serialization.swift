@@ -98,6 +98,12 @@ extension JSON {
         /// Whether or not the deserialized JSON is allowed to contain insignificant whitespace
         public static let requireMinified = DeserializationOptions(rawValue: 1 << 4)
 
+        /// Ignore the actively configured recursion depth limit.
+        public static let ignoreRecursionDepthLimit = DeserializationOptions(rawValue: 1 << 5)
+
+        /// Ignore the actively configured input size limit
+        public static let ignoreInputSizeLimit = DeserializationOptions(rawValue: 1 << 6)
+
         /// The default set of options
         public static let `default`: DeserializationOptions = [.fragmentsAllowed, .allowByteOrderMark]
 
@@ -112,6 +118,64 @@ extension JSON {
     }
 
     // MARK: - API
+
+    /// The default recursion depth limit of 256 steps
+    public static let defaultRecursionDepthLimit: size_t = calculateMaxDepth()
+
+    /// The default input size limit of 100MB, in bytes
+    public static let defaultInputSizeLimit: size_t = calculateMaxInputSize()
+
+    /// Perform the provided operation with a custom recursion depth limit
+    /// - Parameters:
+    ///   - limit: The desired recursion depth limit
+    ///   - operation: The operation to perform
+    /// - Returns: The return value of the operation
+    public static func withRecursionDepthLimit<T>(
+        _ limit: size_t,
+        operation: () throws -> T
+    ) rethrows -> T {
+        assert(limit >= 1, "Recursion depth limit must be greater than or equal to 1")
+        return try $recursionDepthLimit.withValue(limit, operation: operation)
+    }
+
+    /// Perform the provided async operation with a custom recursion depth limit
+    /// - Parameters:
+    ///   - limit: The desired recursion depth limit
+    ///   - operation: The operation to perform
+    /// - Returns: The return value of the operation
+    public static func withRecursionDepthLimit<T>(
+        _ limit: size_t,
+        operation: () async throws -> T
+    ) async rethrows -> T {
+        assert(limit >= 1, "Recursion depth limit must be greater than or equal to 1")
+        return try await $recursionDepthLimit.withValue(limit, operation: operation)
+    }
+
+    /// Perform the provided operation with a custom input size limit
+    /// - Parameters:
+    ///   - limit: The desired input size limit, in bytes
+    ///   - operation: The operation to perform
+    /// - Returns: The return value of the operation
+    public static func withInputSizeLimit<T>(
+        _ limit: Int,
+        operation: () throws -> T
+    ) rethrows -> T {
+        assert(limit >= 1, "Input size limit must be greater than or equal to 1")
+        return try $inputSizeLimit.withValue(limit, operation: operation)
+    }
+
+    /// Perform the provided async operation with a custom input size limit
+    /// - Parameters:
+    ///   - limit: The desired input size limit, in bytes
+    ///   - operation: The operation to perform
+    /// - Returns: The return value of the operation
+    public static func withInputSizeLimit<T>(
+        _ limit: Int,
+        operation: () async throws -> T
+    ) async rethrows -> T {
+        assert(limit >= 1, "Input size limit must be greater than or equal to 1")
+        return try await $inputSizeLimit.withValue(limit, operation: operation)
+    }
 
     /// Create a typed JSON value from a JSON string
     /// - Parameters:
@@ -536,13 +600,21 @@ extension JSON {
         }
     }
 
-    private static let defaultRecursionDepthLimit: Int = 256
+    @TaskLocal
+    private static var recursionDepthLimit: size_t = defaultRecursionDepthLimit
+
+    @TaskLocal
+    private static var inputSizeLimit: size_t = defaultInputSizeLimit
 
     @inline(__always)
     private static func parse(
         _ data: Data,
         _ options: DeserializationOptions
     ) throws -> JSON {
+        if !options.contains(.ignoreInputSizeLimit), data.count > inputSizeLimit {
+            throw JSONDeserializationError.inputSizeLimitExceeded
+        }
+
         var jsonValue: OpaquePointer?
         let result = data.withUnsafeBytes { buffer in
             json_parse(
@@ -551,7 +623,7 @@ extension JSON {
                 &jsonValue,
                 options.contains(.allowByteOrderMark),
                 !options.contains(.requireMinified),
-                defaultRecursionDepthLimit
+                options.contains(.ignoreRecursionDepthLimit) ? 0 : recursionDepthLimit
             )
         }
 
@@ -638,6 +710,10 @@ extension JSON {
         _ data: Data,
         _ options: DeserializationOptions
     ) async throws -> JSON {
+        if !options.contains(.ignoreInputSizeLimit), data.count > inputSizeLimit {
+            throw JSONDeserializationError.inputSizeLimitExceeded
+        }
+
         var jsonValue: OpaquePointer?
         let result = data.withUnsafeBytes { buffer in
             json_parse(
@@ -646,7 +722,7 @@ extension JSON {
                 &jsonValue,
                 options.contains(.allowByteOrderMark),
                 !options.contains(.requireMinified),
-                defaultRecursionDepthLimit
+                options.contains(.ignoreRecursionDepthLimit) ? 0 : recursionDepthLimit
             )
         }
 
@@ -761,6 +837,27 @@ extension JSON {
             throw JSONDeserializationError.illegalFragment
         }
         return json
+    }
+
+    private static func calculateMaxDepth() -> size_t {
+        var attr = pthread_attr_t()
+
+        pthread_attr_init(&attr)
+
+        defer {
+            pthread_attr_destroy(&attr)
+        }
+
+        var size: size_t = 0
+        pthread_attr_getstacksize(&attr, &size)
+
+        return min(1024, max(16, size / 512))
+    }
+
+    private static func calculateMaxInputSize() -> size_t {
+        let physicalMemory = Double(ProcessInfo.processInfo.physicalMemory)
+        let cap = size_t(physicalMemory * 0.01)
+        return min(max(cap, 1 * 1024 * 1024), 50 * 1024 * 1024)
     }
 
 }
