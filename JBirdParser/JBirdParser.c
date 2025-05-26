@@ -264,32 +264,32 @@ static void json_string_pool_init(string_pool_t *pool, json_memory_arena_t *aren
 static bool json_string_pool_resize(string_pool_t *pool, json_memory_arena_t *arena) {
     size_t old_bucket_count = pool->bucket_count;
     string_pool_entry_t **old_buckets = pool->buckets;
-    
+
     size_t new_bucket_count = old_bucket_count * 2;
     string_pool_entry_t **new_buckets = (string_pool_entry_t **)json_arena_alloc(arena, new_bucket_count * sizeof(string_pool_entry_t *));
-    
+
     if (!new_buckets) {
         return false;
     }
-    
+
     memset(new_buckets, 0, new_bucket_count * sizeof(string_pool_entry_t *));
-    
+
     for (size_t i = 0; i < old_bucket_count; i++) {
         string_pool_entry_t *entry = old_buckets[i];
         while (entry) {
             string_pool_entry_t *next = entry->next;
-            
+
             size_t new_bucket_idx = entry->hash & (new_bucket_count - 1);
             entry->next = new_buckets[new_bucket_idx];
             new_buckets[new_bucket_idx] = entry;
-            
+
             entry = next;
         }
     }
-    
+
     pool->buckets = new_buckets;
     pool->bucket_count = new_bucket_count;
-    
+
     return true;
 }
 
