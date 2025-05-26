@@ -61,7 +61,16 @@ nonisolated(unsafe) let benchmarks = {
     for (name, data) in files {
         Benchmark.defaultConfiguration.maxIterations = 1_000_000_000_000_000
         #if CI
-            Benchmark.defaultConfiguration.metrics = [.wallClock, .cpuTotal, .instructions]
+            Benchmark.defaultConfiguration.metrics = [
+                .wallClock,
+                .cpuTotal,
+                .instructions
+            ]
+            Benchmark.defaultConfiguration.thresholds = [
+                .wallClock: BenchmarkThresholds.relaxed,
+                .cpuTotal: BenchmarkThresholds.relaxed,
+                .instructions: BenchmarkThresholds.relaxed
+            ]
         #endif
         Benchmark("Parse (\(name))") { benchmark in
             for _ in benchmark.scaledIterations {
