@@ -47,7 +47,6 @@
 
 #define SMALL_STRING_SIZE 16
 #define STRING_POOL_INITIAL_SIZE 64
-#define STRING_POOL_INITIAL_BUCKETS 128
 
 typedef enum {
     CHAR_CLASS_NONE = 0,
@@ -145,44 +144,12 @@ static inline bool is_whitespace(uint8_t c) {
     return char_class[c] == CHAR_CLASS_WHITESPACE;
 }
 
-struct json_memory_arena;
-
-typedef struct json_memory_arena json_memory_arena_t;
-
-typedef struct string_pool_entry {
-    const char *str;
-    size_t len;
-    uint32_t hash;
-    struct string_pool_entry *next;
-} string_pool_entry_t;
-
 typedef struct {
-    string_pool_entry_t **buckets;
-    size_t bucket_count;
-    size_t entry_count;
-    json_memory_arena_t *arena;
+    const char **strings;
+    size_t *lengths;
+    size_t count;
+    size_t capacity;
 } string_pool_t;
-
-static inline uint32_t hash_string(const char *str, size_t len) {
-    uint32_t hash = 2166136261u;
-    const uint8_t *bytes = (const uint8_t *)str;
-
-    while (len >= 4) {
-        hash = (hash ^ bytes[0]) * 16777619u;
-        hash = (hash ^ bytes[1]) * 16777619u;
-        hash = (hash ^ bytes[2]) * 16777619u;
-        hash = (hash ^ bytes[3]) * 16777619u;
-        bytes += 4;
-        len -= 4;
-    }
-
-    while (len > 0) {
-        hash = (hash ^ *bytes++) * 16777619u;
-        len--;
-    }
-
-    return hash;
-}
 
 typedef struct json_memory_block {
     char *memory;
@@ -250,34 +217,36 @@ static void *json_arena_alloc(json_memory_arena_t *arena, size_t size);
 static bool try_parse_simple_string(json_parser_t *parser, const char **out_str, size_t *out_len);
 
 static void json_string_pool_init(string_pool_t *pool, json_memory_arena_t *arena) {
-    pool->bucket_count = STRING_POOL_INITIAL_BUCKETS;
-    pool->entry_count = 0;
-    pool->arena = arena;
-    pool->buckets = (string_pool_entry_t **)json_arena_alloc(arena, pool->bucket_count * sizeof(string_pool_entry_t *));
-    if (pool->buckets) {
-        memset(pool->buckets, 0, pool->bucket_count * sizeof(string_pool_entry_t *));
-    }
+    pool->capacity = STRING_POOL_INITIAL_SIZE;
+    pool->count = 0;
+    pool->strings = (const char **)json_arena_alloc(arena, pool->capacity * sizeof(const char *));
+    pool->lengths = (size_t *)json_arena_alloc(arena, pool->capacity * sizeof(size_t));
 }
 
 static const char *json_string_pool_get_or_add(string_pool_t *pool, const char *str, size_t len, json_memory_arena_t *arena) {
-    if (!pool->buckets) {
-        return NULL;
-    }
 
-    uint32_t hash = hash_string(str, len);
-    size_t bucket_idx = hash & (pool->bucket_count - 1); // Assumes power of 2
-
-    string_pool_entry_t *entry = pool->buckets[bucket_idx];
-    while (entry) {
-        if (entry->hash == hash && entry->len == len && memcmp(entry->str, str, len) == 0) {
-            return entry->str; // Found existing string
+    for (size_t i = 0; i < pool->count; i++) {
+        if (pool->lengths[i] == len && memcmp(pool->strings[i], str, len) == 0) {
+            return pool->strings[i];
         }
-        entry = entry->next;
     }
 
-    string_pool_entry_t *new_entry = (string_pool_entry_t *)json_arena_alloc(arena, sizeof(string_pool_entry_t));
-    if (!new_entry)
-        return NULL;
+    if (pool->count >= pool->capacity) {
+        size_t new_capacity = pool->capacity * 2;
+        const char **new_strings = (const char **)json_arena_alloc(arena, new_capacity * sizeof(const char *));
+        size_t *new_lengths = (size_t *)json_arena_alloc(arena, new_capacity * sizeof(size_t));
+
+        if (!new_strings || !new_lengths)
+            return NULL;
+
+        memcpy(new_strings, pool->strings, pool->count * sizeof(const char *));
+        memcpy(new_lengths, pool->lengths, pool->count * sizeof(size_t));
+
+        pool->strings = new_strings;
+        pool->lengths = new_lengths;
+        pool->capacity = new_capacity;
+    }
+
     char *new_str = (char *)json_arena_alloc(arena, len + 1);
     if (!new_str)
         return NULL;
@@ -285,20 +254,9 @@ static const char *json_string_pool_get_or_add(string_pool_t *pool, const char *
     memcpy(new_str, str, len);
     new_str[len] = '\0';
 
-    new_entry->str = new_str;
-    new_entry->len = len;
-    new_entry->hash = hash;
-    new_entry->next = pool->buckets[bucket_idx];
-    pool->buckets[bucket_idx] = new_entry;
-
-    pool->entry_count++;
-
-    // Check if we need to resize (load factor > 0.75)
-    if (pool->entry_count > (pool->bucket_count * 3) / 4) {
-        // In a real implementation, we'd resize here, but since we're using
-        // arena allocation, resizing is complex. For now, we'll accept
-        // degraded performance at high load factors.
-    }
+    pool->strings[pool->count] = new_str;
+    pool->lengths[pool->count] = len;
+    pool->count++;
 
     return new_str;
 }
@@ -320,10 +278,10 @@ json_memory_arena_t *json_arena_init(size_t input_size) {
         arena->block_size = JSON_ARENA_LARGE_BLOCK_SIZE;
     }
 
-    arena->string_pool.buckets = NULL;
-    arena->string_pool.bucket_count = 0;
-    arena->string_pool.entry_count = 0;
-    arena->string_pool.arena = arena;
+    arena->string_pool.capacity = 0;
+    arena->string_pool.count = 0;
+    arena->string_pool.strings = NULL;
+    arena->string_pool.lengths = NULL;
 
     if (!json_arena_add_block(arena, 0)) {
         free(arena);
