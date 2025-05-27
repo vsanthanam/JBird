@@ -126,6 +126,8 @@ extension JSON {
     public static let defaultInputSizeLimit: size_t = calculateMaxInputSize()
 
     /// Perform the provided operation with a custom recursion depth limit
+    ///
+    /// To remove the recursion depth limit entirely, use `0`
     /// - Parameters:
     ///   - limit: The desired recursion depth limit
     ///   - operation: The operation to perform
@@ -134,11 +136,13 @@ extension JSON {
         _ limit: size_t,
         operation: () throws -> T
     ) rethrows -> T {
-        assert(limit >= 1, "Recursion depth limit must be greater than or equal to 1")
+        assert(limit >= 0, "Recursion depth limit must be greater than or equal to 0")
         return try $recursionDepthLimit.withValue(limit, operation: operation)
     }
 
     /// Perform the provided async operation with a custom recursion depth limit
+    ///
+    /// To remove the recursion depth limit entirely, use `0`
     /// - Parameters:
     ///   - limit: The desired recursion depth limit
     ///   - operation: The operation to perform
@@ -147,11 +151,13 @@ extension JSON {
         _ limit: size_t,
         operation: () async throws -> T
     ) async rethrows -> T {
-        assert(limit >= 1, "Recursion depth limit must be greater than or equal to 1")
+        assert(limit >= 0, "Recursion depth limit must be greater than or equal to 0")
         return try await $recursionDepthLimit.withValue(limit, operation: operation)
     }
 
     /// Perform the provided operation with a custom input size limit
+    ///
+    /// To remove the input size limit entirely, use `0`
     /// - Parameters:
     ///   - limit: The desired input size limit, in bytes
     ///   - operation: The operation to perform
@@ -160,11 +166,13 @@ extension JSON {
         _ limit: Int,
         operation: () throws -> T
     ) rethrows -> T {
-        assert(limit >= 1, "Input size limit must be greater than or equal to 1")
+        assert(limit >= 0, "Input size limit must be greater than or equal to 0")
         return try $inputSizeLimit.withValue(limit, operation: operation)
     }
 
     /// Perform the provided async operation with a custom input size limit
+    ///
+    /// To remove the input size limit entirely, use `0`
     /// - Parameters:
     ///   - limit: The desired input size limit, in bytes
     ///   - operation: The operation to perform
@@ -173,7 +181,7 @@ extension JSON {
         _ limit: Int,
         operation: () async throws -> T
     ) async rethrows -> T {
-        assert(limit >= 1, "Input size limit must be greater than or equal to 1")
+        assert(limit >= 0, "Input size limit must be greater than or equal to 0")
         return try await $inputSizeLimit.withValue(limit, operation: operation)
     }
 
@@ -611,7 +619,7 @@ extension JSON {
         _ data: Data,
         _ options: DeserializationOptions
     ) throws -> JSON {
-        if !options.contains(.ignoreInputSizeLimit), data.count > inputSizeLimit {
+        if inputSizeLimit != 0, !options.contains(.ignoreInputSizeLimit), data.count > inputSizeLimit {
             throw JSONDeserializationError.inputSizeLimitExceeded
         }
 
@@ -710,7 +718,7 @@ extension JSON {
         _ data: Data,
         _ options: DeserializationOptions
     ) async throws -> JSON {
-        if !options.contains(.ignoreInputSizeLimit), data.count > inputSizeLimit {
+        if inputSizeLimit != 0, !options.contains(.ignoreInputSizeLimit), data.count > inputSizeLimit {
             throw JSONDeserializationError.inputSizeLimitExceeded
         }
 

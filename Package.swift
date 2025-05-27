@@ -43,11 +43,6 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "JBirdParser",
-            path: "JBirdParser",
-            publicHeadersPath: "include"
-        ),
-        .target(
             name: "JBird",
             dependencies: [
                 "JBirdParser"
@@ -64,6 +59,21 @@ let package = Package(
                 "JBirdParser"
             ],
             path: "JBirdTests",
+            swiftSettings: [
+                .enableUpcomingFeature("StrictConcurrency=complete")
+            ]
+        ),
+        .target(
+            name: "JBirdParser",
+            path: "JBirdParser",
+            publicHeadersPath: "include"
+        ),
+        .testTarget(
+            name: "JBirdParserTests",
+            dependencies: [
+                "JBirdParser"
+            ],
+            path: "JBirdParserTests",
             swiftSettings: [
                 .enableUpcomingFeature("StrictConcurrency=complete")
             ]
