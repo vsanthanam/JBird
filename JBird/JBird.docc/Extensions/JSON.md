@@ -119,6 +119,12 @@
 - ``deserialize(_:options:)-(Data,_)``
 - ``deserialize(_:options:)-(String,_)``
 - ``DeserializationOptions``
+- ``withRecursionDepthLimit(_:operation:)-88fw4``
+- ``withRecursionDepthLimit(_:operation:)-5u9iv``
+- ``withInputSizeLimit(_:operation:)-5dvqh``
+- ``withInputSizeLimit(_:operation:)-2oxr5``
+- ``defaultRecursionDepthLimit``
+- ``defaultInputSizeLimit``
 
 ### Serialization
 

@@ -68,6 +68,8 @@ public enum JSONDeserializationError: Error, Equatable, Sendable, CustomStringCo
 
     case depthLimitExceeded
 
+    case inputSizeLimitExceeded
+
     // MARK: - CustomStringConvertible
 
     public var description: String {
@@ -104,6 +106,8 @@ public enum JSONDeserializationError: Error, Equatable, Sendable, CustomStringCo
             "Out of memory"
         case .depthLimitExceeded:
             "Depth limit exceeded"
+        case .inputSizeLimitExceeded:
+            "Input size limit exceeded"
         }
     }
 

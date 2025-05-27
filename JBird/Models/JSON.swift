@@ -1209,20 +1209,3 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
 }
-
-public func + (lhs: JSON, rhs: JSON) throws -> JSON {
-    switch (lhs, rhs) {
-    case let (.array(lhs), .array(rhs)):
-        .array(lhs + rhs)
-    case let (.number(lhs), .number(rhs)):
-        .number(lhs + rhs)
-    case let (.string(lhs), .string(rhs)):
-        .string(lhs + rhs)
-    case (.object, _), (.array, _), (.number, _), (.string, _), (.literal, _):
-        throw JSONError.illegalAddition
-    }
-}
-
-public func += (lhs: inout JSON, rhs: JSON) throws {
-    lhs = try lhs + rhs
-}
