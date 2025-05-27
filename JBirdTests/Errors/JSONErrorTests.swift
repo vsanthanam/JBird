@@ -77,4 +77,6 @@ func jsonErrorDescriptionTests() {
     let uuidDecodingFailure = JSONError.uuidDecodingFailure("foo")
     #expect(uuidDecodingFailure.description == "Cannot decode UUID from 'foo'")
 
+    let illegalAddition = JSONError.illegalAddition
+    #expect(illegalAddition.description == "Illegal addition of JSON values")
 }

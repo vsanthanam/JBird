@@ -1226,4 +1226,119 @@ struct JSONTests {
         }
 
     }
+
+    @Suite("JSON Addition Tests")
+    struct JSONAdditionTests {
+
+        @Test("Add Numbers")
+        func addNumbers() throws {
+            let literal: JSON = true
+            let object: JSON = ["foo": "bar"]
+            let array: JSON = ["foo", "baz", "qux", "qux"]
+            var number: JSON = 12
+            let string: JSON = "Hello, World!"
+            #expect(try number + number == 24)
+            #expect(throws: JSONError.illegalAddition) {
+                try number + literal
+            }
+            #expect(throws: JSONError.illegalAddition) {
+                try number + object
+            }
+            #expect(throws: JSONError.illegalAddition) {
+                try number + array
+            }
+            #expect(throws: JSONError.illegalAddition) {
+                try number + string
+            }
+            try number += number
+            #expect(number == 24)
+            #expect(throws: JSONError.illegalAddition) {
+                try number += literal
+            }
+            #expect(throws: JSONError.illegalAddition) {
+                try number += object
+            }
+            #expect(throws: JSONError.illegalAddition) {
+                try number += array
+            }
+            #expect(throws: JSONError.illegalAddition) {
+                try number += string
+            }
+
+        }
+
+        @Test("Add Arrays")
+        func addArrays() throws {
+            let literal: JSON = true
+            let object: JSON = ["foo": "bar"]
+            var array: JSON = ["foo", "baz", "qux", "qux"]
+            let number: JSON = 12
+            let string: JSON = "Hello, World!"
+            #expect(try array + array == ["foo", "baz", "qux", "qux", "foo", "baz", "qux", "qux"])
+            #expect(throws: JSONError.illegalAddition) {
+                try array + literal
+            }
+            #expect(throws: JSONError.illegalAddition) {
+                try array + object
+            }
+            #expect(throws: JSONError.illegalAddition) {
+                try array + number
+            }
+            #expect(throws: JSONError.illegalAddition) {
+                try array + string
+            }
+            try array += array
+            #expect(array == ["foo", "baz", "qux", "qux", "foo", "baz", "qux", "qux"])
+            #expect(throws: JSONError.illegalAddition) {
+                try array += literal
+            }
+            #expect(throws: JSONError.illegalAddition) {
+                try array += object
+            }
+            #expect(throws: JSONError.illegalAddition) {
+                try array += number
+            }
+            #expect(throws: JSONError.illegalAddition) {
+                try array += string
+            }
+
+        }
+
+        @Test("Add String")
+        func addStrings() throws {
+            let literal: JSON = true
+            let object: JSON = ["foo": "bar"]
+            let array: JSON = ["foo", "baz", "qux", "qux"]
+            let number: JSON = 12
+            var string: JSON = "Hello, World!"
+            #expect(try string + string == "Hello, World!Hello, World!")
+            #expect(throws: JSONError.illegalAddition) {
+                try string + literal
+            }
+            #expect(throws: JSONError.illegalAddition) {
+                try string + object
+            }
+            #expect(throws: JSONError.illegalAddition) {
+                try string + array
+            }
+            #expect(throws: JSONError.illegalAddition) {
+                try string + number
+            }
+            try string += string
+            #expect(string == "Hello, World!Hello, World!")
+            #expect(throws: JSONError.illegalAddition) {
+                try string += literal
+            }
+            #expect(throws: JSONError.illegalAddition) {
+                try string += object
+            }
+            #expect(throws: JSONError.illegalAddition) {
+                try string += array
+            }
+            #expect(throws: JSONError.illegalAddition) {
+                try string += number
+            }
+        }
+
+    }
 }
