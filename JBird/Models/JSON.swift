@@ -1209,3 +1209,31 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
 }
+
+/// Add two JSONs together, if possible
+/// - Parameters:
+///   - lhs: a JSON value
+///   - rhs: another JSON value
+/// - Throws: An error, if the two values cannot be added
+/// - Returns: The combined JSON value
+public func + (lhs: JSON, rhs: JSON) throws -> JSON {
+    switch (lhs, rhs) {
+    case let (.number(lhs), .number(rhs)):
+        return .number(lhs + rhs)
+    case let (.array(lhs), .array(rhs)):
+        return .array(lhs + rhs)
+    case let (.string(lhs), .string(rhs)):
+        return .string(lhs + rhs)
+    case (.literal, _), (.number, _), (.array, _), (.object, _), (.string, _):
+        throw JSONError.illegalAddition
+    }
+}
+
+/// Add two JSON values together
+/// - Parameters:
+///   - lhs: a JSON value
+///   - rhs: another JSON value
+/// - Throws: An error, if the two values cannot be added
+public func += (lhs: inout JSON, rhs: JSON) throws {
+    lhs = try lhs + rhs
+}

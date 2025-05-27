@@ -934,4 +934,22 @@ struct DeserializationTests {
         }
     }
 
+    @Test("Add JSON numbers")
+    func addJSONNumbers() {
+        var int: JSON.Number = 12
+        var double: JSON.Number = 1.2
+        #expect(int + int == 24)
+        #expect(double + double == 2.4)
+        #expect(int + double == 13.2)
+        #expect(double + int == 13.2)
+        int += int
+        #expect(int == 24)
+        double += double
+        #expect(double == 2.4)
+        double += int
+        #expect(double == 26.4)
+        int += double
+        #expect(int == 50.4)
+    }
+
 }

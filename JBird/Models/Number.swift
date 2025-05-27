@@ -163,3 +163,29 @@ extension JSON {
     }
 
 }
+
+/// Add two JSON numbers together
+/// - Parameters:
+///   - lhs: A JSON number
+///   - rhs: Another JSON number
+/// - Returns: The combined JSON number
+public func + (lhs: JSON.Number, rhs: JSON.Number) -> JSON.Number {
+    switch (lhs, rhs) {
+    case let (.int(lhs), .int(rhs)):
+        .int(lhs + rhs)
+    case let (.double(lhs), .double(rhs)):
+        .double(lhs + rhs)
+    case let (.int(lhs), .double(rhs)):
+        .double(Double(lhs) + rhs)
+    case let (.double(lhs), .int(rhs)):
+        .double(lhs + Double(rhs))
+    }
+}
+
+/// Add two JSON numbers togetherb
+/// - Parameters:
+///   - lhs: A JSON number
+///   - rhs: Another JSON number
+public func += (lhs: inout JSON.Number, rhs: JSON.Number) {
+    lhs = lhs + rhs
+}
