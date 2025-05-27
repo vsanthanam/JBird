@@ -104,6 +104,8 @@ extension JSON {
         /// Ignore the actively configured input size limit
         public static let ignoreInputSizeLimit = DeserializationOptions(rawValue: 1 << 6)
 
+        public static let requireUniqueKeys = DeserializationOptions(rawValue: 1 << 7)
+
         /// The default set of options
         public static let `default`: DeserializationOptions = [.fragmentsAllowed, .allowByteOrderMark]
 
@@ -630,7 +632,8 @@ extension JSON {
                 buffer.count,
                 &jsonValue,
                 options.contains(.allowByteOrderMark),
-                !options.contains(.requireMinified),
+                options.contains(.requireMinified),
+                options.contains(.requireUniqueKeys),
                 options.contains(.ignoreRecursionDepthLimit) ? 0 : recursionDepthLimit
             )
         }
@@ -729,7 +732,8 @@ extension JSON {
                 buffer.count,
                 &jsonValue,
                 options.contains(.allowByteOrderMark),
-                !options.contains(.requireMinified),
+                options.contains(.requireMinified),
+                options.contains(.requireUniqueKeys),
                 options.contains(.ignoreRecursionDepthLimit) ? 0 : recursionDepthLimit
             )
         }

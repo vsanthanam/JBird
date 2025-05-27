@@ -70,6 +70,8 @@ public enum JSONDeserializationError: Error, Equatable, Sendable, CustomStringCo
 
     case inputSizeLimitExceeded
 
+    case duplicateKey
+
     // MARK: - CustomStringConvertible
 
     public var description: String {
@@ -108,6 +110,8 @@ public enum JSONDeserializationError: Error, Equatable, Sendable, CustomStringCo
             "Depth limit exceeded"
         case .inputSizeLimitExceeded:
             "Input size limit exceeded"
+        case .duplicateKey:
+            "Duplicate keys found in JSON object"
         }
     }
 
@@ -144,6 +148,8 @@ public enum JSONDeserializationError: Error, Equatable, Sendable, CustomStringCo
             self = .outOfMemory
         case JSON_MAX_DEPTH_EXCEEDED:
             self = .depthLimitExceeded
+        case JSON_DUPLICATE_KEY:
+            self = .duplicateKey
         default:
             self = .unknown
         }
