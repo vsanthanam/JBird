@@ -976,7 +976,7 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
     bool is_negative = false;
     bool is_double = false;
     double double_value = 0.0;
-    int64_t int_value = 0;
+    uint64_t uint_value = 0;
     int digit_count = 0;
     bool integer_overflow = false;
 
@@ -1075,7 +1075,14 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
                     digit_count++;
 
                     if (!integer_overflow) {
-                        int_value = int_value * 10 + digit;
+                        uint64_t max_value = is_negative ? ((uint64_t)INT64_MAX + 1) : INT64_MAX;
+                        if (uint_value > (max_value - digit) / 10) {
+                            integer_overflow = true;
+                            double_value = (double)uint_value;
+                            is_double = true;
+                        } else {
+                            uint_value = uint_value * 10 + digit;
+                        }
                     } else {
                         double_value = double_value * 10.0 + (double)digit;
                     }
@@ -1083,7 +1090,7 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
 
                 if (!integer_overflow && digit_run_length > digits_to_process) {
                     integer_overflow = true;
-                    double_value = (double)int_value;
+                    double_value = (double)uint_value;
                     is_double = true;
 
                     for (size_t i = digits_to_process; i < digit_run_length; i++) {
@@ -1099,15 +1106,14 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
                 digit_count++;
 
                 if (!integer_overflow) {
-                    if (int_value > (INT64_MAX - digit) / 10) {
+                    uint64_t max_value = is_negative ? ((uint64_t)INT64_MAX + 1) : INT64_MAX;
+                    if (uint_value > (max_value - digit) / 10) {
                         integer_overflow = true;
-                        double_value = (double)int_value;
+                        double_value = (double)uint_value;
                         is_double = true;
+                    } else {
+                        uint_value = uint_value * 10 + digit;
                     }
-                }
-
-                if (!integer_overflow) {
-                    int_value = int_value * 10 + digit;
                 } else {
                     double_value = double_value * 10.0 + (double)digit;
                 }
@@ -1118,15 +1124,13 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
                 digit_count++;
 
                 if (!integer_overflow) {
-                    if (int_value > (INT64_MAX - digit) / 10) {
+                    uint64_t max_value = is_negative ? ((uint64_t)INT64_MAX + 1) : INT64_MAX;
+                    if (uint_value > (max_value - digit) / 10) {
                         integer_overflow = true;
-                        double_value = (double)int_value;
+                        double_value = (double)uint_value;
                         is_double = true;
-                    }
-                    if (!integer_overflow) {
-                        int_value = int_value * 10 + digit;
                     } else {
-                        double_value = double_value * 10.0 + (double)digit;
+                        uint_value = uint_value * 10 + digit;
                     }
                 } else {
                     double_value = double_value * 10.0 + (double)digit;
@@ -1148,7 +1152,7 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
         }
 
         if (!integer_overflow) {
-            double_value = (double)int_value;
+            double_value = (double)uint_value;
         }
 
         double fraction = 0.0;
@@ -1162,7 +1166,6 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
     }
 
     if (json_has_more(parser) && (json_peek(parser) == 'e' || json_peek(parser) == 'E')) {
-        is_double = true;
         json_next(parser);
 
         bool exp_negative = false;
@@ -1174,9 +1177,10 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
             return JSON_INVALID_NUMBER;
         }
 
-        if (!integer_overflow && !(parser->index > start_index + (is_negative ? 1 : 0) + digit_count + 1)) {
-            double_value = (double)int_value;
+        if (!integer_overflow && !is_double) {
+            double_value = (double)uint_value;
         }
+        is_double = true;
 
         int exp_value = 0;
         while (json_has_more(parser) && is_digit(json_peek(parser))) {
@@ -1203,7 +1207,17 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
     if (is_double) {
         *out_value = json_create_double(parser->arena, is_negative ? -double_value : double_value);
     } else {
-        *out_value = json_create_int(parser->arena, is_negative ? -int_value : int_value);
+        int64_t final_int_value;
+        if (is_negative) {
+            if (uint_value == ((uint64_t)INT64_MAX + 1)) {
+                final_int_value = INT64_MIN;
+            } else {
+                final_int_value = -(int64_t)uint_value;
+            }
+        } else {
+            final_int_value = (int64_t)uint_value;
+        }
+        *out_value = json_create_int(parser->arena, final_int_value);
     }
 
     return *out_value ? JSON_NO_ERROR : JSON_OUT_OF_MEMORY;
@@ -1228,7 +1242,6 @@ static json_error_t json_parse_value(json_parser_t *parser, json_value_t **out_v
         return JSON_UNEXPECTED_END_OF_INPUT;
     }
 
-    // Check recursion depth limit
     if (parser->max_depth > 0 && parser->current_depth >= parser->max_depth) {
         return JSON_MAX_DEPTH_EXCEEDED;
     }
@@ -1236,7 +1249,6 @@ static json_error_t json_parse_value(json_parser_t *parser, json_value_t **out_v
     uint8_t c = json_peek(parser);
     uint8_t char_type = char_class[c];
 
-    // Handle string
     if (char_type == CHAR_CLASS_QUOTE) {
         parser->index++;
 
@@ -1267,7 +1279,6 @@ static json_error_t json_parse_value(json_parser_t *parser, json_value_t **out_v
         return *out_value ? JSON_NO_ERROR : JSON_OUT_OF_MEMORY;
     }
 
-    // Handle structural characters and literals
     switch (char_type) {
     case CHAR_CLASS_LBRACE:
         return json_parse_object(parser, out_value);
