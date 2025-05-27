@@ -993,18 +993,18 @@ struct JBirdParserTests {
 //    func parseNumberWithPositiveExponent() throws {
 //        let jsonData = "1e+10".data(using: .utf8)!
 //        var value: OpaquePointer?
-//        
+//
 //        let result = jsonData.withUnsafeBytes { bytes in
 //            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, true, 0)
 //        }
-//        
+//
 //        #expect(result == JSON_NO_ERROR)
 //        #expect(value != nil)
-//        
+//
 //        // Debug: Check what type it actually is
 //        let type = json_get_type(value)
 //        print("Type: \(type.rawValue)")
-//        
+//
 //        if type == JSON_NUMBER_DOUBLE {
 //            let doubleValue = json_get_double(value)
 //            print("Double value: \(doubleValue)")
@@ -1016,7 +1016,7 @@ struct JBirdParserTests {
 //        } else {
 //            #expect(false, "Unexpected type \(type.rawValue) for scientific notation")
 //        }
-//        
+//
 //        json_free(value)
 //    }
 
