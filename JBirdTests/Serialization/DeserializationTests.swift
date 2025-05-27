@@ -102,7 +102,7 @@ struct DeserializationTests {
         }
 
         @Test("Literal")
-        func literal() throws {
+        func literal() async throws {
             let raw = #"""
             true
             """#
@@ -110,10 +110,13 @@ struct DeserializationTests {
             #expect(throws: JSONDeserializationError.illegalFragment) {
                 _ = try JSON.value(from: data, options: [])
             }
+            await #expect(throws: JSONDeserializationError.illegalFragment) {
+                try await JSON.deserialize(data, options: [])
+            }
         }
 
         @Test("Number")
-        func number() throws {
+        func number() async throws {
             let raw = #"""
             123
             """#
@@ -121,16 +124,22 @@ struct DeserializationTests {
             #expect(throws: JSONDeserializationError.illegalFragment) {
                 _ = try JSON.value(from: data, options: [])
             }
+            await #expect(throws: JSONDeserializationError.illegalFragment) {
+                try await JSON.deserialize(data, options: [])
+            }
         }
 
         @Test("String")
-        func string() throws {
+        func string() async throws {
             let raw = #"""
             "hello"
             """#
             let data = try #require(raw.data(using: .utf8))
             #expect(throws: JSONDeserializationError.illegalFragment) {
                 _ = try JSON.value(from: data, options: [])
+            }
+            await #expect(throws: JSONDeserializationError.illegalFragment) {
+                try await JSON.deserialize(data, options: [])
             }
         }
 
@@ -187,6 +196,9 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
             #expect(throws: JSONDeserializationError.illegalFragment) {
                 try JSON.value(from: data, options: [.omitNullValues, .fragmentsAllowed])
+            }
+            await #expect(throws: JSONDeserializationError.illegalFragment) {
+                try await JSON.deserialize(data, options: [.omitNullValues, .fragmentsAllowed])
             }
         }
 
@@ -883,6 +895,9 @@ struct DeserializationTests {
                 try await JSON.deserialize(data)
             }
         }
+        _ = try JSON.withRecursionDepthLimit(2) {
+            try JSON.value(from: data, options: .ignoreRecursionDepthLimit)
+        }
         _ = try await JSON.withRecursionDepthLimit(2) {
             try await JSON.deserialize(data, options: .ignoreRecursionDepthLimit)
         }
@@ -910,6 +925,9 @@ struct DeserializationTests {
             try await JSON.withInputSizeLimit(12) {
                 try await JSON.deserialize(data)
             }
+        }
+        _ = try JSON.withInputSizeLimit(12) {
+            try JSON.value(from: data, options: .ignoreInputSizeLimit)
         }
         _ = try await JSON.withInputSizeLimit(12) {
             try await JSON.deserialize(data, options: .ignoreInputSizeLimit)
