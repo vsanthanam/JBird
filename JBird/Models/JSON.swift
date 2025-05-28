@@ -44,7 +44,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     public init(
         _ data: Data
     ) throws {
-        self = try JSON.value(from: data)
+        self = try JSON.value(for: data)
     }
 
     /// Create a `JSON` value by deserializing a Swift string
@@ -52,7 +52,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     public init(
         jsonString: String
     ) throws {
-        self = try JSON.value(from: jsonString)
+        self = try JSON.value(for: jsonString)
     }
 
     /// Create a JSON object declaratively

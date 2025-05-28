@@ -1,5 +1,99 @@
 # ``JSON``
 
+## Overview
+
+The `JSON` enum is a powerful, type-safe representation of JSON values in Swift. It provides a comprehensive API for creating, manipulating, and converting JSON data while maintaining type safety and offering intuitive Swift-like syntax.
+
+A [legal JSON value](https://datatracker.ietf.org/doc/html/rfc8259) must be one of the following:
+
+- An array: A comma separated list of other legal JSON values, enclosed with square brackets
+- An object: A comma separated list of string keys and their JSON value members, enclosed with curly brackets
+- A number: A numeric value represented in base 10 using decimal digits.
+- A string: A character sequence enclosed with quotation marks.
+- One of three legal literal values: `true`, `false`, or `null`
+
+Because of these rules, an enumeration with associated types is an ideal way to model JSON objects in Swift:
+
+```swift
+enum JSON {
+    case literal(Literal)
+    case object([String: JSON])
+    case array([JSON])
+    case number(Number)
+    case string(String)
+}
+```
+
+### Creating typed JSON values in Swift
+
+Given the following JSON:
+
+```json
+{
+    "first_name": "Steve",
+    "last_name": "Jobs",
+    "founded_apple": true,
+    "patent_count": 317
+}
+```
+
+You could use the enumeration to model the same data like this:
+
+```swift
+let steve = JSON.object(
+    [
+        "first_name": .string("Steve"),
+        "last_name": .string("Jobs"),
+        "founded_apple": .literal(.true),
+        "patent_count": .number(.int(317))
+    ]
+)
+```
+
+#### Swift Literal Expressions
+
+The enumeration is very explicit, but can lead to code that is both more cumbersome to write and more difficult to read when compared to standard JSON syntax.
+To avoid these issues, you can initialize `JSON` using Swift literals:
+
+```swift
+let steve: JSON = [
+    "first_name": "Steve",
+    "last_name": "Jobs",
+    "founded_apple": true,
+    "patent_count": 317
+]
+```
+
+#### JSON Result Builders
+
+You can also create complex JSON expression declaratively, using the ``ObjectBuilder`` or ``ArrayBuilder`` result builders:
+
+```swift
+let user: JSON = JSON {
+    ("id", 123)
+    ("profile", JSON {
+        ("name", "Alice")
+        ("email", "alice@example.com")
+        ("preferences", JSON {
+            if darkTheme {
+                ("theme", "dark")
+            } else {
+                ("theme", "light")
+            }
+            ("theme", "dark")
+            if hasNotifications {
+                ("notifications", true)
+            }
+        })
+    })
+    ("tags", JSON {
+        for tag in tags {
+            tag
+        }
+    })
+}
+```
+
 ## Topics
 
 ### Initializers
@@ -114,8 +208,8 @@
 
 - ``init(_:)-(Data)``
 - ``init(jsonString:)``
-- ``value(from:options:)-(Data,_)``
-- ``value(from:options:)-(String,_)``
+- ``value(for:options:)-(Data,_)``
+- ``value(for:options:)-(String,_)``
 - ``deserialize(_:options:)-(Data,_)``
 - ``deserialize(_:options:)-(String,_)``
 - ``DeserializationOptions``

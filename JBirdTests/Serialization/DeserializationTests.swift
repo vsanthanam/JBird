@@ -44,7 +44,7 @@ struct DeserializationTests {
         func noBom() {
             let data = Data([0xEF, 0xBB, 0xBF, 0x7B, 0x7D])
             #expect(throws: JSONDeserializationError.invalidCharacter) {
-                _ = try JSON.value(from: data, options: .default.subtracting(.allowByteOrderMark))
+                _ = try JSON.value(for: data, options: .default.subtracting(.allowByteOrderMark))
             }
         }
 
@@ -59,7 +59,7 @@ struct DeserializationTests {
             {"foo":true}
             """#
             let data = try #require(raw.data(using: .utf8))
-            let json = try JSON.value(from: data, options: .default.union(.requireMinified))
+            let json = try JSON.value(for: data, options: .default.union(.requireMinified))
             #expect(json == ["foo": true])
         }
 
@@ -72,7 +72,7 @@ struct DeserializationTests {
             """#
             let data = try #require(raw.data(using: .utf8))
             #expect(throws: JSONDeserializationError.missingObjectKey) {
-                _ = try JSON.value(from: data, options: .default.union(.requireMinified))
+                _ = try JSON.value(for: data, options: .default.union(.requireMinified))
             }
         }
 
@@ -87,7 +87,7 @@ struct DeserializationTests {
             {"foo":true}
             """#
             let data = try #require(raw.data(using: .utf8))
-            let json = try JSON.value(from: data, options: [])
+            let json = try JSON.value(for: data, options: [])
             #expect(json == ["foo": true])
         }
 
@@ -97,7 +97,7 @@ struct DeserializationTests {
             [1,2,3]
             """#
             let data = try #require(raw.data(using: .utf8))
-            let json = try JSON.value(from: data, options: [])
+            let json = try JSON.value(for: data, options: [])
             #expect(json == [1, 2, 3])
         }
 
@@ -108,7 +108,7 @@ struct DeserializationTests {
             """#
             let data = try #require(raw.data(using: .utf8))
             #expect(throws: JSONDeserializationError.illegalFragment) {
-                _ = try JSON.value(from: data, options: [])
+                _ = try JSON.value(for: data, options: [])
             }
             await #expect(throws: JSONDeserializationError.illegalFragment) {
                 try await JSON.deserialize(data, options: [])
@@ -122,7 +122,7 @@ struct DeserializationTests {
             """#
             let data = try #require(raw.data(using: .utf8))
             #expect(throws: JSONDeserializationError.illegalFragment) {
-                _ = try JSON.value(from: data, options: [])
+                _ = try JSON.value(for: data, options: [])
             }
             await #expect(throws: JSONDeserializationError.illegalFragment) {
                 try await JSON.deserialize(data, options: [])
@@ -136,7 +136,7 @@ struct DeserializationTests {
             """#
             let data = try #require(raw.data(using: .utf8))
             #expect(throws: JSONDeserializationError.illegalFragment) {
-                _ = try JSON.value(from: data, options: [])
+                _ = try JSON.value(for: data, options: [])
             }
             await #expect(throws: JSONDeserializationError.illegalFragment) {
                 try await JSON.deserialize(data, options: [])
@@ -195,7 +195,7 @@ struct DeserializationTests {
             let fromAsyncString = try await JSON.deserialize(raw)
             #expect(fromAsyncString == json)
             #expect(throws: JSONDeserializationError.illegalFragment) {
-                try JSON.value(from: data, options: [.omitNullValues, .fragmentsAllowed])
+                try JSON.value(for: data, options: [.omitNullValues, .fragmentsAllowed])
             }
             await #expect(throws: JSONDeserializationError.illegalFragment) {
                 try await JSON.deserialize(data, options: [.omitNullValues, .fragmentsAllowed])
@@ -657,9 +657,9 @@ struct DeserializationTests {
             {"foo":[1,null,2],"bar":null}
             """#
             let data = try #require(raw.data(using: .utf8))
-            let json = try JSON.value(from: data, options: .omitNullKeys)
+            let json = try JSON.value(for: data, options: .omitNullKeys)
             #expect(json == ["foo": [1, nil, 2]])
-            let fromString = try JSON.value(from: raw, options: .omitNullKeys)
+            let fromString = try JSON.value(for: raw, options: .omitNullKeys)
             #expect(fromString == json)
             let fromAsyncData = try await JSON.deserialize(data, options: .omitNullKeys)
             #expect(fromAsyncData == json)
@@ -673,9 +673,9 @@ struct DeserializationTests {
             {"foo":[1,null,2],"bar":null}
             """#
             let data = try #require(raw.data(using: .utf8))
-            let json = try JSON.value(from: data, options: .omitNullValues)
+            let json = try JSON.value(for: data, options: .omitNullValues)
             #expect(json == ["foo": [1, 2]])
-            let fromString = try JSON.value(from: raw, options: .omitNullValues)
+            let fromString = try JSON.value(for: raw, options: .omitNullValues)
             #expect(fromString == json)
             let fromAsyncData = try await JSON.deserialize(data, options: .omitNullValues)
             #expect(fromAsyncData == json)
@@ -761,7 +761,7 @@ struct DeserializationTests {
         func unsupportedBOM() throws {
             let data = Data([0xEF, 0xBB, 0xBF, 0x7B, 0x7D])
             #expect(throws: JSONDeserializationError.invalidCharacter) {
-                _ = try JSON.value(from: data, options: [])
+                _ = try JSON.value(for: data, options: [])
             }
         }
 
@@ -895,7 +895,7 @@ struct DeserializationTests {
             }
         }
         _ = try JSON.withRecursionDepthLimit(2) {
-            try JSON.value(from: data, options: .ignoreRecursionDepthLimit)
+            try JSON.value(for: data, options: .ignoreRecursionDepthLimit)
         }
         _ = try await JSON.withRecursionDepthLimit(2) {
             try await JSON.deserialize(data, options: .ignoreRecursionDepthLimit)
@@ -926,7 +926,7 @@ struct DeserializationTests {
             }
         }
         _ = try JSON.withInputSizeLimit(12) {
-            try JSON.value(from: data, options: .ignoreInputSizeLimit)
+            try JSON.value(for: data, options: .ignoreInputSizeLimit)
         }
         _ = try await JSON.withInputSizeLimit(12) {
             try await JSON.deserialize(data, options: .ignoreInputSizeLimit)
@@ -955,7 +955,7 @@ struct DeserializationTests {
             """#
             let data = try #require(raw.data(using: .utf8))
             #expect(throws: JSONDeserializationError.duplicateKey) {
-                _ = try JSON.value(from: data, options: .requireUniqueKeys)
+                _ = try JSON.value(for: data, options: .requireUniqueKeys)
             }
             await #expect(throws: JSONDeserializationError.duplicateKey) {
                 _ = try await JSON.deserialize(data, options: .requireUniqueKeys)
