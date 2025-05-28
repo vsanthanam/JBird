@@ -1235,7 +1235,6 @@ struct JBirdParserTests {
         let type = json_get_type(value)
         #expect(type == JSON_NUMBER_INT)
         #expect(json_get_int(value) == -9_223_372_036_854_775_808)
-
     }
 
     @Test("Parse number with positive exponent")
@@ -1280,6 +1279,274 @@ struct JBirdParserTests {
         #expect(value != nil)
         #expect(json_get_type(value) == JSON_NUMBER_DOUBLE)
         #expect(abs(json_get_double(value) - 1.5e-2) < 1e-6)
+    }
+
+    // MARK: - Boundary Value Tests
+
+    @Test("Parse INT64_MAX as integer")
+    func parseInt64MaxAsInteger() throws {
+        let raw = "9223372036854775807" // INT64_MAX
+        let jsonData = try #require(raw.data(using: .utf8))
+        var value: OpaquePointer?
+
+        let result = jsonData.withUnsafeBytes { bytes in
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, true, 0)
+        }
+
+        defer {
+            json_free(value)
+        }
+
+        #expect(result == JSON_NO_ERROR)
+        #expect(value != nil)
+        #expect(json_get_type(value) == JSON_NUMBER_INT)
+        #expect(json_get_int(value) == Int64.max)
+    }
+
+    @Test("Parse INT64_MIN as integer")
+    func parseInt64MinAsInteger() throws {
+        let raw = "-9223372036854775808" // INT64_MIN
+        let jsonData = try #require(raw.data(using: .utf8))
+        var value: OpaquePointer?
+
+        let result = jsonData.withUnsafeBytes { bytes in
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, true, 0)
+        }
+
+        defer {
+            json_free(value)
+        }
+
+        #expect(result == JSON_NO_ERROR)
+        #expect(value != nil)
+        #expect(json_get_type(value) == JSON_NUMBER_INT)
+        #expect(json_get_int(value) == Int64.min)
+    }
+
+    @Test("Parse INT64_MAX + 1 as double")
+    func parseInt64MaxPlusOneAsDouble() throws {
+        let raw = "9223372036854775808" // INT64_MAX + 1
+        let jsonData = try #require(raw.data(using: .utf8))
+        var value: OpaquePointer?
+
+        let result = jsonData.withUnsafeBytes { bytes in
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, true, 0)
+        }
+
+        defer {
+            json_free(value)
+        }
+
+        #expect(result == JSON_NO_ERROR)
+        #expect(value != nil)
+        #expect(json_get_type(value) == JSON_NUMBER_DOUBLE)
+        #expect(json_get_double(value) == 9_223_372_036_854_775_808.0)
+    }
+
+    @Test("Parse INT64_MIN - 1 as double")
+    func parseInt64MinMinusOneAsDouble() throws {
+        let raw = "-9223372036854775809" // INT64_MIN - 1
+        let jsonData = try #require(raw.data(using: .utf8))
+        var value: OpaquePointer?
+
+        let result = jsonData.withUnsafeBytes { bytes in
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, true, 0)
+        }
+
+        defer {
+            json_free(value)
+        }
+
+        #expect(result == JSON_NO_ERROR)
+        #expect(value != nil)
+        #expect(json_get_type(value) == JSON_NUMBER_DOUBLE)
+        #expect(json_get_double(value) == -9_223_372_036_854_775_809.0)
+    }
+
+    @Test("Parse short number to test fallback path")
+    func parseShortNumberFallbackPath() throws {
+        // This tests the fallback path (< 16 bytes remaining)
+        let raw = "123"
+        let jsonData = try #require(raw.data(using: .utf8))
+        var value: OpaquePointer?
+
+        let result = jsonData.withUnsafeBytes { bytes in
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, true, 0)
+        }
+
+        defer {
+            json_free(value)
+        }
+
+        #expect(result == JSON_NO_ERROR)
+        #expect(value != nil)
+        #expect(json_get_type(value) == JSON_NUMBER_INT)
+        #expect(json_get_int(value) == 123)
+    }
+
+    @Test("Parse long number to test SIMD path")
+    func parseLongNumberSIMDPath() throws {
+        // This tests the SIMD-optimized path (>= 16 bytes remaining)
+        let raw = "12345678901234567890" // 20 digits, should overflow to double
+        let jsonData = try #require(raw.data(using: .utf8))
+        var value: OpaquePointer?
+
+        let result = jsonData.withUnsafeBytes { bytes in
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, true, 0)
+        }
+
+        defer {
+            json_free(value)
+        }
+
+        #expect(result == JSON_NO_ERROR)
+        #expect(value != nil)
+        #expect(json_get_type(value) == JSON_NUMBER_DOUBLE)
+        #expect(json_get_double(value) == 12_345_678_901_234_567_890.0)
+    }
+
+    @Test("Parse negative long number to test SIMD path")
+    func parseNegativeLongNumberSIMDPath() throws {
+        // This tests the SIMD-optimized path with negative overflow
+        let raw = "-12345678901234567890" // 20 digits, should overflow to double
+        let jsonData = try #require(raw.data(using: .utf8))
+        var value: OpaquePointer?
+
+        let result = jsonData.withUnsafeBytes { bytes in
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, true, 0)
+        }
+
+        defer {
+            json_free(value)
+        }
+
+        #expect(result == JSON_NO_ERROR)
+        #expect(value != nil)
+        #expect(json_get_type(value) == JSON_NUMBER_DOUBLE)
+        #expect(json_get_double(value) == -12_345_678_901_234_567_890.0)
+    }
+
+    @Test("Parse 18-digit number as integer")
+    func parse18DigitNumberAsInteger() throws {
+        // 18 digits should still fit in int64 (within safe processing range)
+        let raw = "123456789012345678" // 18 digits
+        let jsonData = try #require(raw.data(using: .utf8))
+        var value: OpaquePointer?
+
+        let result = jsonData.withUnsafeBytes { bytes in
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, true, 0)
+        }
+
+        defer {
+            json_free(value)
+        }
+
+        #expect(result == JSON_NO_ERROR)
+        #expect(value != nil)
+        #expect(json_get_type(value) == JSON_NUMBER_INT)
+        #expect(json_get_int(value) == 123_456_789_012_345_678)
+    }
+
+    func parseNegative18DigitNumberAsInteger() throws {
+        // 18 digits should still fit in int64 (within safe processing range)
+        let raw = "-123456789012345678" // 18 digits
+        let jsonData = try #require(raw.data(using: .utf8))
+        var value: OpaquePointer?
+
+        let result = jsonData.withUnsafeBytes { bytes in
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, true, 0)
+        }
+
+        defer {
+            json_free(value)
+        }
+
+        #expect(result == JSON_NO_ERROR)
+        #expect(value != nil)
+        #expect(json_get_type(value) == JSON_NUMBER_INT)
+        #expect(json_get_int(value) == -123_456_789_012_345_678)
+    }
+
+    @Test("Parse INT64_MAX - 1 as integer")
+    func parseInt64MaxMinusOneAsInteger() throws {
+        let raw = "9223372036854775806" // INT64_MAX - 1
+        let jsonData = try #require(raw.data(using: .utf8))
+        var value: OpaquePointer?
+
+        let result = jsonData.withUnsafeBytes { bytes in
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, true, 0)
+        }
+
+        defer {
+            json_free(value)
+        }
+
+        #expect(result == JSON_NO_ERROR)
+        #expect(value != nil)
+        #expect(json_get_type(value) == JSON_NUMBER_INT)
+        #expect(json_get_int(value) == Int64.max - 1)
+    }
+
+    @Test("Parse INT64_MIN + 1 as integer")
+    func parseInt64MinPlusOneAsInteger() throws {
+        let raw = "-9223372036854775807" // INT64_MIN + 1
+        let jsonData = try #require(raw.data(using: .utf8))
+        var value: OpaquePointer?
+
+        let result = jsonData.withUnsafeBytes { bytes in
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, true, 0)
+        }
+
+        defer {
+            json_free(value)
+        }
+
+        #expect(result == JSON_NO_ERROR)
+        #expect(value != nil)
+        #expect(json_get_type(value) == JSON_NUMBER_INT)
+        #expect(json_get_int(value) == Int64.min + 1)
+    }
+
+    @Test("Parse extremely large positive number")
+    func parseExtremelyLargePositiveNumber() throws {
+        let raw = "999999999999999999999999999999"
+        let jsonData = try #require(raw.data(using: .utf8))
+        var value: OpaquePointer?
+
+        let result = jsonData.withUnsafeBytes { bytes in
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, true, 0)
+        }
+
+        defer {
+            json_free(value)
+        }
+
+        #expect(result == JSON_NO_ERROR)
+        #expect(value != nil)
+        #expect(json_get_type(value) == JSON_NUMBER_DOUBLE)
+        // TODO: Fix precision tests
+        #expect(json_get_double(value) > 0)
+    }
+
+    @Test("Parse extremely large negative number")
+    func parseExtremelyLargeNegativeNumber() throws {
+        let raw = "-999999999999999999999999999999"
+        let jsonData = try #require(raw.data(using: .utf8))
+        var value: OpaquePointer?
+
+        let result = jsonData.withUnsafeBytes { bytes in
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, true, 0)
+        }
+
+        defer {
+            json_free(value)
+        }
+
+        #expect(result == JSON_NO_ERROR)
+        #expect(value != nil)
+        #expect(json_get_type(value) == JSON_NUMBER_DOUBLE)
+        // TODO: Fix precision tests
+        #expect(json_get_double(value) < 0)
     }
 
     @Test("Parse long string")

@@ -976,7 +976,7 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
     bool is_negative = false;
     bool is_double = false;
     double double_value = 0.0;
-    uint64_t uint_value = 0;
+    int64_t int_value = 0;
     int digit_count = 0;
     bool integer_overflow = false;
 
@@ -1075,14 +1075,7 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
                     digit_count++;
 
                     if (!integer_overflow) {
-                        uint64_t max_value = is_negative ? ((uint64_t)INT64_MAX + 1) : INT64_MAX;
-                        if (uint_value > (max_value - digit) / 10) {
-                            integer_overflow = true;
-                            double_value = (double)uint_value;
-                            is_double = true;
-                        } else {
-                            uint_value = uint_value * 10 + digit;
-                        }
+                        int_value = int_value * 10 + digit;
                     } else {
                         double_value = double_value * 10.0 + (double)digit;
                     }
@@ -1090,7 +1083,7 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
 
                 if (!integer_overflow && digit_run_length > digits_to_process) {
                     integer_overflow = true;
-                    double_value = (double)uint_value;
+                    double_value = (double)int_value;
                     is_double = true;
 
                     for (size_t i = digits_to_process; i < digit_run_length; i++) {
@@ -1106,14 +1099,19 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
                 digit_count++;
 
                 if (!integer_overflow) {
-                    uint64_t max_value = is_negative ? ((uint64_t)INT64_MAX + 1) : INT64_MAX;
-                    if (uint_value > (max_value - digit) / 10) {
+                    // Check for overflow considering the sign
+                    int64_t limit = is_negative ? -(INT64_MIN / 10) : (INT64_MAX / 10);
+                    int64_t last_digit_limit = is_negative ? -(INT64_MIN % 10) : (INT64_MAX % 10);
+
+                    if (int_value > limit || (int_value == limit && digit > last_digit_limit)) {
                         integer_overflow = true;
-                        double_value = (double)uint_value;
+                        double_value = (double)int_value;
                         is_double = true;
-                    } else {
-                        uint_value = uint_value * 10 + digit;
                     }
+                }
+
+                if (!integer_overflow) {
+                    int_value = int_value * 10 + digit;
                 } else {
                     double_value = double_value * 10.0 + (double)digit;
                 }
@@ -1124,13 +1122,19 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
                 digit_count++;
 
                 if (!integer_overflow) {
-                    uint64_t max_value = is_negative ? ((uint64_t)INT64_MAX + 1) : INT64_MAX;
-                    if (uint_value > (max_value - digit) / 10) {
+                    // Check for overflow considering the sign
+                    int64_t limit = is_negative ? -(INT64_MIN / 10) : (INT64_MAX / 10);
+                    int64_t last_digit_limit = is_negative ? -(INT64_MIN % 10) : (INT64_MAX % 10);
+
+                    if (int_value > limit || (int_value == limit && digit > last_digit_limit)) {
                         integer_overflow = true;
-                        double_value = (double)uint_value;
+                        double_value = (double)int_value;
                         is_double = true;
+                    }
+                    if (!integer_overflow) {
+                        int_value = int_value * 10 + digit;
                     } else {
-                        uint_value = uint_value * 10 + digit;
+                        double_value = double_value * 10.0 + (double)digit;
                     }
                 } else {
                     double_value = double_value * 10.0 + (double)digit;
@@ -1152,7 +1156,7 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
         }
 
         if (!integer_overflow) {
-            double_value = (double)uint_value;
+            double_value = (double)int_value;
         }
 
         double fraction = 0.0;
@@ -1178,7 +1182,7 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
         }
 
         if (!integer_overflow && !is_double) {
-            double_value = (double)uint_value;
+            double_value = (double)int_value;
         }
         is_double = true;
 
@@ -1207,22 +1211,11 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
     if (is_double) {
         *out_value = json_create_double(parser->arena, is_negative ? -double_value : double_value);
     } else {
-        int64_t final_int_value;
-        if (is_negative) {
-            if (uint_value == ((uint64_t)INT64_MAX + 1)) {
-                final_int_value = INT64_MIN;
-            } else {
-                final_int_value = -(int64_t)uint_value;
-            }
-        } else {
-            final_int_value = (int64_t)uint_value;
-        }
-        *out_value = json_create_int(parser->arena, final_int_value);
+        *out_value = json_create_int(parser->arena, is_negative ? -int_value : int_value);
     }
 
     return *out_value ? JSON_NO_ERROR : JSON_OUT_OF_MEMORY;
 }
-
 static json_error_t json_parse_value(json_parser_t *parser, json_value_t **out_value);
 
 static json_error_t json_parse_array(json_parser_t *parser, json_value_t **out_value);
