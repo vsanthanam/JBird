@@ -78,7 +78,8 @@ typedef struct json_value json_value_t;
  * @param length The length of the data in bytes
  * @param out_value Pointer to store the resulting parsed value
  * @param allow_bom Whether to allow BOM (Byte Order Mark) at the beginning of the data
- * @param allow_whitespace Whether to allow insignificant whitespace in the data
+ * @param require_minified Whether to require the JSON to be minified (no whitespace)
+ * @param strict_keys Whether to enforce strict key rules (no duplicate keys, etc.)
  * @param max_depth Maximum recursion depth (0 for unlimited)
  * @return Error code indicating success or failure
  */
