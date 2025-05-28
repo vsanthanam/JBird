@@ -647,7 +647,6 @@ extension JSON {
         bytes += [0x5D]
     }
 
-    @inline(__always)
     static func serialize(
         object: [String: JSON],
         into bytes: inout [UInt8],
