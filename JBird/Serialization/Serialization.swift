@@ -33,141 +33,21 @@ import Foundation
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON {
 
-    /// The availabile options when serializing a `JSON` value into a byte buffer or Swift string
-    public struct SerializationOptions: OptionSet, Equatable, Hashable, Sendable {
-
-        // MARK: - API
-
-        /// Whether or not the serialized JSON should include additional whitespace to improve readability
-        ///
-        /// When this option is enabled, the serialized JSON will be formatted with indentation and newlines.
-        public static let prettyPrinted = SerializationOptions(rawValue: 1 << 0)
-
-        /// Whether or not JSON keys with `null` values should be omitted from the resulting JSON
-        ///
-        /// When this option is enabled, keys with `null` values will not be included in the serialized JSON object.
-        public static let omitNullKeys = SerializationOptions(rawValue: 1 << 1)
-
-        /// Whether or not `null` values should be omitted from the resulting JSON
-        ///
-        /// When this option is enabled, `null` values will not be included in the serialized JSON array or JSON objects.
-        public static let omitNullValues = SerializationOptions(rawValue: 1 << 2)
-
-        /// Whether or not JSON keys should be sorted alphabetically
-        ///
-        /// When this option is enabled, the keys in JSON objects will be sorted alphabetically before serialization.
-        public static let sortedKeys = SerializationOptions(rawValue: 1 << 3)
-
-        /// Whether or not non-root JSON should be allowed
-        ///
-        /// When this option is enabled, the serialized JSON can be a fragment, rather than a complete JSON object or array.
-        public static let fragmentsAllowed = SerializationOptions(rawValue: 1 << 4)
-
-        /// Whether or not the serialized JSON should contain a UTF-8 byte order mark
-        ///
-        /// When this option is enabled, the serialized JSON will start with a UTF-8 byte order mark (BOM).
-        public static let includeByteOrderMark = SerializationOptions(rawValue: 1 << 5)
-
-        /// Whether or not to escape characters outside the ASCII range.
-        ///
-        /// When this option is enabled, characters with Unicode code points greater than 127 will be escaped in the serialized JSON.
-        /// This can be useful for ensuring compatibility with systems that do not support non-ASCII characters.
-        public static let escapeNonASCII = SerializationOptions(rawValue: 1 << 6)
-
-        /// Whether or not characters outside the basic multi-lingual plane should be escaped
-        ///
-        /// When this option is enabled, characters with Unicode code points greater than `65535` will be escaped in the serialized JSON.
-        /// This can be useful for ensuring compatibility with systems that do not support characters outside the basic multilingual plane.
-        public static let escapeSpecialCharacters = SerializationOptions(rawValue: 1 << 7)
-
-        /// Whether or not to escape the forward slash character
-        ///
-        /// When this option is enabled, the forward slash character (`/`) will be escaped as `\/` in the serialized JSON.
-        /// This can be useful for preventing issues with certain parsers that may misinterpret the forward slash.
-        public static let escapeForwardSlash = SerializationOptions(rawValue: 1 << 8)
-
-        /// The default set of options
-        public static let `default`: SerializationOptions = [.fragmentsAllowed, .escapeSpecialCharacters]
-
-        // MARK: - OptionSet
-
-        public init(rawValue: Int) {
-            self.rawValue = rawValue
-        }
-
-        public let rawValue: Int
-
-    }
-
-    /// The available options for JSON deserialization
-    public struct DeserializationOptions: OptionSet, Equatable, Hashable, Sendable {
-
-        // MARK: - API
-
-        /// Whether or not JSON keys with `null` values should be omitted from JSON objects when parsing
-        ///
-        /// When this option is enabled, keys with `null` values will not be included in the deserialized JSON object.
-        public static let omitNullKeys = DeserializationOptions(rawValue: 1 << 0)
-
-        /// Whether or not `null` values should be omitted when parsing
-        ///
-        /// When this option is enabled, `null` values will not be included in the deserialized JSON array or JSON objects.
-        public static let omitNullValues = DeserializationOptions(rawValue: 1 << 1)
-
-        /// Whether or not the root value is allowed to be a fragment
-        ///
-        /// When this option is enabled, the deserialized JSON can be a fragment, rather than a complete JSON object or array.
-        public static let fragmentsAllowed = DeserializationOptions(rawValue: 1 << 2)
-
-        /// Whether or not the the deserialized JSON is allowed to contain a UTF-8 byte order mark
-        ///
-        /// When this option is enabled, the deserialized JSON can start with a UTF-8 byte order mark (BOM).
-        public static let allowByteOrderMark = DeserializationOptions(rawValue: 1 << 3)
-
-        /// Whether or not the deserialized JSON is allowed to contain insignificant whitespace
-        ///
-        /// When this option is enabled, the deserialized JSON may not contain insignificant whitespace, such as spaces and newlines.
-        public static let requireMinified = DeserializationOptions(rawValue: 1 << 4)
-
-        /// Ignore the actively configured recursion depth limit.
-        ///
-        /// When this option is enabled, the deserialization will not be limited by the configured recursion depth limit.
-        /// This can be useful for deserializing deeply nested JSON structures, but may lead to excessive memory usage or stack overflow if the JSON is too deeply nested.
-        public static let ignoreRecursionDepthLimit = DeserializationOptions(rawValue: 1 << 5)
-
-        /// Ignore the actively configured input size limit
-        ///
-        /// When this option is enabled, the deserialization will not be limited by the configured input size limit.
-        /// This can be useful for deserializing large JSON payloads, but may lead to excessive memory usage if the JSON is too large.
-        public static let ignoreInputSizeLimit = DeserializationOptions(rawValue: 1 << 6)
-
-        /// Require that all keys in JSON objects are unique
-        ///
-        /// By default, duplicate keys are allowed, and the last occurrence of a key will be used.
-        /// When this option is enabled, the deserialization will fail if any duplicate keys are found in JSON objects.
-        ///
-        /// - Note: The use of this option can impact parser performance, especially for large JSON objects with many keys.
-        public static let requireUniqueKeys = DeserializationOptions(rawValue: 1 << 7)
-
-        /// The default set of options
-        public static let `default`: DeserializationOptions = [.fragmentsAllowed, .allowByteOrderMark]
-
-        // MARK: - OptionSet
-
-        public init(rawValue: Int) {
-            self.rawValue = rawValue
-        }
-
-        public let rawValue: Int
-
-    }
-
     // MARK: - API
+
+    /// Precalculate the default recurstion and depth limits
+    ///
+    /// Calling this method ahead of your first deserialization operation will marginally improve performance
+    /// - Note: If you have already performed on deserialization operation, or if you have already called this method once before, this method is a no-op
+    public static func warmLimits() {
+        _ = defaultRecursionDepthLimit
+        _ = defaultInputSizeLimit
+    }
 
     /// The default recursion depth limit
     ///
-    /// This is calculated based on the available memory and the maximum recursion depth limit on the first invocation of a deserialization operation.
-    /// Subsequent invocations will use the same limit and avoid recalculating it again.
+    /// This is calculated based on the memory profile of the system upon the first invocation of a deserialization operation.
+    /// Subsequent invocations will use the same limit to avoid recalculating it again.
     ///
     /// You can alter this behavior in two ways:
     /// - By calling ``JSON/withRecursionDepthLimit(_:operation:)-88fw4`` to set a custom limit for the current task
@@ -176,8 +56,8 @@ extension JSON {
 
     /// The default input size limit
     ///
-    /// This is calculated based on the available memory and the maximum recursion depth limit on the first invocation of a deserialization operation.
-    /// Subsequent invocations will use the same limit and avoid recalculating it again.
+    /// This is calculated based on the memory profile of the system upon the first invocation of a deserialization operation.
+    /// Subsequent invocations will use the same calculated limit to avoid recalculating it again.
     ///
     /// You can alter this behavior in two ways:
     /// - By calling ``JSON/withInputSizeLimit(_:operation:)-5dvqh`` to set a custom limit for the current task
@@ -186,7 +66,7 @@ extension JSON {
 
     /// Perform the provided operation with a custom recursion depth limit
     ///
-    /// By default, the recursion depth limit is set to a value that is calculated based on the available memory on the first invocation of a deserialization operation.
+    /// By default, the recursion depth limit is set to a value that is calculated based on memory profile of the system upon the first invocation of a deserialization operation.
     /// Subsequent invocations will use the same limit and avoid recalculating it again.
     ///
     /// You can use this method to set a custom recursion depth limit:
@@ -215,7 +95,7 @@ extension JSON {
 
     /// Perform the provided async operation with a custom recursion depth limit
     ///
-    /// By default, the recursion depth limit is set to a value that is calculated based on the available memory on the first invocation of a deserialization operation.
+    /// By default, the recursion depth limit is set to a value that is calculated based on the memory profile of the system upon the first invocation of a deserialization operation.
     /// Subsequent invocations will use the same limit and avoid recalculating it again.
     ///
     /// You can use this method to set a custom recursion depth limit:
@@ -244,7 +124,7 @@ extension JSON {
 
     /// Perform the provided operation with a custom input size limit
     ///
-    /// By default, the input size limit is set to a value that is calculated based on the available memory on the first invocation of a deserialization operation.
+    /// By default, the input size limit is set to a value that is calculated based on the memory profile of the system upon the first invocation of a deserialization operation.
     /// Subsequent invocations will use the same limit and avoid recalculating it again.
     ///
     /// You can use this method to set a custom input size limit:
@@ -306,11 +186,11 @@ extension JSON {
     ///   - options: The deserialization options
     /// - Returns: The typed JSON value
     public static func value(
-        from string: String,
+        for string: String,
         options: DeserializationOptions = .default
     ) throws -> JSON {
         try value(
-            from: string.data(using: .utf8)!,
+            for: string.data(using: .utf8)!,
             options: options
         )
     }
@@ -321,7 +201,7 @@ extension JSON {
     ///   - options: The deserialization options
     /// - Returns: The typed JSON value
     public static func value(
-        from data: Data,
+        for data: Data,
         options: DeserializationOptions = .default
     ) throws -> JSON {
         try parse(data, options)
@@ -387,7 +267,7 @@ extension JSON {
         return String(data: data, encoding: .utf8)!
     }
 
-    /// Create a byte buffer from a typed `JSON` value
+    /// Create a byte buffer from a typed JSON value
     /// - Parameters:
     ///   - value: The JSON value to serialize
     ///   - options: The serialization options
@@ -405,7 +285,7 @@ extension JSON {
         )
     }
 
-    /// Create a Swift string from a typed `JSON` value
+    /// Create a Swift string from a typed JSON value
     /// - Parameters:
     ///   - value: The JSON value to serialize
     ///   - options: The serialization options
