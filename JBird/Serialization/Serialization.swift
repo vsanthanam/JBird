@@ -39,30 +39,51 @@ extension JSON {
         // MARK: - API
 
         /// Whether or not the serialized JSON should include additional whitespace to improve readability
+        ///
+        /// When this option is enabled, the serialized JSON will be formatted with indentation and newlines.
         public static let prettyPrinted = SerializationOptions(rawValue: 1 << 0)
 
         /// Whether or not JSON keys with `null` values should be omitted from the resulting JSON
+        ///
+        /// When this option is enabled, keys with `null` values will not be included in the serialized JSON object.
         public static let omitNullKeys = SerializationOptions(rawValue: 1 << 1)
 
         /// Whether or not `null` values should be omitted from the resulting JSON
+        ///
+        /// When this option is enabled, `null` values will not be included in the serialized JSON array or JSON objects.
         public static let omitNullValues = SerializationOptions(rawValue: 1 << 2)
 
         /// Whether or not JSON keys should be sorted alphabetically
+        ///
+        /// When this option is enabled, the keys in JSON objects will be sorted alphabetically before serialization.
         public static let sortedKeys = SerializationOptions(rawValue: 1 << 3)
 
         /// Whether or not non-root JSON should be allowed
+        ///
+        /// When this option is enabled, the serialized JSON can be a fragment, rather than a complete JSON object or array.
         public static let fragmentsAllowed = SerializationOptions(rawValue: 1 << 4)
 
         /// Whether or not the serialized JSON should contain a UTF-8 byte order mark
+        ///
+        /// When this option is enabled, the serialized JSON will start with a UTF-8 byte order mark (BOM).
         public static let includeByteOrderMark = SerializationOptions(rawValue: 1 << 5)
 
         /// Whether or not to escape characters outside the ASCII range.
+        ///
+        /// When this option is enabled, characters with Unicode code points greater than 127 will be escaped in the serialized JSON.
+        /// This can be useful for ensuring compatibility with systems that do not support non-ASCII characters.
         public static let escapeNonASCII = SerializationOptions(rawValue: 1 << 6)
 
         /// Whether or not characters outside the basic multi-lingual plane should be escaped
+        ///
+        /// When this option is enabled, characters with Unicode code points greater than `65535` will be escaped in the serialized JSON.
+        /// This can be useful for ensuring compatibility with systems that do not support characters outside the basic multilingual plane.
         public static let escapeSpecialCharacters = SerializationOptions(rawValue: 1 << 7)
 
         /// Whether or not to escape the forward slash character
+        ///
+        /// When this option is enabled, the forward slash character (`/`) will be escaped as `\/` in the serialized JSON.
+        /// This can be useful for preventing issues with certain parsers that may misinterpret the forward slash.
         public static let escapeForwardSlash = SerializationOptions(rawValue: 1 << 8)
 
         /// The default set of options
@@ -84,26 +105,48 @@ extension JSON {
         // MARK: - API
 
         /// Whether or not JSON keys with `null` values should be omitted from JSON objects when parsing
+        ///
+        /// When this option is enabled, keys with `null` values will not be included in the deserialized JSON object.
         public static let omitNullKeys = DeserializationOptions(rawValue: 1 << 0)
 
         /// Whether or not `null` values should be omitted when parsing
+        ///
+        /// When this option is enabled, `null` values will not be included in the deserialized JSON array or JSON objects.
         public static let omitNullValues = DeserializationOptions(rawValue: 1 << 1)
 
         /// Whether or not the root value is allowed to be a fragment
+        ///
+        /// When this option is enabled, the deserialized JSON can be a fragment, rather than a complete JSON object or array.
         public static let fragmentsAllowed = DeserializationOptions(rawValue: 1 << 2)
 
         /// Whether or not the the deserialized JSON is allowed to contain a UTF-8 byte order mark
+        ///
+        /// When this option is enabled, the deserialized JSON can start with a UTF-8 byte order mark (BOM).
         public static let allowByteOrderMark = DeserializationOptions(rawValue: 1 << 3)
 
         /// Whether or not the deserialized JSON is allowed to contain insignificant whitespace
+        ///
+        /// When this option is enabled, the deserialized JSON may not contain insignificant whitespace, such as spaces and newlines.
         public static let requireMinified = DeserializationOptions(rawValue: 1 << 4)
 
         /// Ignore the actively configured recursion depth limit.
+        ///
+        /// When this option is enabled, the deserialization will not be limited by the configured recursion depth limit.
+        /// This can be useful for deserializing deeply nested JSON structures, but may lead to excessive memory usage or stack overflow if the JSON is too deeply nested.
         public static let ignoreRecursionDepthLimit = DeserializationOptions(rawValue: 1 << 5)
 
         /// Ignore the actively configured input size limit
+        ///
+        /// When this option is enabled, the deserialization will not be limited by the configured input size limit.
+        /// This can be useful for deserializing large JSON payloads, but may lead to excessive memory usage if the JSON is too large.
         public static let ignoreInputSizeLimit = DeserializationOptions(rawValue: 1 << 6)
 
+        /// Require that all keys in JSON objects are unique
+        ///
+        /// By default, duplicate keys are allowed, and the last occurrence of a key will be used.
+        /// When this option is enabled, the deserialization will fail if any duplicate keys are found in JSON objects.
+        ///
+        /// - Note: The use of this option can impact parser performance, especially for large JSON objects with many keys.
         public static let requireUniqueKeys = DeserializationOptions(rawValue: 1 << 7)
 
         /// The default set of options
@@ -121,15 +164,43 @@ extension JSON {
 
     // MARK: - API
 
-    /// The default recursion depth limit of 256 steps
+    /// The default recursion depth limit
+    ///
+    /// This is calculated based on the available memory and the maximum recursion depth limit on the first invocation of a deserialization operation.
+    /// Subsequent invocations will use the same limit and avoid recalculating it again.
+    ///
+    /// You can alter this behavior in two ways:
+    /// - By calling ``JSON/withRecursionDepthLimit(_:operation:)-88fw4`` to set a custom limit for the current task
+    /// - By providing the ``JSON/DeserializationOptions/ignoreRecursionDepthLimit`` option when deserializing JSON
     public static let defaultRecursionDepthLimit: size_t = calculateMaxDepth()
 
-    /// The default input size limit of 100MB, in bytes
+    /// The default input size limit
+    ///
+    /// This is calculated based on the available memory and the maximum recursion depth limit on the first invocation of a deserialization operation.
+    /// Subsequent invocations will use the same limit and avoid recalculating it again.
+    ///
+    /// You can alter this behavior in two ways:
+    /// - By calling ``JSON/withInputSizeLimit(_:operation:)-5dvqh`` to set a custom limit for the current task
+    /// - By providing the ``JSON/DeserializationOptions/ignoreInputSizeLimit`` option when deserializing JSON
     public static let defaultInputSizeLimit: size_t = calculateMaxInputSize()
 
     /// Perform the provided operation with a custom recursion depth limit
     ///
+    /// By default, the recursion depth limit is set to a value that is calculated based on the available memory on the first invocation of a deserialization operation.
+    /// Subsequent invocations will use the same limit and avoid recalculating it again.
+    ///
+    /// You can use this method to set a custom recursion depth limit:
+    ///
+    /// ```swift
+    /// let data = Data( ... )
+    /// let json = try JSON.withRecursionDepthLimit(1000) {
+    ///     // All JSON operations performed within this closure will use a recursion depth limit of 1000
+    ///     try JSON(data)
+    /// }
+    /// ```
+    ///
     /// To remove the recursion depth limit entirely, use `0`
+    ///
     /// - Parameters:
     ///   - limit: The desired recursion depth limit
     ///   - operation: The operation to perform
@@ -144,7 +215,21 @@ extension JSON {
 
     /// Perform the provided async operation with a custom recursion depth limit
     ///
+    /// By default, the recursion depth limit is set to a value that is calculated based on the available memory on the first invocation of a deserialization operation.
+    /// Subsequent invocations will use the same limit and avoid recalculating it again.
+    ///
+    /// You can use this method to set a custom recursion depth limit:
+    ///
+    /// ```swift
+    /// let data = Data( ... )
+    /// let json = try await JSON.withRecursionDepthLimit(1000) {
+    ///     // All JSON operations performed within this closure will use a recursion depth limit of 1000
+    ///     try await JSON.deserialize(data)
+    /// }
+    /// ```
+    ///
     /// To remove the recursion depth limit entirely, use `0`
+    ///
     /// - Parameters:
     ///   - limit: The desired recursion depth limit
     ///   - operation: The operation to perform
@@ -159,7 +244,21 @@ extension JSON {
 
     /// Perform the provided operation with a custom input size limit
     ///
+    /// By default, the input size limit is set to a value that is calculated based on the available memory on the first invocation of a deserialization operation.
+    /// Subsequent invocations will use the same limit and avoid recalculating it again.
+    ///
+    /// You can use this method to set a custom input size limit:
+    ///
+    /// ```swift
+    /// let data = Data( ... )
+    /// let json = try JSON.withInputSizeLimit(1024 * 1024) {
+    ///    // All JSON operations performed within this closure will use an input size limit of 1 MB
+    ///    try JSON(data)
+    /// }
+    /// ```
+    ///
     /// To remove the input size limit entirely, use `0`
+    ///
     /// - Parameters:
     ///   - limit: The desired input size limit, in bytes
     ///   - operation: The operation to perform
@@ -174,7 +273,21 @@ extension JSON {
 
     /// Perform the provided async operation with a custom input size limit
     ///
+    /// By default, the input size limit is set to a value that is calculated based on the available memory on the first invocation of a deserialization operation.
+    /// Subsequent invocations will use the same limit and avoid recalculating it again.
+    ///
+    /// You can use this method to set a custom input size limit:
+    ///
+    /// ```swift
+    /// let data = Data( ... )
+    /// let json = try await JSON.withInputSizeLimit(1024 * 1024) {
+    ///    // All JSON operations performed within this closure will use an input size limit of 1 MB
+    ///    try await JSON.deserialize(data)
+    /// }
+    /// ```
+    ///
     /// To remove the input size limit entirely, use `0`
+    ///
     /// - Parameters:
     ///   - limit: The desired input size limit, in bytes
     ///   - operation: The operation to perform
