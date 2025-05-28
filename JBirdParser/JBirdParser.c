@@ -240,7 +240,8 @@ typedef struct {
     size_t temp_size;
     size_t temp_capacity;
     json_memory_arena_t *arena;
-    bool allow_whitespace;
+    bool require_minified;
+    bool strict_keys;
     size_t max_depth;
     size_t current_depth;
 } json_parser_t;
@@ -617,7 +618,7 @@ static json_error_t json_array_push(json_value_t *array, json_value_t *element, 
     return JSON_NO_ERROR;
 }
 
-static void json_parser_init(json_parser_t *parser, const uint8_t *input, size_t length, bool allow_whitespace, size_t max_depth) {
+static void json_parser_init(json_parser_t *parser, const uint8_t *input, size_t length, bool require_minified, bool strict_keys, size_t max_depth) {
     parser->input = input;
     parser->length = length;
     parser->index = 0;
@@ -625,7 +626,8 @@ static void json_parser_init(json_parser_t *parser, const uint8_t *input, size_t
     parser->temp_size = 0;
     parser->temp_capacity = 0;
     parser->arena = json_arena_init(length);
-    parser->allow_whitespace = allow_whitespace;
+    parser->require_minified = require_minified;
+    parser->strict_keys = strict_keys;
     parser->max_depth = max_depth;
     parser->current_depth = 0;
 }
@@ -769,7 +771,7 @@ static uint8_t json_next(json_parser_t *parser) {
 }
 
 static inline void json_consume_whitespace(json_parser_t *parser) {
-    if (!parser->allow_whitespace) {
+    if (parser->require_minified) {
         return;
     }
 
@@ -1419,6 +1421,20 @@ static json_error_t json_parse_object(json_parser_t *parser, json_value_t **out_
                 object->data.object.capacity = new_capacity;
             }
 
+            // Check for duplicate keys
+            if (parser->strict_keys) {
+                for (size_t i = 0; i < object->data.object.count; i++) {
+                    const char *existing_key = json_string_get(&object->data.object.keys[i]);
+                    size_t existing_len = object->data.object.keys[i].length;
+
+                    if (existing_len == key_len &&
+                        memcmp(existing_key, interned_key, key_len) == 0) {
+                        parser->current_depth--;
+                        return JSON_DUPLICATE_KEY;
+                    }
+                }
+            }
+
             json_string_t *str = &object->data.object.keys[object->data.object.count];
             str->length = key_len;
 
@@ -1466,6 +1482,19 @@ static json_error_t json_parse_object(json_parser_t *parser, json_value_t **out_
                 object->data.object.keys = new_keys;
                 object->data.object.values = new_values;
                 object->data.object.capacity = new_capacity;
+            }
+
+            if (parser->strict_keys) {
+                for (size_t i = 0; i < object->data.object.count; i++) {
+                    const char *existing_key = json_string_get(&object->data.object.keys[i]);
+                    size_t existing_len = object->data.object.keys[i].length;
+
+                    if (existing_len == parser->temp_size &&
+                        memcmp(existing_key, parser->temp_buffer, parser->temp_size) == 0) {
+                        parser->current_depth--;
+                        return JSON_DUPLICATE_KEY;
+                    }
+                }
             }
 
             json_string_t *str = &object->data.object.keys[object->data.object.count];
@@ -1646,7 +1675,7 @@ static bool try_parse_simple_string(json_parser_t *parser, const char **out_str,
     return false;
 }
 
-json_error_t json_parse(const uint8_t *data, size_t length, json_value_t **out_value, bool allow_bom, bool allow_whitespace, size_t max_depth) {
+json_error_t json_parse(const uint8_t *data, size_t length, json_value_t **out_value, bool allow_bom, bool require_minified, bool strict_keys, size_t max_depth) {
     if (!data || !out_value) {
         return JSON_INVALID_JSON;
     }
@@ -1654,7 +1683,7 @@ json_error_t json_parse(const uint8_t *data, size_t length, json_value_t **out_v
     *out_value = NULL;
 
     json_parser_t parser;
-    json_parser_init(&parser, data, length, allow_whitespace, max_depth);
+    json_parser_init(&parser, data, length, require_minified, strict_keys, max_depth);
 
     if (!parser.arena) {
         json_parser_cleanup(&parser);

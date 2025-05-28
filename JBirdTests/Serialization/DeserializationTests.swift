@@ -720,7 +720,6 @@ struct DeserializationTests {
                     "grault": [{}]
                 }
             ],
-            "garply": null,
             "waldo": "fred",
             "fred": null,
             "plugh": [
@@ -931,6 +930,36 @@ struct DeserializationTests {
         }
         _ = try await JSON.withInputSizeLimit(12) {
             try await JSON.deserialize(data, options: .ignoreInputSizeLimit)
+        }
+    }
+
+    @Suite("Duplicate Key Tests")
+    struct DuplicateKeyTests {
+
+        @Test("Duplicate Keys in Object")
+        func duplicateKeys() async throws {
+            let raw = #"""
+            {"foo": true, "foo": false}
+            """#
+            let data = try #require(raw.data(using: .utf8))
+            let json = try JSON(data)
+            #expect(json == ["foo": false]) // Last key wins
+            let fromString = try JSON(jsonString: raw)
+            #expect(fromString == json)
+        }
+
+        @Test("Duplicate Keys Not Allowed")
+        func duplicateKeysNotAllowed() async throws {
+            let raw = #"""
+            {"foo": true, "foo": false}
+            """#
+            let data = try #require(raw.data(using: .utf8))
+            #expect(throws: JSONDeserializationError.duplicateKey) {
+                _ = try JSON.value(from: data, options: .requireUniqueKeys)
+            }
+            await #expect(throws: JSONDeserializationError.duplicateKey) {
+                _ = try await JSON.deserialize(data, options: .requireUniqueKeys)
+            }
         }
     }
 
