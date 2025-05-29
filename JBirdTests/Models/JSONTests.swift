@@ -1224,6 +1224,5 @@ struct JSONTests {
                 try array.filter { key, _ in key != "qux" }
             }
         }
-
     }
 }

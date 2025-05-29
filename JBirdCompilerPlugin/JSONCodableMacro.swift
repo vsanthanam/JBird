@@ -180,12 +180,12 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
                 if omitIfNil {
                     """
                     if let \(name) {
-                        (\"\(key)\", \(name))
+                        \"\(key)\" => \(name)
                     }
                     """
                 } else {
                     """
-                    (\"\(key)\", \(name))
+                    \"\(key)\" => \(name)
                     """
                 }
             }

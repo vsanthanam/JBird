@@ -70,27 +70,27 @@ You can also create complex JSON expression declaratively, using the ``ObjectBui
 
 ```swift
 let user: JSON = JSON {
-    ("id", 123)
-    ("profile", JSON {
-        ("name", "Alice")
-        ("email", "alice@example.com")
-        ("preferences", JSON {
+    "id" => 123
+    "profile" => JSON {
+        "name" => "Alice"
+        "email" => "alice@example.com"
+        "preferences" => JSON {
             if darkTheme {
-                ("theme", "dark")
+                "theme" => "dark"
             } else {
-                ("theme", "light")
+                "theme" => "light"
             }
-            ("theme", "dark")
+            "theme" => "dark"
             if hasNotifications {
-                ("notifications", true)
+                "notifications" => true
             }
-        })
-    })
-    ("tags", JSON {
+        }
+    }
+    "tags" => JSON {
         for tag in tags {
             tag
         }
-    })
+    }
 }
 ```
 

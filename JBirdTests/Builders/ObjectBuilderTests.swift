@@ -90,4 +90,71 @@ struct ObjectBuilderTests {
         #expect(json == ["a": "a", "b": "b", "c": "c"])
     }
 
+    @Test(
+        "Complex Builder",
+        arguments: [
+            (
+                true,
+                true,
+                ["tag1", "tag2", "tag3"],
+                JSON.object([
+                    "id": 123,
+                    "profile": [
+                        "name": "Alice",
+                        "email": "alice@example.com",
+                        "preferences": [
+                            "theme": "dark",
+                            "notifications": true
+                        ]
+                    ],
+                    "tags": ["tag1", "tag2", "tag3"]
+                ])
+            ),
+            (
+                true,
+                false,
+                ["tag1", "tag2", "tag3"],
+                JSON.object([
+                    "id": 123,
+                    "profile": [
+                        "name": "Alice",
+                        "email": "alice@example.com",
+                        "preferences": [
+                            "theme": "dark"
+                        ]
+                    ],
+                    "tags": ["tag1", "tag2", "tag3"]
+                ])
+            )
+        ]
+    )
+    func complexBuilder(darkTheme: Bool, hasNotifications: Bool, tags: [String], json: JSON) {
+        let user = buildUser(darkTheme: darkTheme, hasNotifications: hasNotifications, tags: tags)
+        #expect(user == json)
+    }
+
+    @JSON.ObjectBuilder
+    private func buildUser(darkTheme: Bool, hasNotifications: Bool, tags: [String]) -> JSON {
+        "id" => 123
+        "profile" => JSON {
+            "name" => "Alice"
+            "email" => "alice@example.com"
+            "preferences" => JSON {
+                if darkTheme {
+                    "theme" => "dark"
+                } else {
+                    "theme" => "light"
+                }
+                "theme" => "dark"
+                if hasNotifications {
+                    "notifications" => true
+                }
+            }
+        }
+        "tags" => JSON {
+            for tag in tags {
+                tag
+            }
+        }
+    }
 }
