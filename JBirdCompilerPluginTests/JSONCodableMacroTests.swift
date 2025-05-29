@@ -58,7 +58,7 @@ final class JSONCodableMacroTests: XCTestCase {
 
                     @JBird.JSON.ObjectBuilder
                     public func encodeToJSON() -> JSON {
-                        ("name", name)
+                        "name" => name
                     }
 
                     public init(json: JSON) throws {
@@ -101,7 +101,7 @@ final class JSONCodableMacroTests: XCTestCase {
 
                     @JBird.JSON.ObjectBuilder
                     public func encodeToJSON() -> JSON {
-                        ("custom_name", name)
+                        "custom_name" => name
                     }
 
                     public init(json: JSON) throws {
@@ -144,7 +144,7 @@ final class JSONCodableMacroTests: XCTestCase {
 
                     @JBird.JSON.ObjectBuilder
                     public func encodeToJSON() -> JSON {
-                        ("foo_bar", fooBar)
+                        "foo_bar" => fooBar
                     }
 
                     public init(json: JSON) throws {
@@ -188,7 +188,7 @@ final class JSONCodableMacroTests: XCTestCase {
                     @JBird.JSON.ObjectBuilder
                     public func encodeToJSON() -> JSON {
                         if let name {
-                        ("name", name)
+                        "name" => name
                         }
                     }
 
