@@ -135,3 +135,13 @@ jobs:
       run: ./.scripts/xcode-select
     - name: Validate Documentation
       run: ./.scripts/lint-docc
+  check-xcframework:
+    name: Validate XCFramework
+    runs-on: macos-15
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Select Xcode Version
+      run: ./.scripts/xcode-select
+    - name: Validate Documentation
+      run: ./.scripts/build-xcframework
