@@ -1,5 +1,5 @@
 // JBird
-// JSONSerializationErrorTests.swift
+// JBird.swift
 //
 // MIT License
 //
@@ -23,16 +23,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import JBird
-import Testing
+@_exported import JBirdBuilders
+@_exported import JBirdCore
+@_exported import JBirdMacros
 
-@Test("JSONSerializationError Descriptions")
-func jSONSerializationErrorDescriptions() {
-
-    let invalidFloat = JSONSerializationError.invalidFloat
-    #expect(invalidFloat.description == "Invalid floating point value")
-
-    let illegalFragment = JSONSerializationError.illegalFragment
-    #expect(illegalFragment.description == "Attemped to serialize a JSON fragment without required `fragmentsAllowed` option")
-
-}
+enum JBird {}

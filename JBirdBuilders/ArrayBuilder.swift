@@ -1,5 +1,5 @@
 // JBird
-// ObjectBuilder.swift
+// ArrayBuilder.swift
 //
 // MIT License
 //
@@ -23,82 +23,70 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+import JBirdCore
+
 extension JSON {
 
-    /// A result builder for JSON objects
+    /// Create a JSON array declaratively
+    /// - Parameter elements: The elements in the array
+    public init(
+        @ArrayBuilder elements: () -> JSON
+    ) {
+        self = elements()
+    }
+
+    /// A result builder for JSON arrays
     @resultBuilder
-    public enum ObjectBuilder {
+    public enum ArrayBuilder {
 
         public static func buildExpression(
-            _ expression: (String, JSON)
-        ) -> [(String, JSON)] {
+            _ expression: JSON
+        ) -> [JSON] {
             [expression]
         }
 
-        public static func buildExpression<T>(
-            _ expression: (String, T)
-        ) -> [(String, JSON)] where T: JSONEncodable {
-            let (key, value) = expression
-            return [(key, JSON(value))]
-        }
-
         public static func buildExpression(
-            _ expression: [(String, JSON)]
-        ) -> [(String, JSON)] {
-            expression
-        }
-
-        public static func buildExpression(
-            _ expression: [String: JSON]
-        ) -> [(String, JSON)] {
-            expression.map(\.self)
+            _ expression: some JSONEncodable
+        ) -> [JSON] {
+            [JSON(expression)]
         }
 
         public static func buildBlock(
-            _ components: [(String, JSON)]
-        ) -> [(String, JSON)] {
+            _ components: [JSON]...
+        ) -> [JSON] {
             components
-        }
-
-        public static func buildBlock(
-            _ components: [(String, JSON)]...
-        ) -> [(String, JSON)] {
-            components.flatMap(\.self)
+                .flatMap(\.self)
         }
 
         public static func buildEither(
-            first component: [(String, JSON)]
-        ) -> [(String, JSON)] {
+            first component: [JSON]
+        ) -> [JSON] {
             component
         }
 
         public static func buildEither(
-            second component: [(String, JSON)]
-        ) -> [(String, JSON)] {
+            second component: [JSON]
+        ) -> [JSON] {
             component
         }
 
         public static func buildOptional(
-            _ component: [(String, JSON)]?
-        ) -> [(String, JSON)] {
+            _ component: [JSON]?
+        ) -> [JSON] {
             component ?? []
         }
 
         public static func buildArray(
-            _ components: [[(String, JSON)]]
-        ) -> [(String, JSON)] {
-            components.flatMap(\.self)
+            _ components: [[JSON]]
+        ) -> [JSON] {
+            components
+                .flatMap(\.self)
         }
 
         public static func buildFinalResult(
-            _ component: [(String, JSON)]
+            _ component: [JSON]
         ) -> JSON {
-            let dict = component.reduce(into: [String: JSON]()) { prev, pair in
-                let (key, value) = pair
-                prev[key] = value
-            }
-            return JSON(dict)
+            .array(component)
         }
 
     }

@@ -47,7 +47,7 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
 
         let encodable = try DeclSyntax(
             """
-            extension \(raw: name): JBird.JSONEncodable {}
+            extension \(raw: name): JBirdCore.JSONEncodable {}
             """
         )
         .as(ExtensionDeclSyntax.self)
@@ -55,7 +55,7 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
 
         let decodable = try DeclSyntax(
             """
-            extension \(raw: name): JBird.JSONDecodable {}
+            extension \(raw: name): JBirdCore.JSONDecodable {}
             """
         )
         .as(ExtensionDeclSyntax.self)
@@ -193,7 +193,7 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
 
         let encodable = DeclSyntax(
             """
-            @JBird.JSON.ObjectBuilder
+            @JBirdCore.JSON.ObjectBuilder
             public func encodeToJSON() -> JSON {
                 \(raw: encodeItems)
             }

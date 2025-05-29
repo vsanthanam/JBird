@@ -1,5 +1,5 @@
 // JBird
-// JBirdMacrosTests.swift
+// JSONSerializationErrorTests.swift
 //
 // MIT License
 //
@@ -23,56 +23,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Foundation
-import JBirdBuilders
 import JBirdCore
-import JBirdMacros
 import Testing
 
-@JSONCodable
-private struct Foo: Equatable {
+@Test("JSONSerializationError Descriptions")
+func jSONSerializationErrorDescriptions() {
 
-    init(
-        fooBar: Int?,
-        nested: TestNested?,
-        id: String
-    ) {
-        self.fooBar = fooBar
-        self.nested = nested
-        self.id = id
-    }
+    let invalidFloat = JSONSerializationError.invalidFloat
+    #expect(invalidFloat.description == "Invalid floating point value")
 
-    @JSONKey(.snakeCase)
-    let fooBar: Int?
-
-    @OmitIfNil
-    let nested: TestNested?
-
-    let id: String
-
-    @JSONCodable
-    struct TestNested: Equatable {
-
-        init(name: String) {
-            self.name = name
-        }
-
-        let name: String
-
-    }
-
-}
-
-@Test("Test @JSONCodable Sample")
-func jsonCodableSample() throws {
-
-    let model = Foo(fooBar: 12, nested: nil, id: "123")
-    let json = JSON(model)
-    let decoded = try Foo(json: json)
-    #expect(model == decoded)
-    #expect(json == [
-        "foo_bar": 12,
-        "id": "123"
-    ])
+    let illegalFragment = JSONSerializationError.illegalFragment
+    #expect(illegalFragment.description == "Attemped to serialize a JSON fragment without required `fragmentsAllowed` option")
 
 }

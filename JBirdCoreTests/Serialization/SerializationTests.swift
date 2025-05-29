@@ -24,7 +24,7 @@
 // SOFTWARE.
 
 import Foundation
-import JBird
+import JBirdCore
 import Testing
 
 @Suite("Serialization Tests")
