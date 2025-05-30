@@ -6,7 +6,7 @@ plugins:
 - jekyll-remote-theme
 documentation_url: "https://www.usejbird.com/docs/documentation/jbird"
 copyright_owner: "Varun Santhanam"
-social_image: "https://www.usejbird.com/assets/images/social-image.png"
+social_image: "https://www.usejbird.com/assets/images/social-preview.png"
 EOF
 
 echo "✅ _config.yml created."
