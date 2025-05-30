@@ -49,7 +49,7 @@ jobs:
       - name: Xcode Version
         run: ./.scripts/xcode-select
       - name: Build Documentation
-        run: swift package generate-documentation --target JBird
+        run: swift package generate-documentation --enable-experimental-combined-documentation --target JBird --target JBirdMacros
       - name: Locate DocC Archive
         run: cd .build/plugins/Swift-DocC/outputs
       - name: Compress DocC Archive

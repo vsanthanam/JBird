@@ -1,7 +1,10 @@
 #!/bin/bash
 
 swift package --allow-writing-to-directory docs \
-    generate-documentation --target JBird \
+    generate-documentation \
+    --enable-experimental-combined-documentation \
+    --target JBird \
+    --target JBirdMacros \
     --disable-indexing \
     --transform-for-static-hosting \
     --hosting-base-path docs \
