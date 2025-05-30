@@ -24,8 +24,9 @@
 // SOFTWARE.
 
 import Foundation
-import JBird
+import JBirdCore
 import JBirdMacros
+import JBirdBuilders
 import Testing
 
 @JSONCodable

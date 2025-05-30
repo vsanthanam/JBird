@@ -3,8 +3,9 @@
 swift package --allow-writing-to-directory docs \
     generate-documentation \
     --enable-experimental-combined-documentation \
-    --target JBird \
+    --target JBirdCore \
     --target JBirdMacros \
+    --target JBirdBuilders \
     --disable-indexing \
     --transform-for-static-hosting \
     --hosting-base-path docs \

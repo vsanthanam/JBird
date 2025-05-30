@@ -23,7 +23,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import JBirdCore
+
 extension JSON {
+    
+    /// Create a JSON array declaratively
+    /// - Parameter elements: The elements in the array
+    public init(
+        @ArrayBuilder elements: () -> JSON
+    ) {
+        self = elements()
+    }
 
     /// A result builder for JSON arrays
     @resultBuilder

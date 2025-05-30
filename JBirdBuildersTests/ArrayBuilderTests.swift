@@ -24,12 +24,24 @@
 // SOFTWARE.
 
 import Foundation
-import JBird
+import JBirdCore
+import JBirdBuilders
 import Testing
 
 @Suite("ArrayBuilder Tests")
 struct ArrayBuilderTests {
 
+    @Test("Initialize using ArrayBuilder")
+    func arrayBuilderInit() {
+        let json = JSON {
+            "foo"
+            123
+            true
+        }
+
+        #expect(json == ["foo", 123, true])
+    }
+    
     @Test("Element Expression")
     func tupleExpression() {
         let json = JSON {

@@ -23,11 +23,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import JBird
+import JBirdCore
+import JBirdBuilders
 import Testing
 
 @Suite("ObjectBuilder Tests")
 struct ObjectBuilderTests {
+    
+    
+    @Test("Initialize using ObjectBuilder")
+    func objectBuilderInit() {
+        let json = JSON {
+            "foo" => "bar"
+            "baz" => 123
+            "qux" => true
+        }
+
+        #expect(json == ["foo": "bar", "baz": 123, "qux": true])
+    }
 
     @Test("Tuple Expression")
     func tupleExpression() {
