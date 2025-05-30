@@ -1209,13 +1209,3 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
 }
-
-infix operator => : AdditionPrecedence
-public func => (lhs: String, rhs: JSON) -> (String, JSON) {
-    (lhs, rhs)
-}
-
-@_disfavoredOverload
-public func => (lhs: String, rhs: some JSONEncodable) -> (String, JSON) {
-    lhs => JSON(rhs)
-}
