@@ -979,7 +979,6 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
     bool is_double = false;
     double double_value = 0.0;
     int64_t int_value = 0;
-    int digit_count = 0;
     bool integer_overflow = false;
 
     if (json_peek(parser) == '-') {
@@ -994,7 +993,6 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
         return JSON_INVALID_NUMBER;
 
     if (c == '0') {
-        digit_count = 1;
         json_next(parser);
         if (json_has_more(parser) && is_digit(json_peek(parser))) {
             return JSON_INVALID_NUMBER;
@@ -1074,7 +1072,6 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
 
                 for (size_t i = 0; i < digits_to_process; i++) {
                     uint8_t digit = parser->input[parser->index++] - '0';
-                    digit_count++;
 
                     if (!integer_overflow) {
                         int_value = int_value * 10 + digit;
@@ -1090,7 +1087,6 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
 
                     for (size_t i = digits_to_process; i < digit_run_length; i++) {
                         uint8_t digit = parser->input[parser->index++] - '0';
-                        digit_count++;
                         double_value = double_value * 10.0 + (double)digit;
                     }
                 }
@@ -1098,7 +1094,6 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
 
             while (json_has_more(parser) && is_digit(json_peek(parser))) {
                 uint8_t digit = json_next(parser) - '0';
-                digit_count++;
 
                 if (!integer_overflow) {
                     // Check for overflow considering the sign
@@ -1121,7 +1116,6 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
         } else {
             while (json_has_more(parser) && is_digit(json_peek(parser))) {
                 uint8_t digit = json_next(parser) - '0';
-                digit_count++;
 
                 if (!integer_overflow) {
                     // Check for overflow considering the sign

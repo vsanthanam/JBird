@@ -32,7 +32,7 @@ struct ObjectBuilderTests {
     @Test("Tuple Expression")
     func tupleExpression() {
         let json = JSON {
-            ("key", .string("value"))
+            "key" => "value"
         }
         #expect(json == ["key": "value"])
     }
@@ -60,9 +60,9 @@ struct ObjectBuilderTests {
     func conditionalExpression(useFoo: Bool, result: JSON) {
         let json = JSON {
             if useFoo {
-                ("foo", true)
+                "foo" => true
             } else {
-                ("bar", false)
+                "bar" => false
             }
         }
         #expect(json == result)
@@ -72,9 +72,9 @@ struct ObjectBuilderTests {
     func optionalExpression(useFoo: Bool, result: JSON) {
         let json = JSON {
             if useFoo {
-                ("foo", true)
+                "foo" => true
             }
-            ("bar", false)
+            "bar" => false
         }
         #expect(json == result)
     }
@@ -84,7 +84,7 @@ struct ObjectBuilderTests {
         let keys = ["a", "b", "c"]
         let json = JSON {
             for key in keys {
-                (key, key)
+                key => key
             }
         }
         #expect(json == ["a": "a", "b": "b", "c": "c"])
@@ -125,6 +125,39 @@ struct ObjectBuilderTests {
                     ],
                     "tags": ["tag1", "tag2", "tag3"]
                 ])
+            ),
+            (
+                false,
+                false,
+                ["tag1", "tag2", "tag3"],
+                JSON.object([
+                    "id": 123,
+                    "profile": [
+                        "name": "Alice",
+                        "email": "alice@example.com",
+                        "preferences": [
+                            "theme": "light"
+                        ]
+                    ],
+                    "tags": ["tag1", "tag2", "tag3"]
+                ])
+            ),
+            (
+                false,
+                true,
+                ["tag1", "tag2", "tag3"],
+                JSON.object([
+                    "id": 123,
+                    "profile": [
+                        "name": "Alice",
+                        "email": "alice@example.com",
+                        "preferences": [
+                            "theme": "light",
+                            "notifications": true
+                        ]
+                    ],
+                    "tags": ["tag1", "tag2", "tag3"]
+                ])
             )
         ]
     )
@@ -145,7 +178,6 @@ struct ObjectBuilderTests {
                 } else {
                     "theme" => "light"
                 }
-                "theme" => "dark"
                 if hasNotifications {
                     "notifications" => true
                 }

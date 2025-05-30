@@ -104,3 +104,21 @@ extension JSON {
     }
 
 }
+
+/// An infix operator for creating key-value pairs in JSON objects, designed to be used with the `ObjectBuilder`.
+infix operator => : AdditionPrecedence
+public func => (
+    lhs: String,
+    rhs: JSON
+) -> (String, JSON) {
+    (lhs, rhs)
+}
+
+/// An infix operator for creating key-value pairs in JSON objects, designed to be used with the `ObjectBuilder`.
+@_disfavoredOverload
+public func => (
+    lhs: String,
+    rhs: some JSONEncodable
+) -> (String, JSON) {
+    lhs => JSON(rhs)
+}
