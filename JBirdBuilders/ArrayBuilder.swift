@@ -26,7 +26,7 @@
 import JBirdCore
 
 extension JSON {
-    
+
     /// Create a JSON array declaratively
     /// - Parameter elements: The elements in the array
     public init(

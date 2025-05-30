@@ -24,8 +24,8 @@
 // SOFTWARE.
 
 import Foundation
-import JBirdCore
 import JBirdBuilders
+import JBirdCore
 import Testing
 
 @Suite("ArrayBuilder Tests")
@@ -41,7 +41,7 @@ struct ArrayBuilderTests {
 
         #expect(json == ["foo", 123, true])
     }
-    
+
     @Test("Element Expression")
     func tupleExpression() {
         let json = JSON {

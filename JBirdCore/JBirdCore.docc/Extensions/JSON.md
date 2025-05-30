@@ -64,42 +64,11 @@ let steve: JSON = [
 ]
 ```
 
-#### JSON Result Builders
-
-You can also create complex JSON expression declaratively, using the ``ObjectBuilder`` or ``ArrayBuilder`` result builders:
-
-```swift
-let user: JSON = JSON {
-    "id" => 123
-    "profile" => JSON {
-        "name" => "Alice"
-        "email" => "alice@example.com"
-        "preferences" => JSON {
-            if darkTheme {
-                "theme" => "dark"
-            } else {
-                "theme" => "light"
-            }
-            "theme" => "dark"
-            if hasNotifications {
-                "notifications" => true
-            }
-        }
-    }
-    "tags" => JSON {
-        for tag in tags {
-            tag
-        }
-    }
-}
-```
-
 ## Topics
 
 ### Initializers
 
 - ``init(_:)-(JSONEncodable)``
-- ``init(fields:)``
 
 ### Subtypes
 
@@ -213,10 +182,10 @@ let user: JSON = JSON {
 - ``deserialize(_:options:)-(Data,_)``
 - ``deserialize(_:options:)-(String,_)``
 - ``DeserializationOptions``
-- ``withRecursionDepthLimit(_:operation:)-88fw4``
-- ``withRecursionDepthLimit(_:operation:)-5u9iv``
-- ``withInputSizeLimit(_:operation:)-5dvqh``
-- ``withInputSizeLimit(_:operation:)-2oxr5``
+- ``withRecursionDepthLimit(_:operation:)-8riei``
+- ``withRecursionDepthLimit(_:operation:)-9bvap``
+- ``withInputSizeLimit(_:operation:)-2sm2h``
+- ``withInputSizeLimit(_:operation:)-5f6en``
 - ``defaultRecursionDepthLimit``
 - ``defaultInputSizeLimit``
 
@@ -229,11 +198,6 @@ let user: JSON = JSON {
 - ``serialize(_:options:)``
 - ``stringify(_:options:)``
 - ``SerializationOptions``
-
-### Result Builders
-
-- ``ArrayBuilder``
-- ``ObjectBuilder``
 
 ### Literal Expression Support
 

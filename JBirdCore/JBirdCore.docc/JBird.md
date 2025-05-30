@@ -1,4 +1,4 @@
-# ``JBird``
+# ``JBirdCore``
 
 A blazing fast, type-safe library for working with JSON in Swift
 
@@ -27,11 +27,6 @@ A blazing fast, type-safe library for working with JSON in Swift
 - ``JSONCodable``
 - ``JSONLiteralConvertible``
 - ``JSONNumberConvertible``
-
-### Result Builders
-
-- ``JSON/ArrayBuilder``
-- ``JSON/ObjectBuilder``
 
 ### Errors
 
