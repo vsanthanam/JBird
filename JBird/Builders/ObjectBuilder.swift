@@ -36,13 +36,6 @@ extension JSON {
             [expression]
         }
 
-        public static func buildExpression<T>(
-            _ expression: (String, T)
-        ) -> [(String, JSON)] where T: JSONEncodable {
-            let (key, value) = expression
-            return [(key, JSON(value))]
-        }
-
         public static func buildExpression(
             _ expression: [(String, JSON)]
         ) -> [(String, JSON)] {
