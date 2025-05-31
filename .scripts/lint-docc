@@ -10,8 +10,9 @@ output=$(swift package \
     --allow-writing-to-directory "$temp_dir" \
     generate-documentation \
     --enable-experimental-combined-documentation \
-    --target JBird \
+    --target JBirdCore \
     --target JBirdMacros \
+    --target JBirdBuilders \
     --output-path "$temp_dir" \
     --transform-for-static-hosting \
     --hosting-base-path temp-docs 2>&1)

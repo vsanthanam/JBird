@@ -55,22 +55,6 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         self = try JSON.value(for: jsonString)
     }
 
-    /// Create a JSON object declaratively
-    /// - Parameter fields: The fields in the object
-    public init(
-        @ObjectBuilder fields: () -> JSON
-    ) {
-        self = fields()
-    }
-
-    /// Create a JSON array declaratively
-    /// - Parameter elements: The elements in the array
-    public init(
-        @ArrayBuilder elements: () -> JSON
-    ) {
-        self = elements()
-    }
-
     // MARK: - API
 
     /// A JSON literal value

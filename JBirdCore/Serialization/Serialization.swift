@@ -50,7 +50,7 @@ extension JSON {
     /// Subsequent invocations will use the same limit to avoid recalculating it again.
     ///
     /// You can alter this behavior in two ways:
-    /// - By calling ``JSON/withRecursionDepthLimit(_:operation:)-88fw4`` to set a custom limit for the current task
+    /// - By calling ``JSON/withRecursionDepthLimit(_:operation:)-8riei`` to set a custom limit for the current task
     /// - By providing the ``JSON/DeserializationOptions/ignoreRecursionDepthLimit`` option when deserializing JSON
     public static let defaultRecursionDepthLimit: size_t = calculateMaxDepth()
 
@@ -60,7 +60,7 @@ extension JSON {
     /// Subsequent invocations will use the same calculated limit to avoid recalculating it again.
     ///
     /// You can alter this behavior in two ways:
-    /// - By calling ``JSON/withInputSizeLimit(_:operation:)-5dvqh`` to set a custom limit for the current task
+    /// - By calling ``JSON/withInputSizeLimit(_:operation:)-2sm2h`` to set a custom limit for the current task
     /// - By providing the ``JSON/DeserializationOptions/ignoreInputSizeLimit`` option when deserializing JSON
     public static let defaultInputSizeLimit: size_t = calculateMaxInputSize()
 

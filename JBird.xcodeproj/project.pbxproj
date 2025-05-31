@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0789525C2DDAA10000B53A96 /* JBirdParser.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 078952402DDAA08900B53A96 /* JBirdParser.framework */; };
-		0789525D2DDAA10000B53A96 /* JBirdParser.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 078952402DDAA08900B53A96 /* JBirdParser.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		07EDDFED2DEA625100865604 /* JBirdParser.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 078952402DDAA08900B53A96 /* JBirdParser.framework */; };
+		07EDDFEE2DEA625100865604 /* JBirdParser.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 078952402DDAA08900B53A96 /* JBirdParser.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		0789525E2DDAA10000B53A96 /* PBXContainerItemProxy */ = {
+		07EDDFEF2DEA625100865604 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 078951DB2DDAA01700B53A96 /* Project object */;
 			proxyType = 1;
@@ -22,13 +22,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		078952602DDAA10000B53A96 /* Embed Frameworks */ = {
+		07EDDFF12DEA625100865604 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				0789525D2DDAA10000B53A96 /* JBirdParser.framework in Embed Frameworks */,
+				07EDDFEE2DEA625100865604 /* JBirdParser.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -36,8 +36,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		078951E42DDAA01700B53A96 /* JBird.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JBird.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		078952402DDAA08900B53A96 /* JBirdParser.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JBirdParser.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		07EDDF9E2DEA623500865604 /* JBirdCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JBirdCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -51,11 +51,6 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		078951E62DDAA01700B53A96 /* JBird */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = JBird;
-			sourceTree = "<group>";
-		};
 		078952412DDAA08900B53A96 /* JBirdParser */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -64,21 +59,26 @@
 			path = JBirdParser;
 			sourceTree = "<group>";
 		};
+		07EDDF9F2DEA623500865604 /* JBirdCore */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = JBirdCore;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		078951E12DDAA01700B53A96 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				0789525C2DDAA10000B53A96 /* JBirdParser.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		0789523D2DDAA08900B53A96 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		07EDDF9B2DEA623500865604 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				07EDDFED2DEA625100865604 /* JBirdParser.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,8 +88,8 @@
 		078951DA2DDAA01700B53A96 = {
 			isa = PBXGroup;
 			children = (
-				078951E62DDAA01700B53A96 /* JBird */,
 				078952412DDAA08900B53A96 /* JBirdParser */,
+				07EDDF9F2DEA623500865604 /* JBirdCore */,
 				0789525B2DDAA10000B53A96 /* Frameworks */,
 				078951E52DDAA01700B53A96 /* Products */,
 			);
@@ -98,8 +98,8 @@
 		078951E52DDAA01700B53A96 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				078951E42DDAA01700B53A96 /* JBird.framework */,
 				078952402DDAA08900B53A96 /* JBirdParser.framework */,
+				07EDDF9E2DEA623500865604 /* JBirdCore.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -114,14 +114,14 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		078951DF2DDAA01700B53A96 /* Headers */ = {
+		0789523B2DDAA08900B53A96 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		0789523B2DDAA08900B53A96 /* Headers */ = {
+		07EDDF992DEA623500865604 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -131,31 +131,6 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		078951E32DDAA01700B53A96 /* JBird */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 078951F62DDAA01700B53A96 /* Build configuration list for PBXNativeTarget "JBird" */;
-			buildPhases = (
-				078951DF2DDAA01700B53A96 /* Headers */,
-				078951E02DDAA01700B53A96 /* Sources */,
-				078951E12DDAA01700B53A96 /* Frameworks */,
-				078951E22DDAA01700B53A96 /* Resources */,
-				078952602DDAA10000B53A96 /* Embed Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				0789525F2DDAA10000B53A96 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				078951E62DDAA01700B53A96 /* JBird */,
-			);
-			name = JBird;
-			packageProductDependencies = (
-			);
-			productName = JBird;
-			productReference = 078951E42DDAA01700B53A96 /* JBird.framework */;
-			productType = "com.apple.product-type.framework";
-		};
 		0789523F2DDAA08900B53A96 /* JBirdParser */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0789524F2DDAA08900B53A96 /* Build configuration list for PBXNativeTarget "JBirdParser" */;
@@ -179,6 +154,31 @@
 			productReference = 078952402DDAA08900B53A96 /* JBirdParser.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		07EDDF9D2DEA623500865604 /* JBirdCore */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 07EDDFB12DEA623600865604 /* Build configuration list for PBXNativeTarget "JBirdCore" */;
+			buildPhases = (
+				07EDDF992DEA623500865604 /* Headers */,
+				07EDDF9A2DEA623500865604 /* Sources */,
+				07EDDF9B2DEA623500865604 /* Frameworks */,
+				07EDDF9C2DEA623500865604 /* Resources */,
+				07EDDFF12DEA625100865604 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				07EDDFF02DEA625100865604 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				07EDDF9F2DEA623500865604 /* JBirdCore */,
+			);
+			name = JBirdCore;
+			packageProductDependencies = (
+			);
+			productName = JBirdCore;
+			productReference = 07EDDF9E2DEA623500865604 /* JBirdCore.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -189,10 +189,10 @@
 				LastSwiftUpdateCheck = 1630;
 				LastUpgradeCheck = 1630;
 				TargetAttributes = {
-					078951E32DDAA01700B53A96 = {
+					0789523F2DDAA08900B53A96 = {
 						CreatedOnToolsVersion = 16.3;
 					};
-					0789523F2DDAA08900B53A96 = {
+					07EDDF9D2DEA623500865604 = {
 						CreatedOnToolsVersion = 16.3;
 					};
 				};
@@ -211,21 +211,21 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				078951E32DDAA01700B53A96 /* JBird */,
 				0789523F2DDAA08900B53A96 /* JBirdParser */,
+				07EDDF9D2DEA623500865604 /* JBirdCore */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		078951E22DDAA01700B53A96 /* Resources */ = {
+		0789523E2DDAA08900B53A96 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		0789523E2DDAA08900B53A96 /* Resources */ = {
+		07EDDF9C2DEA623500865604 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -235,14 +235,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		078951E02DDAA01700B53A96 /* Sources */ = {
+		0789523C2DDAA08900B53A96 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		0789523C2DDAA08900B53A96 /* Sources */ = {
+		07EDDF9A2DEA623500865604 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -252,10 +252,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		0789525F2DDAA10000B53A96 /* PBXTargetDependency */ = {
+		07EDDFF02DEA625100865604 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 0789523F2DDAA08900B53A96 /* JBirdParser */;
-			targetProxy = 0789525E2DDAA10000B53A96 /* PBXContainerItemProxy */;
+			targetProxy = 07EDDFEF2DEA625100865604 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -382,100 +382,6 @@
 			};
 			name = Release;
 		};
-		078951F72DDAA01700B53A96 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
-				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_MODULE_VERIFIER = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
-					"@executable_path/../Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.0;
-				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
-				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.jbird.JBIrd;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = auto;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator macosx watchos watchsimulator xros xrsimulator";
-				SUPPORTS_MACCATALYST = YES;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_INSTALL_MODULE = YES;
-				SWIFT_INSTALL_OBJC_HEADER = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,3,4,7";
-				TVOS_DEPLOYMENT_TARGET = 16.0;
-				WATCHOS_DEPLOYMENT_TARGET = 9.0;
-				XROS_DEPLOYMENT_TARGET = 1.0;
-			};
-			name = Debug;
-		};
-		078951F82DDAA01700B53A96 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
-				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_MODULE_VERIFIER = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
-					"@executable_path/../Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.0;
-				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
-				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.jbird.JBIrd;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = auto;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator macosx watchos watchsimulator xros xrsimulator";
-				SUPPORTS_MACCATALYST = YES;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_INSTALL_MODULE = YES;
-				SWIFT_INSTALL_OBJC_HEADER = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,3,4,7";
-				TVOS_DEPLOYMENT_TARGET = 16.0;
-				WATCHOS_DEPLOYMENT_TARGET = 9.0;
-				XROS_DEPLOYMENT_TARGET = 1.0;
-			};
-			name = Release;
-		};
 		078952502DDAA08900B53A96 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -505,7 +411,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.jbird.JBIrd;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jbird.JBirdParser;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
@@ -553,7 +459,101 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.jbird.JBIrd;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jbird.JBirdParser;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator macosx watchos watchsimulator xros xrsimulator";
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,3,4,7";
+				TVOS_DEPLOYMENT_TARGET = 16.0;
+				WATCHOS_DEPLOYMENT_TARGET = 9.0;
+				XROS_DEPLOYMENT_TARGET = 1.0;
+			};
+			name = Release;
+		};
+		07EDDFAD2DEA623600865604 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.jbird.JBirdCore;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator macosx watchos watchsimulator xros xrsimulator";
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,3,4,7";
+				TVOS_DEPLOYMENT_TARGET = 16.0;
+				WATCHOS_DEPLOYMENT_TARGET = 9.0;
+				XROS_DEPLOYMENT_TARGET = 1.0;
+			};
+			name = Debug;
+		};
+		07EDDFAE2DEA623600865604 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.jbird.JBirdCore;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
@@ -584,20 +584,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		078951F62DDAA01700B53A96 /* Build configuration list for PBXNativeTarget "JBird" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				078951F72DDAA01700B53A96 /* Debug */,
-				078951F82DDAA01700B53A96 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		0789524F2DDAA08900B53A96 /* Build configuration list for PBXNativeTarget "JBirdParser" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				078952502DDAA08900B53A96 /* Debug */,
 				078952512DDAA08900B53A96 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		07EDDFB12DEA623600865604 /* Build configuration list for PBXNativeTarget "JBirdCore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				07EDDFAD2DEA623600865604 /* Debug */,
+				07EDDFAE2DEA623600865604 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

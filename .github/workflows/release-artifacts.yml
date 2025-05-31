@@ -9,7 +9,7 @@ jobs:
     name: Build XCFramework
     runs-on: macos-15
     outputs:
-        artifact-name: JBird.xcframework.zip
+        artifact-name: JBirdCore.xcframework.zip
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -20,8 +20,8 @@ jobs:
       - name: Upload XCFramework
         uses: actions/upload-artifact@v4
         with:
-          name: JBird.xcframework.zip
-          path: Products/JBird.xcframework.zip
+          name: JBirdCore.xcframework.zip
+          path: Products/JBirdCore.xcframework.zip
   attach-xcframework:
     name: Attach XCFramework to Release
     needs: build-xcframework
@@ -32,12 +32,12 @@ jobs:
       - name: Download XCFramework
         uses: actions/download-artifact@v4
         with:
-          name: JBird.xcframework.zip
+          name: JBirdCore.xcframework.zip
           path: .
       - name: Attach DocC Archive to Release
         uses: softprops/action-gh-release@v1
         with:
-          files: ./JBird.xcframework.zip
+          files: ./JBirdCore.xcframework.zip
   build-docc-archive:
     name: Build DocC Archive
     runs-on: macos-15
@@ -49,7 +49,7 @@ jobs:
       - name: Xcode Version
         run: ./.scripts/xcode-select
       - name: Build Documentation
-        run: swift package generate-documentation --enable-experimental-combined-documentation --target JBird --target JBirdMacros
+        run: swift package generate-documentation --enable-experimental-combined-documentation --target JBirdCore --target JBirdMacros
       - name: Locate DocC Archive
         run: cd .build/plugins/Swift-DocC/outputs
       - name: Compress DocC Archive

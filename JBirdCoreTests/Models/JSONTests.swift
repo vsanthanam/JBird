@@ -24,7 +24,7 @@
 // SOFTWARE.
 
 import Foundation
-import JBird
+import JBirdCore
 import Testing
 
 @Suite("JSON Tests")
@@ -373,28 +373,6 @@ struct JSONTests {
 
     @Suite("Initializer Tests")
     struct InitializerTests {
-
-        @Test("Initialize using ObjectBuilder")
-        func objectBuilderInit() {
-            let json = JSON {
-                ("foo", "bar")
-                ("baz", 123)
-                ("qux", true)
-            }
-
-            #expect(json == ["foo": "bar", "baz": 123, "qux": true])
-        }
-
-        @Test("Initialize using ArrayBuilder")
-        func arrayBuilderInit() {
-            let json = JSON {
-                "foo"
-                123
-                true
-            }
-
-            #expect(json == ["foo", 123, true])
-        }
 
         @Test("Initialize from String")
         func stringInit() throws {
