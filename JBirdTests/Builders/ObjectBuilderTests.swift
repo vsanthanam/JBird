@@ -40,7 +40,7 @@ struct ObjectBuilderTests {
     @Test("Array of Tuples Expression")
     func arrayOfTuplesExpression() {
         let json = JSON {
-            [("foo", .literal(.true)), ("bar", .literal(.false))]
+            [("foo" => .literal(.true)), ("bar" => .literal(.false))]
         }
         #expect(json == ["foo": true, "bar": false])
     }
