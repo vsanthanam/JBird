@@ -10,12 +10,73 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  changes:
+    name: Analyze Changes
+    runs-on: ubuntu-latest
+    outputs:
+      swift: ${{ steps.set.outputs.swift }}
+      c: ${{ steps.set.outputs.c }}
+      yaml: ${{ steps.set.outputs.yaml }}
+      markdown: ${{ steps.set.outputs.markdown }}
+      code: ${{ steps.set.outputs.code }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Get changed files
+        id: changed
+        run: |
+          if [[ "${{ github.event_name }}" != "pull_request" ]]; then
+            echo "swift=true" >> $GITHUB_OUTPUT
+            echo "c=true" >> $GITHUB_OUTPUT
+            echo "yaml=true" >> $GITHUB_OUTPUT
+            echo "markdown=true" >> $GITHUB_OUTPUT
+            echo "code=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          git fetch origin ${{ github.event.pull_request.base.ref }} --depth=1
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }})
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          HAS_SWIFT=false
+          HAS_C=false
+          HAS_YAML=false
+          HAS_MD=false
+          ONLY_MD=true
+
+          for file in $CHANGED_FILES; do
+            [[ "$file" =~ \.swift$ ]] && HAS_SWIFT=true
+            [[ "$file" =~ \.c$ || "$file" =~ \.h$ ]] && HAS_C=true
+            [[ "$file" =~ \.ya?ml$ ]] && HAS_YAML=true
+            [[ "$file" =~ \.md$ ]] && HAS_MD=true
+
+            if [[ ! "$file" =~ \.md$ ]]; then
+              ONLY_MD=false
+            fi
+          done
+
+          echo "swift=$([[ $HAS_SWIFT == true ]] && echo true || echo false)" >> $GITHUB_OUTPUT
+          echo "c=$([[ $HAS_C == true ]] && echo true || echo false)" >> $GITHUB_OUTPUT
+          echo "yaml=$([[ $HAS_YAML == true ]] && echo true || echo false)" >> $GITHUB_OUTPUT
+          echo "markdown=$([[ $HAS_MD == true ]] && echo true || echo false)" >> $GITHUB_OUTPUT
+          echo "code=$([[ $ONLY_MD == true ]] && echo false || echo true)" >> $GITHUB_OUTPUT
+      - name: Set final outputs
+        id: set
+        run: |
+          echo "swift=${{ steps.changed.outputs.swift }}" >> $GITHUB_OUTPUT
+          echo "c=${{ steps.changed.outputs.c }}" >> $GITHUB_OUTPUT
+          echo "yaml=${{ steps.changed.outputs.yaml }}" >> $GITHUB_OUTPUT
+          echo "markdown=${{ steps.changed.outputs.markdown }}" >> $GITHUB_OUTPUT
+          echo "code=${{ steps.changed.outputs.code }}" >> $GITHUB_OUTPUT
   build-xcode:
     strategy:
       matrix:
         platform: [macos, maccatalyst, ios, watchos, tvos, visionos]
         scheme: [JBirdCore, JBirdBuilders]
     name: Build with Xcode (${{ matrix.platform }}, ${{ matrix.scheme }})
+    needs: changes
+    if: ${{ needs.changes.outputs.code == 'true' }}
     runs-on: macos-15
     steps:
     - name: Checkout
@@ -25,7 +86,9 @@ jobs:
     - name: Build JBird
       run: ./.scripts/build-${{ matrix.platform }}-xcode ${{ matrix.scheme }}
   swiftformat:
-    name: Run SwiftFormat
+    name: Run SwiftFormat 
+    needs: changes
+    if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.yaml == 'true' }}
     runs-on: macos-15
     steps:
     - name: Checkout
@@ -36,6 +99,8 @@ jobs:
       run: ./.scripts/lint-swiftformat
   build-macos-spm:
     name: Build JBird (macOS)
+    needs: changes
+    if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
     runs-on: macos-15
     outputs:
       artifact-name: macos-build
@@ -55,7 +120,8 @@ jobs:
         path: build.zip
   test-macos-spm:
     name: Test JBird (macOS)
-    needs: build-macos-spm
+    needs: [build-macos-spm, changes]
+    if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
     runs-on: macos-15
     steps:
       - name: Checkout
@@ -73,6 +139,8 @@ jobs:
         run: swift test
   build-ubuntu-spm:
     name: Build JBird (Ubuntu)
+    needs: changes
+    if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       artifact-name: ubuntu-build
@@ -94,7 +162,8 @@ jobs:
           path: build.zip
   test-ubuntu-spm:
     name: Test JBird (Ubuntu)
-    needs: build-ubuntu-spm
+    needs: [build-ubuntu-spm, changes]
+    if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
     runs-on: ubuntu-latest
     container:
       image: swift:6.1
@@ -114,6 +183,8 @@ jobs:
         run: swift test
   clang-format:
     name: Run clang-format
+    needs: changes
+    if: ${{ needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -128,6 +199,8 @@ jobs:
         run: ./.scripts/lint-clang-format
   lint-docc:
     name: Validate Documentation
+    needs: changes
+    if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.yaml == 'true' || needs.changes.outputs.markdown == 'true' }}
     runs-on: macos-15
     steps:
     - name: Checkout
@@ -141,6 +214,8 @@ jobs:
       matrix:
         target: [JBirdCore, JBirdBuilders]
     name: Build XCFramework (${{ matrix.target }})
+    needs: changes
+    if: ${{ needs.changes.outputs.code == 'true' }}
     runs-on: macos-15
     steps:
     - name: Checkout
