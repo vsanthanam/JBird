@@ -224,3 +224,19 @@ jobs:
       run: ./.scripts/xcode-select
     - name: Build XCFramework
       run: ./.scripts/build-xcframework ${{ matrix.target }}
+  validate-pr:
+    name: Validate Pull Request
+    if: ${{ github.event_name == 'pull_request' }}
+    needs:
+      - build-xcode
+      - build-macos-spm
+      - test-macos-spm
+      - build-ubuntu-spm
+      - test-ubuntu-spm
+      - build-xcframework
+      - swiftformat
+      - clang-format
+      - lint-docc
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "✅ All required jobs completed successfully."
