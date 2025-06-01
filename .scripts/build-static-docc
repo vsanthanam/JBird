@@ -3,10 +3,11 @@
 swift package --allow-writing-to-directory docs \
     generate-documentation \
     --enable-experimental-combined-documentation \
-    --target JBird \
-    --target JBirdCore \
-    --target JBirdBuilders \
-    --target JBirdMacros \
+    --product JBird \
+    --product JBirdCore \
+    --product JBirdBuilders \
+    --product JBirdMacros \
+    --product JBird \
     --disable-indexing \
     --transform-for-static-hosting \
     --hosting-base-path docs \

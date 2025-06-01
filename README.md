@@ -4,7 +4,7 @@
 [![GitHub Release](https://img.shields.io/github/v/release/vsanthanam/JBird?include_prereleases)](https://github.com/vsanthanam/JBird/releases)
 [![Build Status](https://img.shields.io/github/check-runs/vsanthanam/JBird/main)](https://github.com/vsanthanam/JBird/actions)
 [![Swift Version](https://img.shields.io/badge/swift-6.1-critical)](https://swift.org)
-[![Documentation](https://img.shields.io/badge/documentation-GitHub-8A2BE2)](https://usejbird.com/docs/documentation/)
+[![Documentation](https://img.shields.io/badge/documentation-GitHub-8A2BE2)](https://usejbird.com/docs/documentation/jbird)
 
 A blazing fast, type-safe library for working with JSON in Swift
 
@@ -91,14 +91,14 @@ These benchmarks were run on a variety of JSON files ranging from 64KB to 5MB, i
 
 ## Usage & Documentation
 
-JBird's documentation is built with [DocC](https://developer.apple.com/documentation/docc) and included wich each release as a DocC archive. The latest version is hosted on [GitHub Pages](https://pages.github.com) and is available [here](https://usejbird.com/docs/documentation/).
+JBird's documentation is built with [DocC](https://developer.apple.com/documentation/docc) and included wich each release as a DocC archive. The latest version is hosted on [GitHub Pages](https://pages.github.com) and is available [here](https://usejbird.com/docs/documentation/jbird).
 
 Additional information is available on the [Swift Package Index](https://swiftpackageindex.com/vsanthanam/JBird)
 
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fvsanthanam%2FJBird%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/vsanthanam/JBird)
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fvsanthanam%2FJBird%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/vsanthanam/JBird)
 
-Explore [the documentation](https://usejbird.com/docs/documentation/) for more details.
+Explore [the documentation](https://usejbird.com/docs/documentation/jbird) for more details.
 
 ## License
 
