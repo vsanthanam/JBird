@@ -72,9 +72,44 @@ jobs:
   build-xcode:
     strategy:
       matrix:
-        platform: [macos, maccatalyst, ios, watchos, tvos, visionos]
-        scheme: [JBirdCore, JBirdBuilders]
-    name: Build with Xcode (${{ matrix.platform }}, ${{ matrix.scheme }})
+        include:
+          - platform: macos
+            scheme: JBirdCore
+            displayName: macOS, JBirdCore
+          - platform: macos
+            scheme: JBirdBuilders
+            displayName: macOS, JBirdBuilders
+          - platform: maccatalyst
+            scheme: JBirdCore
+            displayName: Catalyst, JBirdCore
+          - platform: maccatalyst
+            scheme: JBirdBuilders
+            displayName: Catalyst, JBirdBuilders
+          - platform: ios
+            scheme: JBirdCore
+            displayName: iOS, JBirdCore
+          - platform: ios
+            scheme: JBirdBuilders
+            displayName: iOS, JBirdBuilders
+          - platform: watchos
+            scheme: JBirdCore
+            displayName: watchOS, JBirdCore
+          - platform: watchos
+            scheme: JBirdBuilders
+            displayName: watchOS, JBirdBuilders
+          - platform: tvos
+            scheme: JBirdCore
+            displayName: tvOS, JBirdCore
+          - platform: tvos
+            scheme: JBirdBuilders
+            displayName: tvOS, JBirdBuilders
+          - platform: visionos
+            scheme: JBirdCore
+            displayName: visionOS, JBirdCore
+          - platform: visionos
+            scheme: JBirdBuilders
+            displayName: visionOS, JBirdBuilders
+    name: Build with Xcode (${{ matrix.displayName }})
     needs: changes
     if: ${{ needs.changes.outputs.code == 'true' }}
     runs-on: macos-15
@@ -212,7 +247,9 @@ jobs:
   build-xcframework:
     strategy:
       matrix:
-        target: [JBirdCore, JBirdBuilders]
+        include:
+          - target: JBirdCore
+          - target: JBirdBuilders
     name: Build XCFramework (${{ matrix.target }})
     needs: changes
     if: ${{ needs.changes.outputs.code == 'true' }}
