@@ -1,7 +1,16 @@
 #!/bin/bash
 set -euo pipefail
 
-FRAMEWORK_NAME="JBird"
+# Check if framework name is provided as first argument
+if [ $# -eq 0 ]; then
+  echo "❌ Error: Framework name is required as the first argument"
+  echo "Usage: $0 <framework_name> [--static] [--platforms \"platform1,platform2,...\"]"
+  exit 1
+fi
+
+FRAMEWORK_NAME="$1"
+shift  # Remove the framework name from the arguments list
+
 OUTPUT_DIR="Products"
 ARCHIVE_DIR="$OUTPUT_DIR/archives"
 XCFRAMEWORK_NAME="$FRAMEWORK_NAME.xcframework"
@@ -29,7 +38,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     *)
       echo "Unknown option: $1"
-      echo "Usage: $0 [--static] [--platforms \"platform1,platform2,...\"]"
+      echo "Usage: $0 <framework_name> [--static] [--platforms \"platform1,platform2,...\"]"
       exit 1
       ;;
   esac

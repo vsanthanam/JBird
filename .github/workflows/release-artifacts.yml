@@ -6,25 +6,31 @@ permissions:
   contents: write
 jobs:
   build-xcframework:
-    name: Build XCFramework
+    strategy:
+      matrix:
+        target: [JBirdCore, JBirdBuilders]
+    name: Build XCFramework (${{ matrix.target }})
     runs-on: macos-15
     outputs:
-        artifact-name: JBird.xcframework.zip
+        artifact-name: ${{ matrix.target }}.xcframework.zip
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Xcode Version
         run: ./.scripts/xcode-select
       - name: Build XCFramework
-        run: ./.scripts/build-xcframework
+        run: ./.scripts/build-xcframework ${{ matrix.target }}
       - name: Upload XCFramework
         uses: actions/upload-artifact@v4
         with:
-          name: JBird.xcframework.zip
-          path: Products/JBird.xcframework.zip
+          name: ${{ matrix.target }}.xcframework.zip
+          path: Products/${{ matrix.target }}.xcframework.zip
   attach-xcframework:
-    name: Attach XCFramework to Release
+    name: Attach XCFramework (${{ matrix.target }})
     needs: build-xcframework
+    strategy:
+      matrix:
+        target: [JBirdCore, JBirdBuilders]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -32,12 +38,12 @@ jobs:
       - name: Download XCFramework
         uses: actions/download-artifact@v4
         with:
-          name: JBird.xcframework.zip
+          name: ${{ matrix.target }}.xcframework.zip
           path: .
-      - name: Attach DocC Archive to Release
+      - name: Attach XCFramework to Release
         uses: softprops/action-gh-release@v1
         with:
-          files: ./JBird.xcframework.zip
+          files: ./${{ matrix.target }}.xcframework.zip
   build-docc-archive:
     name: Build DocC Archive
     runs-on: macos-15
@@ -49,7 +55,7 @@ jobs:
       - name: Xcode Version
         run: ./.scripts/xcode-select
       - name: Build Documentation
-        run: swift package generate-documentation --enable-experimental-combined-documentation --target JBird --target JBirdMacros
+        run: swift package generate-documentation --enable-experimental-combined-documentation --target JBird --target JBirdCore --target JBirdBuilders --target JBirdMacros
       - name: Locate DocC Archive
         run: cd .build/plugins/Swift-DocC/outputs
       - name: Compress DocC Archive

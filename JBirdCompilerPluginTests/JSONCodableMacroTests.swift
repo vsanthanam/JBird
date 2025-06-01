@@ -56,7 +56,7 @@ final class JSONCodableMacroTests: XCTestCase {
 
                     let name: String
 
-                    @JBird.JSON.ObjectBuilder
+                    @JBirdCore.JSON.ObjectBuilder
                     public func encodeToJSON() -> JSON {
                         "name" => name
                     }
@@ -67,10 +67,10 @@ final class JSONCodableMacroTests: XCTestCase {
 
                 }
 
-                extension Foo: JBird.JSONEncodable {
+                extension Foo: JBirdCore.JSONEncodable {
                 }
 
-                extension Foo: JBird.JSONDecodable {
+                extension Foo: JBirdCore.JSONDecodable {
                 }
                 """,
                 macros: testMacros
@@ -99,7 +99,7 @@ final class JSONCodableMacroTests: XCTestCase {
                     @JSONKey("custom_name")
                     let name: String
 
-                    @JBird.JSON.ObjectBuilder
+                    @JBirdCore.JSON.ObjectBuilder
                     public func encodeToJSON() -> JSON {
                         "custom_name" => name
                     }
@@ -110,10 +110,10 @@ final class JSONCodableMacroTests: XCTestCase {
 
                 }
 
-                extension Foo: JBird.JSONEncodable {
+                extension Foo: JBirdCore.JSONEncodable {
                 }
 
-                extension Foo: JBird.JSONDecodable {
+                extension Foo: JBirdCore.JSONDecodable {
                 }
                 """,
                 macros: testMacros
@@ -142,7 +142,7 @@ final class JSONCodableMacroTests: XCTestCase {
                     @JSONKey(.snakeCase)
                     let fooBar: String
 
-                    @JBird.JSON.ObjectBuilder
+                    @JBirdCore.JSON.ObjectBuilder
                     public func encodeToJSON() -> JSON {
                         "foo_bar" => fooBar
                     }
@@ -153,10 +153,10 @@ final class JSONCodableMacroTests: XCTestCase {
 
                 }
 
-                extension Foo: JBird.JSONEncodable {
+                extension Foo: JBirdCore.JSONEncodable {
                 }
 
-                extension Foo: JBird.JSONDecodable {
+                extension Foo: JBirdCore.JSONDecodable {
                 }
                 """,
                 macros: testMacros
@@ -185,7 +185,7 @@ final class JSONCodableMacroTests: XCTestCase {
                     @OmitIfNil
                     let name: String?
 
-                    @JBird.JSON.ObjectBuilder
+                    @JBirdCore.JSON.ObjectBuilder
                     public func encodeToJSON() -> JSON {
                         if let name {
                         "name" => name
@@ -202,10 +202,10 @@ final class JSONCodableMacroTests: XCTestCase {
 
                 }
 
-                extension Foo: JBird.JSONEncodable {
+                extension Foo: JBirdCore.JSONEncodable {
                 }
 
-                extension Foo: JBird.JSONDecodable {
+                extension Foo: JBirdCore.JSONDecodable {
                 }
                 """,
                 macros: testMacros

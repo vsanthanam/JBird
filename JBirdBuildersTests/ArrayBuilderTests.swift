@@ -24,7 +24,8 @@
 // SOFTWARE.
 
 import Foundation
-import JBird
+import JBirdBuilders
+import JBirdCore
 import Testing
 
 @Suite("ArrayBuilder Tests")

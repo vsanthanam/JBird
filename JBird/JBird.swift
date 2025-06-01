@@ -1,5 +1,5 @@
 // JBird
-// JBirdMacrosTests.swift
+// JBird.swift
 //
 // MIT License
 //
@@ -23,56 +23,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Foundation
-import JBirdBuilders
-import JBirdCore
-import JBirdMacros
-import Testing
+@_exported import JBirdBuilders
+@_exported import JBirdCore
+@_exported import JBirdMacros
 
-@JSONCodable
-private struct Foo: Equatable {
-
-    init(
-        fooBar: Int?,
-        nested: TestNested?,
-        id: String
-    ) {
-        self.fooBar = fooBar
-        self.nested = nested
-        self.id = id
-    }
-
-    @JSONKey(.snakeCase)
-    let fooBar: Int?
-
-    @OmitIfNil
-    let nested: TestNested?
-
-    let id: String
-
-    @JSONCodable
-    struct TestNested: Equatable {
-
-        init(name: String) {
-            self.name = name
-        }
-
-        let name: String
-
-    }
-
-}
-
-@Test("Test @JSONCodable Sample")
-func jsonCodableSample() throws {
-
-    let model = Foo(fooBar: 12, nested: nil, id: "123")
-    let json = JSON(model)
-    let decoded = try Foo(json: json)
-    #expect(model == decoded)
-    #expect(json == [
-        "foo_bar": 12,
-        "id": "123"
-    ])
-
-}
+enum JBirdEnum {}

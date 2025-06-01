@@ -14,7 +14,8 @@ jobs:
     strategy:
       matrix:
         platform: [macos, maccatalyst, ios, watchos, tvos, visionos]
-    name: Build JBird with Xcode (${{ matrix.platform }})
+        scheme: [JBirdCore, JBirdBuilders]
+    name: Build with Xcode (${{ matrix.platform }}, ${{ matrix.scheme }})
     runs-on: macos-15
     steps:
     - name: Checkout
@@ -22,7 +23,7 @@ jobs:
     - name: Select Xcode Version
       run: ./.scripts/xcode-select
     - name: Build JBird
-      run: ./.scripts/build-${{ matrix.platform }}-xcode
+      run: ./.scripts/build-${{ matrix.platform }}-xcode ${{ matrix.scheme }}
   swiftformat:
     name: Run SwiftFormat
     runs-on: macos-15
@@ -135,3 +136,16 @@ jobs:
       run: ./.scripts/xcode-select
     - name: Validate Documentation
       run: ./.scripts/lint-docc
+  build-xcframework:
+    strategy:
+      matrix:
+        target: [JBirdCore, JBirdBuilders]
+    name: Build XCFramework (${{ matrix.target }})
+    runs-on: macos-15
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Select Xcode Version
+      run: ./.scripts/xcode-select
+    - name: Build XCFramework
+      run: ./.scripts/build-xcframework ${{ matrix.target }}
