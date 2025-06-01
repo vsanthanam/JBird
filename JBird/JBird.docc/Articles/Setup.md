@@ -52,8 +52,6 @@ To avoid forcing a dependency on [`swift-syntax`](https://github.com/swiftlang/s
 )
 ```
 
-Doing this will add the `@JSONCodable`, `@JSONKey`, and `@OmitIfNil` macros to your project, which can be used automatically add conformance to ``JSONCodable`` to your Swift types. For more information on how to use these macros, see the <doc:Macros>.
-
 ## Binary Distribution via XCFramework
 
 JBird is available as a precompiled XCFramework for macOS, iOS, watchOS, tvOS, and visionOS. You can download an XCFramework for a particular version of JBird from the [GitHub Releases](https://github.com/vsanthanam/JBird/release) page. To build the framework from source, you can clone the repository, and run the built-in script:

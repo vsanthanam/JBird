@@ -23,7 +23,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import JBirdCore
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON {
+
+    /// Create a JSON array declaratively
+    /// - Parameter elements: The elements in the array
+    public init(
+        @ArrayBuilder elements: () -> JSON
+    ) {
+        self = elements()
+    }
 
     /// A result builder for JSON arrays
     @resultBuilder

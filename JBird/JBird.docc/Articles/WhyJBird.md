@@ -88,7 +88,7 @@ var json = try JSON(data)
 try json.setValue(true, forKey: "isVerified")
 ```
 
-The ``JSON`` type also features many collection-like APIs, such as ``JSON/filter(_:)-((JSON)->Bool)``, ``JSON/map(_:)-((JSON)->T)``, ``JSON/isEmpty``, etc., though it is not a true Swift `Collection` due to variadic, unstructured nature of JSON payloads.
+The ``/JBirdCore/JSON`` type also features many collection-like APIs, such as ``/JBirdCore/JSON/filter(_:)-((JSON)->Bool)``, ``/JBirdCore/JSON/map(_:)-((JSON)->T)``, ``/JBirdCore/JSON/isEmpty``, etc., though it is not a true Swift `Collection` due to variadic, unstructured nature of JSON payloads.
 
 #### Blazing Fast Performance
 

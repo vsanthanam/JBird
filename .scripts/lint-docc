@@ -11,6 +11,8 @@ output=$(swift package \
     generate-documentation \
     --enable-experimental-combined-documentation \
     --target JBird \
+    --target JBirdCore \
+    --target JBirdBuilders \
     --target JBirdMacros \
     --output-path "$temp_dir" \
     --transform-for-static-hosting \
