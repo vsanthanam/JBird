@@ -1,4 +1,20 @@
-# ``JBird``
+# Get Started with JBird
 
-A blazing fast, type-safe library for working with JSON in Swift
+Learn the basics and get started with your first project
 
+@Metadata {
+   @TechnologyRoot
+}
+
+## Topics
+
+### Articles
+
+- <doc:WhyJBird>
+- <doc:Setup>
+
+### API Reference
+
+- ``/JBirdCore``
+- ``/JBirdBuilders``
+- ``/JBirdMacros``
