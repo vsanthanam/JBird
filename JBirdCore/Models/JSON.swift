@@ -313,15 +313,6 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         try value(forSubscript: .init(key: key))
     }
 
-    /// Retrieve a value from the JSON object using a specified key
-    /// - Parameter key: A string key to use for lookup
-    /// - Returns: The JSON value at the specified key
-    public func value<Key>(
-        forKey key: Key
-    ) throws -> JSON where Key: RawRepresentable, Key.RawValue: StringProtocol {
-        try value(forKey: key.rawValue)
-    }
-
     /// Retrieve a value from the JSON object using a specified index
     /// - Parameter index: An integer index to use for lookup
     /// - Returns: The JSON value at the specified index
@@ -329,15 +320,6 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         atIndex index: some BinaryInteger
     ) throws -> JSON {
         try value(forSubscript: .init(index: index))
-    }
-
-    /// Retrieve a value from the JSON object using a specified index
-    /// - Parameter index: An integer index to use for lookup
-    /// - Returns: The JSON value at the specified index
-    public func value<Index>(
-        atIndex index: Index
-    ) throws -> JSON where Index: RawRepresentable, Index.RawValue: BinaryInteger {
-        try value(atIndex: index.rawValue)
     }
 
     /// Retrieve a value from the JSON object using a specified subscript
@@ -414,15 +396,6 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         return containsValue(forSubscript: `subscript`)
     }
 
-    /// Check whether a JSON object contains a value for the provided key
-    /// - Parameter key: The key
-    /// - Returns: `true` if the object contains the provided key, `false` if the object does not contain the provided key, or if the JSON value is not an object
-    public func containsValue<Key>(
-        forKey key: Key
-    ) -> Bool where Key: RawRepresentable, Key.RawValue: StringProtocol {
-        containsValue(forKey: key.rawValue)
-    }
-
     /// Check whether a JSON array contains a value for the provided index
     /// - Parameter index: The index
     /// - Returns: `true` if the array contains the provided index, `false` if the object does not contain the provided index, or if the JSON value is not an array
@@ -431,15 +404,6 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ) -> Bool {
         let `subscript` = Subscript(index: index)
         return containsValue(forSubscript: `subscript`)
-    }
-
-    /// Check whether a JSON array contains a value for the provided index
-    /// - Parameter index: The index
-    /// - Returns: `true` if the array contains the provided index, `false` if the object does not contain the provided index, or if the JSON value is not an array
-    public func containsValue<Index>(
-        atIndex index: Index
-    ) -> Bool where Index: RawRepresentable, Index.RawValue: BinaryInteger {
-        containsValue(atIndex: index.rawValue)
     }
 
     /// Check whether a JSON array contains a value for the subscript
@@ -483,17 +447,6 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         try setValue(value, forSubscript: .init(key: key))
     }
 
-    /// Set a value in the JSON object using a specified key
-    /// - Parameters:
-    ///   - value: The JSON value to set
-    ///   - key: A string key to use for lookup
-    public mutating func setValue<Key>(
-        _ value: JSON,
-        forKey key: Key
-    ) throws where Key: RawRepresentable, Key.RawValue: StringProtocol {
-        try setValue(value, forKey: key.rawValue)
-    }
-
     /// Set a value in the JSON object using a specified index
     /// - Parameters:
     ///   - value: The JSON value to set
@@ -503,17 +456,6 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         atIndex index: some BinaryInteger
     ) throws {
         try setValue(value, forSubscript: .init(index: index))
-    }
-
-    /// Set a value in the JSON object using a specified index
-    /// - Parameters:
-    ///   - value: The JSON value to set
-    ///   - index: An integer index to use for lookup
-    public mutating func setValue<Index>(
-        _ value: JSON,
-        atIndex index: Index
-    ) throws where Index: RawRepresentable, Index.RawValue: BinaryInteger {
-        try setValue(value, atIndex: index.rawValue)
     }
 
     /// Set a value in the JSON object using a specified subscript
@@ -770,17 +712,6 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         self = .array(array)
     }
 
-    /// Insert a value into a JSON array at a provided index
-    /// - Parameters:
-    ///   - value: The value to insert
-    ///   - index: The index to use to insert the value
-    public mutating func insert<Index>(
-        _ value: JSON,
-        at index: Index
-    ) throws where Index: RawRepresentable, Index.RawValue: BinaryInteger {
-        try insert(value, at: index.rawValue)
-    }
-
     public mutating func swapAt(
         _ i: some BinaryInteger,
         _ j: some BinaryInteger
@@ -798,13 +729,6 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         self = .array(array)
     }
 
-    public mutating func swapAt<Index>(
-        _ i: Index,
-        _ j: Index
-    ) throws where Index: RawRepresentable, Index.RawValue: BinaryInteger {
-        try swapAt(i.rawValue, j.rawValue)
-    }
-
     /// Remove the value at the provided key from a JSON object
     /// - Parameter key: The key to remove
     public mutating func removeValue(
@@ -814,14 +738,6 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         try removeValue(forSubscript: `subscript`)
     }
 
-    /// Remove the value at the provided key from a JSON object
-    /// - Parameter key: The key to remove
-    public mutating func removeValue<Key>(
-        forKey key: Key
-    ) throws where Key: RawRepresentable, Key.RawValue: StringProtocol {
-        try removeValue(forKey: key.rawValue)
-    }
-
     /// Remove the value at the provided index from a JSON array
     /// - Parameter index: The index to remove
     public mutating func removeValue(
@@ -829,14 +745,6 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ) throws {
         let `subscript` = Subscript(index: index)
         try removeValue(forSubscript: `subscript`)
-    }
-
-    /// Remove the value at the provided index from a JSON array
-    /// - Parameter index: The index to remove
-    public mutating func removeValue<Index>(
-        atIndex index: Index
-    ) throws where Index: RawRepresentable, Index.RawValue: BinaryInteger {
-        try removeValue(atIndex: index.rawValue)
     }
 
     /// Remove the value at the provided subscript
