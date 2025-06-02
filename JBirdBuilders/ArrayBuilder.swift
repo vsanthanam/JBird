@@ -46,6 +46,7 @@ extension JSON {
             [expression]
         }
 
+        @_disfavoredOverload
         public static func buildExpression(
             _ expression: some JSONEncodable
         ) -> [JSON] {
