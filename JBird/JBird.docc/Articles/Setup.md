@@ -39,31 +39,38 @@ Then, add the dependency to your target:
 )
 ```
 
-### Optional Macros
+### Smaller Sub-modules
 
-To avoid forcing a dependency on [`swift-syntax`](https://github.com/swiftlang/swift-syntax), JBird does not include its macros by default. If you wish to include them in your project, you can do so by adding the following to your `Package.swift` file:
+JBird features macros, custom infix operators, and result builders, all of which can add considerably time to your builds. This will be fine for many projects, but if you intentionally do not want the overhead of theses features, you can depend three smaller modules:
+
+- `JBirdCore`, which features the core JBird API
+- `JBirdBuilders`, which features a declarative API for composing JSON values directly in Swift. *This module depends on `JBirdCore`.*
+- `JBirdMacros`, which enables the compiler to automatically implement `JSONCodable` conformance for your custom Swift types. *This module depends on `JBirdCore`, `JBirdBuilders`, and `SwiftSyntax`*
+
+If you depend on `JBird`, you will get all three of these modules automatically, but if you want to depend on them individually, you can use explicitly call out the products that you want to use in your `Package.swift` files:
 
 ```swift
 .target(
     name: "YourTarget",
     dependencies: [
-        .product(name: "JBirdMacros", package: "JBird")
+        .product(name: "JBirdCore", package: "JBird"),
+        .product(name: "JBirdBuilders", package: "JBird")
     ]
 )
 ```
 
 ## Binary Distribution via XCFramework
 
-JBird is available as a precompiled XCFramework for macOS, iOS, watchOS, tvOS, and visionOS. You can download an XCFramework for a particular version of JBird from the [GitHub Releases](https://github.com/vsanthanam/JBird/release) page. To build the framework from source, you can clone the repository, and run the built-in script:
+JBirdCore and JBirdBuilders are available as precompiled XCFrameworks for macOS, iOS, watchOS, tvOS, and visionOS. You can download an XCFramework for a particular version of JBird from the [GitHub Releases](https://github.com/vsanthanam/JBird/release) page. To build the framework from source, you can clone the repository, and run the built-in script:
 
 ```shell
 $ path/to/jbird/repo
-$ ./.scripts/build-xcframework
+$ ./.scripts/build-xcframework JBirdCore
 ```
 
-By default, the script creates a dynamic framework that builds for all Apple platforms. You can force a static framework by using the `--static` flag. You can specifiy specific platforms to include with the `--platforms` flag.
+By default, the script creates a dynamic framework that builds for all supported Apple platforms. You can force a static framework by using the `--static` flag. You can specifiy specific platforms to include with the `--platforms` flag. 
 
-*Note: the XCFramework does not include any of the JBird macros. You must have Xcode and the SDKs of the target platforms installed on your machine.*
+*Note: You can only use the script to build either `JBirdCore` or `JBirdBuilders`. The combined `JBird` module with all APIs is not supported, because Swift macros cannot be distributed via XCFramework*
 
 ## Clone from Source
 
@@ -73,8 +80,7 @@ To add JBird source code directly without any intermediary, you can clone the re
 $ git clone https://github.com/vsanthanam/JBird.git
 ```
 
-From there, you can copy the contents of `JBird` and `JBirdParser` to the destination of your choice. If you want access to the macros, you will also need to copy the contents of `JBirdMacros` and `JBirdCompilerPlugin`. You will also need access to [`swift-syntax`](https://github.com/swiftlang/swift-syntax).
-
+From there, you can copy the contents of `JBirdCore` and `JBirdParser` to the destination of your choice. You can optionally copy the contents of `JBirdBuilders` or `JBirdMacros`, if you want those features as well.
 You can also download a specific version of the package from the [GitHub Releases](https://github.com/vsanthanam/JBird/releases) page, or from the [Swift Package Index](https://swiftpackageindex.com/vsanthanam/JBird).
 
 @Small {

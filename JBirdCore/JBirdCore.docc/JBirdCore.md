@@ -1,6 +1,6 @@
 # ``JBirdCore``
 
-A blazing fast, type-safe library for working with JSON in Swift
+APIs to create, deserialize, manipulate, and serialize JSON data in Swift
 
 ## Topics
 
