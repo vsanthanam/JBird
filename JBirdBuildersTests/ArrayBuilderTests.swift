@@ -31,16 +31,16 @@ import Testing
 @Suite("ArrayBuilder Tests")
 struct ArrayBuilderTests {
 
-    @Test("Element Expression")
-    func tupleExpression() {
+    @Test("JSON Expression")
+    func jsonExpression() {
         let json = JSON {
             .string("foo")
         }
         #expect(json == ["foo"])
     }
 
-    @Test("Array of Elements")
-    func arrayOfTuplesExpression() {
+    @Test("Multiple JSON Elements")
+    func multipleJSONElementsExpression() {
         let json = JSON {
             JSON.string("foo")
             JSON.literal(.null)
