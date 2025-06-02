@@ -47,12 +47,6 @@ extension JSON {
         }
 
         public static func buildExpression(
-            _ expression: [(String, JSON)]
-        ) -> [(String, JSON)] {
-            expression
-        }
-
-        public static func buildExpression(
             _ expression: [String: JSON]
         ) -> [(String, JSON)] {
             expression.map(\.self)
