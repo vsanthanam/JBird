@@ -46,10 +46,12 @@ extension JSON {
             [expression]
         }
 
-        public static func buildExpression(
-            _ expression: [(String, JSON)]
-        ) -> [(String, JSON)] {
-            expression
+        @_disfavoredOverload
+        public static func buildExpression<T>(
+            _ expression: (String, T)
+        ) -> [(String, JSON)] where T: JSONEncodable {
+            let (key, value) = expression
+            return [(key, JSON(value))]
         }
 
         public static func buildExpression(
@@ -119,9 +121,9 @@ public func => (
 
 /// An infix operator for creating key-value pairs in JSON objects, designed to be used with the `ObjectBuilder`.
 @_disfavoredOverload
-public func => (
+public func => <T>(
     lhs: String,
-    rhs: some JSONEncodable
-) -> (String, JSON) {
-    lhs => JSON(rhs)
+    rhs: T
+) -> (String, T) where T: JSONEncodable {
+    (lhs, rhs)
 }

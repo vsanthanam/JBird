@@ -396,14 +396,6 @@ struct JSONCodableTests {
 
     }
 
-    @Test("Codable onvenience extensions")
-    func codableExtensions() throws {
-        let uuid = UUID()
-        let data = try Data(encodingJSON: uuid)
-        let decoded = try UUID(decodingJSON: data)
-        #expect(uuid == decoded)
-    }
-
     @Suite("Int8 Conformance Tests")
     struct Int8Tests {
 

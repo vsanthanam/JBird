@@ -38,14 +38,6 @@ struct ObjectBuilderTests {
         #expect(json == ["key": "value"])
     }
 
-    @Test("Array of Tuples Expression")
-    func arrayOfTuplesExpression() {
-        let json = JSON {
-            [("foo" => .literal(.true)), ("bar" => .literal(.false))]
-        }
-        #expect(json == ["foo": true, "bar": false])
-    }
-
     @Test("Dictionary Expression")
     func dictionaryExpression() {
         let json = JSON(fields: {

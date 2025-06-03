@@ -87,9 +87,12 @@ let scores: [Int] = try json["scores"].decode()
 
 // Custom type conversion
 struct User: JSONCodable {
+
     let name: String
     let age: Int
     let scores: [Int]
+
+    
 }
 
 let user = try json.decode(into: User.self)
