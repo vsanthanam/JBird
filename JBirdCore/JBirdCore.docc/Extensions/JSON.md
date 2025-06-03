@@ -123,14 +123,10 @@ let steve: JSON = [
 
 - ``keys``
 - ``values``
-- ``value(forKey:)-(StringProtocol)``
-- ``value(forKey:)-(Key)``
-- ``containsValue(forKey:)-(StringProtocol)``
-- ``containsValue(forKey:)-(Key)``
-- ``setValue(_:forKey:)-(_,StringProtocol)``
-- ``setValue(_:forKey:)-(_,Key)``
-- ``removeValue(forKey:)-(StringProtocol)``
-- ``removeValue(forKey:)-(Key)``
+- ``value(forKey:)``
+- ``containsValue(forKey:)``
+- ``setValue(_:forKey:)``
+- ``removeValue(forKey:)``
 - ``merge(_:uniquingKeysWith:)``
 - ``merging(_:uniquingKeysWith:)``
 - ``filter(_:)-(([String:JSON].Element)->Bool)``
@@ -147,18 +143,12 @@ let steve: JSON = [
 
 - ``first``
 - ``last``
-- ``value(atIndex:)-(BinaryInteger)``
-- ``value(atIndex:)-(Index)``
-- ``containsValue(atIndex:)-(BinaryInteger)``
-- ``containsValue(atIndex:)-(Index)``
-- ``setValue(_:atIndex:)-(_,BinaryInteger)``
-- ``setValue(_:atIndex:)-(_,Index)``
-- ``removeValue(atIndex:)-(BinaryInteger)``
-- ``removeValue(atIndex:)-(Index)``
-- ``insert(_:at:)-(_,BinaryInteger)``
-- ``insert(_:at:)-(_,Index)``
-- ``swapAt(_:_:)-(BinaryInteger,_)``
-- ``swapAt(_:_:)-(Index,_)`` 
+- ``value(atIndex:)``
+- ``containsValue(atIndex:)``
+- ``setValue(_:atIndex:)``
+- ``removeValue(atIndex:)``
+- ``insert(_:at:)``
+- ``swapAt(_:_:)``
 - ``append(_:)``
 - ``append(contentsOf:)-(JSON)``
 - ``append(contentsOf:)-(Collection<JSON>)``

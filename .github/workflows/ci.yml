@@ -263,7 +263,7 @@ jobs:
       run: ./.scripts/build-xcframework ${{ matrix.target }}
   validate-pr:
     name: Validate Pull Request
-    if: ${{ github.event_name == 'pull_request' }}
+    if: ${{ always() && github.event_name == 'pull_request' }}
     needs:
       - build-xcode
       - build-macos-spm
@@ -276,4 +276,20 @@ jobs:
       - lint-docc
     runs-on: ubuntu-latest
     steps:
-      - run: echo "✅ All required jobs completed successfully."
+      - name: Check upstream jobs
+        run: |
+          # If any job failed, this status will not be 'success'
+          if [[ "${{ needs.build-xcode.result }}" == "failure" ]] || \
+            [[ "${{ needs.build-macos-spm.result }}" == "failure" ]] || \
+            [[ "${{ needs.test-macos-spm.result }}" == "failure" ]] || \
+            [[ "${{ needs.build-ubuntu-spm.result }}" == "failure" ]] || \
+            [[ "${{ needs.test-ubuntu-spm.result }}" == "failure" ]] || \
+            [[ "${{ needs.build-xcframework.result }}" == "failure" ]] || \
+            [[ "${{ needs.swiftformat.result }}" == "failure" ]] || \
+            [[ "${{ needs.clang-format.result }}" == "failure" ]] || \
+            [[ "${{ needs.lint-docc.result }}" == "failure" ]]; then
+            echo "❌ Upstream job failed."
+            exit 1
+          else
+            echo "✅ All required jobs completed successfully."
+          fi

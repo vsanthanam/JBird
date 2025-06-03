@@ -445,15 +445,8 @@ struct JSONTests {
                 "baz": 123
             ]
 
-            enum Keys: String {
-                case foo
-                case baz
-            }
-
             #expect(try json.value(forKey: "foo") == "bar")
             #expect(try json.value(forKey: "baz") == 123)
-            #expect(try json.value(forKey: Keys.foo) == "bar")
-            #expect(try json.value(forKey: Keys.baz) == 123)
             #expect(throws: JSONError.keyNotFound("qux")) {
                 _ = try json.value(forKey: "qux")
             }
@@ -463,18 +456,9 @@ struct JSONTests {
         func valueAtIndex() throws {
             let json: JSON = [1, "bar", true]
 
-            enum Indexes: Int {
-                case first
-                case second
-                case third
-            }
-
             #expect(try json.value(atIndex: 0) == 1)
             #expect(try json.value(atIndex: 1) == "bar")
             #expect(try json.value(atIndex: 2) == true)
-            #expect(try json.value(atIndex: Indexes.first) == 1)
-            #expect(try json.value(atIndex: Indexes.second) == "bar")
-            #expect(try json.value(atIndex: Indexes.third) == true)
             #expect(throws: JSONError.indexOutOfBounds(3)) {
                 _ = try json.value(atIndex: 3)
             }
@@ -512,22 +496,10 @@ struct JSONTests {
             let jsonObject: JSON = ["foo": "bar"]
             let jsonArray: JSON = [1, 2, 3]
 
-            enum Keys: String {
-                case foo
-                case baz
-            }
-
-            enum Indexes: Int {
-                case first = 1
-                case second = 5
-            }
-
             #expect(jsonObject.containsValue(forKey: "foo"))
             #expect(!jsonObject.containsValue(forKey: "baz"))
             #expect(jsonObject.containsValue(forSubscript: .key("foo")))
             #expect(!jsonObject.containsValue(forSubscript: .key("baz")))
-            #expect(jsonObject.containsValue(forKey: Keys.foo))
-            #expect(!jsonObject.containsValue(forKey: Keys.baz))
             #expect(jsonObject.containsValue(forSubscript: "foo"))
             #expect(!jsonObject.containsValue(forSubscript: "baz"))
 
@@ -535,8 +507,6 @@ struct JSONTests {
             #expect(!jsonArray.containsValue(atIndex: 5))
             #expect(jsonArray.containsValue(forSubscript: .index(1)))
             #expect(!jsonArray.containsValue(forSubscript: .index(5)))
-            #expect(jsonArray.containsValue(atIndex: Indexes.first))
-            #expect(!jsonArray.containsValue(atIndex: Indexes.second))
             #expect(jsonArray.containsValue(forSubscript: 1))
             #expect(!jsonArray.containsValue(forSubscript: 5))
 
@@ -553,55 +523,30 @@ struct JSONTests {
         func setValueForKey() throws {
             var json: JSON = ["foo": "bar"]
 
-            enum Keys: String {
-                case key
-                case qux
-            }
-
             try json.setValue("baz", forKey: "qux")
             #expect(json == ["foo": "bar", "qux": "baz"])
-
-            try json.setValue("bar", forKey: Keys.qux)
-            #expect(json == ["foo": "bar", "qux": "bar"])
 
             var nonObjectJson: JSON = "string"
             #expect(throws: JSONError.invalidSubscript(JSON.Subscript("key"))) {
                 try nonObjectJson.setValue("value", forKey: "key")
             }
-            #expect(throws: JSONError.invalidSubscript(JSON.Subscript("key"))) {
-                try nonObjectJson.setValue("value", forKey: Keys.key)
-            }
+
         }
 
         @Test("Set value at index tests")
         func setValueAtIndex() throws {
             var json: JSON = [1, 2, 3]
 
-            enum Indexes: Int {
-                case first = 0
-                case second = 1
-                case third = 5
-            }
-
             try json.setValue(4, atIndex: 1)
             #expect(json == [1, 4, 3])
 
-            try json.setValue(6, atIndex: Indexes.second)
-            #expect(json == [1, 6, 3])
-
             #expect(throws: JSONError.indexOutOfBounds(5)) {
                 try json.setValue(5, atIndex: 5)
-            }
-            #expect(throws: JSONError.indexOutOfBounds(5)) {
-                try json.setValue(5, atIndex: Indexes.third)
             }
 
             var nonArrayJson: JSON = "string"
             #expect(throws: JSONError.invalidSubscript(JSON.Subscript(0))) {
                 try nonArrayJson.setValue("value", atIndex: 0)
-            }
-            #expect(throws: JSONError.invalidSubscript(JSON.Subscript(0))) {
-                try nonArrayJson.setValue("value", atIndex: Indexes.first)
             }
         }
 
@@ -641,9 +586,6 @@ struct JSONTests {
             try json.insert(5, at: 2)
             #expect(json == [1, 2, 5, 3, 4, 1, 2, 3, 4, true])
 
-            try json.insert(3, at: Indexes.first)
-            #expect(json == [3, 1, 2, 5, 3, 4, 1, 2, 3, 4, true])
-
             #expect(throws: JSONError.indexOutOfBounds(11)) {
                 try json.insert(6, at: 11)
             }
@@ -659,14 +601,6 @@ struct JSONTests {
             var jsonObject: JSON = ["foo": 1, "bar": 2, "qux": 3, "quux": 4]
             var jsonArray: JSON = [1, 2, 3, 4]
 
-            enum Keys: String {
-                case quux
-            }
-
-            enum Indexes: Int {
-                case first = 0
-            }
-
             try jsonObject.removeValue(forKey: "foo")
             #expect(jsonObject == ["bar": 2, "qux": 3, "quux": 4])
 
@@ -676,9 +610,6 @@ struct JSONTests {
             try jsonObject.removeValue(forSubscript: "qux")
             #expect(jsonObject == ["quux": 4])
 
-            try jsonObject.removeValue(forKey: Keys.quux)
-            #expect(jsonObject == [:])
-
             try jsonArray.removeValue(atIndex: 3)
             #expect(jsonArray == [1, 2, 3])
 
@@ -687,9 +618,6 @@ struct JSONTests {
 
             try jsonArray.removeValue(forSubscript: 1)
             #expect(jsonArray == [1])
-
-            try jsonArray.removeValue(atIndex: Indexes.first)
-            #expect(jsonArray == [])
 
             #expect(throws: JSONError.keyNotFound("nonexistent")) {
                 try jsonObject.removeValue(forKey: "nonexistent")
@@ -1134,13 +1062,6 @@ struct JSONTests {
     func arrayIndexSwap() throws {
         var array: JSON = [1, 2, 3, 4]
         var object: JSON = ["foo": "bar", "baz": "qux"]
-        enum Index: Int {
-            case zero
-            case one
-            case two
-            case three
-            case four
-        }
 
         try array.swapAt(0, 3)
         #expect(array == [4, 2, 3, 1])
@@ -1151,17 +1072,6 @@ struct JSONTests {
         #expect(throws: JSONError.indexOutOfBounds(4)) {
             try array.swapAt(4, 3)
         }
-
-        try array.swapAt(Index.two, Index.one)
-        #expect(array == [4, 3, 2, 1])
-
-        #expect(throws: JSONError.indexOutOfBounds(4)) {
-            try array.swapAt(Index.two, Index.four)
-        }
-        #expect(throws: JSONError.indexOutOfBounds(4)) {
-            try array.swapAt(Index.four, Index.three)
-        }
-
         #expect(throws: JSONError.illegalArrayConversion) {
             try object.swapAt(0, 1)
         }
