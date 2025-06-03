@@ -23,7 +23,7 @@ To add JBird as a dependency to an existing Swift package, add the following lin
 dependencies: [
     .package(
         url: "https://github.com/vsanthanam/JBird.git",
-        from: "1.0.0"
+        from: "0.0.0"
     )
 ]
 ```
@@ -43,7 +43,7 @@ Then, add the dependency to your target:
 
 JBird features macros, custom infix operators, and result builders, all of which can add considerably time to your builds. This will be fine for many projects, but if you intentionally do not want the overhead of theses features, you can depend three smaller modules:
 
-- `JBirdCore`, which contains the majority of the JBird API surface, but does not contain any result builders, infix operators, or Swift macros.
+- `JBirdCore`, which features the core JBird API
 - `JBirdBuilders`, which features a declarative API for composing JSON values directly in Swift. *This module depends on `JBirdCore`.*
 - `JBirdMacros`, which enables the compiler to automatically implement `JSONCodable` conformance for your custom Swift types. *This module depends on `JBirdCore`, `JBirdBuilders`, and `SwiftSyntax`*
 
