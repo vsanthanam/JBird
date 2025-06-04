@@ -47,6 +47,10 @@ extension JSON {
         }
 
         public static func buildExpression(
+            _ expression: Never
+        ) -> Never {}
+
+        public static func buildExpression(
             _ expression: JSON
         ) -> [JSON] {
             [expression]
@@ -57,6 +61,10 @@ extension JSON {
             _ expression: some JSONEncodable
         ) -> [JSON] {
             [JSON(expression)]
+        }
+
+        public static func buildBlock() -> [JSON] {
+            []
         }
 
         public static func buildBlock(
