@@ -32,7 +32,7 @@ public enum JSONKeyComputationRule {
     case snakeCase
 }
 
-/// A macro that automatically implements ``/JSONCore/JSONCodable`` conformance to the types it annotates
+/// A macro that automatically implements ``/JBirdCore/JSONCodable`` conformance to the types it annotates
 ///
 /// You can only apply this macro to types that meet the following conditions:
 /// - The type must be a `struct`
@@ -82,7 +82,7 @@ public enum JSONKeyComputationRule {
 /// ```
 ///
 /// You can further customize what keys are used to represent stored properties.
-/// See ``@JSONKey(_:)-(JSONKeyComputationRule)``, ``@JSONKey(_:)-(String)``, and ``@OmitIfNil`` for more information.
+/// See ``JBirdMacros/JSONKey(_:)-3i5us``, ``JBirdMacros/JSONKey(_:)-uxxr``, and ``JBirdMacros/OmitIfNil(_:)`` for more information.
 ///
 /// - Note: If you are using this macro as part of `JBirdMacros`, you must also import `JBirdCore` and `JBirdBuilders` for the macro to properly expand.
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
@@ -101,7 +101,7 @@ public macro JSONCodable() = #externalMacro(
 
 /// A macro that allows you to determine how the key for for a stored property of a `@JSONCodable` type is computed.
 ///
-/// This macro enables a stored property in a ``@JSONCodable`` annotated struct to determine what kind of key computation rule is used.
+/// This macro enables a stored property in a ``JBirdMacros/JSONCodable()`` annotated struct to determine what kind of key computation rule is used.
 ///
 /// Example:
 ///
@@ -129,7 +129,7 @@ public macro JSONKey(
 
 /// A macro that allows you to use a custom key name for a stored property of a `@JSONCodable` type.
 ///
-/// This macro enables a stored property in a ``@JSONCodable`` annotated struct to determine what key is used encode the value when it is represented as JSON
+/// This macro enables a stored property in a ``JBirdMacros/JSONCodable()`` annotated struct to determine what key is used encode the value when it is represented as JSON
 ///
 /// Example:
 ///
