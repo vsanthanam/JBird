@@ -7,12 +7,23 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		073E74242DF0FCA4006E469B /* JBirdCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0782A3902DECCDA500CE9465 /* JBirdCore.framework */; };
+		073E74252DF0FCA4006E469B /* JBirdCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0782A3902DECCDA500CE9465 /* JBirdCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		073E74272DF0FCAB006E469B /* JBirdCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0782A3902DECCDA500CE9465 /* JBirdCore.framework */; };
+		073E742A2DF0FCC3006E469B /* JBirdBuilders.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0782A3C32DECCDF600CE9465 /* JBirdBuilders.framework */; };
+		073E742B2DF0FCC3006E469B /* JBirdBuilders.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0782A3C32DECCDF600CE9465 /* JBirdBuilders.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0782A3B92DECCDDB00CE9465 /* JBirdParser.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 078952402DDAA08900B53A96 /* JBirdParser.framework */; };
 		0782A3BA2DECCDDB00CE9465 /* JBirdParser.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 078952402DDAA08900B53A96 /* JBirdParser.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		0782A3CE2DECCE1500CE9465 /* JBirdCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0782A3902DECCDA500CE9465 /* JBirdCore.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		073E742C2DF0FCC3006E469B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 078951DB2DDAA01700B53A96 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0782A3C22DECCDF600CE9465;
+			remoteInfo = JBirdBuilders;
+		};
 		0782A3BB2DECCDDB00CE9465 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 078951DB2DDAA01700B53A96 /* Project object */;
@@ -30,6 +41,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		073E74262DF0FCA4006E469B /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				073E742B2DF0FCC3006E469B /* JBirdBuilders.framework in Embed Frameworks */,
+				073E74252DF0FCA4006E469B /* JBirdCore.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0782A3BD2DECCDDB00CE9465 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -44,6 +67,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		073E740F2DF0FC49006E469B /* JBird.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JBird.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0782A3902DECCDA500CE9465 /* JBirdCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JBirdCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0782A3C32DECCDF600CE9465 /* JBirdBuilders.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JBirdBuilders.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		078952402DDAA08900B53A96 /* JBirdParser.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JBirdParser.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -60,6 +84,12 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		073E74182DF0FC60006E469B /* JBird */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			name = JBird;
+			path = Sources/JBird;
+			sourceTree = "<group>";
+		};
 		07DAD5552DF0E67800A3E6DD /* JBirdCore */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			name = JBirdCore;
@@ -84,6 +114,15 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		073E740C2DF0FC49006E469B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				073E742A2DF0FCC3006E469B /* JBirdBuilders.framework in Frameworks */,
+				073E74242DF0FCA4006E469B /* JBirdCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0782A38D2DECCDA500CE9465 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -96,7 +135,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0782A3CE2DECCE1500CE9465 /* JBirdCore.framework in Frameworks */,
+				073E74272DF0FCAB006E469B /* JBirdCore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -115,6 +154,7 @@
 			children = (
 				0789525B2DDAA10000B53A96 /* Frameworks */,
 				078951E52DDAA01700B53A96 /* Products */,
+				073E74182DF0FC60006E469B /* JBird */,
 				07DAD5552DF0E67800A3E6DD /* JBirdCore */,
 				07DAD56F2DF0E6B800A3E6DD /* JBirdBuilders */,
 				07DAD5692DF0E69E00A3E6DD /* JBirdParser */,
@@ -127,6 +167,7 @@
 				078952402DDAA08900B53A96 /* JBirdParser.framework */,
 				0782A3902DECCDA500CE9465 /* JBirdCore.framework */,
 				0782A3C32DECCDF600CE9465 /* JBirdBuilders.framework */,
+				073E740F2DF0FC49006E469B /* JBird.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -141,6 +182,13 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		073E740A2DF0FC49006E469B /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0782A38B2DECCDA500CE9465 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -165,6 +213,31 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		073E740E2DF0FC49006E469B /* JBird */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 073E74132DF0FC49006E469B /* Build configuration list for PBXNativeTarget "JBird" */;
+			buildPhases = (
+				073E740A2DF0FC49006E469B /* Headers */,
+				073E740B2DF0FC49006E469B /* Sources */,
+				073E740C2DF0FC49006E469B /* Frameworks */,
+				073E740D2DF0FC49006E469B /* Resources */,
+				073E74262DF0FCA4006E469B /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				073E742D2DF0FCC3006E469B /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				073E74182DF0FC60006E469B /* JBird */,
+			);
+			name = JBird;
+			packageProductDependencies = (
+			);
+			productName = JBird;
+			productReference = 073E740F2DF0FC49006E469B /* JBird.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 		0782A38F2DECCDA500CE9465 /* JBirdCore */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0782A3942DECCDA500CE9465 /* Build configuration list for PBXNativeTarget "JBirdCore" */;
@@ -247,6 +320,9 @@
 				LastSwiftUpdateCheck = 1630;
 				LastUpgradeCheck = 1630;
 				TargetAttributes = {
+					073E740E2DF0FC49006E469B = {
+						CreatedOnToolsVersion = 16.3;
+					};
 					0782A38F2DECCDA500CE9465 = {
 						CreatedOnToolsVersion = 16.3;
 					};
@@ -275,11 +351,19 @@
 				0789523F2DDAA08900B53A96 /* JBirdParser */,
 				0782A38F2DECCDA500CE9465 /* JBirdCore */,
 				0782A3C22DECCDF600CE9465 /* JBirdBuilders */,
+				073E740E2DF0FC49006E469B /* JBird */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		073E740D2DF0FC49006E469B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0782A38E2DECCDA500CE9465 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -304,6 +388,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		073E740B2DF0FC49006E469B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0782A38C2DECCDA500CE9465 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -328,6 +419,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		073E742D2DF0FCC3006E469B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0782A3C22DECCDF600CE9465 /* JBirdBuilders */;
+			targetProxy = 073E742C2DF0FCC3006E469B /* PBXContainerItemProxy */;
+		};
 		0782A3BC2DECCDDB00CE9465 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 0789523F2DDAA08900B53A96 /* JBirdParser */;
@@ -341,6 +437,98 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		073E74142DF0FC49006E469B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.jbird.JBird;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator macosx watchos watchsimulator xros xrsimulator";
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,3,4,7";
+				TVOS_DEPLOYMENT_TARGET = 16.0;
+				WATCHOS_DEPLOYMENT_TARGET = 9.0;
+				XROS_DEPLOYMENT_TARGET = 1.0;
+			};
+			name = Debug;
+		};
+		073E74152DF0FC49006E469B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.jbird.JBird;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator macosx watchos watchsimulator xros xrsimulator";
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,3,4,7";
+				TVOS_DEPLOYMENT_TARGET = 16.0;
+				WATCHOS_DEPLOYMENT_TARGET = 9.0;
+				XROS_DEPLOYMENT_TARGET = 1.0;
+			};
+			name = Release;
+		};
 		0782A3952DECCDA500CE9465 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -750,6 +938,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		073E74132DF0FC49006E469B /* Build configuration list for PBXNativeTarget "JBird" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				073E74142DF0FC49006E469B /* Debug */,
+				073E74152DF0FC49006E469B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		0782A3942DECCDA500CE9465 /* Build configuration list for PBXNativeTarget "JBirdCore" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
