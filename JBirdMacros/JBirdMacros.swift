@@ -53,7 +53,7 @@ public enum JSONKeyComputationRule {
 ///
 /// would be expanded to this Swift code:
 ///
-/// ```
+/// ```swift
 /// @JSONCodable struct User {
 ///
 ///     let username: String
