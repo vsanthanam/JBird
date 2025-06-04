@@ -32,6 +32,59 @@ public enum JSONKeyComputationRule {
     case snakeCase
 }
 
+/// A macro that automatically implements ``/JSONCore/JSONCodable`` conformance to the types it annotates
+///
+/// You can only apply this macro to types that meet the following conditions:
+/// - The type must be a `struct`
+/// - The type must only have stored properties that conform  `JSONCodable`.
+///
+/// When applied, this Swift code:
+///
+/// ```swift
+/// @JSONCodable struct User {
+///
+///     let username: String
+///
+///     let age: Int
+///
+///     let tags: [String]
+/// }
+/// ```
+///
+/// would be expanded to this Swift code:
+///
+/// ```
+/// @JSONCodable struct User {
+///
+///     let username: String
+///
+///     let age: Int
+///
+///     let tags: [String]
+///
+///     @JSON.ObjectBuilder
+///     public func encodeToJSON() -> JSON {
+///         "username" => username
+///         "age" => age
+///         "tags" => tags
+///     }
+///
+///     public init(json: JSON) throws {
+///         self.username = try json["username"]
+///         self.age = try json["age"]
+///         self.tags = try json["tags"]
+///     }
+///
+/// }
+///
+/// extension User: JSONEncodable {}
+/// extension User: JSONDecodable {}
+/// ```
+///
+/// You can further customize what keys are used to represent stored properties.
+/// See ``@JSONKey(_:)-(JSONKeyComputationRule)``, ``@JSONKey(_:)-(String)``, and ``@OmitIfNil`` for more information.
+///
+/// - Note: If you are using this macro as part of `JBirdMacros`, you must also import `JBirdCore` and `JBirdBuilders` for the macro to properly expand.
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 @attached(
     extension,
@@ -46,6 +99,25 @@ public macro JSONCodable() = #externalMacro(
     type: "JSONCodableMacro"
 )
 
+/// A macro that allows you to determine how the key for for a stored property of a `@JSONCodable` type is computed.
+///
+/// This macro enables a stored property in a ``@JSONCodable`` annotated struct to determine what kind of key computation rule is used.
+///
+/// Example:
+///
+/// ```swift
+/// @JSONCodable struct User {
+///
+///     @JSONKey(.snakeCase) let firstName: String
+///
+///     @JSONKey(.snakeCase) let lastName: String
+///
+/// }
+/// ```
+///
+/// In this example, the JSON object used to represent instances of `User` will store the `firstName` property using a key called `"first_name"`, and the last `lastName` property using a key called `"last_name"`.
+///
+/// See the ``JSONKeyComputationRule`` enumeration for more information
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 @attached(peer)
 public macro JSONKey(
@@ -55,6 +127,20 @@ public macro JSONKey(
     type: "JSONKeyMacro"
 )
 
+/// A macro that allows you to use a custom key name for a stored property of a `@JSONCodable` type.
+///
+/// This macro enables a stored property in a ``@JSONCodable`` annotated struct to determine what key is used encode the value when it is represented as JSON
+///
+/// Example:
+///
+/// ```swift
+/// @JSONCodable struct User {
+///
+///     @JSONKey("ldap") let name: String
+/// }
+/// ```
+///
+/// In this example, the JSON object used to represent instances of `User` will store the `name` property using a key called `"ldap"`, rather than the default value of `"name"`.
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 @attached(peer)
 public macro JSONKey(
@@ -72,8 +158,11 @@ public macro JSONKey(
 ///
 /// ```swift
 /// @JSONCodable struct User {
+///
 ///     let id: String
+///
 ///     @OmitIfNil var nickname: String?
+///
 /// }
 /// ```
 ///
