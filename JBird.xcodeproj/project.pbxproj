@@ -50,7 +50,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		078952612DDAA12A00B53A96 /* Exceptions for "JBirdParser" folder in "JBirdParser" target */ = {
+		07DAD5732DF0E7CA00A3E6DD /* Exceptions for "JBirdParser" folder in "JBirdParser" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			publicHeaders = (
 				include/JBirdParser.h,
@@ -60,22 +60,25 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		0782A3912DECCDA500CE9465 /* JBirdCore */ = {
+		07DAD5552DF0E67800A3E6DD /* JBirdCore */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = JBirdCore;
+			name = JBirdCore;
+			path = Sources/JBirdCore;
 			sourceTree = "<group>";
 		};
-		0782A3C42DECCDF600CE9465 /* JBirdBuilders */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = JBirdBuilders;
-			sourceTree = "<group>";
-		};
-		078952412DDAA08900B53A96 /* JBirdParser */ = {
+		07DAD5692DF0E69E00A3E6DD /* JBirdParser */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				078952612DDAA12A00B53A96 /* Exceptions for "JBirdParser" folder in "JBirdParser" target */,
+				07DAD5732DF0E7CA00A3E6DD /* Exceptions for "JBirdParser" folder in "JBirdParser" target */,
 			);
-			path = JBirdParser;
+			name = JBirdParser;
+			path = Sources/JBirdParser;
+			sourceTree = "<group>";
+		};
+		07DAD56F2DF0E6B800A3E6DD /* JBirdBuilders */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			name = JBirdBuilders;
+			path = Sources/JBirdBuilders;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -110,11 +113,11 @@
 		078951DA2DDAA01700B53A96 = {
 			isa = PBXGroup;
 			children = (
-				078952412DDAA08900B53A96 /* JBirdParser */,
-				0782A3912DECCDA500CE9465 /* JBirdCore */,
-				0782A3C42DECCDF600CE9465 /* JBirdBuilders */,
 				0789525B2DDAA10000B53A96 /* Frameworks */,
 				078951E52DDAA01700B53A96 /* Products */,
+				07DAD5552DF0E67800A3E6DD /* JBirdCore */,
+				07DAD56F2DF0E6B800A3E6DD /* JBirdBuilders */,
+				07DAD5692DF0E69E00A3E6DD /* JBirdParser */,
 			);
 			sourceTree = "<group>";
 		};
@@ -178,7 +181,7 @@
 				0782A3BC2DECCDDB00CE9465 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				0782A3912DECCDA500CE9465 /* JBirdCore */,
+				07DAD5552DF0E67800A3E6DD /* JBirdCore */,
 			);
 			name = JBirdCore;
 			packageProductDependencies = (
@@ -202,7 +205,7 @@
 				0782A3D12DECCE1500CE9465 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				0782A3C42DECCDF600CE9465 /* JBirdBuilders */,
+				07DAD56F2DF0E6B800A3E6DD /* JBirdBuilders */,
 			);
 			name = JBirdBuilders;
 			packageProductDependencies = (
@@ -225,7 +228,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				078952412DDAA08900B53A96 /* JBirdParser */,
+				07DAD5692DF0E69E00A3E6DD /* JBirdParser */,
 			);
 			name = JBirdParser;
 			packageProductDependencies = (
@@ -677,7 +680,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.jbird.JBIrd;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jbird.JBirdParser;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
@@ -725,7 +728,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.jbird.JBIrd;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jbird.JBirdParser;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;

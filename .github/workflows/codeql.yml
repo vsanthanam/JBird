@@ -103,7 +103,7 @@ jobs:
       name: Build JBirdParser
       shell: bash
       run: |
-        cd JBirdParser && clang -Iinclude -c JBirdParser.c -o JBirdParser.o
+        cd Sources/JBirdParser && clang -Iinclude -c JBirdParser.c -o JBirdParser.o
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
