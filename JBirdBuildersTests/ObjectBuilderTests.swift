@@ -30,6 +30,12 @@ import Testing
 @Suite("ObjectBuilder Tests")
 struct ObjectBuilderTests {
 
+    @Test("Empty Expression")
+    func emptyExpression() {
+        let json = JSON(fields: {})
+        #expect(json == [:])
+    }
+
     @Test("Tuple Expression")
     func tupleExpression() {
         let json = JSON {
