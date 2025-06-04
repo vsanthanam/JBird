@@ -107,7 +107,7 @@ let scores = Array<UInt64>(json: try json["scores"]) // You can also call the in
 You can also convert JSON values into custom Swift types that conform to the `JSONCodable` protocol.
 This allows for automatic encoding and decoding of complex data structures without manual serialization logic.
 
-```
+```swift
 struct User: JSONCodable {
 
     let name: String
