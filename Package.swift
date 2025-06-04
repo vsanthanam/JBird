@@ -66,6 +66,16 @@ let package = Package(
                 .enableUpcomingFeature("StrictConcurrency=complete")
             ]
         ),
+        .testTarget(
+            name: "JBirdTests",
+            dependencies: [
+                "JBird"
+            ],
+            path: "JBirdTests",
+            swiftSettings: [
+                .enableUpcomingFeature("StrictConcurrency=complete")
+            ]
+        ),
         .target(
             name: "JBirdCore",
             dependencies: [
