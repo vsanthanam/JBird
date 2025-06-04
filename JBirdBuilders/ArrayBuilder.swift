@@ -41,6 +41,12 @@ extension JSON {
     public enum ArrayBuilder {
 
         public static func buildExpression(
+            _ expression: Void
+        ) -> [JSON] {
+            []
+        }
+
+        public static func buildExpression(
             _ expression: JSON
         ) -> [JSON] {
             [expression]

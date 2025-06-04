@@ -31,6 +31,12 @@ import Testing
 @Suite("ArrayBuilder Tests")
 struct ArrayBuilderTests {
 
+    @Test("Empty Expression")
+    func emptyExpression() {
+        let json = JSON(elements: {})
+        #expect(json == [])
+    }
+
     @Test("JSON Expression")
     func jsonExpression() {
         let json = JSON {
