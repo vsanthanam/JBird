@@ -310,7 +310,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     public func value(
         forKey key: some StringProtocol
     ) throws -> JSON {
-        try value(forSubscript: .init(key: key))
+        try value(forSubscript: .key(key))
     }
 
     /// Retrieve a value from the JSON object using a specified index
@@ -319,7 +319,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     public func value(
         atIndex index: some BinaryInteger
     ) throws -> JSON {
-        try value(forSubscript: .init(index: index))
+        try value(forSubscript: .index(index))
     }
 
     /// Retrieve a value from the JSON object using a specified subscript
@@ -392,7 +392,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     public func containsValue(
         forKey key: some StringProtocol
     ) -> Bool {
-        let `subscript` = Subscript(key: key)
+        let `subscript` = Subscript.key(key)
         return containsValue(forSubscript: `subscript`)
     }
 
@@ -402,7 +402,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     public func containsValue(
         atIndex index: some BinaryInteger
     ) -> Bool {
-        let `subscript` = Subscript(index: index)
+        let `subscript` = Subscript.index(index)
         return containsValue(forSubscript: `subscript`)
     }
 
@@ -444,7 +444,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         _ value: JSON,
         forKey key: some StringProtocol
     ) throws {
-        try setValue(value, forSubscript: .init(key: key))
+        try setValue(value, forSubscript: .key(key))
     }
 
     /// Set a value in the JSON object using a specified index
@@ -455,7 +455,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         _ value: JSON,
         atIndex index: some BinaryInteger
     ) throws {
-        try setValue(value, forSubscript: .init(index: index))
+        try setValue(value, forSubscript: .index(index))
     }
 
     /// Set a value in the JSON object using a specified subscript
@@ -734,7 +734,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     public mutating func removeValue(
         forKey key: some StringProtocol
     ) throws {
-        let `subscript` = Subscript(key: key)
+        let `subscript` = Subscript.key(key)
         try removeValue(forSubscript: `subscript`)
     }
 
@@ -743,7 +743,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     public mutating func removeValue(
         atIndex index: some BinaryInteger
     ) throws {
-        let `subscript` = Subscript(index: index)
+        let `subscript` = Subscript.index(index)
         try removeValue(forSubscript: `subscript`)
     }
 

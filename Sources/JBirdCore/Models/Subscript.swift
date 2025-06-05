@@ -39,20 +39,20 @@ extension JSON {
             self = convertible.jsonSubscript
         }
 
-        /// Create a subscript from a `StringProtocol`-conforming type
-        /// - Parameter key: The key to convert into a subscript
-        public init(
-            key: some StringProtocol
-        ) {
-            self = .key(.init(key))
+        // MARK: - API
+
+        @_disfavoredOverload
+        public static func key(
+            _ key: some StringProtocol
+        ) -> Subscript {
+            Subscript.key(String(key))
         }
 
-        /// Create a subscript from a `BinaryInteger`-conforming type
-        /// - Parameter index: The index to convert into a subscript
-        public init(
-            index: some BinaryInteger
-        ) {
-            self = .index(.init(index))
+        @_disfavoredOverload
+        public static func index(
+            _ key: some BinaryInteger
+        ) -> Subscript {
+            Subscript.index(Int(key))
         }
 
         // MARK: - Cases
