@@ -47,7 +47,10 @@ jobs:
       - name: Setup Jekyll Configuration
         run: ./.scripts/setup-theme
       - name: Move Website Contents
-        run: mv .web/{*,.[!.]*,..?*} . && rmdir .web
+        run: |
+          shopt -s dotglob nullglob
+          mv .web/* .
+        shell: bash
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Build with Jekyll
