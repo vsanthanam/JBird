@@ -25,6 +25,8 @@
 
 @_exported import JBirdBuilders
 @_exported import JBirdCore
-@_exported import JBirdMacros
+#if SWIFT_PACKAGE
+    @_exported import JBirdMacros
+#endif
 
 enum JBirdEnum {}

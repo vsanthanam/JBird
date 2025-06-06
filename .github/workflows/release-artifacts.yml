@@ -8,7 +8,7 @@ jobs:
   build-xcframework:
     strategy:
       matrix:
-        target: [JBirdCore, JBirdBuilders]
+        target: [JBird, JBirdCore, JBirdBuilders]
     name: Build XCFramework (${{ matrix.target }})
     runs-on: macos-15
     outputs:
@@ -30,7 +30,7 @@ jobs:
     needs: build-xcframework
     strategy:
       matrix:
-        target: [JBirdCore, JBirdBuilders]
+        target: [JBird, JBirdCore, JBirdBuilders]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
