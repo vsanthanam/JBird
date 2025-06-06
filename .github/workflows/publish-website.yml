@@ -45,7 +45,9 @@ jobs:
       - name: Decompress Documentation
         run: unzip docs.zip
       - name: Setup Jekyll Configuration
-        run: ./.scripts/setup-theme 
+        run: ./.scripts/setup-theme
+      - name: Move Website Contents
+        run: mv .web/{*,.[!.]*,..?*} . && rmdir .web
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Build with Jekyll
