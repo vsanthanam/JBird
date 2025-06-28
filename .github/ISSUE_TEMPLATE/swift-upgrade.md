@@ -11,7 +11,7 @@ assignees: vsanthanam
 
 - [ ] Change `swift-tools-version` in `Package.swift`
 - [ ] Make necessary changes to framework source code
-- [ ] If applicable, change `platforms` in `Package.swift
+- [ ] If applicable, change `platforms` in `Package.swift`
 - [ ] If applicable, update `@available` declarations
 - [ ] Update `.swiftformat` to include the correct version of Swift
 - [ ] Update README badges to include accurate platforms, Swift versions
