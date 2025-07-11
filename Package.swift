@@ -50,7 +50,7 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/nicklockwood/SwiftFormat.git",
-            exact: "0.56.2"
+            exact: "0.56.4"
         )
     ],
     targets: [
