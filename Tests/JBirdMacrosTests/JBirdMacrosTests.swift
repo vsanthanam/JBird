@@ -35,11 +35,15 @@ private struct Foo: Equatable {
     init(
         fooBar: Int?,
         nested: TestNested?,
-        id: String
+        id: String,
+        optionalWithoutAnnotation: Int?,
+        nilIfMissing: Double?
     ) {
         self.fooBar = fooBar
         self.nested = nested
         self.id = id
+        self.optionalWithoutAnnotation = optionalWithoutAnnotation
+        self.nilIfMissing = nilIfMissing
     }
 
     @JSONKey(.snakeCase)
@@ -49,6 +53,11 @@ private struct Foo: Equatable {
     let nested: TestNested?
 
     let id: String
+
+    let optionalWithoutAnnotation: Int?
+
+    @OmitIfNil(false)
+    let nilIfMissing: Double?
 
     @JSONCodable
     struct TestNested: Equatable {
@@ -66,13 +75,20 @@ private struct Foo: Equatable {
 @Test("Test @JSONCodable Sample")
 func jsonCodableSample() throws {
 
-    let model = Foo(fooBar: 12, nested: nil, id: "123")
+    let model = Foo(
+        fooBar: 12,
+        nested: nil,
+        id: "123",
+        optionalWithoutAnnotation: nil,
+        nilIfMissing: nil
+    )
     let json = JSON(model)
     let decoded = try Foo(json: json)
     #expect(model == decoded)
     #expect(json == [
         "foo_bar": 12,
-        "id": "123"
+        "id": "123",
+        "nilIfMissing": .null
     ])
 
 }

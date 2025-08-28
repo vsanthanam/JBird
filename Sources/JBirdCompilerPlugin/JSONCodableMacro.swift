@@ -164,7 +164,8 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
                         omitIfNil = true
                     }
                 } else {
-                    omitIfNil = false
+                    // Default behavior: true for optional properties, false for non-optional
+                    omitIfNil = isOptionalType(binding.typeAnnotation?.type)
                 }
 
                 storedProperties += [(name: name, key: key, omitIfNil: omitIfNil)]
@@ -230,6 +231,28 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
     }
 
     // MARK: - Private
+
+    private static func isOptionalType(_ type: TypeSyntax?) -> Bool {
+        guard let type else { return false }
+
+        // Check for Optional<T> syntax
+        if let identifierType = type.as(IdentifierTypeSyntax.self),
+           identifierType.name.text == "Optional" {
+            return true
+        }
+
+        // Check for T? syntax
+        if type.is(OptionalTypeSyntax.self) {
+            return true
+        }
+
+        // Check for T! syntax
+        if type.is(ImplicitlyUnwrappedOptionalTypeSyntax.self) {
+            return true
+        }
+
+        return false
+    }
 
     private static func snakeCase(_ name: String) -> String {
         let regex = Regex {
