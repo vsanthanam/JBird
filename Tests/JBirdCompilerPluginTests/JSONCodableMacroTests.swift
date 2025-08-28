@@ -167,7 +167,53 @@ final class JSONCodableMacroTests: XCTestCase {
 
     }
 
-    func test_omitIfNil() throws {
+    func test_omitIfNil_noAnnotation() throws {
+        #if canImport(JBirdCompilerPlugin)
+            assertMacroExpansion(
+                """
+                @JSONCodable
+                struct Foo {
+
+                    let name: String?
+
+                }
+                """,
+                expandedSource: """
+                struct Foo {
+
+                    let name: String?
+
+                    @JBirdCore.JSON.ObjectBuilder
+                    public func encodeToJSON() -> JSON {
+                        if let name {
+                        "name" => name
+                        }
+                    }
+
+                    public init(json: JSON) throws {
+                        if let name = try? json["name"] {
+                        self.name = try name.decode()
+                        } else {
+                        self.name = nil
+                        }
+                    }
+
+                }
+
+                extension Foo: JBirdCore.JSONEncodable {
+                }
+
+                extension Foo: JBirdCore.JSONDecodable {
+                }
+                """,
+                macros: testMacros
+            )
+        #else
+            throw XCTSkip("macros are only supported when running tests for the host platform")
+        #endif
+    }
+
+    func test_omitIfNil_withAnnotation() throws {
         #if canImport(JBirdCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -198,6 +244,96 @@ final class JSONCodableMacroTests: XCTestCase {
                         } else {
                         self.name = nil
                         }
+                    }
+
+                }
+
+                extension Foo: JBirdCore.JSONEncodable {
+                }
+
+                extension Foo: JBirdCore.JSONDecodable {
+                }
+                """,
+                macros: testMacros
+            )
+        #else
+            throw XCTSkip("macros are only supported when running tests for the host platform")
+        #endif
+    }
+
+    func test_omitIfNil_withAnnotation_true() throws {
+        #if canImport(JBirdCompilerPlugin)
+            assertMacroExpansion(
+                """
+                @JSONCodable(true)
+                struct Foo {
+
+                    @OmitIfNil(true)
+                    let name: String?
+
+                }
+                """,
+                expandedSource: """
+                struct Foo {
+
+                    @OmitIfNil(true)
+                    let name: String?
+
+                    @JBirdCore.JSON.ObjectBuilder
+                    public func encodeToJSON() -> JSON {
+                        if let name {
+                        "name" => name
+                        }
+                    }
+
+                    public init(json: JSON) throws {
+                        if let name = try? json["name"] {
+                        self.name = try name.decode()
+                        } else {
+                        self.name = nil
+                        }
+                    }
+
+                }
+
+                extension Foo: JBirdCore.JSONEncodable {
+                }
+
+                extension Foo: JBirdCore.JSONDecodable {
+                }
+                """,
+                macros: testMacros
+            )
+        #else
+            throw XCTSkip("macros are only supported when running tests for the host platform")
+        #endif
+    }
+
+    func test_omitIfNil_withAnnotation_false() throws {
+        #if canImport(JBirdCompilerPlugin)
+            assertMacroExpansion(
+                """
+                @JSONCodable
+                struct Foo {
+
+                    @OmitIfNil(false)
+                    let name: String?
+
+                }
+                """,
+                expandedSource: """
+                struct Foo {
+
+                    @OmitIfNil(false)
+                    let name: String?
+
+                    @JBirdCore.JSON.ObjectBuilder
+                    public func encodeToJSON() -> JSON {
+                        "name" => name
+                    }
+
+                    public init(json: JSON) throws {
+                        self.name = try json["name"]
                     }
 
                 }
