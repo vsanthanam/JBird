@@ -13,7 +13,7 @@ concurrency:
 jobs:
   build-docc:
     name: Build Documentation
-    runs-on: macos-15
+    runs-on: macos-26
     outputs:
       artifact-name: docs
     steps:

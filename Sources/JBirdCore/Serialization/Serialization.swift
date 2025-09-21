@@ -214,6 +214,7 @@ extension JSON {
     ///   - data: The JSON string
     ///   - options: The deserialization options
     /// - Returns: The typed JSON value
+    @concurrent
     public static func deserialize(
         _ data: Data,
         options: DeserializationOptions = .default
@@ -228,6 +229,7 @@ extension JSON {
     ///   - string: The byte buffer
     ///   - options: The deserialization options
     /// - Returns: The typed JSON value
+    @concurrent
     public static func deserialize(
         _ string: String,
         options: DeserializationOptions = .default
@@ -272,6 +274,7 @@ extension JSON {
     ///   - value: The JSON value to serialize
     ///   - options: The serialization options
     /// - Returns: The byte buffer containing a UTF-8 encoded string representing the provided JSON value
+    @concurrent
     public static func serialize(
         _ value: JSON,
         options: SerializationOptions = .default
@@ -290,6 +293,7 @@ extension JSON {
     ///   - value: The JSON value to serialize
     ///   - options: The serialization options
     /// - Returns: A Swift string representing the provided JSON value
+    @concurrent
     public static func stringify(
         _ value: JSON,
         options: SerializationOptions = .default
@@ -300,7 +304,7 @@ extension JSON {
 
     // MARK: - Private
 
-    @inline(__always)
+    @_transparent
     private static func startSerialization(
         from json: JSON,
         options: SerializationOptions,
@@ -709,7 +713,7 @@ extension JSON {
         return json
     }
 
-    @inline(__always)
+    @_transparent
     private static func parseAsync(
         _ data: Data,
         _ options: DeserializationOptions

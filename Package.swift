@@ -1,4 +1,4 @@
-// swift-tools-version: 6.1
+// swift-tools-version: 6.2
 
 import CompilerPluginSupport
 import PackageDescription
@@ -62,7 +62,8 @@ let package = Package(
                 "JBirdMacros"
             ],
             swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency=complete")
+                .enableUpcomingFeature("StrictConcurrency=complete"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault")
             ]
         ),
         .testTarget(
@@ -71,7 +72,8 @@ let package = Package(
                 "JBird"
             ],
             swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency=complete")
+                .enableUpcomingFeature("StrictConcurrency=complete"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault")
             ]
         ),
         .target(
@@ -80,7 +82,8 @@ let package = Package(
                 "JBirdParser"
             ],
             swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency=complete")
+                .enableUpcomingFeature("StrictConcurrency=complete"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault")
             ]
         ),
         .testTarget(
@@ -90,7 +93,8 @@ let package = Package(
                 "JBirdParser"
             ],
             swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency=complete")
+                .enableUpcomingFeature("StrictConcurrency=complete"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault")
             ]
         ),
         .target(
@@ -103,7 +107,8 @@ let package = Package(
                 "JBirdParser"
             ],
             swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency=complete")
+                .enableUpcomingFeature("StrictConcurrency=complete"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault")
             ]
         ),
         .target(
@@ -112,7 +117,8 @@ let package = Package(
                 "JBirdCore"
             ],
             swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency=complete")
+                .enableUpcomingFeature("StrictConcurrency=complete"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault")
             ]
         ),
         .testTarget(
@@ -122,7 +128,8 @@ let package = Package(
                 "JBirdCore"
             ],
             swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency=complete")
+                .enableUpcomingFeature("StrictConcurrency=complete"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault")
             ]
         ),
         .target(
@@ -133,7 +140,8 @@ let package = Package(
                 "JBirdBuilders"
             ],
             swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency=complete")
+                .enableUpcomingFeature("StrictConcurrency=complete"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault")
             ]
         ),
         .testTarget(
@@ -142,7 +150,8 @@ let package = Package(
                 "JBirdMacros"
             ],
             swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency=complete")
+                .enableUpcomingFeature("StrictConcurrency=complete"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault")
             ]
         ),
         .macro(
@@ -158,7 +167,8 @@ let package = Package(
                 )
             ],
             swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency=complete")
+                .enableUpcomingFeature("StrictConcurrency=complete"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault")
             ]
         ),
         .testTarget(
@@ -171,7 +181,8 @@ let package = Package(
                 )
             ],
             swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency=complete")
+                .enableUpcomingFeature("StrictConcurrency=complete"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault")
             ]
         )
     ],
