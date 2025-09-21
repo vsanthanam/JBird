@@ -27,7 +27,7 @@ let jbird: PackageDescription.Package.Dependency = switch benchmarkTarget {
 case .release:
     .package(
         url: "https://github.com/vsanthanam/JBird.git",
-        from: "1.1.0"
+        from: "1.2.0"
     )
 case .remote:
     .package(
