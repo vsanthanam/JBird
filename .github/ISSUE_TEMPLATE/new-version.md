@@ -12,3 +12,4 @@ assignees: vsanthanam
 - [ ] Update README badges
 - [ ] Update README installation instructions
 - [ ] Update DocC installation instructions
+- [ ] Update reference version in benchmark target's `Package.swift`

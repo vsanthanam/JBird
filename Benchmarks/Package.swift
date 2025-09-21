@@ -27,7 +27,7 @@ let jbird: PackageDescription.Package.Dependency = switch benchmarkTarget {
 case .release:
     .package(
         url: "https://github.com/vsanthanam/JBird.git",
-        from: "1.0.1"
+        from: "1.1.0"
     )
 case .remote:
     .package(
@@ -49,7 +49,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/ordo-one/package-benchmark",
-            from: "1.0.0"
+            exact: "1.29.4"
         ),
         jbird,
         .package(
