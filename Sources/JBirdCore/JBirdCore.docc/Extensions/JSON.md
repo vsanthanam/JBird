@@ -119,7 +119,7 @@ let steve: JSON = [
 - ``subscript(_:as:)-(JSON.Subscript...,_)``
 - ``subscript(_:as:)-(PathComponent,_)``
 
-### Working with JSON objects
+### Working with JSON objects and arrays
 
 - ``keys``
 - ``values``
@@ -130,6 +130,8 @@ let steve: JSON = [
 - ``merge(_:uniquingKeysWith:)``
 - ``merging(_:uniquingKeysWith:)``
 - ``filter(_:)-(([String:JSON].Element)->Bool)``
+- ``filterKeys(_:)``
+- ``filterValues(_:)``
 - ``allSatisfy(_:)-(([String:JSON].Element)->Bool)``
 - ``map(_:)-(([String:JSON].Element)->T)``
 - ``mapValues(_:)``
@@ -138,9 +140,6 @@ let steve: JSON = [
 - ``reduce(into:_:)-(_,(Result,[String:JSON].Element)->Void)``
 - ``reduce(_:_:)-(_,(Result,[String:JSON].Element)->Result)``
 - ``forEach(_:)-(([String:JSON].Element)->Void)``
-
-### Working with JSON arrays
-
 - ``first``
 - ``last``
 - ``value(atIndex:)``
@@ -162,6 +161,7 @@ let steve: JSON = [
 - ``reduce(into:_:)-(_,(Result,JSON)->Void)``
 - ``reduce(_:_:)-(_,(Result,JSON)->Result)``
 - ``forEach(_:)-((JSON)->Void)``
+- ``filterNils()``
 
 ### Deserialization
 

@@ -308,7 +308,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameter key: A string key to use for lookup
     /// - Returns: The JSON value at the specified key
     public func value(
-        forKey key: some StringProtocol
+        forKey key: String
     ) throws -> JSON {
         try value(forSubscript: .key(key))
     }
@@ -317,7 +317,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameter index: An integer index to use for lookup
     /// - Returns: The JSON value at the specified index
     public func value(
-        atIndex index: some BinaryInteger
+        atIndex index: Int
     ) throws -> JSON {
         try value(forSubscript: .index(index))
     }
@@ -390,7 +390,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameter key: The key
     /// - Returns: `true` if the object contains the provided key, `false` if the object does not contain the provided key, or if the JSON value is not an object
     public func containsValue(
-        forKey key: some StringProtocol
+        forKey key: String
     ) -> Bool {
         let `subscript` = Subscript.key(key)
         return containsValue(forSubscript: `subscript`)
@@ -400,7 +400,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameter index: The index
     /// - Returns: `true` if the array contains the provided index, `false` if the object does not contain the provided index, or if the JSON value is not an array
     public func containsValue(
-        atIndex index: some BinaryInteger
+        atIndex index: Int
     ) -> Bool {
         let `subscript` = Subscript.index(index)
         return containsValue(forSubscript: `subscript`)
@@ -442,7 +442,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ///   - key: A string key to use for lookup
     public mutating func setValue(
         _ value: JSON,
-        forKey key: some StringProtocol
+        forKey key: String
     ) throws {
         try setValue(value, forSubscript: .key(key))
     }
@@ -453,7 +453,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ///   - index: An integer index to use for lookup
     public mutating func setValue(
         _ value: JSON,
-        atIndex index: some BinaryInteger
+        atIndex index: Int
     ) throws {
         try setValue(value, forSubscript: .index(index))
     }
@@ -732,7 +732,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Remove the value at the provided key from a JSON object
     /// - Parameter key: The key to remove
     public mutating func removeValue(
-        forKey key: some StringProtocol
+        forKey key: String
     ) throws {
         let `subscript` = Subscript.key(key)
         try removeValue(forSubscript: `subscript`)
@@ -741,7 +741,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Remove the value at the provided index from a JSON array
     /// - Parameter index: The index to remove
     public mutating func removeValue(
-        atIndex index: some BinaryInteger
+        atIndex index: Int
     ) throws {
         let `subscript` = Subscript.index(index)
         try removeValue(forSubscript: `subscript`)
@@ -797,13 +797,35 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         try .object(objectValue.merging(other.objectValue, uniquingKeysWith: combine))
     }
 
-    /// Returns a new JSON object containing the key-value pairs of the object that satisfy the given predicate
+    /// Returns a new JSON object containing the key-value pairs of this object that satisfy the given predicate
     /// - Parameter isIncluded: A closure that takes a key-value pair as its argument and returns a Boolean value indicating whether the pair should be included in the returned JSON object.
     /// - Returns: The filtered JSON object
     public func filter(
         _ isIncluded: (Dictionary<String, JSON>.Element) throws -> Bool
     ) throws -> JSON {
         try .object(objectValue.filter(isIncluded))
+    }
+
+    /// Returns a new JSON object containing the key-value pairs of this object who's keys satisfy the given predicate
+    /// - Parameter isIncluded: A closure that takes a JSON key as its argument and returns a Boolean value indicating whether the key should be included in the returned JSON object.
+    /// - Returns: The filtered JSON object
+    public func filterKeys(
+        _ isIncluded: (String) throws -> Bool
+    ) throws -> JSON {
+        try filter { key, _ in
+            try isIncluded(key)
+        }
+    }
+
+    /// Returns a new JSON object containing the key-value pairs of this object who's values satisfy the given predicate
+    /// - Parameter isIncluded: A closure that takes a JSON object as its argument and returns a Boolean value indicating whether the value should be included in the returned JSON object.
+    /// - Returns: The filtered JSON object
+    public func filterValues(
+        _ isIncluded: (JSON) throws -> Bool
+    ) throws -> JSON {
+        try filter { _, value in
+            try isIncluded(value)
+        }
     }
 
     /// Returns a new JSON value containing the elements of the array that satisfy the given predicate
@@ -813,6 +835,19 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         _ isIncluded: (JSON) throws -> Bool
     ) throws -> JSON {
         try .array(arrayValue.filter(isIncluded))
+    }
+
+    public func filterNils() throws -> JSON {
+        switch self {
+        case .array:
+            try filter { value in value != nil }
+        case .object:
+            try filterValues { value in value != nil }
+        case .number,
+             .literal,
+             .string:
+            throw JSONError.illegalCollectionConversion
+        }
     }
 
     /// Remove the value at the provided subscript

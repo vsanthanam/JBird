@@ -41,7 +41,7 @@ extension JSON {
             self = convertible.jsonLiteral
         }
 
-        // MARK: - Cases
+        // MARK: - API
 
         /// A `true` literal
         case `true`
@@ -51,8 +51,6 @@ extension JSON {
 
         /// A `null` literal
         case null
-
-        // MARK: - API
 
         /// The value as a Swift `bool`
         public var boolValue: Bool {
