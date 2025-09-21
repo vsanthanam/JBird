@@ -249,8 +249,7 @@ extension JSON {
     ) throws -> Data {
         try startSerialization(
             from: json,
-            options: options,
-            isCancellable: false
+            options: options
         )
     }
 
@@ -276,10 +275,8 @@ extension JSON {
         _ value: JSON,
         options: SerializationOptions = .default
     ) async throws -> Data {
-        let json = JSON(value)
-        try Task.checkCancellation()
-        return try startSerializationAsync(
-            from: json,
+        try await startSerializationAsync(
+            from: value,
             options: options
         )
     }
@@ -299,7 +296,6 @@ extension JSON {
 
     // MARK: - Private
 
-    @_transparent
     private static func startSerialization(
         from json: JSON,
         options: SerializationOptions
@@ -329,7 +325,6 @@ extension JSON {
         return Data(bytes)
     }
 
-    @_transparent
     @concurrent
     private static func startSerializationAsync(
         from json: JSON,
@@ -744,7 +739,6 @@ extension JSON {
         return json
     }
 
-    @_transparent
     @concurrent
     private static func parseAsync(
         _ data: Data,
