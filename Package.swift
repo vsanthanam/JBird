@@ -42,11 +42,11 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/swiftlang/swift-syntax.git",
-            exact: "601.0.1"
+            exact: "602.0.0"
         ),
         .package(
             url: "https://github.com/swiftlang/swift-docc-plugin.git",
-            exact: "1.4.3"
+            exact: "1.4.5"
         ),
         .package(
             url: "https://github.com/nicklockwood/SwiftFormat.git",
@@ -62,7 +62,6 @@ let package = Package(
                 "JBirdMacros"
             ],
             swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency=complete"),
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault")
             ]
         ),
@@ -72,7 +71,6 @@ let package = Package(
                 "JBird"
             ],
             swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency=complete"),
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault")
             ]
         ),
@@ -82,7 +80,6 @@ let package = Package(
                 "JBirdParser"
             ],
             swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency=complete"),
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault")
             ]
         ),
@@ -93,7 +90,6 @@ let package = Package(
                 "JBirdParser"
             ],
             swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency=complete"),
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault")
             ]
         ),
@@ -107,7 +103,6 @@ let package = Package(
                 "JBirdParser"
             ],
             swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency=complete"),
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault")
             ]
         ),
@@ -117,7 +112,6 @@ let package = Package(
                 "JBirdCore"
             ],
             swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency=complete"),
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault")
             ]
         ),
@@ -128,7 +122,6 @@ let package = Package(
                 "JBirdCore"
             ],
             swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency=complete"),
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault")
             ]
         ),
@@ -140,7 +133,6 @@ let package = Package(
                 "JBirdBuilders"
             ],
             swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency=complete"),
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault")
             ]
         ),
@@ -150,7 +142,6 @@ let package = Package(
                 "JBirdMacros"
             ],
             swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency=complete"),
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault")
             ]
         ),
@@ -167,7 +158,6 @@ let package = Package(
                 )
             ],
             swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency=complete"),
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault")
             ]
         ),
@@ -181,10 +171,10 @@ let package = Package(
                 )
             ],
             swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency=complete"),
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault")
             ]
         )
     ],
+    swiftLanguageModes: [.v6],
     cLanguageStandard: .c11
 )

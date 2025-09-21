@@ -59,16 +59,16 @@ private struct Foo: Equatable {
     @OmitIfNil(false)
     let nilIfMissing: Double?
 
-    @JSONCodable
-    struct TestNested: Equatable {
+}
 
-        init(name: String) {
-            self.name = name
-        }
+@JSONCodable
+struct TestNested: Equatable {
 
-        let name: String
-
+    init(name: String) {
+        self.name = name
     }
+
+    let name: String
 
 }
 
