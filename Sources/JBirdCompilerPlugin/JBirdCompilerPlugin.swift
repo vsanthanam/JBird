@@ -31,7 +31,7 @@ import SwiftSyntaxMacros
 @main
 struct JBirdCompilerPlugin: CompilerPlugin {
 
-    let providingMacros: [Macro.Type] = [
+    let providingMacros: [any Macro.Type] = [
         JSONCodableMacro.self,
         JSONKeyMacro.self,
         OmitIfNilMacro.self
