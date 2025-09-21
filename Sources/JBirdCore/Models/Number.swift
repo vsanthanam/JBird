@@ -39,13 +39,11 @@ extension JSON {
             self = convertible.jsonNumber
         }
 
-        // MARK: - Cases
+        // MARK: - API
 
         case int(Int)
 
         case double(Double)
-
-        // MARK: - API
 
         /// The number value as a Swift integer
         public var intValue: Int {

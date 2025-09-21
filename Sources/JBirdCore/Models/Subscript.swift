@@ -41,22 +41,6 @@ extension JSON {
 
         // MARK: - API
 
-        @_disfavoredOverload
-        public static func key(
-            _ key: some StringProtocol
-        ) -> Subscript {
-            Subscript.key(String(key))
-        }
-
-        @_disfavoredOverload
-        public static func index(
-            _ key: some BinaryInteger
-        ) -> Subscript {
-            Subscript.index(Int(key))
-        }
-
-        // MARK: - Cases
-
         /// A key subscript
         case key(String)
 

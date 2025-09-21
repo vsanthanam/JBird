@@ -29,20 +29,6 @@ import Testing
 @Suite("Subscript Tests")
 struct SubscriptTests {
 
-    @Test("StringProtocol Type Method")
-    func stringProtocolTypeMethod() {
-        let str: Substring = "foo"
-        let key = JSON.Subscript.key(str)
-        #expect(key == .key("foo"))
-    }
-
-    @Test("BinaryInteger Type Method")
-    func binaryIntegerTypeMethod() {
-        let int: UInt32 = 12
-        let index = JSON.Subscript.index(int)
-        #expect(index == .index(12))
-    }
-
     @Test("SubscriptConvertibleInit")
     func subscriptConvertibleInit() {
         let key = JSON.Subscript("foo")
