@@ -214,7 +214,6 @@ extension JSON {
     ///   - data: The JSON string
     ///   - options: The deserialization options
     /// - Returns: The typed JSON value
-    @concurrent
     public static func deserialize(
         _ data: Data,
         options: DeserializationOptions = .default
@@ -229,7 +228,6 @@ extension JSON {
     ///   - string: The byte buffer
     ///   - options: The deserialization options
     /// - Returns: The typed JSON value
-    @concurrent
     public static func deserialize(
         _ string: String,
         options: DeserializationOptions = .default
@@ -274,17 +272,15 @@ extension JSON {
     ///   - value: The JSON value to serialize
     ///   - options: The serialization options
     /// - Returns: The byte buffer containing a UTF-8 encoded string representing the provided JSON value
-    @concurrent
     public static func serialize(
         _ value: JSON,
         options: SerializationOptions = .default
     ) async throws -> Data {
         let json = JSON(value)
         try Task.checkCancellation()
-        return try startSerialization(
+        return try startSerializationAsync(
             from: json,
-            options: options,
-            isCancellable: true
+            options: options
         )
     }
 
@@ -293,7 +289,6 @@ extension JSON {
     ///   - value: The JSON value to serialize
     ///   - options: The serialization options
     /// - Returns: A Swift string representing the provided JSON value
-    @concurrent
     public static func stringify(
         _ value: JSON,
         options: SerializationOptions = .default
@@ -307,8 +302,7 @@ extension JSON {
     @_transparent
     private static func startSerialization(
         from json: JSON,
-        options: SerializationOptions,
-        isCancellable: Bool
+        options: SerializationOptions
     ) throws -> Data {
         if !options.contains(.fragmentsAllowed) {
             switch json {
@@ -325,7 +319,44 @@ extension JSON {
         if options.contains(.includeByteOrderMark) {
             serializeBOM(into: &bytes)
         }
-        try serialize(json: json, into: &bytes, level: options.contains(.prettyPrinted) ? 0 : nil, options: options, isCancellable: isCancellable)
+        try serialize(
+            json: json,
+            into: &bytes,
+            level: options.contains(.prettyPrinted) ? 0 : nil,
+            options: options,
+            isCancellable: false
+        )
+        return Data(bytes)
+    }
+
+    @_transparent
+    @concurrent
+    private static func startSerializationAsync(
+        from json: JSON,
+        options: SerializationOptions
+    ) async throws -> Data {
+        if !options.contains(.fragmentsAllowed) {
+            switch json {
+            case .literal, .number, .string:
+                throw JSONSerializationError.illegalFragment
+            case .array, .object:
+                break
+            }
+        }
+        if options.contains(.omitNullValues), json.isNull {
+            throw JSONSerializationError.illegalFragment
+        }
+        var bytes = [UInt8]()
+        if options.contains(.includeByteOrderMark) {
+            serializeBOM(into: &bytes)
+        }
+        try serialize(
+            json: json,
+            into: &bytes,
+            level: options.contains(.prettyPrinted) ? 0 : nil,
+            options: options,
+            isCancellable: true
+        )
         return Data(bytes)
     }
 
@@ -714,6 +745,7 @@ extension JSON {
     }
 
     @_transparent
+    @concurrent
     private static func parseAsync(
         _ data: Data,
         _ options: DeserializationOptions
