@@ -843,6 +843,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ///   - shouldOverwrite: Whether or not existing content should be overwritten
     @available(macOS 13.0, macCatalyst 16.0, *)
     @discardableResult
+    @concurrent
     public func write(
         fileURL: URL,
         options: JSON.SerializationOptions = .default,

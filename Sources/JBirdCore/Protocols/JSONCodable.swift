@@ -147,7 +147,7 @@ extension String: JSONCodable {
 extension Array: JSONEncodable where Element: JSONEncodable {
 
     public func encodeToJSON() -> JSON {
-        .array(map(JSON.init))
+        .array(map { element in JSON(element) })
     }
 
 }
@@ -165,7 +165,7 @@ extension Array: JSONDecodable where Element: JSONDecodable {
 extension Dictionary: JSONEncodable where Key == String, Value: JSONEncodable {
 
     public func encodeToJSON() -> JSON {
-        .object(mapValues(JSON.init))
+        .object(mapValues { value in JSON(value) })
     }
 
 }
@@ -232,7 +232,7 @@ extension Optional: JSONDecodable where Wrapped: JSONDecodable {
 extension Set: JSONEncodable where Element: JSONEncodable {
 
     public func encodeToJSON() -> JSON {
-        .array(map(JSON.init))
+        .array(map { element in JSON(element) })
     }
 
 }

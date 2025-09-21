@@ -173,9 +173,9 @@ let steve: JSON = [
 - ``deserialize(_:options:)-(String,_)``
 - ``DeserializationOptions``
 - ``withRecursionDepthLimit(_:operation:)-8riei``
-- ``withRecursionDepthLimit(_:operation:)-9bvap``
+- ``withRecursionDepthLimit(_:operation:)-9u6jf``
 - ``withInputSizeLimit(_:operation:)-2sm2h``
-- ``withInputSizeLimit(_:operation:)-5f6en``
+- ``withInputSizeLimit(_:operation:)-7cgom``
 - ``defaultRecursionDepthLimit``
 - ``defaultInputSizeLimit``
 

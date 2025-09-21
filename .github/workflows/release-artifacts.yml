@@ -10,7 +10,7 @@ jobs:
       matrix:
         target: [JBird, JBirdCore, JBirdBuilders]
     name: Build XCFramework (${{ matrix.target }})
-    runs-on: macos-15
+    runs-on: macos-26
     outputs:
         artifact-name: ${{ matrix.target }}.xcframework.zip
     steps:
@@ -46,7 +46,7 @@ jobs:
           files: ./${{ matrix.target }}.xcframework.zip
   build-docc-archive:
     name: Build DocC Archive
-    runs-on: macos-15
+    runs-on: macos-26
     outputs:
       artifact-name: archive
     steps:
