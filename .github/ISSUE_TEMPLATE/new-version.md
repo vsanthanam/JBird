@@ -13,3 +13,4 @@ assignees: vsanthanam
 - [ ] Update README installation instructions
 - [ ] Update DocC installation instructions
 - [ ] Update reference version in benchmark target's `Package.swift`
+- [ ] Re-run benchmarks
