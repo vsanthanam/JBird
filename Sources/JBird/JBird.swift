@@ -23,9 +23,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-@_exported import JBirdBuilders
-@_exported import JBirdCore
-#if SWIFT_PACKAGE
+#if canImport(JBirdBuilders)
+    @_exported import JBirdBuilders
+#endif
+
+#if canImport(JBirdCore)
+    @_exported import JBirdCore
+#endif
+
+#if canImport(JBirdMacros)
     @_exported import JBirdMacros
 #endif
 
