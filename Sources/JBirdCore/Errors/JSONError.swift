@@ -79,8 +79,6 @@ public enum JSONError: Error, Equatable, Sendable, CustomStringConvertible {
     /// Thrown when a UUID cannot be decoded from a JSON string
     case uuidDecodingFailure(String)
 
-    case illegalAddition
-
     // MARK: - CustomStringConvertible
 
     public var description: String {
@@ -117,8 +115,6 @@ public enum JSONError: Error, Equatable, Sendable, CustomStringConvertible {
             "Cannot decode URL from '\(string)'"
         case let .uuidDecodingFailure(string):
             "Cannot decode UUID from '\(string)'"
-        case .illegalAddition:
-            "Illegal addition of JSON values"
         }
     }
 
