@@ -99,16 +99,19 @@ jobs:
       run: ./.scripts/lint-swiftformat
   build-macos-spm:
     name: Build JBird (macOS)
+    strategy:
+      matrix:
+        swift: [6.1, 6.2]
     needs: changes
     if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
-    runs-on: macos-26
+    runs-on: ${{ matrix.swift == '6.1' && 'macos-15' || 'macos-26' }}
     outputs:
       artifact-name: macos-build
     steps:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Select Xcode Version
-      run: ./.scripts/xcode-select
+      run: ./.scripts/xcode-select ${{ matrix.swift == '6.1' && '16.4' || '26.0' }}
     - name: Build JBird
       run: swift build -v --build-path .build
     - name: Compress Build
@@ -116,22 +119,25 @@ jobs:
     - name: Upload Build
       uses: actions/upload-artifact@v4
       with:
-        name: macos-build
+        name: macos-build-${{ matrix.swift }}
         path: build.zip
   test-macos-spm:
     name: Test JBird (macOS)
+    strategy:
+      matrix:
+        swift: [6.1, 6.2]
     needs: [build-macos-spm, changes]
     if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
-    runs-on: macos-26
+    runs-on: ${{ matrix.swift == '6.1' && 'macos-15' || 'macos-26' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Xcode Version
-        run: ./.scripts/xcode-select
+        run: ./.scripts/xcode-select ${{ matrix.swift == '6.1' && '16.4' || '26.0' }}
       - name: Download Build
         uses: actions/download-artifact@v4
         with:
-          name: macos-build
+          name: macos-build-${{ matrix.swift }}
           path: .
       - name: Decompress Build
         run: unzip build.zip
@@ -139,13 +145,16 @@ jobs:
         run: swift test
   build-ubuntu-spm:
     name: Build JBird (Ubuntu)
+    strategy:
+      matrix:
+        swift: [6.1, 6.2]
     needs: changes
     if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       artifact-name: ubuntu-build
     container:
-      image: swift:6.2
+      image: swift:${{ matrix.swift }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -158,22 +167,25 @@ jobs:
       - name: Upload Build
         uses: actions/upload-artifact@v4
         with:
-          name: ubuntu-build
+          name: ubuntu-build-${{ matrix.swift }}
           path: build.zip
   test-ubuntu-spm:
     name: Test JBird (Ubuntu)
+    strategy:
+      matrix:
+        swift: [6.1, 6.2]
     needs: [build-ubuntu-spm, changes]
     if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
     runs-on: ubuntu-latest
     container:
-      image: swift:6.2
+      image: swift:${{ matrix.swift }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Download Build
         uses: actions/download-artifact@v4
         with:
-          name: ubuntu-build
+          name: ubuntu-build-${{ matrix.swift }}
           path: .
       - name: Install `unzip`
         run: apt-get update && apt-get install -y unzip

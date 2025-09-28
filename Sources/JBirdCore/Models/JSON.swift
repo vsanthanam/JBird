@@ -871,33 +871,62 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         try JSON.string(from: self)
     }
 
-    /// Write the JSON model to disk
-    /// - Parameters:
-    ///   - fileURL: The file URL to write to
-    ///   - options: Serialization options to use when writing the JSON model to disk
-    ///   - shouldOverwrite: Whether or not existing content should be overwritten
-    @available(macOS 13.0, macCatalyst 16.0, *)
-    @discardableResult
-    @concurrent
-    public func write(
-        fileURL: URL,
-        options: JSON.SerializationOptions = .default,
-        shouldOverwrite: Bool = false
-    ) async throws -> Data {
-        if FileManager.default.fileExists(atPath: fileURL.path()) {
-            if shouldOverwrite {
-                try FileManager.default.removeItem(at: fileURL)
-                try Task.checkCancellation()
-            } else {
-                throw JSONError.fileExists(fileURL)
+    #if swift(>=6.2)
+        /// Write the JSON model to disk
+        /// - Parameters:
+        ///   - fileURL: The file URL to write to
+        ///   - options: Serialization options to use when writing the JSON model to disk
+        ///   - shouldOverwrite: Whether or not existing content should be overwritten
+        @available(macOS 13.0, macCatalyst 16.0, *)
+        @discardableResult
+        @concurrent
+        public func write(
+            fileURL: URL,
+            options: JSON.SerializationOptions = .default,
+            shouldOverwrite: Bool = false
+        ) async throws -> Data {
+            if FileManager.default.fileExists(atPath: fileURL.path()) {
+                if shouldOverwrite {
+                    try FileManager.default.removeItem(at: fileURL)
+                    try Task.checkCancellation()
+                } else {
+                    throw JSONError.fileExists(fileURL)
+                }
             }
-        }
 
-        let data = try await JSON.serialize(self, options: options)
-        try data.write(to: fileURL, options: .withoutOverwriting)
-        try Task.checkCancellation()
-        return data
-    }
+            let data = try await JSON.serialize(self, options: options)
+            try data.write(to: fileURL, options: .withoutOverwriting)
+            try Task.checkCancellation()
+            return data
+        }
+    #else
+        /// Write the JSON model to disk
+        /// - Parameters:
+        ///   - fileURL: The file URL to write to
+        ///   - options: Serialization options to use when writing the JSON model to disk
+        ///   - shouldOverwrite: Whether or not existing content should be overwritten
+        @available(macOS 13.0, macCatalyst 16.0, *)
+        @discardableResult
+        public func write(
+            fileURL: URL,
+            options: JSON.SerializationOptions = .default,
+            shouldOverwrite: Bool = false
+        ) async throws -> Data {
+            if FileManager.default.fileExists(atPath: fileURL.path()) {
+                if shouldOverwrite {
+                    try FileManager.default.removeItem(at: fileURL)
+                    try Task.checkCancellation()
+                } else {
+                    throw JSONError.fileExists(fileURL)
+                }
+            }
+
+            let data = try await JSON.serialize(self, options: options)
+            try data.write(to: fileURL, options: .withoutOverwriting)
+            try Task.checkCancellation()
+            return data
+        }
+    #endif
 
     /// Retrieve a value from the JSON object using a specified subscript
     /// - Parameter subscript: A subscript to use for lookup
