@@ -42,7 +42,7 @@ extension JSON {
 
         public static func buildExpression(
             _ expression: Void
-        ) -> [JSON] {
+        ) -> Array {
             []
         }
 
@@ -52,55 +52,55 @@ extension JSON {
 
         public static func buildExpression(
             _ expression: JSON
-        ) -> [JSON] {
+        ) -> Array {
             [expression]
         }
 
         @_disfavoredOverload
         public static func buildExpression(
             _ expression: some JSONEncodable
-        ) -> [JSON] {
+        ) -> Array {
             [JSON(expression)]
         }
 
-        public static func buildBlock() -> [JSON] {
+        public static func buildBlock() -> Array {
             []
         }
 
         public static func buildBlock(
-            _ components: [JSON]...
-        ) -> [JSON] {
+            _ components: Array...
+        ) -> Array {
             components
                 .flatMap(\.self)
         }
 
         public static func buildEither(
-            first component: [JSON]
-        ) -> [JSON] {
+            first component: Array
+        ) -> Array {
             component
         }
 
         public static func buildEither(
-            second component: [JSON]
-        ) -> [JSON] {
+            second component: Array
+        ) -> Array {
             component
         }
 
         public static func buildOptional(
-            _ component: [JSON]?
-        ) -> [JSON] {
+            _ component: Array?
+        ) -> Array {
             component ?? []
         }
 
         public static func buildArray(
-            _ components: [[JSON]]
-        ) -> [JSON] {
+            _ components: [Array]
+        ) -> Array {
             components
                 .flatMap(\.self)
         }
 
         public static func buildFinalResult(
-            _ component: [JSON]
+            _ component: Array
         ) -> JSON {
             .array(component)
         }

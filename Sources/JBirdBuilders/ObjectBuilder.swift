@@ -69,7 +69,7 @@ extension JSON {
         }
 
         public static func buildExpression(
-            _ expression: [String: JSON]
+            _ expression: Object
         ) -> [(String, JSON)] {
             expression.map(\.self)
         }
@@ -113,7 +113,7 @@ extension JSON {
         public static func buildFinalResult(
             _ component: [(String, JSON)]
         ) -> JSON {
-            let dict = component.reduce(into: [String: JSON]()) { prev, pair in
+            let dict = component.reduce(into: Object()) { prev, pair in
                 let (key, value) = pair
                 prev[key] = value
             }
