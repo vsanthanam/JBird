@@ -74,6 +74,8 @@ let steve: JSON = [
 
 - ``Literal``
 - ``Number``
+- ``Object``
+- ``Array``
 
 ### Decoding JSON values into Swift types
 

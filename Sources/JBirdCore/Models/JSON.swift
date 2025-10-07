@@ -61,10 +61,10 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     case literal(Literal)
 
     /// A JSON object
-    case object([String: JSON])
+    case object(Object)
 
     /// A JSON array
-    case array([JSON])
+    case array(Array)
 
     /// A JSON number value
     case number(Number)
@@ -119,7 +119,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// The JSON value as an object
-    public var objectValue: [String: JSON] {
+    public var objectValue: Object {
         get throws {
             switch self {
             case let .object(object):
@@ -131,7 +131,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// The JSON value as an array
-    public var arrayValue: [JSON] {
+    public var arrayValue: Array {
         get throws {
             switch self {
             case let .array(array):

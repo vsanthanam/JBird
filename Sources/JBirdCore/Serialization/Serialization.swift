@@ -536,7 +536,7 @@ extension JSON {
 
     @inline(__always)
     private static func serialize(
-        array: [JSON],
+        array: Array,
         into bytes: inout [UInt8],
         level: Int?,
         options: SerializationOptions,
@@ -544,7 +544,7 @@ extension JSON {
     ) throws {
         bytes += [0x5B]
 
-        let realArray: [JSON] = if options.contains(.omitNullValues) {
+        let realArray: Array = if options.contains(.omitNullValues) {
             array.compactMap { value in value.isNull ? JSON?.none : value }
         } else {
             array
@@ -589,7 +589,7 @@ extension JSON {
     }
 
     static func serialize(
-        object: [String: JSON],
+        object: Object,
         into bytes: inout [UInt8],
         level: Int?,
         options: SerializationOptions,
@@ -606,7 +606,7 @@ extension JSON {
             bytes += [0x0A] // Newline
         }
 
-        let usableObject: [String: JSON] = if options.contains(.omitNullKeys) || options.contains(.omitNullValues) {
+        let usableObject: Object = if options.contains(.omitNullKeys) || options.contains(.omitNullValues) {
             object.compactMapValues { value in value.isNull ? JSON?.none : value }
         } else {
             object
@@ -724,7 +724,7 @@ extension JSON {
                 return .string(str)
             case JSON_ARRAY:
                 let count = json_get_array_size(value)
-                var array = [JSON]()
+                var array = Array()
                 array.reserveCapacity(count)
 
                 for i in 0..<count {
@@ -738,18 +738,18 @@ extension JSON {
                 return .array(array)
             case JSON_OBJECT:
                 let count = json_get_object_size(value)
-                var dict = [String: JSON]()
-                dict.reserveCapacity(count)
+                var object = Object()
+                object.reserveCapacity(count)
 
                 for i in 0..<count {
                     let key = String(cString: json_get_object_key(value, i))
                     let objValue = json_get_object_value(value, i).unsafelyUnwrapped
                     let value = try materialize(objValue, options)
-                    if (!options.contains(.omitNullKeys) && !options.contains(.omitNullValues)) || !value.isNull {
-                        dict[key] = value
+                    if !value.isNull || (!options.contains(.omitNullKeys) && !options.contains(.omitNullValues)) {
+                        object[key] = value
                     }
                 }
-                return .object(dict)
+                return .object(object)
             default:
                 throw JSONDeserializationError.unknown
             }
@@ -872,7 +872,7 @@ extension JSON {
                             }
                         }
                         do {
-                            var object: [String: JSON] = [:]
+                            var object = Object()
                             object.reserveCapacity(count)
                             for try await (key, value) in group {
                                 if (!options.contains(.omitNullKeys) && !options.contains(.omitNullValues)) || !value.isNull {
@@ -1006,7 +1006,7 @@ extension JSON {
                             }
                         }
                         do {
-                            var object: [String: JSON] = [:]
+                            var object = Object()
                             object.reserveCapacity(count)
                             for try await (key, value) in group {
                                 if (!options.contains(.omitNullKeys) && !options.contains(.omitNullValues)) || !value.isNull {
