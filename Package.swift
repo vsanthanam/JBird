@@ -65,6 +65,7 @@ let package = Package(
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
+                .treatAllWarnings(as: .error)
             ]
         ),
         .testTarget(
@@ -76,6 +77,7 @@ let package = Package(
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
+                .treatAllWarnings(as: .error)
             ]
         ),
         .target(
@@ -87,6 +89,7 @@ let package = Package(
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
+                .treatAllWarnings(as: .error)
             ]
         ),
         .testTarget(
@@ -99,6 +102,7 @@ let package = Package(
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
+                .treatAllWarnings(as: .error)
             ]
         ),
         .target(
@@ -107,6 +111,7 @@ let package = Package(
             swiftSettings: [
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
+                .treatAllWarnings(as: .error)
             ]
         ),
         .testTarget(
@@ -118,6 +123,7 @@ let package = Package(
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
+                .treatAllWarnings(as: .error)
             ]
         ),
         .target(
@@ -129,6 +135,7 @@ let package = Package(
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
+                .treatAllWarnings(as: .error)
             ]
         ),
         .testTarget(
@@ -141,6 +148,7 @@ let package = Package(
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
+                .treatAllWarnings(as: .error)
             ]
         ),
         .target(
@@ -154,6 +162,7 @@ let package = Package(
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
+                .treatAllWarnings(as: .error)
             ]
         ),
         .testTarget(
@@ -165,6 +174,7 @@ let package = Package(
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
+                .treatAllWarnings(as: .error)
             ]
         ),
         .macro(
@@ -183,6 +193,7 @@ let package = Package(
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
+                .treatAllWarnings(as: .error)
             ]
         ),
         .testTarget(
@@ -198,6 +209,7 @@ let package = Package(
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
+                .treatAllWarnings(as: .error)
             ]
         )
     ],
