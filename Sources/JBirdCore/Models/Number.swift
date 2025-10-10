@@ -95,7 +95,19 @@ extension JSON {
         /// - Strings are represented as `String`
         /// - Integers are represented as `Int`
         /// - Floating point numbers are represented as `Double`
+        @available(*, deprecated, renamed: "unboxed()", message: "Use unboxed() instead.")
         public var untyped: Any? {
+            switch self {
+            case let .int(int):
+                int
+            case let .double(double):
+                double
+            }
+        }
+
+        /// The untyped representation of the JSON literal
+        /// - Returns: An `AnyHashable` containing an `Int` or a `Double` representing the JSON number.
+        public func unboxed() -> AnyHashable {
             switch self {
             case let .int(int):
                 int

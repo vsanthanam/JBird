@@ -91,6 +91,7 @@ extension JSON {
         /// This property returns the JSON literal as a native Swift type:
         /// - `true` and `false` literals are represented as `Bool`
         /// - `null` literals are represented as `nil`
+        @available(*, deprecated, renamed: "unboxed()", message: "Use unboxed() instead.")
         public var untyped: Any? {
             switch self {
             case .true:
@@ -99,6 +100,19 @@ extension JSON {
                 false
             case .null:
                 nil
+            }
+        }
+
+        /// The untyped representation of the JSON literal
+        /// - Returns: An `AnyHashable` containing a boolean or `NSNull` representing the JSON literal
+        public func unboxed() -> AnyHashable {
+            switch self {
+            case .true:
+                true
+            case .false:
+                false
+            case .null:
+                NSNull()
             }
         }
 
