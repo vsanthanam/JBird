@@ -62,14 +62,14 @@ struct NumberTests {
         #expect(double == .double(4.2))
     }
 
-    @Test("Untyped Number")
-    func untypedNumber() throws {
+    @Test("Unboxed Number")
+    func unboxedNumber() throws {
         let int: JSON.Number = 12
-        let untypedInt = try #require(int.untyped as? Int)
+        let untypedInt = try #require(int.unboxed().base as? Int)
         #expect(untypedInt == 12)
 
         let double: JSON.Number = 12.34
-        let untypedDouble = try #require(double.untyped as? Double)
+        let untypedDouble = try #require(double.unboxed().base as? Double)
         #expect(untypedDouble == 12.34)
     }
 

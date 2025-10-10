@@ -23,6 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import Foundation
 import JBirdCore
 import Testing
 
@@ -65,18 +66,18 @@ struct LiteralTests {
         #expect(JSON.Literal.null.isBool == false)
     }
 
-    @Test("Literal Untyped Tests")
-    func untypeTests() throws {
+    @Test("Literal Unboxed Tests")
+    func unboxedTests() throws {
         let `true` = JSON.Literal.true
-        let trueUntyped = try #require(`true`.untyped as? Bool)
+        let trueUntyped = try #require(`true`.unboxed().base as? Bool)
         #expect(trueUntyped)
 
         let `false` = JSON.Literal.false
-        let falseUntyped = try #require(`false`.untyped as? Bool)
+        let falseUntyped = try #require(`false`.unboxed().base as? Bool)
         #expect(!falseUntyped)
 
         let null = JSON.Literal.null
-        #expect(null.untyped == nil)
+        #expect(null.unboxed().base is NSNull)
     }
 
     @Test("Literal Expression Tests")
