@@ -280,6 +280,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Floating point numbers are represented as `Double`
     /// - Arrays are represented as `[Any?]`
     /// - Objects are represented as `[String: Any?]`
+    @available(*, deprecated, renamed: "unboxed()", message: "Use unboxed() instead.")
     public var untyped: Any? {
         switch self {
         case let .literal(literal):
@@ -292,6 +293,29 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             array.map(\.untyped)
         case let .object(object):
             object.mapValues(\.untyped)
+        }
+    }
+
+    /// The untyped representation of the JSON value
+    /// - Returns: An `AnyHashable` containing a string, boolean, array, dictionary, or `NSNull` representing the JSON value
+    public func unboxed() -> AnyHashable {
+        switch self {
+        case let .literal(literal):
+            literal.unboxed()
+        case let .string(string):
+            string
+        case let .number(number):
+            number.unboxed()
+        case let .array(array):
+            array
+                .map { json in
+                    json.unboxed()
+                }
+        case let .object(object):
+            object
+                .mapValues { json in
+                    json.unboxed()
+                }
         }
     }
 

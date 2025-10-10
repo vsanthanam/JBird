@@ -69,8 +69,8 @@ struct JSONTests {
         }
     }
 
-    @Test("Untyped JSON")
-    func untypedJSON() throws {
+    @Test("Unboxed JSON")
+    func unboxedJSON() throws {
         let `true`: JSON = true
         let `false`: JSON = false
         let null: JSON = nil
@@ -81,12 +81,12 @@ struct JSONTests {
         let object: JSON = ["name": "John", "age": 30]
         #expect(`true` == true)
         #expect(`false` == false)
-        #expect(null.untyped == nil)
-        #expect(string.untyped is String)
-        #expect(int.untyped is Int)
-        #expect(double.untyped is Double)
-        #expect(array.untyped is [Any])
-        #expect(object.untyped is [String: Any])
+        #expect(null.unboxed().base is NSNull)
+        #expect(string.unboxed().base is String)
+        #expect(int.unboxed().base is Int)
+        #expect(double.unboxed().base is Double)
+        #expect(array.unboxed().base is [AnyHashable])
+        #expect(object.unboxed().base is [String: AnyHashable])
     }
 
     @Suite("Value Checking Tests")
