@@ -861,6 +861,8 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         try .array(arrayValue.filter(isIncluded))
     }
 
+    /// Remove `null` values from a JSON array
+    /// - Returns: A JSON array with no null values
     public func filterNils() throws -> JSON {
         switch self {
         case .array:
@@ -903,6 +905,10 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             ///   - options: Serialization options to use when writing the JSON model to disk
             ///   - shouldOverwrite: Whether or not existing content should be overwritten
             @available(macOS 13.0, macCatalyst 16.0, *)
+            @available(iOS, unavailable)
+            @available(watchOS, unavailable)
+            @available(tvOS, unavailable)
+            @available(visionOS, unavailable)
             @discardableResult
             @concurrent
             public func write(
@@ -919,8 +925,14 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
                     }
                 }
 
-                let data = try await JSON.serialize(self, options: options)
-                try data.write(to: fileURL, options: .withoutOverwriting)
+                let data = try await JSON.serialize(
+                    self,
+                    options: options
+                )
+                try data.write(
+                    to: fileURL,
+                    options: .withoutOverwriting
+                )
                 try Task.checkCancellation()
                 return data
             }
@@ -931,6 +943,10 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             ///   - options: Serialization options to use when writing the JSON model to disk
             ///   - shouldOverwrite: Whether or not existing content should be overwritten
             @available(macOS 13.0, macCatalyst 16.0, *)
+            @available(iOS, unavailable)
+            @available(watchOS, unavailable)
+            @available(tvOS, unavailable)
+            @available(visionOS, unavailable)
             @discardableResult
             public func write(
                 fileURL: URL,
@@ -946,8 +962,14 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
                     }
                 }
 
-                let data = try await JSON.serialize(self, options: options)
-                try data.write(to: fileURL, options: .withoutOverwriting)
+                let data = try await JSON.serialize(
+                    self,
+                    options: options
+                )
+                try data.write(
+                    to: fileURL,
+                    options: .withoutOverwriting
+                )
                 try Task.checkCancellation()
                 return data
             }
