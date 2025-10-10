@@ -633,67 +633,69 @@ struct JSONTests {
         }
     }
 
-    @Suite("JSON writing tests", .serialized)
-    struct WritingTests {
+    #if canImport(Darwin)
+        @Suite("JSON writing tests", .serialized)
+        struct WritingTests {
 
-        init() {
-            try? FileManager.default.removeItem(atPath: testURL.path())
-        }
-
-        let testURL = FileManager.default.temporaryDirectory.appending(path: "test.json", directoryHint: .notDirectory)
-
-        @available(macOS 13.0, macCatalyst 16.0, *)
-        @Test("Write to disk without previous content")
-        func writeToDiskWithoutPreviousContent() async throws {
-            let json: JSON = [
-                "foo": true,
-                "bar": false,
-                "baz": nil
-            ]
-
-            try await json.write(fileURL: testURL, options: .sortedKeys)
-            let diskContent = try String(contentsOf: testURL, encoding: .utf8)
-            let expected = #"""
-            {"bar":false,"baz":null,"foo":true}
-            """#
-            #expect(diskContent == expected)
-        }
-
-        @available(macOS 13.0, macCatalyst 16.0, *)
-        @Test("Write to disk with previous content")
-        func writeToDiskWithPreviousContent() async throws {
-            let junk = try #require("junk".data(using: .utf8))
-            try junk.write(to: testURL)
-            let json: JSON = [
-                "foo": true,
-                "bar": false,
-                "baz": nil
-            ]
-
-            await #expect(throws: JSONError.fileExists(testURL)) {
-                try await json.write(fileURL: testURL)
+            init() {
+                try? FileManager.default.removeItem(atPath: testURL.path())
             }
+
+            let testURL = FileManager.default.temporaryDirectory.appending(path: "test.json", directoryHint: .notDirectory)
+
+            @available(macOS 13.0, macCatalyst 16.0, *)
+            @Test("Write to disk without previous content")
+            func writeToDiskWithoutPreviousContent() async throws {
+                let json: JSON = [
+                    "foo": true,
+                    "bar": false,
+                    "baz": nil
+                ]
+
+                try await json.write(fileURL: testURL, options: .sortedKeys)
+                let diskContent = try String(contentsOf: testURL, encoding: .utf8)
+                let expected = #"""
+                {"bar":false,"baz":null,"foo":true}
+                """#
+                #expect(diskContent == expected)
+            }
+
+            @available(macOS 13.0, macCatalyst 16.0, *)
+            @Test("Write to disk with previous content")
+            func writeToDiskWithPreviousContent() async throws {
+                let junk = try #require("junk".data(using: .utf8))
+                try junk.write(to: testURL)
+                let json: JSON = [
+                    "foo": true,
+                    "bar": false,
+                    "baz": nil
+                ]
+
+                await #expect(throws: JSONError.fileExists(testURL)) {
+                    try await json.write(fileURL: testURL)
+                }
+            }
+
+            @Test("Write to disk overwriting previous content")
+            func writeToDiskOverwritingPreviousContent() async throws {
+                let junk = try #require("junk".data(using: .utf8))
+                try junk.write(to: testURL)
+                let json: JSON = [
+                    "foo": true,
+                    "bar": false,
+                    "baz": nil
+                ]
+
+                try await json.write(fileURL: testURL, options: .sortedKeys, shouldOverwrite: true)
+                let diskContent = try String(contentsOf: testURL, encoding: .utf8)
+                let expected = #"""
+                {"bar":false,"baz":null,"foo":true}
+                """#
+                #expect(diskContent == expected)
+            }
+
         }
-
-        @Test("Write to disk overwriting previous content")
-        func writeToDiskOverwritingPreviousContent() async throws {
-            let junk = try #require("junk".data(using: .utf8))
-            try junk.write(to: testURL)
-            let json: JSON = [
-                "foo": true,
-                "bar": false,
-                "baz": nil
-            ]
-
-            try await json.write(fileURL: testURL, options: .sortedKeys, shouldOverwrite: true)
-            let diskContent = try String(contentsOf: testURL, encoding: .utf8)
-            let expected = #"""
-            {"bar":false,"baz":null,"foo":true}
-            """#
-            #expect(diskContent == expected)
-        }
-
-    }
+    #endif
 
     @Suite("Convenience Serialization Tests")
     struct SerializationTests {
