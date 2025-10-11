@@ -95,7 +95,7 @@ public enum JSONKeyComputationRule {
     names: named(init(json:)), named(encodeToJSON)
 )
 public macro JSONCodable() = #externalMacro(
-    module: "JBirdCompilerPlugin",
+    module: "JBirdMacrosCompilerPlugin",
     type: "JSONCodableMacro"
 )
 
@@ -123,7 +123,7 @@ public macro JSONCodable() = #externalMacro(
 public macro JSONKey(
     _ keyRule: JSONKeyComputationRule = .copy,
 ) = #externalMacro(
-    module: "JBirdCompilerPlugin",
+    module: "JBirdMacrosCompilerPlugin",
     type: "JSONKeyMacro"
 )
 
@@ -146,7 +146,7 @@ public macro JSONKey(
 public macro JSONKey(
     _ key: String
 ) = #externalMacro(
-    module: "JBirdCompilerPlugin",
+    module: "JBirdMacrosCompilerPlugin",
     type: "JSONKeyMacro"
 )
 
@@ -173,6 +173,6 @@ public macro JSONKey(
 public macro OmitIfNil(
     _ omitIfNil: Bool = true
 ) = #externalMacro(
-    module: "JBirdCompilerPlugin",
+    module: "JBirdMacrosCompilerPlugin",
     type: "OmitIfNilMacro"
 )
