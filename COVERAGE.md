@@ -4,10 +4,14 @@ This document describes the code coverage reporting setup for the JBird project.
 
 ## Overview
 
-Code coverage is automatically generated and reported for all commits and pull requests using the macOS Swift 6.2 test suite. The coverage data is collected using Swift's built-in code coverage support and is visualized in two ways:
+Code coverage is automatically generated and reported for all commits and pull requests across all test configurations:
+- macOS Swift 6.1 and 6.2
+- Ubuntu Swift 6.1 and 6.2
 
-1. **GitHub Actions Summary**: A formatted table showing coverage metrics directly in the CI job output
-2. **Codecov.io**: Detailed coverage reports, PR comments, and trend tracking
+The coverage data is collected using Swift's built-in code coverage support and is visualized in two ways:
+
+1. **GitHub Actions Summary**: A formatted table showing coverage metrics directly in the CI job output for each platform/Swift version combination
+2. **Codecov.io**: Detailed coverage reports, PR comments, and trend tracking with consolidated data from all platforms
 
 ## Coverage Metrics
 
@@ -21,16 +25,16 @@ The following metrics are tracked:
 
 ### GitHub Actions Summary
 
-After each test run on Swift 6.2, you can view the coverage summary by:
+After each test run, you can view the coverage summary by:
 
 1. Go to the "Actions" tab in the GitHub repository
 2. Select a workflow run
-3. Click on "Test JBird (macOS)" for Swift 6.2
+3. Click on a test job (e.g., "Test JBird (macOS)" or "Test JBird (Ubuntu)")
 4. Scroll down to view the coverage table in the summary section
 
 The summary shows:
 ```
-## 📊 Code Coverage Report (Swift 6.2)
+## 📊 Code Coverage Report (macOS, Swift 6.2)
 
 | Metric | Coverage | Covered | Total |
 |--------|----------|---------|-------|
@@ -39,14 +43,17 @@ The summary shows:
 | **Regions** | **XX.XX%** | XXXX | XXXX |
 ```
 
+Each platform and Swift version combination produces its own coverage report.
+
 ### Codecov Integration
 
-Codecov provides additional features:
+Codecov provides additional features by consolidating coverage data from all platforms:
 
-- **PR Comments**: Automatic comments on pull requests showing coverage changes
+- **PR Comments**: Automatic comments on pull requests showing coverage changes across all platforms
 - **Coverage Trends**: Historical tracking of coverage over time
 - **File-level Coverage**: Detailed line-by-line coverage for each file
 - **Coverage Badge**: Optional badge for the README
+- **Platform Comparison**: Compare coverage across macOS and Ubuntu builds
 
 Visit https://codecov.io/gh/vsanthanam/JBird to view detailed reports.
 
@@ -71,16 +78,24 @@ You can then examine the JSON file to see detailed coverage information.
 
 ### CI Configuration
 
-Code coverage is enabled in `.github/workflows/ci.yml`:
+Code coverage is enabled in `.github/workflows/ci.yml` for all test jobs:
+- macOS Swift 6.1 and 6.2
+- Ubuntu Swift 6.1 and 6.2
 
 ```yaml
 - name: Test JBird
-  run: swift test --enable-code-coverage  # Only for Swift 6.2
+  run: swift test --enable-code-coverage
 ```
 
 ### Codecov Configuration
 
 The Codecov token is stored as a repository secret (`CODECOV_TOKEN`). For public repositories, this token is optional but recommended for better reliability and rate limits.
+
+Coverage data from all platforms is uploaded with appropriate flags:
+- `swift-6.1,macos` - macOS with Swift 6.1
+- `swift-6.2,macos` - macOS with Swift 6.2
+- `swift-6.1,ubuntu` - Ubuntu with Swift 6.1
+- `swift-6.2,ubuntu` - Ubuntu with Swift 6.2
 
 To configure the token:
 1. Sign up at https://codecov.io
