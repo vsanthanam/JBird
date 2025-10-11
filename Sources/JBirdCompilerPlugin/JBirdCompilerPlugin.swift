@@ -48,22 +48,8 @@ extension Optional {
         case let .some(value):
             return value
         case .none:
-            throw MacroError(message())
+            throw MacroExpansionErrorMessage(message())
         }
     }
-
-}
-
-struct MacroError: Error, CustomStringConvertible {
-
-    init(
-        _ message: String = "Macro Expansion Failed"
-    ) {
-        self.message = message
-    }
-
-    let message: String
-
-    var description: String { message }
 
 }

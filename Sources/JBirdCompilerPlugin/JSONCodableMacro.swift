@@ -82,10 +82,9 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
         for item in members {
             if let property = item.decl.as(VariableDeclSyntax.self) {
                 guard property.bindings.count == 1 else {
-                    throw MacroError("@JSONCodable can only be applied to single-value stored properties")
+                    throw MacroExpansionErrorMessage("@JSONCodable can only be applied to single-value stored properties")
                 }
 
-                let name: String
                 let key: String
                 let omitIfNil: Bool
 
@@ -94,11 +93,11 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
                 guard binding.accessorBlock == nil else {
                     continue
                 }
-                if let identifierPattern = binding.pattern.as(IdentifierPatternSyntax.self) {
-                    name = identifierPattern.identifier.text
-                } else {
-                    throw MacroError()
-                }
+
+                let name = try binding.pattern
+                    .as(IdentifierPatternSyntax.self)
+                    .mustExist()
+                    .identifier.text
 
                 if let keyAttribute = try property.attributes.first(where: { attribute in
                     let attribute = try attribute
@@ -173,7 +172,7 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
         }
 
         if Set(storedProperties.map(\.key)).count != storedProperties.count {
-            throw MacroError("Cannot generate JSONCodable conformance. Duplicate keys found.")
+            throw MacroExpansionErrorMessage("Cannot generate JSONCodable conformance. Duplicate keys found.")
         }
 
         let encodeItems = storedProperties
