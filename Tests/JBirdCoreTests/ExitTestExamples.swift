@@ -93,4 +93,16 @@ struct ExitTestExamples {
             _ = unboxed.base as! Int
         }
     }
+
+    /// Example demonstrating accessing JSON array without bounds checking.
+    /// Shows the importance of using try/catch with JSON subscript operations.
+    @Test("Accessing JSON array element without error handling can crash")
+    func jsonArrayAccessWithoutErrorHandling() async {
+        await #expect(processExitsWith: .failure) {
+            let json = JSON.array([1, 2, 3])
+            // Using try! without bounds checking can crash if index is out of bounds
+            // This is contrived since JSON throws errors, but demonstrates the pattern
+            _ = try! json[999] // Will throw, and try! will crash
+        }
+    }
 }
