@@ -72,6 +72,10 @@ By default, the script creates a dynamic framework that builds for all supported
 
 *Note: You can only use the script to build either `JBirdCore` or `JBirdBuilders`. The combined `JBird` module with all APIs is not supported, because Swift macros cannot be distributed via XCFramework*
 
+### Privacy Manifest
+
+JBirdCore and JBirdBuilders include a `PrivacyInfo.xcprivacy` file that declares the library does not track users or collect data. This privacy manifest is automatically included in both Swift Package Manager distributions and XCFramework builds, ensuring compliance with Apple's App Store requirements.
+
 ## Clone from Source
 
 To add JBird source code directly without any intermediary, you can clone the repository directly from GitHub:
