@@ -61,6 +61,9 @@ let package = Package(
                 "JBirdBuilders",
                 "JBirdMacros"
             ],
+            resources: [
+                .copy("PrivacyInfo.xcprivacy")
+            ],
             swiftSettings: [
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
@@ -148,6 +151,9 @@ let package = Package(
                 "JBirdCompilerPlugin",
                 "JBirdCore",
                 "JBirdBuilders"
+            ],
+            resources: [
+                .copy("PrivacyInfo.xcprivacy")
             ],
             swiftSettings: [
                 .enableUpcomingFeature("ExistentialAny"),

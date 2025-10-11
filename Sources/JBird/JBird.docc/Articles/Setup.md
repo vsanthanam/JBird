@@ -74,7 +74,7 @@ By default, the script creates a dynamic framework that builds for all supported
 
 ### Privacy Manifest
 
-JBirdCore and JBirdBuilders include a `PrivacyInfo.xcprivacy` file that declares the library does not track users or collect data. This privacy manifest is automatically included in both Swift Package Manager distributions and XCFramework builds, ensuring compliance with Apple's App Store requirements.
+All JBird modules (JBird, JBirdCore, JBirdBuilders, and JBirdMacros) include a `PrivacyInfo.xcprivacy` file that declares the library does not track users or collect data. This privacy manifest is automatically included in both Swift Package Manager distributions and XCFramework builds, ensuring compliance with Apple's App Store requirements.
 
 ## Clone from Source
 
