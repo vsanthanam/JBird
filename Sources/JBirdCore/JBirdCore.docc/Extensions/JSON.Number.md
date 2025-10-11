@@ -49,21 +49,6 @@ if number.isDouble {
 }
 ```
 
-### Number Equality
-
-The `Number` enum implements smart equality comparison. When comparing an integer with a floating-point number, it checks if the floating-point value represents an exact integer:
-
-```swift
-let int: JSON.Number = 42
-let double: JSON.Number = 42.0
-
-// These are equal because 42.0 is exactly 42
-int == double // true
-
-let notEqual: JSON.Number = 42.5
-int == notEqual // false
-```
-
 ## Topics
 
 ### Cases
@@ -74,8 +59,6 @@ int == notEqual // false
 ### Initializers
 
 - ``init(_:)``
-- ``init(integerLiteral:)``
-- ``init(floatLiteral:)``
 
 ### Instance Properties
 
@@ -83,10 +66,14 @@ int == notEqual // false
 - ``doubleValue``
 - ``isInt``
 - ``isDouble``
-- ``unboxed()``
-- ``description``
 
-### Type Aliases
+### Instance Methods
+
+- ``unboxed()``
+
+### Literal Expression Support
 
 - ``IntegerLiteralType``
+- ``init(integerLiteral:)``
 - ``FloatLiteralType``
+- ``init(floatLiteral:)``

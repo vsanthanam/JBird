@@ -54,17 +54,19 @@ if literal.isNull {
 ### Initializers
 
 - ``init(_:)``
-- ``init(booleanLiteral:)``
-- ``init(nilLiteral:)``
 
 ### Instance Properties
 
 - ``boolValue``
 - ``isBool``
 - ``isNull``
-- ``unboxed()``
-- ``description``
 
-### Type Aliases
+### Instance Methods
+
+- ``unboxed()``
+
+### Literal Expression Support
 
 - ``BooleanLiteralType``
+- ``init(booleanLiteral:)``
+- ``init(nilLiteral:)``
