@@ -85,6 +85,9 @@ let package = Package(
             dependencies: [
                 "JBirdParser"
             ],
+            resources: [
+                .copy("PrivacyInfo.xcprivacy")
+            ],
             swiftSettings: [
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("ExistentialAny"),
@@ -130,6 +133,9 @@ let package = Package(
             name: "JBirdBuilders",
             dependencies: [
                 "JBirdCore"
+            ],
+            resources: [
+                .copy("PrivacyInfo.xcprivacy")
             ],
             swiftSettings: [
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
