@@ -38,21 +38,21 @@ public struct OmitIfNilMacro: PeerMacro {
         in context: some MacroExpansionContext
     ) throws -> [DeclSyntax] {
         guard let varDecl = declaration.as(VariableDeclSyntax.self) else {
-            throw MacroError("@OmitIfNil can only be applied to stored properties")
+            throw MacroExpansionErrorMessage("@OmitIfNil can only be applied to stored properties")
         }
 
         guard varDecl.bindings.count == 1 else {
-            throw MacroError("@OmitIfNil can only be applied to a single stored property")
+            throw MacroExpansionErrorMessage("@OmitIfNil can only be applied to a single stored property")
         }
 
         let binding = try varDecl.bindings.first.mustExist()
 
         guard binding.accessorBlock == nil else {
-            throw MacroError("@OmitIfNil can only be applied to stored properties, not computed properties")
+            throw MacroExpansionErrorMessage("@OmitIfNil can only be applied to stored properties, not computed properties")
         }
 
         guard let typeAnnotation = binding.typeAnnotation else {
-            throw MacroError("@OmitIfNil can only be applied to properties with explicit type annotations")
+            throw MacroExpansionErrorMessage("@OmitIfNil can only be applied to properties with explicit type annotations")
         }
 
         let type = typeAnnotation.type
@@ -69,7 +69,7 @@ public struct OmitIfNilMacro: PeerMacro {
         }
 
         guard isOptional else {
-            throw MacroError("@OmitIfNil can only be applied to properties with optional types")
+            throw MacroExpansionErrorMessage("@OmitIfNil can only be applied to properties with optional types")
         }
 
         return []
