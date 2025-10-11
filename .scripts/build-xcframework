@@ -106,6 +106,23 @@ build_archive() {
     local framework_path="$ARCHIVE_DIR/$name.xcarchive/Products/Library/Frameworks/$FRAMEWORK_NAME.framework"
     bundle_static_dependencies "$framework_path"
   fi
+
+  # Ensure PrivacyInfo.xcprivacy is at the root of the framework
+  local framework_path="$ARCHIVE_DIR/$name.xcarchive/Products/Library/Frameworks/$FRAMEWORK_NAME.framework"
+  ensure_privacy_manifest_at_root "$framework_path"
+}
+
+ensure_privacy_manifest_at_root() {
+  local framework_path="$1"
+  local privacy_manifest="PrivacyInfo.xcprivacy"
+  
+  # Check if privacy manifest exists in Resources subdirectory
+  if [ -f "$framework_path/Resources/$privacy_manifest" ]; then
+    echo "📋 Moving $privacy_manifest to framework root"
+    cp "$framework_path/Resources/$privacy_manifest" "$framework_path/$privacy_manifest"
+  elif [ -f "$framework_path/$privacy_manifest" ]; then
+    echo "✓ $privacy_manifest already at framework root"
+  fi
 }
 
 bundle_static_dependencies() {
