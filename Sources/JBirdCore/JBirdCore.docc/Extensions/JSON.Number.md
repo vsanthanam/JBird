@@ -60,16 +60,16 @@ if number.isDouble {
 
 - ``init(_:)``
 
-### Instance Properties
+### Decoding number values into Swift types
 
 - ``intValue``
 - ``doubleValue``
+- ``unboxed()``
+
+### Inspecting number values
+
 - ``isInt``
 - ``isDouble``
-
-### Instance Methods
-
-- ``unboxed()``
 
 ### Literal Expression Support
 

@@ -55,15 +55,15 @@ if literal.isNull {
 
 - ``init(_:)``
 
-### Instance Properties
+### Decoding literal values into Swift types
 
 - ``boolValue``
+- ``unboxed()``
+
+### Inspecting literal values
+
 - ``isBool``
 - ``isNull``
-
-### Instance Methods
-
-- ``unboxed()``
 
 ### Literal Expression Support
 
