@@ -84,6 +84,8 @@ Code coverage is enabled in `.github/workflows/ci.yml` for macOS test jobs:
   run: swift test --enable-code-coverage
 ```
 
+The coverage report filters results to only include project source files (those in `/Sources/` directory), excluding Swift package dependencies. This ensures accurate coverage metrics for the project's own code.
+
 ### Codecov Configuration
 
 The Codecov token is stored as a repository secret (`CODECOV_TOKEN`). For public repositories, this token is optional but recommended for better reliability and rate limits.
