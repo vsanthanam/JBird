@@ -84,15 +84,15 @@ Code coverage is enabled in `.github/workflows/ci.yml` for macOS test jobs:
   run: swift test --enable-code-coverage
 ```
 
-The coverage report filters results to only include project source files (those in `/Sources/` directory), excluding Swift package dependencies. This ensures accurate coverage metrics for the project's own code.
+The coverage report filters results to only include project source files (those in `/Sources/` directory), excluding Swift package dependencies. This ensures accurate coverage metrics for the project's own code. The filtered JSON is then uploaded to Codecov to ensure consistency across all platforms.
 
 ### Codecov Configuration
 
 The Codecov token is stored as a repository secret (`CODECOV_TOKEN`). For public repositories, this token is optional but recommended for better reliability and rate limits.
 
-Coverage data from all Swift versions is uploaded with appropriate flags:
-- `swift-6.1,macos` - macOS with Swift 6.1
-- `swift-6.2,macos` - macOS with Swift 6.2
+Coverage data from all Swift versions is uploaded with a single flag per upload:
+- `swift-6.1` - macOS with Swift 6.1
+- `swift-6.2` - macOS with Swift 6.2
 
 To configure the token:
 1. Sign up at https://codecov.io
