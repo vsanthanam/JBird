@@ -163,7 +163,7 @@ let package = Package(
         .target(
             name: "JBirdMacros",
             dependencies: [
-                "JBirdCompilerPlugin",
+                "JBirdMacrosCompilerPlugin",
                 "JBirdCore",
                 "JBirdBuilders"
             ],
@@ -190,7 +190,7 @@ let package = Package(
             ]
         ),
         .macro(
-            name: "JBirdCompilerPlugin",
+            name: "JBirdMacrosCompilerPlugin",
             dependencies: [
                 .product(
                     name: "SwiftSyntaxMacros",
@@ -209,9 +209,9 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "JBirdCompilerPluginTests",
+            name: "JBirdMacrosCompilerPluginTests",
             dependencies: [
-                "JBirdCompilerPlugin",
+                "JBirdMacrosCompilerPlugin",
                 .product(
                     name: "SwiftSyntaxMacrosTestSupport",
                     package: "swift-syntax"

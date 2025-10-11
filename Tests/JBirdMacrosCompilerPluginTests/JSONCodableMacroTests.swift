@@ -30,8 +30,8 @@ import SwiftSyntaxMacrosTestSupport
 import XCTest
 
 // Macro implementations build for the host, so the corresponding module is not available when cross-compiling. Cross-compiled tests may still make use of the macro itself in end-to-end tests.
-#if canImport(JBirdCompilerPlugin)
-    import JBirdCompilerPlugin
+#if canImport(JBirdMacrosCompilerPlugin)
+    import JBirdMacrosCompilerPlugin
 
     let testMacros: [String: any Macro.Type] = [
         "JSONCodable": JSONCodableMacro.self,
@@ -41,7 +41,7 @@ import XCTest
 final class JSONCodableMacroTests: XCTestCase {
 
     func test_basic() throws {
-        #if canImport(JBirdCompilerPlugin)
+        #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
                 @JSONCodable
@@ -82,7 +82,7 @@ final class JSONCodableMacroTests: XCTestCase {
     }
 
     func test_customKey() throws {
-        #if canImport(JBirdCompilerPlugin)
+        #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
                 @JSONCodable
@@ -125,7 +125,7 @@ final class JSONCodableMacroTests: XCTestCase {
     }
 
     func test_snakeCase() throws {
-        #if canImport(JBirdCompilerPlugin)
+        #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
                 @JSONCodable
@@ -168,7 +168,7 @@ final class JSONCodableMacroTests: XCTestCase {
     }
 
     func test_omitIfNil_noAnnotation() throws {
-        #if canImport(JBirdCompilerPlugin)
+        #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
                 @JSONCodable
@@ -214,7 +214,7 @@ final class JSONCodableMacroTests: XCTestCase {
     }
 
     func test_omitIfNil_withAnnotation() throws {
-        #if canImport(JBirdCompilerPlugin)
+        #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
                 @JSONCodable
@@ -262,7 +262,7 @@ final class JSONCodableMacroTests: XCTestCase {
     }
 
     func test_omitIfNil_withAnnotation_true() throws {
-        #if canImport(JBirdCompilerPlugin)
+        #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
                 @JSONCodable(true)
@@ -310,7 +310,7 @@ final class JSONCodableMacroTests: XCTestCase {
     }
 
     func test_omitIfNil_withAnnotation_false() throws {
-        #if canImport(JBirdCompilerPlugin)
+        #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
                 @JSONCodable
