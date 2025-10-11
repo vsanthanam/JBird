@@ -195,6 +195,8 @@ jobs:
           name: macos-swift-6.2
           fail_ci_if_error: false
         env:
+          # CODECOV_TOKEN is optional for public repos but recommended for reliability
+          # Add it as a repository secret for better rate limits and private repos
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   build-ubuntu-spm:
     name: Build JBird (Ubuntu)
