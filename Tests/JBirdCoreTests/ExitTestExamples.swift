@@ -70,4 +70,27 @@ struct ExitTestExamples {
             _ = array[10] // This will crash
         }
     }
+
+    /// Example demonstrating that attempting to force unwrap a failed JSON decode would crash.
+    /// In normal code, we would use try/catch, but this test shows what would happen without it.
+    @Test("Force unwrapping failed JSON decode causes process exit")
+    func forceUnwrapFailedDecode() async {
+        await #expect(processExitsWith: .failure) {
+            let json = JSON.string("not a number")
+            // Normally you'd use try, but forcing the unwrap would crash
+            _ = try! json.decode(into: Int.self)
+        }
+    }
+
+    /// Example showing that force casting to wrong type causes crash.
+    /// This demonstrates the danger of using 'as!' with JSON values.
+    @Test("Force cast to wrong type causes process exit")
+    func forceCastWrongType() async {
+        await #expect(processExitsWith: .failure) {
+            let json = JSON.string("hello")
+            let unboxed = json.unboxed()
+            // Force cast to wrong type will crash
+            _ = unboxed.base as! Int
+        }
+    }
 }
