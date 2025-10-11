@@ -101,6 +101,51 @@ build_archive() {
   else
     xcodebuild archive "${build_settings[@]}"
   fi
+
+  if [ "$BUILD_STATIC" = true ]; then
+    local framework_path="$ARCHIVE_DIR/$name.xcarchive/Products/Library/Frameworks/$FRAMEWORK_NAME.framework"
+    bundle_static_dependencies "$framework_path"
+  fi
+}
+
+bundle_static_dependencies() {
+  local framework_path="$1"
+  local framework_binary="$framework_path/$FRAMEWORK_NAME"
+  local parent_dir
+  parent_dir="$(dirname "$framework_path")"
+  local dependencies_dirs=(
+    "$framework_path/Frameworks"
+    "$framework_path/Versions/Current/Frameworks"
+    "$parent_dir"
+  )
+
+  for dependencies_dir in "${dependencies_dirs[@]}"; do
+    if [ -d "$dependencies_dir" ]; then
+      shopt -s nullglob
+      for dependency in "$dependencies_dir"/*.framework; do
+        if [ "$dependency" = "$framework_path" ]; then
+          continue
+        fi
+        local dependency_name
+        dependency_name="$(basename "$dependency" .framework)"
+        local dependency_binary="$dependency/$dependency_name"
+        if [ -f "$dependency_binary" ]; then
+          if file "$dependency_binary" | grep -q "dynamically linked shared library"; then
+            echo "⚠️ Skipping dynamic dependency $dependency_name when producing static framework"
+          else
+            echo "🔗 Bundling static dependency $dependency_name into $FRAMEWORK_NAME"
+            /usr/bin/libtool -static -o "$framework_binary.merged" "$framework_binary" "$dependency_binary"
+            mv "$framework_binary.merged" "$framework_binary"
+          fi
+        fi
+        rm -rf "$dependency"
+      done
+      shopt -u nullglob
+      if [ "$dependencies_dir" != "$parent_dir" ]; then
+        rm -rf "$dependencies_dir"
+      fi
+    fi
+  done
 }
 
 # Function to check if an item exists in an array
