@@ -26,3 +26,7 @@ Benchmarks/.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 *.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
 /*.gcno
 **/xcshareddata/WorkspaceSettings.xcsettings
+
+# Code Coverage
+*.profraw
+*.profdata

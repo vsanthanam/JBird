@@ -142,7 +142,60 @@ jobs:
       - name: Decompress Build
         run: unzip build.zip
       - name: Test JBird
-        run: swift test
+        run: swift test ${{ matrix.swift == '6.2' && '--enable-code-coverage' || '' }}
+      - name: Generate Coverage Report
+        if: matrix.swift == '6.2'
+        run: |
+          COVERAGE_JSON=$(swift test --show-codecov-path)
+          echo "Coverage report location: $COVERAGE_JSON"
+          
+          # Extract coverage statistics
+          LINES_PERCENT=$(jq -r '.data[0].totals.lines.percent' "$COVERAGE_JSON")
+          LINES_COVERED=$(jq -r '.data[0].totals.lines.covered' "$COVERAGE_JSON")
+          LINES_TOTAL=$(jq -r '.data[0].totals.lines.count' "$COVERAGE_JSON")
+          
+          FUNCTIONS_PERCENT=$(jq -r '.data[0].totals.functions.percent' "$COVERAGE_JSON")
+          FUNCTIONS_COVERED=$(jq -r '.data[0].totals.functions.covered' "$COVERAGE_JSON")
+          FUNCTIONS_TOTAL=$(jq -r '.data[0].totals.functions.count' "$COVERAGE_JSON")
+          
+          REGIONS_PERCENT=$(jq -r '.data[0].totals.regions.percent' "$COVERAGE_JSON")
+          REGIONS_COVERED=$(jq -r '.data[0].totals.regions.covered' "$COVERAGE_JSON")
+          REGIONS_TOTAL=$(jq -r '.data[0].totals.regions.count' "$COVERAGE_JSON")
+          
+          # Round percentages to 2 decimal places
+          LINES_PERCENT=$(printf "%.2f" "$LINES_PERCENT")
+          FUNCTIONS_PERCENT=$(printf "%.2f" "$FUNCTIONS_PERCENT")
+          REGIONS_PERCENT=$(printf "%.2f" "$REGIONS_PERCENT")
+          
+          # Create markdown summary
+          cat >> $GITHUB_STEP_SUMMARY << EOF
+          ## 📊 Code Coverage Report (Swift 6.2)
+          
+          | Metric | Coverage | Covered | Total |
+          |--------|----------|---------|-------|
+          | **Lines** | **${LINES_PERCENT}%** | ${LINES_COVERED} | ${LINES_TOTAL} |
+          | **Functions** | **${FUNCTIONS_PERCENT}%** | ${FUNCTIONS_COVERED} | ${FUNCTIONS_TOTAL} |
+          | **Regions** | **${REGIONS_PERCENT}%** | ${REGIONS_COVERED} | ${REGIONS_TOTAL} |
+          
+          ✨ Coverage report generated successfully!
+          EOF
+          
+          echo "Lines Coverage: ${LINES_PERCENT}%"
+          echo "Functions Coverage: ${FUNCTIONS_PERCENT}%"
+          echo "Regions Coverage: ${REGIONS_PERCENT}%"
+          
+          # Save coverage path for next step
+          echo "COVERAGE_JSON=$COVERAGE_JSON" >> $GITHUB_ENV
+      - name: Upload Coverage to Codecov
+        if: matrix.swift == '6.2'
+        uses: codecov/codecov-action@v5
+        with:
+          files: ${{ env.COVERAGE_JSON }}
+          flags: swift-6.2,macos
+          name: macos-swift-6.2
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   build-ubuntu-spm:
     name: Build JBird (Ubuntu)
     strategy:
