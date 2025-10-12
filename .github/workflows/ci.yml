@@ -1,16 +1,6 @@
 name: JBird CI
 permissions:
   contents: read
-x-macos-spm-matrix: &macos-spm-matrix
-  swift: ["6.1", "6.2"]
-  include:
-    - swift: "6.1"
-      runner: macos-15
-      xcode: "16.4"
-    - swift: "6.2"
-      runner: macos-26
-      xcode: "26.0"
-x-ubuntu-spm-versions: &ubuntu-spm-versions ["6.1", "6.2"]
 on:
   push:
     branches: [ "main" ]
@@ -109,31 +99,39 @@ jobs:
       run: ./.scripts/lint-swiftformat
   build-macos-spm:
     name: Build JBird (macOS)
-    strategy:
-      matrix: *macos-spm-matrix
+    strategy: &macos-spm-strategy
+      matrix:
+        swift: ["6.1", "6.2"]
+        include:
+          - swift: "6.1"
+            runner: macos-15
+            xcode: "16.4"
+          - swift: "6.2"
+            runner: macos-26
+            xcode: "26.0"
     needs: changes
     if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
     runs-on: ${{ matrix.runner }}
     outputs:
       artifact-name: macos-build
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Select Xcode Version
-      run: ./.scripts/xcode-select ${{ matrix.xcode }}
-    - name: Build JBird
-      run: swift build -v --build-path .build
-    - name: Compress Build
-      run: zip -r build.zip .build
-    - name: Upload Build
-      uses: actions/upload-artifact@v4
-      with:
-        name: macos-build-${{ matrix.swift }}
-        path: build.zip
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Select Xcode Version
+        run: ./.scripts/xcode-select ${{ matrix.xcode }}
+      - name: Build JBird
+        run: swift build -v --build-path .build
+      - name: Compress Build
+        run: zip -r build.zip .build
+      - name: Upload Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build-${{ matrix.swift }}
+          path: build.zip
+
   test-macos-spm:
     name: Test JBird (macOS)
-    strategy:
-      matrix: *macos-spm-matrix
+    strategy: *macos-spm-strategy
     needs: [build-macos-spm, changes]
     if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
     runs-on: ${{ matrix.runner }}
@@ -205,11 +203,12 @@ jobs:
           name: macos-swift-${{ matrix.swift }}
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
+
   build-ubuntu-spm:
     name: Build JBird (Ubuntu)
-    strategy:
+    strategy: &ubuntu-spm-strategy
       matrix:
-        swift: *ubuntu-spm-versions
+        swift: ["6.1", "6.2"]
     needs: changes
     if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
     runs-on: ubuntu-latest
@@ -231,11 +230,10 @@ jobs:
         with:
           name: ubuntu-build-${{ matrix.swift }}
           path: build.zip
+
   test-ubuntu-spm:
     name: Test JBird (Ubuntu)
-    strategy:
-      matrix:
-        swift: *ubuntu-spm-versions
+    strategy: *ubuntu-spm-strategy
     needs: [build-ubuntu-spm, changes]
     if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
     runs-on: ubuntu-latest
@@ -255,6 +253,7 @@ jobs:
         run: unzip build.zip
       - name: Test JBird
         run: swift test
+
   clang-format:
     name: Run clang-format
     needs: changes
