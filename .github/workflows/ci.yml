@@ -153,7 +153,7 @@ jobs:
         id: coverage-report
         run: |
           set -eo pipefail
-          BIN_PATH=$(swift test --build-path .build --show-bin-path | tail -n 1)
+          BIN_PATH=$(swift build --build-path .build --show-bin-path | tail -n 1)
           PROF_PATH=$(swift test --build-path .build --show-codecov-path | tail -n 1)
           if [ ! -f "$PROF_PATH" ]; then
             echo "Unable to locate coverage data at $PROF_PATH" >&2
