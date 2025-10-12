@@ -92,10 +92,17 @@ struct LiteralTests {
     }
 
     @Test("Literal Description Tests")
-    func descriptionTests() {
+    func description() {
         #expect(JSON.Literal.true.description == "true")
         #expect(JSON.Literal.false.description == "false")
         #expect(JSON.Literal.null.description == "null")
+    }
+
+    @Test("RawValue Tests")
+    func rawValue() {
+        #expect(JSON.Literal.true.rawValue == "true")
+        #expect(JSON.Literal.false.rawValue == "false")
+        #expect(JSON.Literal.null.rawValue == "null")
     }
 
 }

@@ -137,14 +137,7 @@ extension JSON {
         // MARK: - CustomStringConvertible
 
         public var description: String {
-            switch self {
-            case .false:
-                "false"
-            case .true:
-                "true"
-            case .null:
-                "null"
-            }
+            rawValue
         }
     }
 
