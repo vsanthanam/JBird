@@ -148,26 +148,34 @@ jobs:
       - name: Decompress Build
         run: unzip build.zip
       - name: Run Tests with Coverage
-        run: swift test --enable-code-coverage --build-path .build
+        env:
+          LLVM_PROFILE_FILE: ${{ runner.temp }}/jbird-${{ matrix.swift }}-%p.profraw
+        run: |
+          mkdir -p "$RUNNER_TEMP"
+          swift test --enable-code-coverage --build-path .build
       - name: Generate Coverage Reports
         id: coverage-report
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+          SWIFT_VERSION: ${{ matrix.swift }}
         run: |
           set -eo pipefail
           BIN_PATH=$(swift build --build-path .build --show-bin-path | tail -n 1)
-          PROF_PATH=$(swift test --build-path .build --show-profdata-path 2>/dev/null | tail -n 1)
-          if [ -z "$PROF_PATH" ] || [ ! -f "$PROF_PATH" ]; then
-            PROF_PATH=$(find .build -name '*.profdata' -print -quit)
-          fi
+          RAW_PROFILE_GLOB="jbird-${SWIFT_VERSION}-*.profraw"
+          mapfile -t RAW_PROFILES < <(find "$RUNNER_TEMP" -name "$RAW_PROFILE_GLOB" -type f)
 
-          if [ -z "$PROF_PATH" ] || [ ! -f "$PROF_PATH" ]; then
-            echo "Unable to locate coverage data in .build (looked for *.profdata)" >&2
+          if [ ${#RAW_PROFILES[@]} -eq 0 ]; then
+            echo "No coverage profiles matching $RAW_PROFILE_GLOB found in $RUNNER_TEMP" >&2
             exit 1
           fi
 
           COVERAGE_DIR=".build/coverage"
           mkdir -p "$COVERAGE_DIR"
+          PROF_PATH="$COVERAGE_DIR/coverage-${SWIFT_VERSION}.profdata"
           LCOV_OUTPUT="$COVERAGE_DIR/coverage-${{ matrix.swift }}.lcov"
           SUMMARY_OUTPUT="$COVERAGE_DIR/coverage-summary-${{ matrix.swift }}.txt"
+
+          xcrun llvm-profdata merge -sparse "${RAW_PROFILES[@]}" -o "$PROF_PATH"
 
           TEST_BINARIES=()
           while IFS= read -r binary; do
