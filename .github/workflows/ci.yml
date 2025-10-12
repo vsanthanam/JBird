@@ -2,8 +2,10 @@ name: JBird CI
 permissions:
   contents: read
 env:
-  MACOS_SPM_MATRIX: '[{"swift":"6.1","runner":"macos-15","xcode":"16.4"},{"swift":"6.2","runner":"macos-26","xcode":"26.0"}]'
-  UBUNTU_SPM_VERSIONS: '["6.1","6.2"]'
+  MACOS_SPM_MATRIX: >-
+    {"swift":["6.1","6.2"],"include":[{"swift":"6.1","runner":"macos-15","xcode":"16.4"},{"swift":"6.2","runner":"macos-26","xcode":"26.0"}]}
+  UBUNTU_SPM_VERSIONS: >-
+    ["6.1","6.2"]
 on:
   push:
     branches: [ "main" ]
@@ -103,8 +105,7 @@ jobs:
   build-macos-spm:
     name: Build JBird (macOS)
     strategy:
-      matrix:
-        include: ${{ fromJSON(env.MACOS_SPM_MATRIX) }}
+      matrix: ${{ fromJSON(env.MACOS_SPM_MATRIX) }}
     needs: changes
     if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
     runs-on: ${{ matrix.runner }}
@@ -127,8 +128,7 @@ jobs:
   test-macos-spm:
     name: Test JBird (macOS)
     strategy:
-      matrix:
-        include: ${{ fromJSON(env.MACOS_SPM_MATRIX) }}
+      matrix: ${{ fromJSON(env.MACOS_SPM_MATRIX) }}
     needs: [build-macos-spm, changes]
     if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
     runs-on: ${{ matrix.runner }}
