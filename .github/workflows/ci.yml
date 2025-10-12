@@ -99,41 +99,47 @@ jobs:
       run: ./.scripts/lint-swiftformat
   build-macos-spm:
     name: Build JBird (macOS)
-    strategy:
+    strategy: &macos-spm-strategy
       matrix:
-        swift: [6.1, 6.2]
+        swift: ["6.1", "6.2"]
+        include:
+          - swift: "6.1"
+            runner: macos-15
+            xcode: "16.4"
+          - swift: "6.2"
+            runner: macos-26
+            xcode: "26.0"
     needs: changes
     if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
-    runs-on: ${{ matrix.swift == '6.1' && 'macos-15' || 'macos-26' }}
+    runs-on: ${{ matrix.runner }}
     outputs:
       artifact-name: macos-build
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Select Xcode Version
-      run: ./.scripts/xcode-select ${{ matrix.swift == '6.1' && '16.4' || '26.0' }}
-    - name: Build JBird
-      run: swift build -v --build-path .build
-    - name: Compress Build
-      run: zip -r build.zip .build
-    - name: Upload Build
-      uses: actions/upload-artifact@v4
-      with:
-        name: macos-build-${{ matrix.swift }}
-        path: build.zip
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Select Xcode Version
+        run: ./.scripts/xcode-select ${{ matrix.xcode }}
+      - name: Build JBird
+        run: swift build -v --build-path .build
+      - name: Compress Build
+        run: zip -r build.zip .build
+      - name: Upload Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build-${{ matrix.swift }}
+          path: build.zip
+
   test-macos-spm:
     name: Test JBird (macOS)
-    strategy:
-      matrix:
-        swift: [6.1, 6.2]
+    strategy: *macos-spm-strategy
     needs: [build-macos-spm, changes]
     if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
-    runs-on: ${{ matrix.swift == '6.1' && 'macos-15' || 'macos-26' }}
+    runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Xcode Version
-        run: ./.scripts/xcode-select ${{ matrix.swift == '6.1' && '16.4' || '26.0' }}
+        run: ./.scripts/xcode-select ${{ matrix.xcode }}
       - name: Download Build
         uses: actions/download-artifact@v4
         with:
@@ -141,13 +147,112 @@ jobs:
           path: .
       - name: Decompress Build
         run: unzip build.zip
-      - name: Test JBird
-        run: swift test
+      - name: Run Tests with Coverage
+        run: |
+          set -eo pipefail
+          COVERAGE_DIR="$GITHUB_WORKSPACE/.build/coverage"
+          mkdir -p "$COVERAGE_DIR"
+          rm -f "$COVERAGE_DIR"/jbird-${{ matrix.swift }}-*.profraw 2>/dev/null || true
+          export LLVM_PROFILE_FILE="$COVERAGE_DIR/jbird-${{ matrix.swift }}-%p.profraw"
+
+          swift test --enable-code-coverage --disable-sandbox --build-path .build
+      - name: Generate Coverage Reports
+        id: coverage-report
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+          SWIFT_VERSION: ${{ matrix.swift }}
+        run: |
+          set -eo pipefail
+          BIN_PATH=$(swift build --build-path .build --show-bin-path | tail -n 1)
+          COVERAGE_DIR=".build/coverage"
+          RAW_PROFILE_GLOB="jbird-${SWIFT_VERSION}-*.profraw"
+          RAW_PROFILES=()
+
+          if [ -d "$COVERAGE_DIR" ]; then
+            while IFS= read -r profile; do
+              RAW_PROFILES+=("$profile")
+            done < <(find "$COVERAGE_DIR" -name "$RAW_PROFILE_GLOB" -type f 2>/dev/null | sort)
+          fi
+
+          if [ ${#RAW_PROFILES[@]} -eq 0 ]; then
+            while IFS= read -r profile; do
+              RAW_PROFILES+=("$profile")
+            done < <(find .build -name "$RAW_PROFILE_GLOB" -type f 2>/dev/null | sort)
+          fi
+
+          if [ ${#RAW_PROFILES[@]} -eq 0 ]; then
+            echo "No coverage profiles found for Swift $SWIFT_VERSION" >&2
+            exit 1
+          fi
+
+          COVERAGE_DIR=".build/coverage"
+          mkdir -p "$COVERAGE_DIR"
+          PROF_PATH="$COVERAGE_DIR/coverage-${SWIFT_VERSION}.profdata"
+          LCOV_OUTPUT="$COVERAGE_DIR/coverage-${{ matrix.swift }}.lcov"
+          SUMMARY_OUTPUT="$COVERAGE_DIR/coverage-summary-${{ matrix.swift }}.txt"
+
+          xcrun llvm-profdata merge -sparse "${RAW_PROFILES[@]}" -o "$PROF_PATH"
+
+          TEST_BINARIES=()
+          while IFS= read -r bundle; do
+            binary_name="$(basename "$bundle" .xctest)"
+            binary_path="$bundle/Contents/MacOS/$binary_name"
+
+            if [ -f "$binary_path" ]; then
+              TEST_BINARIES+=("$binary_path")
+            fi
+          done < <(find "$BIN_PATH" -maxdepth 1 -type d -name "*.xctest" 2>/dev/null | sort)
+
+          if [ ${#TEST_BINARIES[@]} -eq 0 ]; then
+            while IFS= read -r bundle; do
+              binary_name="$(basename "$bundle" .xctest)"
+              binary_path="$bundle/Contents/MacOS/$binary_name"
+
+              if [ -f "$binary_path" ]; then
+                TEST_BINARIES+=("$binary_path")
+              fi
+            done < <(find "$BIN_PATH" -type d -name "*.xctest" 2>/dev/null | sort)
+          fi
+
+          if [ ${#TEST_BINARIES[@]} -eq 0 ]; then
+            echo "No test binaries found within $BIN_PATH" >&2
+            exit 1
+          fi
+
+          xcrun llvm-cov export -format="lcov" \
+            -instr-profile "$PROF_PATH" \
+            "${TEST_BINARIES[@]}" > "$LCOV_OUTPUT"
+
+          xcrun llvm-cov report \
+            --ignore-filename-regex='(^|/)Tests/' \
+            -instr-profile "$PROF_PATH" \
+            "${TEST_BINARIES[@]}" > "$SUMMARY_OUTPUT"
+
+          echo "lcov=$LCOV_OUTPUT" >> "$GITHUB_OUTPUT"
+          echo "summary=$SUMMARY_OUTPUT" >> "$GITHUB_OUTPUT"
+      - name: Publish Coverage Summary
+        run: |
+          {
+            echo "### macOS Swift ${{ matrix.swift }} coverage"
+            echo
+            echo '```'
+            cat "${{ steps.coverage-report.outputs.summary }}"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ${{ steps.coverage-report.outputs.lcov }}
+          flags: macos-swift-${{ matrix.swift }}
+          name: macos-swift-${{ matrix.swift }}
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+
   build-ubuntu-spm:
     name: Build JBird (Ubuntu)
-    strategy:
+    strategy: &ubuntu-spm-strategy
       matrix:
-        swift: [6.1, 6.2]
+        swift: ["6.1", "6.2"]
     needs: changes
     if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
     runs-on: ubuntu-latest
@@ -169,11 +274,10 @@ jobs:
         with:
           name: ubuntu-build-${{ matrix.swift }}
           path: build.zip
+
   test-ubuntu-spm:
     name: Test JBird (Ubuntu)
-    strategy:
-      matrix:
-        swift: [6.1, 6.2]
+    strategy: *ubuntu-spm-strategy
     needs: [build-ubuntu-spm, changes]
     if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
     runs-on: ubuntu-latest
@@ -193,6 +297,7 @@ jobs:
         run: unzip build.zip
       - name: Test JBird
         run: swift test
+
   clang-format:
     name: Run clang-format
     needs: changes
