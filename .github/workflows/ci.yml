@@ -83,7 +83,7 @@ jobs:
       uses: actions/checkout@v4
     - name: Select Xcode Version
       run: ./.scripts/xcode-select
-    - name: Build JBird
+    - name: Build ${{ matrix.scheme }} for ${{ matrix.platform }}
       run: ./.scripts/build-${{ matrix.platform }}-xcode ${{ matrix.scheme }}
   swiftformat:
     name: Run SwiftFormat 
