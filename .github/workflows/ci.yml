@@ -154,9 +154,13 @@ jobs:
         run: |
           set -eo pipefail
           BIN_PATH=$(swift build --build-path .build --show-bin-path | tail -n 1)
-          PROF_PATH=$(swift test --build-path .build --show-codecov-path | tail -n 1)
-          if [ ! -f "$PROF_PATH" ]; then
-            echo "Unable to locate coverage data at $PROF_PATH" >&2
+          PROF_PATH=$(swift test --build-path .build --show-profdata-path 2>/dev/null | tail -n 1)
+          if [ -z "$PROF_PATH" ] || [ ! -f "$PROF_PATH" ]; then
+            PROF_PATH=$(find .build -name '*.profdata' -print -quit)
+          fi
+
+          if [ -z "$PROF_PATH" ] || [ ! -f "$PROF_PATH" ]; then
+            echo "Unable to locate coverage data in .build (looked for *.profdata)" >&2
             exit 1
           fi
 
