@@ -467,12 +467,7 @@ extension JSON {
         }
         let absValue = abs(double)
         if absValue != 0, (absValue >= 1e7 || absValue < 1e-6) {
-            let formatter = NumberFormatter()
-            formatter.locale = Locale(identifier: "en_US_POSIX")
-            formatter.numberStyle = .scientific
-            formatter.positiveFormat = "0.################E+0"
-            formatter.negativeFormat = "-0.################E+0"
-            let str = formatter.string(from: NSNumber(value: double))!
+            let str = floatNumberFormatter.string(from: NSNumber(value: double))!
             bytes += str.utf8
         } else {
             bytes += String(double).utf8
@@ -745,7 +740,7 @@ extension JSON {
                     let key = String(cString: json_get_object_key(value, i))
                     let objValue = json_get_object_value(value, i).unsafelyUnwrapped
                     let value = try materialize(objValue, options)
-                    if !value.isNull || (!options.contains(.omitNullKeys) && !options.contains(.omitNullValues)) {
+                    if (!options.contains(.omitNullKeys) && !options.contains(.omitNullValues)) || !value.isNull {
                         object[key] = value
                     }
                 }
@@ -827,12 +822,11 @@ extension JSON {
                     let count = json_get_array_size(value)
                     let array = try await withThrowingTaskGroup { group in
                         for i in 0..<count {
-                            let getElement = UnsafeClosure {
+                            let element = unsafe_closure {
                                 json_get_array_element(value, i).unsafelyUnwrapped
                             }
                             group.addTask {
-                                let element = getElement()
-                                let value = try await materialize(element, options)
+                                let value = try await materialize(element(), options)
                                 return (value, i)
                             }
                         }
@@ -858,17 +852,15 @@ extension JSON {
                     let count = json_get_object_size(value)
                     let object = try await withThrowingTaskGroup { group in
                         for i in 0..<count {
-                            let getKey = UnsafeClosure {
+                            let key = unsafe_closure {
                                 String(cString: json_get_object_key(value, i))
                             }
-                            let getObjValue = UnsafeClosure {
+                            let objValue = unsafe_closure {
                                 json_get_object_value(value, i).unsafelyUnwrapped
                             }
                             group.addTask {
-                                let key = getKey()
-                                let objValue = getObjValue()
-                                let value = try await materialize(objValue, options)
-                                return (key, value)
+                                let value = try await materialize(objValue(), options)
+                                return (key(), value)
                             }
                         }
                         do {
@@ -961,12 +953,11 @@ extension JSON {
                     let count = json_get_array_size(value)
                     let array = try await withThrowingTaskGroup { group in
                         for i in 0..<count {
-                            let getElement = UnsafeClosure {
+                            let element = unsafe_closure {
                                 json_get_array_element(value, i).unsafelyUnwrapped
                             }
                             group.addTask {
-                                let element = getElement()
-                                let value = try await materialize(element, options)
+                                let value = try await materialize(element(), options)
                                 return (value, i)
                             }
                         }
@@ -992,17 +983,15 @@ extension JSON {
                     let count = json_get_object_size(value)
                     let object = try await withThrowingTaskGroup { group in
                         for i in 0..<count {
-                            let getKey = UnsafeClosure {
+                            let key = unsafe_closure {
                                 String(cString: json_get_object_key(value, i))
                             }
-                            let getObjValue = UnsafeClosure {
+                            let objValue = unsafe_closure {
                                 json_get_object_value(value, i).unsafelyUnwrapped
                             }
                             group.addTask {
-                                let key = getKey()
-                                let objValue = getObjValue()
-                                let value = try await materialize(objValue, options)
-                                return (key, value)
+                                let value = try await materialize(objValue(), options)
+                                return (key(), value)
                             }
                         }
                         do {
@@ -1062,26 +1051,35 @@ extension JSON {
         return min(max(cap, 1 * 1024 * 1024), 50 * 1024 * 1024)
     }
 
+    private struct unsafe_closure<Arguments, Product, Failure: Error>: @unchecked Sendable {
+
+        init(
+            closure: @escaping (Arguments) throws(Failure) -> Product
+        ) {
+            self.closure = closure
+        }
+
+        func callAsFunction(
+            _ argument: Arguments
+        ) throws(Failure) -> Product {
+            try closure(argument)
+        }
+
+        func callAsFunction() throws(Failure) -> Product where Arguments == Void {
+            try closure(())
+        }
+
+        private let closure: (Arguments) throws(Failure) -> Product
+
+    }
+
 }
 
-private struct UnsafeClosure<T, U, Failure: Error>: @unchecked Sendable {
-
-    init(
-        closure: @escaping (T) throws(Failure) -> U
-    ) {
-        self.closure = closure
-    }
-
-    func callAsFunction(
-        _ argument: T
-    ) throws(Failure) -> U {
-        try closure(argument)
-    }
-
-    func callAsFunction() throws(Failure) -> U where T == Void {
-        try closure(())
-    }
-
-    private let closure: (T) throws(Failure) -> U
-
-}
+private let floatNumberFormatter = {
+    let formatter = NumberFormatter()
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    formatter.numberStyle = .scientific
+    formatter.positiveFormat = "0.################E+0"
+    formatter.negativeFormat = "-0.################E+0"
+    return formatter
+}()
