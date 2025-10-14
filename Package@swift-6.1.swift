@@ -6,11 +6,11 @@ import PackageDescription
 let package = Package(
     name: "JBird",
     platforms: [
-        .macOS(.v13),
-        .macCatalyst(.v16),
-        .iOS(.v16),
-        .watchOS(.v9),
-        .tvOS(.v16),
+        .macOS(.v14),
+        .macCatalyst(.v17),
+        .iOS(.v17),
+        .watchOS(.v8),
+        .tvOS(.v17),
         .visionOS(.v1)
     ],
     products: [

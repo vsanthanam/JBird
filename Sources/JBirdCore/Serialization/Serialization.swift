@@ -951,63 +951,123 @@ extension JSON {
                     return .string(str)
                 case JSON_ARRAY:
                     let count = json_get_array_size(value)
-                    let array = try await withThrowingTaskGroup { group in
-                        for i in 0..<count {
-                            let element = unsafe_closure {
-                                json_get_array_element(value, i).unsafelyUnwrapped
-                            }
-                            group.addTask {
-                                let value = try await materialize(element(), options)
-                                return (value, i)
-                            }
-                        }
-                        do {
-                            var results: [(JSON, Int)] = []
-                            results.reserveCapacity(count)
-                            for try await result in group {
-                                results.append(result)
-                            }
-                            return results
-                                .sorted { $0.1 < $1.1 }
-                                .map(\.0)
-                                .filter { value in
-                                    !options.contains(.omitNullValues) || !value.isNull
+                    #if swift(>=6.1)
+                        let array = try await withThrowingTaskGroup { group in
+                            for i in 0..<count {
+                                let element = unsafe_closure {
+                                    json_get_array_element(value, i).unsafelyUnwrapped
                                 }
-                        } catch {
-                            group.cancelAll()
-                            throw error
+                                group.addTask {
+                                    let value = try await materialize(element(), options)
+                                    return (value, i)
+                                }
+                            }
+                            do {
+                                var results: [(JSON, Int)] = []
+                                results.reserveCapacity(count)
+                                for try await result in group {
+                                    results.append(result)
+                                }
+                                return results
+                                    .sorted { $0.1 < $1.1 }
+                                    .map(\.0)
+                                    .filter { value in
+                                        !options.contains(.omitNullValues) || !value.isNull
+                                    }
+                            } catch {
+                                group.cancelAll()
+                                throw error
+                            }
                         }
-                    }
+                    #else
+                        let array = try await withThrowingTaskGroup(of: (JSON, Int).self) { group in
+                            for i in 0..<count {
+                                let element = unsafe_closure {
+                                    json_get_array_element(value, i).unsafelyUnwrapped
+                                }
+                                group.addTask {
+                                    let value = try await materialize(element(), options)
+                                    return (value, i)
+                                }
+                            }
+                            do {
+                                var results: [(JSON, Int)] = []
+                                results.reserveCapacity(count)
+                                for try await result in group {
+                                    results.append(result)
+                                }
+                                return results
+                                    .sorted { $0.1 < $1.1 }
+                                    .map(\.0)
+                                    .filter { value in
+                                        !options.contains(.omitNullValues) || !value.isNull
+                                    }
+                            } catch {
+                                group.cancelAll()
+                                throw error
+                            }
+                        }
+                    #endif
                     return .array(array)
                 case JSON_OBJECT:
                     let count = json_get_object_size(value)
-                    let object = try await withThrowingTaskGroup { group in
-                        for i in 0..<count {
-                            let key = unsafe_closure {
-                                String(cString: json_get_object_key(value, i))
-                            }
-                            let objValue = unsafe_closure {
-                                json_get_object_value(value, i).unsafelyUnwrapped
-                            }
-                            group.addTask {
-                                let value = try await materialize(objValue(), options)
-                                return (key(), value)
-                            }
-                        }
-                        do {
-                            var object = Object()
-                            object.reserveCapacity(count)
-                            for try await (key, value) in group {
-                                if (!options.contains(.omitNullKeys) && !options.contains(.omitNullValues)) || !value.isNull {
-                                    object[key] = value
+                    #if swift(>=6.1)
+                        let object = try await withThrowingTaskGroup { group in
+                            for i in 0..<count {
+                                let key = unsafe_closure {
+                                    String(cString: json_get_object_key(value, i))
+                                }
+                                let objValue = unsafe_closure {
+                                    json_get_object_value(value, i).unsafelyUnwrapped
+                                }
+                                group.addTask {
+                                    let value = try await materialize(objValue(), options)
+                                    return (key(), value)
                                 }
                             }
-                            return object
-                        } catch {
-                            group.cancelAll()
-                            throw error
+                            do {
+                                var object = Object()
+                                object.reserveCapacity(count)
+                                for try await (key, value) in group {
+                                    if (!options.contains(.omitNullKeys) && !options.contains(.omitNullValues)) || !value.isNull {
+                                        object[key] = value
+                                    }
+                                }
+                                return object
+                            } catch {
+                                group.cancelAll()
+                                throw error
+                            }
                         }
-                    }
+                    #else
+                        let object = try await withThrowingTaskGroup(of: (String, JSON).self) { group in
+                            for i in 0..<count {
+                                let key = unsafe_closure {
+                                    String(cString: json_get_object_key(value, i))
+                                }
+                                let objValue = unsafe_closure {
+                                    json_get_object_value(value, i).unsafelyUnwrapped
+                                }
+                                group.addTask {
+                                    let value = try await materialize(objValue(), options)
+                                    return (key(), value)
+                                }
+                            }
+                            do {
+                                var object = Object()
+                                object.reserveCapacity(count)
+                                for try await (key, value) in group {
+                                    if (!options.contains(.omitNullKeys) && !options.contains(.omitNullValues)) || !value.isNull {
+                                        object[key] = value
+                                    }
+                                }
+                                return object
+                            } catch {
+                                group.cancelAll()
+                                throw error
+                            }
+                        }
+                    #endif
                     return .object(object)
                 default:
                     throw JSONDeserializationError.unknown

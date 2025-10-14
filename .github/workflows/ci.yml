@@ -101,20 +101,30 @@ jobs:
     name: Build JBird (macOS)
     strategy:
       matrix:
-        swift: [6.1, 6.2]
+        swift: ['6.0', '6.1', '6.2']
+        include:
+          - swift: '6.0'
+            runner: 'macos-15'
+            xcode: '16.0'
+          - swift: '6.1'
+            runner: 'macos-15'
+            xcode: '16.4'
+          - swift: '6.2'
+            runner: 'macos-26'
+            xcode: '26.0'
     needs: changes
     if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
-    runs-on: ${{ matrix.swift == '6.1' && 'macos-15' || 'macos-26' }}
+    runs-on: ${{ matrix.runner }}
     outputs:
       artifact-name: macos-build
     steps:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Select Xcode Version
-      run: ./.scripts/xcode-select ${{ matrix.swift == '6.1' && '16.4' || '26.0' }}
+      run: ./.scripts/xcode-select ${{ matrix.xcode }}
     - name: Build JBird
       run: swift build -v --build-path .build
-    - name: Compress Build
+    - name: Compress Builds
       run: zip -r build.zip .build
     - name: Upload Build
       uses: actions/upload-artifact@v4
@@ -125,15 +135,25 @@ jobs:
     name: Test JBird (macOS)
     strategy:
       matrix:
-        swift: [6.1, 6.2]
+        swift: ['6.0', '6.1', '6.2']
+        include:
+          - swift: '6.0'
+            runner: 'macos-15'
+            xcode: '16.0'
+          - swift: '6.1'
+            runner: 'macos-15'
+            xcode: '16.4'
+          - swift: '6.2'
+            runner: 'macos-26'
+            xcode: '26.0'
     needs: [build-macos-spm, changes]
     if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
-    runs-on: ${{ matrix.swift == '6.1' && 'macos-15' || 'macos-26' }}
+    runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Xcode Version
-        run: ./.scripts/xcode-select ${{ matrix.swift == '6.1' && '16.4' || '26.0' }}
+        run: ./.scripts/xcode-select ${{ matrix.xcode }}
       - name: Download Build
         uses: actions/download-artifact@v4
         with:
@@ -147,7 +167,7 @@ jobs:
     name: Build JBird (Ubuntu)
     strategy:
       matrix:
-        swift: [6.1, 6.2]
+        swift: ['6.0', '6.1', '6.2']
     needs: changes
     if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
     runs-on: ubuntu-latest
@@ -173,7 +193,7 @@ jobs:
     name: Test JBird (Ubuntu)
     strategy:
       matrix:
-        swift: [6.1, 6.2]
+        swift: ['6.0', '6.1', '6.2']
     needs: [build-ubuntu-spm, changes]
     if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
     runs-on: ubuntu-latest

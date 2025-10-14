@@ -1,4 +1,4 @@
-// swift-tools-version: 6.2
+// swift-tools-version: 6.0
 
 import CompilerPluginSupport
 import PackageDescription
@@ -42,7 +42,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/swiftlang/swift-syntax.git",
-            exact: "602.0.0"
+            exact: "600.0.1"
         ),
         .package(
             url: "https://github.com/swiftlang/swift-docc-plugin.git",
@@ -50,7 +50,7 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/nicklockwood/SwiftFormat.git",
-            exact: "0.58.3"
+            exact: "0.57.2"
         )
     ],
     targets: [
@@ -65,10 +65,8 @@ let package = Package(
                 .copy("PrivacyInfo.xcprivacy")
             ],
             swiftSettings: [
-                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
-                .treatAllWarnings(as: .error)
             ]
         ),
         .testTarget(
@@ -77,10 +75,8 @@ let package = Package(
                 "JBird"
             ],
             swiftSettings: [
-                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
-                .treatAllWarnings(as: .error)
             ]
         ),
         .target(
@@ -92,10 +88,8 @@ let package = Package(
                 .copy("PrivacyInfo.xcprivacy")
             ],
             swiftSettings: [
-                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
-                .treatAllWarnings(as: .error)
             ]
         ),
         .testTarget(
@@ -105,10 +99,8 @@ let package = Package(
                 "JBirdParser"
             ],
             swiftSettings: [
-                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
-                .treatAllWarnings(as: .error)
             ]
         ),
         .target(
@@ -117,7 +109,6 @@ let package = Package(
             swiftSettings: [
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
-                .treatAllWarnings(as: .error)
             ]
         ),
         .testTarget(
@@ -126,10 +117,8 @@ let package = Package(
                 "JBirdParser"
             ],
             swiftSettings: [
-                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
-                .treatAllWarnings(as: .error)
             ]
         ),
         .target(
@@ -141,10 +130,8 @@ let package = Package(
                 .copy("PrivacyInfo.xcprivacy")
             ],
             swiftSettings: [
-                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
-                .treatAllWarnings(as: .error)
             ]
         ),
         .testTarget(
@@ -154,10 +141,8 @@ let package = Package(
                 "JBirdCore"
             ],
             swiftSettings: [
-                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
-                .treatAllWarnings(as: .error)
             ]
         ),
         .target(
@@ -171,10 +156,8 @@ let package = Package(
                 .copy("PrivacyInfo.xcprivacy")
             ],
             swiftSettings: [
-                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
-                .treatAllWarnings(as: .error)
             ]
         ),
         .testTarget(
@@ -183,10 +166,8 @@ let package = Package(
                 "JBirdMacros"
             ],
             swiftSettings: [
-                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
-                .treatAllWarnings(as: .error)
             ]
         ),
         .macro(
@@ -202,10 +183,8 @@ let package = Package(
                 )
             ],
             swiftSettings: [
-                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
-                .treatAllWarnings(as: .error)
             ]
         ),
         .testTarget(
@@ -218,10 +197,8 @@ let package = Package(
                 )
             ],
             swiftSettings: [
-                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
-                .treatAllWarnings(as: .error)
             ]
         )
     ],

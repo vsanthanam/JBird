@@ -358,13 +358,17 @@ struct JSONCodableTests {
             #expect(url == expected)
         }
 
-        @Test("Illegal URL Decode")
-        func ullegalUrlDecode() throws {
-            let json = JSON.string("")
-            #expect(throws: JSONError.urlDecodingFailure("")) {
-                _ = try json.decode(into: URL.self)
+        #if canImport(Darwin) || swift(>=6.1)
+            @Test("Illegal URL Decode")
+            func ullegalUrlDecode() throws {
+                // A bug in the Swift 6.0 linux version of foundation lets you init a URL from an empty string.
+                // Weird.
+                let json = JSON.string("")
+                #expect(throws: JSONError.urlDecodingFailure("")) {
+                    _ = try json.decode(into: URL.self)
+                }
             }
-        }
+        #endif
 
     }
 
