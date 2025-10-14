@@ -193,6 +193,38 @@ jobs:
         run: unzip build.zip
       - name: Test JBird
         run: swift test
+  build-android-spm:
+    name: Build JBird (Android)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        swift: ['6.2']
+    needs: [changes]
+    if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: "Build JBird"
+        uses: skiptools/swift-android-action@v2
+        with:
+          swift-version: ${{ matrix.swift }}
+          run-tests: false
+  test-android-spm:
+    name: Test JBird (Android)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        swift: ['6.2']
+    needs: [build-android-spm, changes]
+    if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: "Build JBird"
+        uses: skiptools/swift-android-action@v2
+        with:
+          swift-version: ${{ matrix.swift }}
+          run-tests: true
   clang-format:
     name: Run clang-format
     needs: changes
@@ -201,12 +233,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
       - name: Install clang-format
         run: |
           sudo apt-get update
           sudo apt-get install -y clang-format
-
       - name: Validate formatting
         run: ./.scripts/lint-clang-format
   lint-docc:
@@ -245,6 +275,8 @@ jobs:
       - test-macos-spm
       - build-ubuntu-spm
       - test-ubuntu-spm
+      - build-android-spm
+      - test-android-spm
       - build-xcframework
       - swiftformat
       - clang-format
@@ -259,6 +291,8 @@ jobs:
             [[ "${{ needs.test-macos-spm.result }}" == "failure" ]] || \
             [[ "${{ needs.build-ubuntu-spm.result }}" == "failure" ]] || \
             [[ "${{ needs.test-ubuntu-spm.result }}" == "failure" ]] || \
+            [[ "${{ needs.build-android-spm.result }}" == "failure" ]] || \
+            [[ "${{ needs.test-android-spm.result }}" == "failure" ]] || \
             [[ "${{ needs.build-xcframework.result }}" == "failure" ]] || \
             [[ "${{ needs.swiftformat.result }}" == "failure" ]] || \
             [[ "${{ needs.clang-format.result }}" == "failure" ]] || \
