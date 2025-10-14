@@ -95,7 +95,7 @@ extension JSON {
         /// - Strings are represented as `String`
         /// - Integers are represented as `Int`
         /// - Floating point numbers are represented as `Double`
-        @available(*, deprecated, renamed: "unboxed()", message: "Use unboxed() instead.")
+        @available(*, deprecated, renamed: "unboxed()", message: "Use unboxed() instead. This property will be removed in a future version.")
         public var untyped: Any? {
             switch self {
             case let .int(int):

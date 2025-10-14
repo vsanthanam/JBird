@@ -280,7 +280,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Floating point numbers are represented as `Double`
     /// - Arrays are represented as `[Any?]`
     /// - Objects are represented as `[String: Any?]`
-    @available(*, deprecated, renamed: "unboxed()", message: "Use unboxed() instead.")
+    @available(*, deprecated, renamed: "unboxed()", message: "Use unboxed() instead. This property will be removed in a future version.")
     public var untyped: Any? {
         switch self {
         case let .literal(literal):
