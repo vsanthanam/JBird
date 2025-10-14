@@ -91,7 +91,7 @@ extension JSON {
         /// This property returns the JSON literal as a native Swift type:
         /// - `true` and `false` literals are represented as `Bool`
         /// - `null` literals are represented as `nil`
-        @available(*, deprecated, renamed: "unboxed()", message: "Use unboxed() instead.")
+        @available(*, deprecated, renamed: "unboxed()", message: "Use unboxed() instead. This property will be removed in a future version.")
         public var untyped: Any? {
             switch self {
             case .true:
