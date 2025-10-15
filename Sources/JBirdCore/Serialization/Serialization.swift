@@ -30,6 +30,10 @@ import Foundation
     import JBirdParser
 #endif
 
+#if os(Windows)
+    import WinSDK
+#endif
+
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON {
 
@@ -1030,20 +1034,34 @@ extension JSON {
         }
     #endif
 
-    private static func calculateMaxDepth() -> size_t {
-        var attr = pthread_attr_t()
+    #if os(Windows)
+        @inline(__always)
+        private static func calculateMaxDepth() -> size_t {
+            var low: ULONG_PTR = 0
+            var high: ULONG_PTR = 0
+            GetCurrentThreadStackLimits(&low, &high)
 
-        pthread_attr_init(&attr)
+            let stackBytes = size_t(high &- low)
 
-        defer {
-            pthread_attr_destroy(&attr)
+            return min(1024, max(16, stackBytes / 512))
         }
+    #else
+        @inline(__always)
+        private static func calculateMaxDepth() -> size_t {
+            var attr = pthread_attr_t()
 
-        var size: size_t = 0
-        pthread_attr_getstacksize(&attr, &size)
+            pthread_attr_init(&attr)
 
-        return min(1024, max(16, size / 512))
-    }
+            defer {
+                pthread_attr_destroy(&attr)
+            }
+
+            var size: size_t = 0
+            pthread_attr_getstacksize(&attr, &size)
+
+            return min(1024, max(16, size / 512))
+        }
+    #endif
 
     private static func calculateMaxInputSize() -> size_t {
         let physicalMemory = Double(ProcessInfo.processInfo.physicalMemory)
