@@ -25,6 +25,7 @@
 
 /// A type that can be represented as a JSON number
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(*, deprecated, renamed: "JSONNumberEncodable", message: "Use JSONLiteralEncodable instead. This protocol will be removed in a future release.")
 public protocol JSONNumberConvertible {
 
     /// The JSON decimal number representation of the value
@@ -33,6 +34,7 @@ public protocol JSONNumberConvertible {
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(*, deprecated, renamed: "JSONNumberEncodable", message: "Use JSONLiteralEncodable instead. This protocol will be removed in a future release.")
 extension Int: JSONNumberConvertible {
 
     public var jsonNumber: JSON.Number {
@@ -42,6 +44,7 @@ extension Int: JSONNumberConvertible {
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(*, deprecated, renamed: "JSONNumberEncodable", message: "Use JSONLiteralEncodable instead. This protocol will be removed in a future release.")
 extension Double: JSONNumberConvertible {
 
     public var jsonNumber: JSON.Number {

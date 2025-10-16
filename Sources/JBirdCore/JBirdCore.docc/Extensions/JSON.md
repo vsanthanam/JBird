@@ -87,6 +87,7 @@ let steve: JSON = [
 - ``stringValue``
 - ``arrayValue``
 - ``objectValue``
+- ``untyped``
 - ``unboxed()``
 - ``decode(into:)``
 

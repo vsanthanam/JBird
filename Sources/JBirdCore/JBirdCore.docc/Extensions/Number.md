@@ -58,7 +58,8 @@ if number.isDouble {
 
 ### Initializers
 
-- ``init(_:)``
+- ``init(_:)-(JSONNumberEncodable)``
+- ``init(_:)-(JSONNumberConvertible)``
 
 ### Decoding number values into Swift types
 
