@@ -43,14 +43,6 @@ let package = Package(
         .package(
             url: "https://github.com/swiftlang/swift-syntax.git",
             exact: "601.0.1"
-        ),
-        .package(
-            url: "https://github.com/swiftlang/swift-docc-plugin.git",
-            exact: "1.4.5"
-        ),
-        .package(
-            url: "https://github.com/nicklockwood/SwiftFormat.git",
-            exact: "0.57.2"
         )
     ],
     targets: [
