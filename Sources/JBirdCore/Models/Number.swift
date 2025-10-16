@@ -33,10 +33,18 @@ extension JSON {
 
         // MARK: - Initializers
 
+        @available(*, deprecated, renamed: "init(_:)", message: "")
+        @_disfavoredOverload
         public init(
             _ convertible: some JSONNumberConvertible
         ) {
             self = convertible.jsonNumber
+        }
+
+        /// Create a `JSON.Number` value from a ``JSONNumberEncodable`` type
+        /// - Parameter encodable: The encodable type to convert to a JSON number
+        public init(_ encodable: some JSONNumberEncodable) {
+            self = encodable.encodeToJSONNumber()
         }
 
         // MARK: - API

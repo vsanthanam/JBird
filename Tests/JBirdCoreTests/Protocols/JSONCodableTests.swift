@@ -146,6 +146,13 @@ struct JSONCodableTests {
             #expect(int == 21)
         }
 
+        @Test("Int As Double Decode")
+        func intDecodeAasDouble() throws {
+            let json = JSON.number(.int(21))
+            let double = try json.decode(into: Double.self)
+            #expect(double == 21.0)
+        }
+
     }
 
     @Suite("Double Conformance Tests")
@@ -163,6 +170,21 @@ struct JSONCodableTests {
             let json = JSON.number(.double(2.1))
             let double = try json.decode(into: Double.self)
             #expect(double == 2.1)
+        }
+
+        @Test("Double Decode As Int")
+        func doubleDecodeAsInt() throws {
+            let json = JSON.number(.double(4.0))
+            let int = try json.decode(into: Int.self)
+            #expect(int == 4)
+        }
+
+        @Test("Double Decode As Int Fails For Fractional Values")
+        func doubleDecodeAsIntFractionalFailure() {
+            let json = JSON.number(.double(4.1))
+            #expect(throws: JSONError.illegalNumberConversion) {
+                _ = try json.decode(into: Int.self)
+            }
         }
 
     }

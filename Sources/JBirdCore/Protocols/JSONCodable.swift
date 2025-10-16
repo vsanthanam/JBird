@@ -66,69 +66,89 @@ extension JSON: JSONCodable {
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension Bool: JSONCodable {
+extension JSONEncodable where Self: JSONLiteralEncodable {
 
     public func encodeToJSON() -> JSON {
-        self ? .literal(.true) : .literal(.false)
-    }
-
-    public init(json: JSON) throws {
-        self = try json.boolValue
+        let literal = JSON.Literal(self)
+        return .literal(literal)
     }
 
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension JSON.Literal: JSONCodable {
-
-    public func encodeToJSON() -> JSON {
-        .literal(self)
-    }
+extension JSONDecodable where Self: JSONLiteralDecodable {
 
     public init(json: JSON) throws {
-        self = try json.literalValue
+        let literal = try json.literalValue
+        try self.init(jsonLiteral: literal)
     }
 
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension Int: JSONCodable {
+extension JSON.Literal: JSONCodable {}
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension Bool: JSONCodable {}
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension JSONEncodable where Self: JSONNumberEncodable {
 
     public func encodeToJSON() -> JSON {
-        .number(.int(self))
-    }
-
-    public init(json: JSON) throws {
-        self = try json.intValue
+        let number = JSON.Number(self)
+        return .number(number)
     }
 
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension Double: JSONCodable {
-
-    public func encodeToJSON() -> JSON {
-        .number(.double(self))
-    }
+extension JSONDecodable where Self: JSONNumberDecodable {
 
     public init(json: JSON) throws {
-        self = try json.doubleValue
+        let number = try json.numberValue
+        try self.init(jsonNumber: number)
     }
 
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension JSON.Number: JSONCodable {
+extension JSON.Number: JSONCodable {}
 
-    public func encodeToJSON() -> JSON {
-        .number(self)
-    }
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension Int: JSONCodable {}
 
-    public init(json: JSON) throws {
-        self = try json.numberValue
-    }
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension Double: JSONCodable {}
 
-}
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension UInt: JSONCodable {}
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension UInt8: JSONCodable {}
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension UInt16: JSONCodable {}
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension UInt32: JSONCodable {}
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension UInt64: JSONCodable {}
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension Int8: JSONCodable {}
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension Int16: JSONCodable {}
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension Int32: JSONCodable {}
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension Int64: JSONCodable {}
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension Float: JSONCodable {}
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension String: JSONCodable {
@@ -276,136 +296,6 @@ extension UUID: JSONCodable {
             throw JSONError.uuidDecodingFailure(str)
         }
         self = uuid
-    }
-
-}
-
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension UInt: JSONCodable {
-
-    public func encodeToJSON() -> JSON {
-        JSON(Int(self))
-    }
-
-    public init(json: JSON) throws {
-        self = try UInt(json.intValue)
-    }
-
-}
-
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension UInt8: JSONCodable {
-
-    public func encodeToJSON() -> JSON {
-        JSON(Int(self))
-    }
-
-    public init(json: JSON) throws {
-        self = try UInt8(json.intValue)
-    }
-
-}
-
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension UInt16: JSONCodable {
-
-    public func encodeToJSON() -> JSON {
-        JSON(Int(self))
-    }
-
-    public init(json: JSON) throws {
-        self = try UInt16(json.intValue)
-    }
-
-}
-
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension UInt32: JSONCodable {
-
-    public func encodeToJSON() -> JSON {
-        JSON(Int(self))
-    }
-
-    public init(json: JSON) throws {
-        self = try UInt32(json.intValue)
-    }
-
-}
-
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension UInt64: JSONCodable {
-
-    public func encodeToJSON() -> JSON {
-        JSON(Int(self))
-    }
-
-    public init(json: JSON) throws {
-        self = try UInt64(json.intValue)
-    }
-
-}
-
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension Int8: JSONCodable {
-
-    public func encodeToJSON() -> JSON {
-        JSON(Int(self))
-    }
-
-    public init(json: JSON) throws {
-        self = try Int8(json.intValue)
-    }
-
-}
-
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension Int16: JSONCodable {
-
-    public func encodeToJSON() -> JSON {
-        JSON(Int(self))
-    }
-
-    public init(json: JSON) throws {
-        self = try Int16(json.intValue)
-    }
-
-}
-
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension Int32: JSONCodable {
-
-    public func encodeToJSON() -> JSON {
-        JSON(Int(self))
-    }
-
-    public init(json: JSON) throws {
-        self = try Int32(json.intValue)
-    }
-
-}
-
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension Int64: JSONCodable {
-
-    public func encodeToJSON() -> JSON {
-        JSON(Int(self))
-    }
-
-    public init(json: JSON) throws {
-        self = try Int64(json.intValue)
-    }
-
-}
-
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension Float: JSONCodable {
-
-    public func encodeToJSON() -> JSON {
-        JSON(Double(self))
-    }
-
-    public init(json: JSON) throws {
-        self = try Float(json.doubleValue)
     }
 
 }

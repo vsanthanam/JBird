@@ -29,16 +29,26 @@ import Foundation
 extension JSON {
 
     /// A JSON literal
-    public enum Literal: String, Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, ExpressibleByNilLiteral, CustomStringConvertible {
+    public enum Literal: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, ExpressibleByNilLiteral, CustomStringConvertible {
 
         // MARK: - Initializers
 
         /// Create a literal from a `JSONLiteralConvertible`-conforming tyoe
         /// - Parameter convertible: The convertible type
+        @available(*, deprecated, renamed: "init(_:)", message: "Use `init(_:)` instead")
+        @_disfavoredOverload
         public init(
             _ convertible: some JSONLiteralConvertible
         ) {
             self = convertible.jsonLiteral
+        }
+
+        /// Create a `JSON.Literal` value from a ``JSONLiteralEncodable`` type
+        /// - Parameter encodable: The encodable type to convert to a JSON literal
+        public init(
+            _ encodable: some JSONLiteralEncodable
+        ) {
+            self = encodable.encodeToJSONLiteral()
         }
 
         // MARK: - API
@@ -137,7 +147,14 @@ extension JSON {
         // MARK: - CustomStringConvertible
 
         public var description: String {
-            rawValue
+            switch self {
+            case .true:
+                "true"
+            case .false:
+                "false"
+            case .null:
+                "null"
+            }
         }
     }
 

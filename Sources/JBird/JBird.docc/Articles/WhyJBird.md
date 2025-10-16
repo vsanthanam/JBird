@@ -61,9 +61,9 @@ JBird provides a fully typed `JSON` enum that accurately represents JSON's data 
 ```swift
 // JBird approach
 let json = try JSON(data)
-let name = try json["user"]["name"].stringValue
-let age = try json["user"]["age"].intValue
-let isActive = try json["user"]["isActive"].boolValue
+let name = try json["user"]["name"].decode(into: String.self)
+let age = try json["user"]["age"].decode(into: Int.self)
+let isActive = try json["user"]["isActive"].decode(into: Bool.self)
 let user = try json["user"].decode(into: User.self)
 ```
 
