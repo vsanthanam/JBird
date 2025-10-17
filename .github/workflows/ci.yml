@@ -226,12 +226,10 @@ jobs:
         run: unzip build.zip
       - name: Test JBird
         run: swift test --skip-build
-  build-test-windows-spm:
-    name: Test JBird (Windows)
+  build-windows-spm:
+    name: Build JBird (Windows)
     strategy:
       matrix:
-        # TODO: - Investigate why unit tests for 6.1 don't work in CI
-        # swift: ['6.1', '6.2']
         swift: ['6.2']
     needs: changes
     if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
@@ -244,7 +242,7 @@ jobs:
         with:
           swift-version: ${{ matrix.swift }}
       - name: Build JBird
-        run: swift build -v --build-path .build
+        run: swift build -v --build-tests --build-path .build -c debug -Xlinker /INCREMENTAL:NO
       - name: Compress Build
         shell: pwsh
         run: |
@@ -254,35 +252,32 @@ jobs:
         with:
           name: windows-build-${{ matrix.swift }}
           path: build.zip
+  test-windows-spm:
+    name: Test JBird (Windows)
+    strategy:
+      matrix:
+        swift: ['6.2']
+    needs: [build-windows-spm, changes]
+    if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Swift
+        uses: SwiftyLab/setup-swift@latest
+        with:
+          swift-version: ${{ matrix.swift }}
+      - name: Download Build
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-build-${{ matrix.swift }}
+          path: .
+      - name: Decompress Build
+        shell: pwsh
+        run: |
+          Expand-Archive -Path "build.zip" -DestinationPath "." -Force
       - name: Test JBird
-        run: swift test
-  # TODO: - Separate build / test jobs for Windows
-  # test-windows-spm:
-  #   name: Test JBird (Windows)
-  #   strategy:
-  #     matrix:
-  #       swift: ['6.2']
-  #   needs: [build-windows-spm, changes]
-  #   if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
-  #   runs-on: windows-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-  #     - name: Setup Swift
-  #       uses: SwiftyLab/setup-swift@latest
-  #       with:
-  #         swift-version: ${{ matrix.swift }}
-  #     - name: Download Build
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: windows-build-${{ matrix.swift }}
-  #         path: .
-  #     - name: Decompress Build
-  #       shell: pwsh
-  #       run: |
-  #         Expand-Archive -Path "build.zip" -DestinationPath "." -Force
-  #     - name: Test JBird
-  #       run: swift test --disable-xctest --skip-build
+        run: swift test --disable-xctest --skip-build
   clang-format:
     name: Run clang-format
     needs: changes
@@ -335,9 +330,8 @@ jobs:
       - test-macos-spm
       - build-ubuntu-spm
       - test-ubuntu-spm
-      - build-test-windows-spm
-      # - build-windows-spm
-      # - test-windows-spm
+      - build-windows-spm
+      - test-windows-spm
       - build-xcframework
       - swiftformat
       - clang-format
@@ -352,7 +346,8 @@ jobs:
             [[ "${{ needs.test-macos-spm.result }}" == "failure" ]] || \
             [[ "${{ needs.build-ubuntu-spm.result }}" == "failure" ]] || \
             [[ "${{ needs.test-ubuntu-spm.result }}" == "failure" ]] || \
-            [[ "${{ needs.build-test-windows-spm.result }}" == "failure" ]] || \
+            [[ "${{ needs.build-windows-spm.result }}" == "failure" ]] || \
+            [[ "${{ needs.test-windows-spm.result }}" == "failure" ]] || \
             [[ "${{ needs.build-xcframework.result }}" == "failure" ]] || \
             [[ "${{ needs.swiftformat.result }}" == "failure" ]] || \
             [[ "${{ needs.clang-format.result }}" == "failure" ]] || \
