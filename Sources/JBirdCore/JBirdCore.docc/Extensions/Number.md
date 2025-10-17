@@ -63,13 +63,14 @@ if number.isDouble {
 
 ### Decoding number values into Swift types
 
-- ``intValue``
-- ``doubleValue``
+- ``decode(into:)``
 - ``unboxed()``
 
 ### Inspecting number values
 
+- ``intValue``
 - ``isInt``
+- ``doubleValue``
 - ``isDouble``
 
 ### Literal Expression Support

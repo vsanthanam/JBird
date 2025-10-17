@@ -58,11 +58,12 @@ if literal.isNull {
 
 ### Decoding literal values into Swift types
 
-- ``boolValue``
 - ``unboxed()``
+- ``decode(into:)``
 
 ### Inspecting literal values
 
+- ``boolValue``
 - ``isBool``
 - ``isNull``
 

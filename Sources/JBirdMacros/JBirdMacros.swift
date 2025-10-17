@@ -121,7 +121,7 @@ public macro JSONCodable() = #externalMacro(
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 @attached(peer)
 public macro JSONKey(
-    _ keyRule: JSONKeyComputationRule = .copy,
+    _ keyRule: JSONKeyComputationRule = .copy
 ) = #externalMacro(
     module: "JBirdMacrosCompilerPlugin",
     type: "JSONKeyMacro"

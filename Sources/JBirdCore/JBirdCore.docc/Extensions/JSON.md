@@ -79,31 +79,30 @@ let steve: JSON = [
 
 ### Decoding JSON values into Swift types
 
-- ``literalValue``
-- ``boolValue``
-- ``numberValue``
-- ``intValue``
-- ``doubleValue``
-- ``stringValue``
-- ``arrayValue``
-- ``objectValue``
-- ``untyped``
 - ``unboxed()``
 - ``decode(into:)``
 
 ### Inspecting JSON values
 
+- ``literalValue``
+- ``isLiteral``
+- ``boolValue``
+- ``isBool``
+- ``numberValue``
+- ``isNumber``
+- ``intValue``
+- ``isInt``
+- ``doubleValue``
+- ``isDouble``
+- ``stringValue``
+- ``isString``
+- ``arrayValue``
+- ``isArray``
+- ``objectValue``
+- ``isObject``
+- ``isNull``
 - ``count``
 - ``isEmpty``
-- ``isBool``
-- ``isNull``
-- ``isLiteral``
-- ``isObject``
-- ``isArray``
-- ``isNumber``
-- ``isInt``
-- ``isDouble``
-- ``isString``
 
 ### Subscripting
 
