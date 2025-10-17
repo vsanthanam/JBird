@@ -416,7 +416,6 @@ struct JSONTests {
             }
         }
 
-        @available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 1.0, *)
         @Test("Value at path tests (parameter packs)")
         func valueAtPathWithPacks() throws {
             let json: JSON = [

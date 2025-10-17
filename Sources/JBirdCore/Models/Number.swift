@@ -97,6 +97,15 @@ extension JSON {
             }
         }
 
+        /// Decode the JSON number into a ``JSONNumberDecodable`` type
+        /// - Parameter type: The type to decode into
+        /// - Returns: The decoded number
+        public func decode<T>(
+            into type: T.Type = T.self
+        ) throws -> T where T: JSONNumberDecodable {
+            try T(jsonNumber: self)
+        }
+
         /// The untyped representation of the JSON number value
         ///
         /// This property returns the JSON number value as a native Swift type:
