@@ -33,22 +33,20 @@ extension JSON {
 
         // MARK: - Initializers
 
-        /// Create a literal from a `JSONLiteralConvertible`-conforming tyoe
-        /// - Parameter convertible: The convertible type
-        @available(*, deprecated, renamed: "init(_:)", message: "Use `init(_:)` instead")
-        @_disfavoredOverload
-        public init(
-            _ convertible: some JSONLiteralConvertible
-        ) {
-            self = convertible.jsonLiteral
-        }
-
         /// Create a `JSON.Literal` value from a ``JSONLiteralEncodable`` type
         /// - Parameter encodable: The encodable type to convert to a JSON literal
         public init(
             _ encodable: some JSONLiteralEncodable
         ) {
             self = encodable.encodeToJSONLiteral()
+        }
+
+        @available(*, deprecated, renamed: "init(_:)", message: "Use `init(_:)` instead")
+        @_disfavoredOverload
+        public init(
+            _ convertible: some JSONLiteralConvertible
+        ) {
+            self = convertible.jsonLiteral
         }
 
         // MARK: - API
