@@ -32,6 +32,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     // MARK: - Initializers
 
     /// Create a `JSON` value from a ``JSONEncodable`` type
+    ///
     /// - Parameter encodable: The encodable type to convert to JSON
     public init(
         _ encodable: some JSONEncodable
@@ -40,6 +41,10 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// Create a `JSON` value by deserializing a byte buffer containing UTF-8 encoded JSON string
+    ///
+    /// For more advaned customization of the deserialization process, use the ``value(for:options:)-(Data,_)`` method, which lets you pass in your own ``DeserializationOptions``.
+    /// For asynhronous deserialization with parallelization, use the ``deserialize(_:options:)-(Data,_)`` method.
+    ///
     /// - Parameter data: The byte buffer to deserialize
     public init(
         _ data: Data
@@ -48,6 +53,9 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// Create a `JSON` value by deserializing a Swift string
+    ///
+    /// For more advanced customization of the deserialization process, use the ``value(for:options:)-(String,_)`` method, which lets you pass in your own ``DeserializationOptions``.
+    /// For asynchronous deserialization with parallelizatition, use the ``deserialize(_:options:)-(String,_)`` method.
     /// - Parameter jsonString: The string to deserialize
     public init(
         jsonString: String
@@ -58,27 +66,52 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     // MARK: - API
 
     /// A JSON literal value
+    ///
+    /// See ``JSON/Literal`` for more information
     case literal(Literal)
 
     /// A JSON object
+    ///
+    /// See ``JSON/Object`` for more information
     case object(Object)
 
     /// A JSON array
+    ///
+    /// See ``JSON/Array`` for more information
     case array(Array)
 
     /// A JSON number value
+    ///
+    /// See ``JSON/Number`` for more information
     case number(Number)
 
     /// A JSON string
     case string(String)
 
     /// A null JSON value
+    ///
+    /// This is sugar for `JSON.literal(.null)`
     public static let null: JSON = nil
 
     /// A zero JSON value
+    ///
+    /// This is sufar for `JSON.number(.int(0))`
     public static let zero: JSON = 0
 
-    /// The number of objects in the JSON array or JSON dictionary
+    /// The number of objects in the JSON array or JSON dictionary.
+    ///
+    /// This property returns an integer describing the number of values in a JSON array or the number of key-value pairs in a JSON object
+    /// It throws an error if the JSON value is not an array or an object.
+    ///
+    /// ```swift
+    /// let object: JSON = ["foo": 1, "bar", 2]
+    /// let array: JSON = ["foo", "bar", "baz"]
+    /// let bool: JSON = false
+    ///
+    /// let first = try object.count // returns 2
+    /// let second = try array.count // returns 3
+    /// let bool = try bool.count // throws an error
+    /// ```
     public var count: Int {
         get throws {
             switch self {
@@ -92,14 +125,38 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         }
     }
 
-    /// Whether or not the JSON array or JSON object is empty
+    /// Whether or not the JSON array or JSON object is empty.
+    ///
+    /// This property returns `true` if the JSON is an empty array or an empty object.
+    /// It returns `false` if the JSON is an array or object that contains other JSON values
+    /// It throws an error if the JSON value is not an array or object
+    ///
+    /// ```swift
+    /// let emptyArray: JSON = []
+    /// let array: JSON = [1, 2, "three"]
+    /// let emptyObject: JSON = [:]
+    /// let object: JSON = ["Foo": "Bar"]
+    /// let nonCollection: JSON = true
+    ///
+    /// let first = try emptyArray.isEmpty // true
+    /// let second = try array.isEmpty // false
+    /// let third = try emptyObject.isEmpty // true
+    /// let fourth = try object.isEmpty // false
+    /// let fifth = try nonCollection.isEmpty // throws
+    /// ```
+    ///
+    /// - Throws: An error, if the JSON value is not a JSON array or a JSON object
     public var isEmpty: Bool {
         get throws {
             try count == 0
         }
     }
 
-    /// The JSON value as a literal
+    /// The JSON value as a literal.
+    ///
+    /// This property will throw an error if the JSON value is anything other than a ``JSON/Literal``
+    ///
+    /// - Throws: An error, if the JSON value is not a JSON literal
     public var literalValue: Literal {
         get throws {
             switch self {
@@ -111,14 +168,22 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         }
     }
 
-    /// The JSON value as a boolean
+    /// The JSON value as a boolean.
+    ///
+    /// This property will throw an error if the JSON value is anything other than a JSON bool
+    ///
+    /// - Throws: An error, if the JSON value is not a bool
     public var boolValue: Bool {
         get throws {
             try literalValue.boolValue
         }
     }
 
-    /// The JSON value as an object
+    /// The JSON value as an object.
+    ///
+    /// This property will throw an error if the JSON value is anything other than a JSON object
+    ///
+    /// - Throws: An error, if the JSON value is not an object
     public var objectValue: Object {
         get throws {
             switch self {
@@ -130,7 +195,11 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         }
     }
 
-    /// The JSON value as an array
+    /// The JSON value as an array.
+    ///
+    /// This property will throw an error if the JSON value is anything other than a JSON array
+    ///
+    /// - Throws: An error, if the JSON value is not an array
     public var arrayValue: Array {
         get throws {
             switch self {
@@ -142,7 +211,11 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         }
     }
 
-    /// The JSON value as a number
+    /// The JSON value as a number.
+    ///
+    /// This property will throw an error if the JSON value is anything other than a ``JSON/Number``
+    ///
+    /// - Throws: An error, if the JSON value is not a number
     public var numberValue: Number {
         get throws {
             switch self {
@@ -154,21 +227,35 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         }
     }
 
-    /// The JSON value as a Swift integer
+    /// The JSON value as a Swift integer.
+    ///
+    /// This property will throw an error if the JSON value is anything other than a JSON integer, even if the JSON contains a double value that could be legally represented an integer, such as `4.0`.
+    ///
+    /// To coerce such doubles into integers, use the ``decode(into:)`` method instead.
+    ///
+    /// - Throws: An error, if the JSON value is not an integer
     public var intValue: Int {
         get throws {
             try numberValue.intValue
         }
     }
 
-    /// The JSON value as a Swift double
+    /// The JSON value as a Swift double.
+    ///
+    /// Thie property will throw an error if the JSON value is anything other than a JSON double, even if the JSON contains an integer value that can be represented as a double.
+    ///
+    /// To coerce integers into doubles, use the ``decode(into:)`` method instead
+    ///
+    /// - Throws: An error, if the JSON value is not a double
     public var doubleValue: Double {
         get throws {
             try numberValue.doubleValue
         }
     }
 
-    /// The JSON value as a Swift string
+    /// The JSON value as a Swift string.
+    ///
+    /// This property will throw an error if the JSON value is anything other than a JSON string.
     public var stringValue: String {
         get throws {
             switch self {
@@ -180,7 +267,9 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         }
     }
 
-    /// Whether or not the JSON value is a Boolean
+    /// Whether or not the JSON value is a Boolean.
+    ///
+    /// This propery returns `true` if the JSON value is a boolean. Otherwise, it returns `false`.
     public var isBool: Bool {
         switch self {
         case let .literal(literal):
@@ -190,7 +279,9 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         }
     }
 
-    /// Whether or not the JSON value is a null value
+    /// Whether or not the JSON value is a null value.
+    ///
+    /// This property returns `true` if the JSON value is `null`. Otherwise, it returns `false`.
     public var isNull: Bool {
         switch self {
         case let .literal(literal):
@@ -201,6 +292,8 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// Whether or not the JSON value is a literal
+    ///
+    /// This property returns `true` if the JSON value is one of the three legal JSON literal values (`true`, `false`, or `null`). Otherwise, it returns `false`
     public var isLiteral: Bool {
         switch self {
         case .literal:
@@ -211,6 +304,8 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// Whether or not the JSON value is an object
+    ///
+    /// This property returns `true` if the JSON value is an object. Otherwise, it returns `false.`
     public var isObject: Bool {
         switch self {
         case .object:
@@ -221,6 +316,8 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// Whether or not the JSON value is an array
+    ///
+    /// This property returns `true` if the JSON value is an array. Otherwise, it returns `false`.
     public var isArray: Bool {
         switch self {
         case .array:
@@ -231,6 +328,8 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// Whether or not the JSON value is a number
+    ///
+    /// This property returns `true` if the JSON value is a number. Otherwise, it returns `false`.
     public var isNumber: Bool {
         switch self {
         case .number:
@@ -241,6 +340,8 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// Whether or not the JSON value is an int
+    ///
+    /// This property returns `true` if the JSON value is an integer. Otherwise, it returns `false`.
     public var isInt: Bool {
         switch self {
         case let .number(number):
@@ -251,6 +352,8 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// Whether or not the JSON value is a double
+    ///
+    /// This property returns `true` if the JSON value is a double. Otherwise, it returns `false`.
     public var isDouble: Bool {
         switch self {
         case let .number(number):
@@ -261,6 +364,8 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// Whether or not the JSON value is a string
+    ///
+    /// This property returns `true` if the JSON value is a string. Otherwise, it returns `false`.
     public var isString: Bool {
         switch self {
         case .string:
@@ -297,7 +402,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// The untyped representation of the JSON value
-    /// - Returns: An `AnyHashable` containing a string, boolean, array, dictionary, or `NSNull` representing the JSON value
+    /// - Returns: An `AnyHashable` containing a `String`, `Int`, `Double`, `Bool`, `[AnyHashable]`, `[String: AnyHashable]`, or `NSNull` representing the JSON value.
     public func unboxed() -> AnyHashable {
         switch self {
         case let .literal(literal):
@@ -322,6 +427,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Decode the JSON value into a ``JSONDecodable`` type
     /// - Parameter type: The type to decode into
     /// - Returns: The decoded value
+    /// - Throws: An error, if the JSON value cannot be decoded into the provided type
     public func decode<T>(
         into type: T.Type = T.self
     ) throws -> T where T: JSONDecodable {
@@ -331,6 +437,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Retrieve a value from the JSON object using a specified key
     /// - Parameter key: A string key to use for lookup
     /// - Returns: The JSON value at the specified key
+    /// - Throws: An error, if the JSON object does not contain a value for the provided key, or if the JSON value is not an object
     public func value(
         forKey key: String
     ) throws -> JSON {
@@ -340,6 +447,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Retrieve a value from the JSON object using a specified index
     /// - Parameter index: An integer index to use for lookup
     /// - Returns: The JSON value at the specified index
+    /// - Throws: An error, if the JSON object does not contain a value for the provided index, or if the JSON value is not an array
     public func value(
         atIndex index: Int
     ) throws -> JSON {
@@ -349,6 +457,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Retrieve a value from the JSON object using a specified subscript
     /// - Parameter subscript: A subscript to use for lookup
     /// - Returns: The JSON value at the specified subscript
+    /// - Throws: An error if the JSON value does not contain a value for the provided subscript, or if the JSON value is incompatible with the provided subscript (e.g. the subscript is a  ``JSON/Subscript/key(_:)`` but the JSON value is an array)
     public func value(
         forSubscript subscript: Subscript
     ) throws -> JSON {
@@ -375,6 +484,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Retrieve a value from the JSON object using a specified subscript
     /// - Parameter subscript: A subscript to use for lookup
     /// - Returns: The JSON value at the specified subscript
+    /// - Throws: An error if the JSON value does not contain a value for the provided subscript, or if the JSON value is incompatible with the provided subscript (e.g. the subscript is a  `String` but the JSON value is an array)
     public func value(
         forSubscript subscript: some JSONSubscriptConvertible
     ) throws -> JSON {
@@ -385,8 +495,9 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Retrieve a value from the JSON object using a specified path
     /// - Parameter path: The path to use for lookup
     /// - Returns: The JSON value at the specified path
+    /// - Throws: An error, if the JSON value does not contain a value at the provided path, or of the JSON value is incompatible with the provided JSON subscript.
     public func value(
-        atPath path: [Subscript]
+        atPath path: Subscript...
     ) throws -> JSON {
         var json = self
         try path.forEach { component in
@@ -398,6 +509,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Retrieve a value from the JSON object using a specified path
     /// - Parameter path: The path to use for lookup
     /// - Returns: The JSON value at the specified path
+    /// - Throws: An error, if the JSON value does not contain a value at the provided path, or of the JSON value is incompatible with the provided JSON subscript.
     public func value<each PathComponent>(
         atPath path: repeat each PathComponent
     ) throws -> JSON where repeat each PathComponent: JSONSubscriptConvertible {
@@ -463,6 +575,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameters:
     ///   - value: The JSON value to set
     ///   - key: A string key to use for lookup
+    /// - Throws: An error, if the JSON value is not an object.
     public mutating func setValue(
         _ value: JSON,
         forKey key: String
@@ -474,6 +587,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameters:
     ///   - value: The JSON value to set
     ///   - index: An integer index to use for lookup
+    /// - Throws: An error, if the JSON object is not an array.
     public mutating func setValue(
         _ value: JSON,
         atIndex index: Int
@@ -485,6 +599,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameters:
     ///   - value: The JSON value to set
     ///   - subscript: A subscript to use for lookup
+    /// - Throws: An error, if the JSON value is incompatible with the provided subscript (e.g. the subscript is a  ``JSON/Subscript/key(_:)`` but the JSON value is an array)
     public mutating func setValue(
         _ value: JSON,
         forSubscript subscript: Subscript
@@ -512,6 +627,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameters:
     ///   - value: The JSON value to set
     ///   - subscript: A subscript to use for lookup
+    /// - Throws: An error, if the JSON value is incompatible with the provided subscript (e.g. the subscript is a  `String` but the JSON value is an array)
     public mutating func setValue(
         _ value: JSON,
         forSubscript subscript: some JSONSubscriptConvertible
@@ -524,6 +640,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// The first value in a JSON array, or `nil` if the array is empty
+    /// - Throws: An error, if the JSON value is not an array.
     public var first: JSON? {
         get throws {
             try arrayValue.first
@@ -531,6 +648,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// The last value in a JSON array, or `nil` if the array is empty
+    /// - Throws: An error, if the JSON value is not an array.
     public var last: JSON? {
         get throws {
             try arrayValue.last
@@ -540,6 +658,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Create a JSON array by adding a JSON value to this array
     /// - Parameter json: The JSON value to add to this array
     /// - Returns: The new array
+    /// - Throws: An error, if the JSON value is not an array.
     public func appending(
         _ json: JSON
     ) throws -> JSON {
@@ -549,6 +668,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Create a JSON array by appending the contents of another JSON array
     /// - Parameter jsonArray: The JSON array to add to this array
     /// - Returns: The new array
+    /// - Throws: An error, if the JSON value is not an array, or if the provided value is not a JSON array.
     public func appending(
         contentsOf jsonArray: JSON
     ) throws -> JSON {
@@ -558,6 +678,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Create a JSON array by appending the contents of a collection of JSON values
     /// - Parameter collection: The collection of JSON values to add to this array
     /// - Returns: The new array
+    /// - Throws: An error, if the JSON value is not an array.
     public func appending(
         contentsOf collection: some Collection<JSON>
     ) throws -> JSON {
@@ -566,6 +687,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
 
     /// Append a JSON value to this JSON array
     /// - Parameter json: The JSON value to append
+    /// - Throws: An error, if the JSON value is not an array.
     public mutating func append(
         _ json: JSON
     ) throws {
@@ -574,6 +696,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
 
     /// Append the contents of another JSON array to this JSON array
     /// - Parameter jsonArray: The JSON array to append
+    /// - Throws: An error, if the JSON value is not an array, or if the provided value is not a JSON array
     public mutating func append(
         contentsOf jsonArray: JSON
     ) throws {
@@ -582,6 +705,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
 
     /// Append the contents of a collection of JSON values to this JSON array
     /// - Parameter collection: The collection of JSON values to append
+    /// - Throws: An error, if the JSON value is not an array.
     public mutating func append(
         contentsOf collection: some Collection<JSON>
     ) throws {
@@ -589,8 +713,28 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// Returns a Boolean value indicating whether every element of a JSON array satisfies a given predicate.
+    ///
+    /// For example:
+    ///
+    /// ```swift
+    /// let json: JSON = ["foo": "bar", "baz"]
+    /// let other: JSON = [24, 12, nil]
+    ///
+    /// let first = json.allSatisfy { value in
+    ///     return value.isString
+    /// }
+    ///
+    /// let second = other.allSatisfy { key, value in
+    ///     return value.number
+    /// }
+    ///
+    /// #expect(first == true)
+    /// #expect(second == false)
+    /// ```
+    ///
     /// - Parameter predicate: A closure that takes an element of the JSON array as its argument and returns a Boolean value that indicates whether the passed element satisfies a condition.
     /// - Returns: `true` if the sequence contains only elements that satisfy `predicate`; otherwise, `false`.
+    /// - Throws: An error, if the JSON value is not an array.
     public func allSatisfy(
         _ predicate: (JSON) throws -> Bool
     ) throws -> Bool {
@@ -598,8 +742,28 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// Returns a Boolean value indicating whether every key-value pair of a JSON object satisfies a given predicate.
+    ///
+    /// For example:
+    ///
+    /// ```swift
+    /// let json: JSON = ["foo": true, "bar": false, "qux": true]
+    /// let other: JSON = ["foo": 12, "bar": 24, "qux": nil]
+    ///
+    /// let first = json.allSatisfy { key, value in
+    ///     return key.count == 3 && value.isBool &&
+    /// }
+    ///
+    /// let second = other.allSatisfy { key, value in
+    ///     return key.count == 3 && value.number
+    /// }
+    ///
+    /// #expect(first == true)
+    /// #expect(second == false)
+    /// ```
+    ///
     /// - Parameter predicate: A closure that takes a key-value pair of the JSON object as its argument and returns a Boolean value that indicates whether the passed element satisfies a condition.
     /// - Returns: `true` if the JSON object contains only key-value pairs that satisfy `predicate`; otherwise, `false`.
+    /// - Throws: An error, if the JSON value is not an object.
     public func allSatisfy(
         _ predicate: (Object.Element) throws -> Bool
     ) throws -> Bool {
@@ -607,13 +771,15 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// The keys in a JSON object
-    public var keys: [String] {
+    /// - Throws: An error, of the JSON value is not an object
+    public var keys: Set<String> {
         get throws {
-            try objectValue.keys.map(\.self)
+            try .init(objectValue.keys)
         }
     }
 
     /// The values in a JSON object
+    /// - Throws: An error, of the JSON value is not an object
     public var values: [JSON] {
         get throws {
             try objectValue.values.map(\.self)
