@@ -136,7 +136,7 @@ jobs:
     - name: Select Xcode Version
       run: ./.scripts/xcode-select ${{ matrix.xcode }}
     - name: Build JBird
-      run: swift build -v --build-path .build
+      run: swift build -v --build-tests --build-path .build
     - name: Compress Build
       run: zip -r build.zip .build
     - name: Upload Build
@@ -175,7 +175,7 @@ jobs:
       - name: Decompress Build
         run: unzip build.zip
       - name: Test JBird
-        run: swift test
+        run: swift test --skip-build
   build-ubuntu-spm:
     name: Build JBird (Ubuntu)
     strategy:
@@ -192,7 +192,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Build JBird
-        run: swift build -v --build-path .build
+        run: swift build -v --build-tests --build-path .build
       - name: Install `zip`
         run: apt-get update && apt-get install -y zip
       - name: Compress Build
@@ -225,7 +225,7 @@ jobs:
       - name: Decompress Build
         run: unzip build.zip
       - name: Test JBird
-        run: swift test
+        run: swift test --skip-build
   build-test-windows-spm:
     name: Test JBird (Windows)
     strategy:
