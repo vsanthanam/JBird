@@ -40,10 +40,15 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
         conformingTo protocols: [TypeSyntax],
         in context: some MacroExpansionContext
     ) throws -> [ExtensionDeclSyntax] {
-        let name = try declaration
-            .as(StructDeclSyntax.self)
-            .mustExist("@JSONCodable macro can only be applied to structs")
-            .name.text
+        let name: String
+
+        if let structDecl = declaration.as(StructDeclSyntax.self) {
+            name = structDecl.name.text
+        } else if let enumDecl = declaration.as(EnumDeclSyntax.self) {
+            name = enumDecl.name.text
+        } else {
+            throw MacroExpansionErrorMessage("@JSONCodable macro can only be applied to structs or enums")
+        }
 
         let encodable = try DeclSyntax(
             """
@@ -72,10 +77,20 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
         conformingTo protocols: [TypeSyntax],
         in context: some MacroExpansionContext
     ) throws -> [DeclSyntax] {
-        let members = try declaration
-            .as(StructDeclSyntax.self)
-            .mustExist("@JSONCodable macro can only be applied to structs")
-            .memberBlock.members
+        if let structDecl = declaration.as(StructDeclSyntax.self) {
+            return try expansionForStruct(structDecl)
+        } else if let enumDecl = declaration.as(EnumDeclSyntax.self) {
+            return try expansionForEnum(enumDecl)
+        } else {
+            throw MacroExpansionErrorMessage("@JSONCodable macro can only be applied to structs or enums")
+        }
+
+    }
+
+    // MARK: - Private
+
+    private static func expansionForStruct(_ declaration: StructDeclSyntax) throws -> [DeclSyntax] {
+        let members = declaration.memberBlock.members
 
         var storedProperties = [(name: String, key: String, omitIfNil: Bool)]()
 
@@ -229,7 +244,146 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
         return [encodable, decodable]
     }
 
-    // MARK: - Private
+    private static func expansionForEnum(_ declaration: EnumDeclSyntax) throws -> [DeclSyntax] {
+        let cases = declaration.memberBlock.members
+            .compactMap { member -> EnumCaseDeclSyntax? in
+                member.decl.as(EnumCaseDeclSyntax.self)
+            }
+            .flatMap { caseDecl -> [EnumCaseElementSyntax] in
+                Array(caseDecl.elements)
+            }
+
+        let caseInfos: [EnumCaseInfo] = cases.map { element in
+            let associatedValues: [AssociatedValue]
+            if let parameters = element.parameterClause?.parameters {
+                associatedValues = parameters.enumerated().map { index, parameter in
+                    let labelText: String?
+                    if let firstName = parameter.firstName, firstName.text != "_" {
+                        labelText = firstName.text
+                    } else {
+                        labelText = nil
+                    }
+                    let bindingName = labelText ?? "value\(index)"
+                    let key = labelText ?? "_\(index)"
+                    return AssociatedValue(label: labelText, key: key, bindingName: bindingName)
+                }
+            } else {
+                associatedValues = []
+            }
+            return EnumCaseInfo(name: element.name.text, associatedValues: associatedValues)
+        }
+
+        let encodeCases = caseInfos
+            .map { info -> String in
+                if info.associatedValues.isEmpty {
+                    return """
+                        case .\(info.name):
+                            return [\"\(info.name)\": .object([:])]
+                    """
+                } else {
+                    let pattern = info.associatedValues
+                        .enumerated()
+                        .map { _, value -> String in
+                            if let label = value.label {
+                                "\(label): \(value.bindingName)"
+                            } else {
+                                value.bindingName
+                            }
+                        }
+                        .joined(separator: ", ")
+
+                    let payloadEntries = info.associatedValues
+                        .enumerated()
+                        .map { index, value -> String in
+                            let suffix = index < info.associatedValues.count - 1 ? "," : ""
+                            return "            \"\(value.key)\": JSON(\(value.bindingName))\(suffix)"
+                        }
+                        .joined(separator: "\n")
+
+                    return """
+                        case let .\(info.name)(\(pattern)):
+                            return [\"\(info.name)\": .object([
+                    \(payloadEntries)
+                            ])]
+                    """
+                }
+            }
+            .joined(separator: "\n")
+
+        let encodable = DeclSyntax(
+            """
+            public func encodeToJSON() -> JSON {
+                switch self {
+                    \(raw: encodeCases)
+                }
+            }
+            """
+        )
+
+        let decodeCases = caseInfos
+            .map { info -> String in
+                if info.associatedValues.isEmpty {
+                    return """
+                        if json.containsValue(forKey: \"\(info.name)\") {
+                            self = .\(info.name)
+                            return
+                        }
+                    """
+                } else {
+                    let argumentExpressions = info.associatedValues
+                        .map { value -> String in
+                            if let label = value.label {
+                                "\(label): try payload[\"\(value.key)\"]"
+                            } else {
+                                "try payload[\"\(value.key)\"]"
+                            }
+                        }
+
+                    let arguments: String
+                    if argumentExpressions.count > 1 {
+                        let joined = argumentExpressions.joined(separator: ",\n                ")
+                        arguments = "\n                \(joined)\n            "
+                    } else {
+                        arguments = argumentExpressions.joined(separator: ", ")
+                    }
+
+                    return """
+                        if json.containsValue(forKey: \"\(info.name)\") {
+                            let payload = try json[\"\(info.name)\"]
+                            self = .\(info.name)(\(arguments))
+                            return
+                        }
+                    """
+                }
+            }
+            .joined(separator: "\n")
+
+        let decodable = DeclSyntax(
+            """
+            public init(json: JSON) throws {
+                \(raw: decodeCases)
+                throw JBirdCore.JSONError.invalidRawRepresentable
+            }
+            """
+        )
+
+        return [encodable, decodable]
+    }
+
+    private struct EnumCaseInfo {
+
+        let name: String
+        let associatedValues: [AssociatedValue]
+
+    }
+
+    private struct AssociatedValue {
+
+        let label: String?
+        let key: String
+        let bindingName: String
+
+    }
 
     private static func isOptionalType(_ type: TypeSyntax?) -> Bool {
         guard let type else { return false }

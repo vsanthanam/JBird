@@ -167,6 +167,90 @@ final class JSONCodableMacroTests: XCTestCase {
 
     }
 
+    func test_enum() throws {
+        #if canImport(JBirdMacrosCompilerPlugin)
+            assertMacroExpansion(
+                """
+                @JSONCodable
+                enum Sample {
+
+                    case plain
+                    case single(Int)
+                    case labeled(value: String)
+                    case multiple(Int, String)
+
+                }
+                """,
+                expandedSource: """
+                enum Sample {
+
+                    case plain
+                    case single(Int)
+                    case labeled(value: String)
+                    case multiple(Int, String)
+
+                    public func encodeToJSON() -> JSON {
+                        switch self {
+                                case .plain:
+                            return ["plain": .object([:])]
+                        case let .single(value0):
+                            return ["single": .object([
+                                "_0": JSON(value0)
+                            ])]
+                        case let .labeled(value: value):
+                            return ["labeled": .object([
+                                "value": JSON(value)
+                            ])]
+                        case let .multiple(value0, value1):
+                            return ["multiple": .object([
+                                "_0": JSON(value0),
+                                "_1": JSON(value1)
+                            ])]
+                        }
+                    }
+
+                    public init(json: JSON) throws {
+                            if json.containsValue(forKey: "plain") {
+                            self = .plain
+                            return
+                        }
+                        if json.containsValue(forKey: "single") {
+                            let payload = try json["single"]
+                            self = .single(try payload["_0"])
+                            return
+                        }
+                        if json.containsValue(forKey: "labeled") {
+                            let payload = try json["labeled"]
+                            self = .labeled(value: try payload["value"])
+                            return
+                        }
+                        if json.containsValue(forKey: "multiple") {
+                            let payload = try json["multiple"]
+                            self = .multiple(
+                                    try payload["_0"],
+                                    try payload["_1"]
+                                )
+                            return
+                        }
+                        throw JBirdCore.JSONError.invalidRawRepresentable
+                    }
+
+                }
+
+                extension Sample: JBirdCore.JSONEncodable {
+                }
+
+                extension Sample: JBirdCore.JSONDecodable {
+                }
+                """,
+                macros: testMacros
+            )
+        #else
+            throw XCTSkip("macros are only supported when running tests for the host platform")
+        #endif
+
+    }
+
     func test_omitIfNil_noAnnotation() throws {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
