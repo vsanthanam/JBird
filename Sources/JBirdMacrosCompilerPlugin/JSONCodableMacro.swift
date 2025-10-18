@@ -337,20 +337,12 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
                     }()
 
                     if !prevIsUnderscore {
-                        // lower|number -> UPPER (e.g., "userID" or "versionX")
-                        if upper, (prevLower || prevNumber) {
+                        // lower -> UPPER (e.g., "userID" or "versionX")
+                        if upper, prevLower {
                             result.append("_")
                         }
                         // UPPER followed by lower (e.g., "URLSession" -> "url_session")
                         else if upper, nextLower {
-                            result.append("_")
-                        }
-                        // letter -> number (e.g., "version2")
-                        else if number, (prevLower || prevUpper) {
-                            result.append("_")
-                        }
-                        // number -> letter (e.g., "v2Alpha")
-                        else if (prevNumber && (upper || lower)) {
                             result.append("_")
                         }
                     }
