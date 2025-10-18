@@ -784,34 +784,48 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         try objectValue.allSatisfy(predicate)
     }
 
-    /// The keys in a JSON object
-    /// - Throws: An error, of the JSON value is not an object
+    /// The keys in a JSON object.
+    /// - Throws: An error, if the JSON value is not an object.
     public var keys: Set<String> {
         get throws {
             try .init(objectValue.keys)
         }
     }
 
-    /// The values in a JSON object
-    /// - Throws: An error, if the JSON value is not an object
+    /// The values in a JSON object.
+    /// - Throws: An error, if the JSON value is not an object.
     public var values: [JSON] {
         get throws {
             try objectValue.values.map(\.self)
         }
     }
 
-    /// Returns an array containing the results of mapping the given closure over this JSON array's values
+    /// Returns an array containing the results of mapping the given closure over this JSON array's values.
     /// - Parameter transform: A mapping closure. `transform` accepts a JSON value as its parameter and returns a transformed value of the same or of a different type.
     /// - Returns: An array containing the transformed elements of this JSON array.
+    /// - Throws: An error, if the JSON value is not an array, or if the `transform` closure throws an error.
     public func map<T>(
         _ transform: (JSON) throws -> T
     ) throws -> [T] {
         try arrayValue.map(transform)
     }
 
-    /// Returns an array containing the results of mapping the given closure over this JSON object's key-value pairs
+    /// Returns a JSON arrary containing the result of mapping the given closure over the JSON array's values.
+    /// - Parameter transform: A mapping closure. `transform` accepts a JSON value as its parameter and returns a transformed value of the same type.
+    /// - Returns: A JSON array containing the transformed elements of this JSON array.
+    /// - Throws: An error, if the JSON value is not an array, or if the `transform` closure throws an error.
+    @_disfavoredOverload
+    public func map(
+        _ transform: (JSON) throws -> JSON
+    ) throws -> JSON {
+        let values = try arrayValue.map(transform)
+        return .init(values)
+    }
+
+    /// Returns an array containing the results of mapping the given closure over this JSON object's key-value pairs.
     /// - Parameter transform: A mapping closure. `transform` accepts a JSON key-value pair as its parameter and returns a transformed value of the same or of a different type.
     /// - Returns: An array containing the transformed key-value pairs of this JSON object.
+    /// - Throws: An error, if the JSON value is not an object, or if the `transform` closure throws an error.
     public func map<T>(
         _ transform: (Object.Element) throws -> T
     ) throws -> [T] {
@@ -820,25 +834,46 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
 
     /// Returns a new dictionary containing the keys of this JSON object with the values transformed by the given closure.
     /// - Parameter transform: A closure that transforms a value. `transform` accepts each JSON value as its parameter and returns a transformed value of the same or of a different type.
-    /// - Returns: A dictionary containing the keys and transformed JSON values of this JSON object
+    /// - Returns: A dictionary containing the keys and transformed JSON values of this JSON object.
+    /// - Throws: An error, if the JSON value is not an object, or if the `transform` closure throws an error.
     public func mapValues<T>(
         _ transform: (JSON) throws -> T
     ) throws -> [String: T] {
         try objectValue.mapValues(transform)
     }
 
-    /// Returns an array containing the non-`nil` results of calling the given transformation with each element of this JSON array
+    /// Returns a JSON object containing the keys of this JSON object with the values transformed by the given closure
+    /// - Parameter transform: A closure that transforms a value. `transform` accepts each JSON value as its parameter and returns a transformed value of the same type.
+    /// - Returns: A JSON object containing the keys and the transformed JSON values of this JSON object.
+    @_disfavoredOverload
+    public func mapValues(
+        _ transform: (JSON) throws -> JSON
+    ) throws -> JSON {
+        let object = try objectValue
+            .map { key, value in
+                try (key, transform(value))
+            }
+            .reduce(into: [String: JSON]()) { prev, pair in
+                let (key, value) = pair
+                prev[key] = value
+            }
+        return .init(object)
+    }
+
+    /// Returns an array containing the non-`nil` results of calling the given transformation with each element of this JSON array.
     /// - Parameter transform: A closure that accepts an element of this JSON array as its argument and returns an optional value.
     /// - Returns: An array of the non-`nil` results of calling `transform` with each element of the JSON array.
+    /// - Throws: An error, if the JSON value is not an array, or if the `transform` closure throws an error.
     public func compactMap<ElementOfResult>(
         _ transform: (JSON) throws -> ElementOfResult?
     ) throws -> [ElementOfResult] {
         try arrayValue.compactMap(transform)
     }
 
-    /// Returns an array containing the non-`nil` results of calling the given transformation with each key-value pair of this JSON object
+    /// Returns an array containing the non-`nil` results of calling the given transformation with each key-value pair of this JSON object.
     /// - Parameter transform: A closure that accepts a key-value pair of this JSON object as its argument and returns an optional value.
     /// - Returns: An array of the non-`nil` results of calling `transform` with each key-value pair of the JSON object.
+    /// - Throws: An error, if the JSON value is not an object, or if the `transform` closure throws an error.
     public func compactMap<ElementOfResult>(
         _ transform: (Object.Element) throws -> ElementOfResult?
     ) throws -> [ElementOfResult] {
@@ -848,6 +883,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Returns a new dictionary containing only the key-value pairs that have non-`nil` values as the result of transformation by the given closure.
     /// - Parameter transform: A closure that transforms a value. `transform` accepts each value of the JSON object as its parameter and returns an optional transformed value of the same or of a different type.
     /// - Returns: A dictionary containing the keys and non-`nil` transformed values of this dictionary.
+    /// - Throws: An error, if the JSON value is not an object, or if the `transform` closure throws an error.
     public func compactMapValues<ElementOfResult>(
         _ transform: (JSON) throws -> ElementOfResult?
     ) throws -> [String: ElementOfResult] {
@@ -884,6 +920,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
 
     /// Calls the given closure on each element in the JSON array in the same order as a for-in loop.
     /// - Parameter body: The closure to call on each JSON element
+    /// - Throws: An error, if the JSON value is not an array, or if the `body` closure throws an error
     public func forEach(
         _ body: (JSON) throws -> Void
     ) throws {
@@ -892,6 +929,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
 
     /// Calls the given closure on each key-value pair in the JSON object in the same order as a for-in loop.
     /// - Parameter body: The closure to call on each JSON key-value pair
+    /// - Throws: An error, if the JSON value is not an object, or if the `body` closure throws an error.
     public func forEach(
         _ body: (Object.Element) throws -> Void
     ) throws {
@@ -902,13 +940,14 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameters:
     ///   - value: The value to insert
     ///   - index: The index to use to insert the value
+    /// - Throws: An error, if the JSON value is not an array, or if the provided index is out of bounds.
     public mutating func insert(
         _ value: JSON,
         at index: some BinaryInteger
     ) throws {
         let index = Int(index)
         var array = try arrayValue
-        guard array.indices.contains(index) else {
+        guard array.indices.contains(index) || index != array.count else {
             throw JSONError.indexOutOfBounds(index)
         }
         array.insert(value, at: index)
