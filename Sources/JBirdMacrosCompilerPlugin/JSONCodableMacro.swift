@@ -30,7 +30,6 @@ import SwiftSyntax
 import SwiftSyntaxBuilder
 import SwiftSyntaxMacros
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
 
     // MARK: - ExtensionMacro
@@ -255,43 +254,73 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
         return false
     }
 
-    private static func snakeCase(_ name: String) -> String {
-        let regex = Regex {
-            ChoiceOf {
-                Regex {
-                    Capture {
-                        ChoiceOf {
-                            CharacterClass.generalCategory(.lowercaseLetter)
-                            CharacterClass.generalCategory(.decimalNumber)
+    private static func snakeCase(
+        _ name: String
+    ) -> String {
+        if #available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *) {
+            let regex = Regex {
+                ChoiceOf {
+                    Regex {
+                        Capture {
+                            ChoiceOf {
+                                CharacterClass.generalCategory(.lowercaseLetter)
+                                CharacterClass.generalCategory(.decimalNumber)
+                            }
+                        }
+                        Capture {
+                            CharacterClass.generalCategory(.uppercaseLetter)
                         }
                     }
-                    Capture {
-                        CharacterClass.generalCategory(.uppercaseLetter)
-                    }
-                }
-                Regex {
-                    Capture {
-                        CharacterClass.generalCategory(.uppercaseLetter)
-                    }
-                    Capture {
-                        CharacterClass.generalCategory(.uppercaseLetter)
-                        CharacterClass.generalCategory(.lowercaseLetter)
+                    Regex {
+                        Capture {
+                            CharacterClass.generalCategory(.uppercaseLetter)
+                        }
+                        Capture {
+                            CharacterClass.generalCategory(.uppercaseLetter)
+                            CharacterClass.generalCategory(.lowercaseLetter)
+                        }
                     }
                 }
             }
-        }
 
-        var result = name
+            var result = name
 
-        result = result.replacing(regex) { match in
-            if let first = match.output.1 {
-                return "\(first)_\(match.output.2!)"
-            } else if let third = match.output.3 {
-                return "\(third)_\(match.output.4!)"
+            result = result.replacing(regex) { match in
+                if let first = match.output.1 {
+                    return "\(first)_\(match.output.2!)"
+                } else if let third = match.output.3 {
+                    return "\(third)_\(match.output.4!)"
+                }
+                return String(match.output.0)
             }
-            return String(match.output.0)
+            return result.lowercased()
+        } else {
+            let camelSegmentPattern = "([a-z0-9])([A-Z])"
+            let acronymBoundaryPattern = "([A-Z])([A-Z][a-z])"
+
+            let camelSegmentRegex = try! NSRegularExpression(pattern: camelSegmentPattern, options: [])
+            let acronymBoundaryRegex = try! NSRegularExpression(pattern: acronymBoundaryPattern, options: [])
+
+            var result = name
+
+            let camelSegmentRange = NSRange(location: 0, length: result.utf16.count)
+            result = camelSegmentRegex.stringByReplacingMatches(
+                in: result,
+                options: [],
+                range: camelSegmentRange,
+                withTemplate: "$1_$2"
+            )
+
+            let acronymBoundaryRange = NSRange(location: 0, length: result.utf16.count)
+            result = acronymBoundaryRegex.stringByReplacingMatches(
+                in: result,
+                options: [],
+                range: acronymBoundaryRange,
+                withTemplate: "$1_$2"
+            )
+
+            return result.lowercased()
         }
-        return result.lowercased()
     }
 
 }

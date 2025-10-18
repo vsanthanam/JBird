@@ -77,7 +77,7 @@ jobs:
           - platform: 'macos'
             name: 'macOS'
           - platform: 'maccatalyst'
-            name: 'macOS (Catalyst)'
+            name: 'Mac Catalyst'
           - platform: 'ios'
             name: 'iOS'
           - platform: 'watchos'
