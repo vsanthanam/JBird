@@ -520,20 +520,22 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         return json
     }
 
-    /// Retrieve a value from the JSON object using a specified path
-    /// - Parameter path: The path to use for lookup
-    /// - Returns: The JSON value at the specified path
-    /// - Throws: An error, if the JSON value does not contain a value at the provided path, or if the JSON value is incompatible with the provided JSON subscript.
-    public func value<each PathComponent>(
-        atPath path: repeat each PathComponent
-    ) throws -> JSON where repeat each PathComponent: JSONSubscriptConvertible {
-        var json = self
-        for component in repeat each path {
-            let `subscript` = Subscript(component)
-            json = try json.value(forSubscript: `subscript`)
+    #if swift(>=6.0)
+        /// Retrieve a value from the JSON object using a specified path
+        /// - Parameter path: The path to use for lookup
+        /// - Returns: The JSON value at the specified path
+        /// - Throws: An error, if the JSON value does not contain a value at the provided path, or if the JSON value is incompatible with the provided JSON subscript.
+        public func value<each PathComponent>(
+            atPath path: repeat each PathComponent
+        ) throws -> JSON where repeat each PathComponent: JSONSubscriptConvertible {
+            var json = self
+            for component in repeat each path {
+                let `subscript` = Subscript(component)
+                json = try json.value(forSubscript: `subscript`)
+            }
+            return json
         }
-        return json
-    }
+    #endif
 
     /// Check whether a JSON object contains a value for the provided key
     /// - Parameter key: The key
@@ -1233,20 +1235,33 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         }
     }
 
-    /// Retrieve a value from the JSON object using a specified subscript
-    /// - Parameter path: A subscript to use for lookup
-    /// - Returns: The JSON value at the specified subscript
-    public subscript<each PathComponent>(
-        _ path: repeat each PathComponent
-    ) -> JSON where repeat each PathComponent: JSONSubscriptConvertible {
-        get throws {
-            var json = self
-            for component in repeat each path {
-                json = try json.value(forSubscript: component)
+    #if swift(>=6.0)
+        /// Retrieve a value from the JSON object using a specified subscript
+        /// - Parameter path: A subscript to use for lookup
+        /// - Returns: The JSON value at the specified subscript
+        public subscript<each PathComponent>(
+            _ path: repeat each PathComponent
+        ) -> JSON where repeat each PathComponent: JSONSubscriptConvertible {
+            get throws {
+                var json = self
+                for component in repeat each path {
+                    json = try json.value(forSubscript: component)
+                }
+                return json
             }
-            return json
         }
-    }
+    #else
+        /// Retrieve a value from the JSON object using a specified subscript
+        /// - Parameter path: A subscript to use for lookup
+        /// - Returns: The JSON value at the specified subscript
+        public subscript(
+            _ subscript: some JSONSubscriptConvertible
+        ) -> JSON {
+            get throws {
+                try value(forSubscript: `subscript`)
+            }
+        }
+    #endif
 
     /// Retrieve a value from the JSON object using a specified subscript
     /// - Parameters:
@@ -1255,36 +1270,53 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Returns: The JSON value at the specified subscript
     @_disfavoredOverload
     public subscript<T>(
-        _ subscript: Subscript...,
+        _ path: Subscript...,
         as type: T.Type = T.self
     ) -> T where T: JSONDecodable {
         get throws {
             var json = self
-            try `subscript`.forEach { `subscript` in
-                json = try json[`subscript`]
-            }
-            return try json.decode(into: type)
-        }
-    }
-
-    /// Retrieve a value from the JSON object using a specified subscript
-    /// - Parameters:
-    ///   - subscript: A subscript to use for lookup
-    ///   - type: The type to decode into. This type can be inferred from the callsite.
-    /// - Returns: The JSON value at the specified subscript
-    @_disfavoredOverload
-    public subscript<each PathComponent, T>(
-        _ subscript: repeat each PathComponent,
-        as type: T.Type = T.self
-    ) -> T where repeat each PathComponent: JSONSubscriptConvertible, T: JSONDecodable {
-        get throws {
-            var json = self
-            for component in repeat each `subscript` {
+            try path.forEach { component in
                 json = try json[component]
             }
             return try json.decode(into: type)
         }
     }
+
+    #if swift(>=6.0)
+        /// Retrieve a value from the JSON object using a specified subscript
+        /// - Parameters:
+        ///   - path: A subscript to use for lookup
+        ///   - type: The type to decode into. This type can be inferred from the callsite.
+        /// - Returns: The JSON value at the specified subscript
+        @_disfavoredOverload
+        public subscript<each PathComponent, T>(
+            _ path: repeat each PathComponent,
+            as type: T.Type = T.self
+        ) -> T where repeat each PathComponent: JSONSubscriptConvertible, T: JSONDecodable {
+            get throws {
+                var json = self
+                for component in repeat each path {
+                    json = try json[component]
+                }
+                return try json.decode(into: type)
+            }
+        }
+    #else
+        /// Retrieve a value from the JSON object using a specified subscript
+        /// - Parameters:
+        ///   - subscript: A subscript to use for lookup
+        ///   - type: The type to decode into. This type can be inferred from the callsite.
+        /// - Returns: The JSON value at the specified subscript
+        @_disfavoredOverload
+        public subscript(
+            _ subscript: some JSONSubscriptConvertible,
+            as type: T.Type = T.self
+        ) -> T where T: JSONDecodable {
+            get throws {
+                try self[`subscript`].decode(into: type)
+            }
+        }
+    #endif
 
     // MARK: - ExpressibleByBooleanLiteral
 

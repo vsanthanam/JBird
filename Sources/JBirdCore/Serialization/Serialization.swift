@@ -1129,27 +1129,51 @@ extension JSON {
         return min(max(cap, 1 * 1024 * 1024), 50 * 1024 * 1024)
     }
 
-    private struct unsafe_closure<Arguments, Product, Failure: Error>: @unchecked Sendable {
+    #if swift(>=6.0)
+        private struct unsafe_closure<Arguments, Product, Failure: Error>: @unchecked Sendable {
 
-        init(
-            closure: @escaping (Arguments) throws(Failure) -> Product
-        ) {
-            self.closure = closure
+            init(
+                closure: @escaping (Arguments) throws(Failure) -> Product
+            ) {
+                self.closure = closure
+            }
+
+            func callAsFunction(
+                _ argument: Arguments
+            ) throws(Failure) -> Product {
+                try closure(argument)
+            }
+
+            func callAsFunction() throws(Failure) -> Product where Arguments == Void {
+                try closure(())
+            }
+
+            private let closure: (Arguments) throws(Failure) -> Product
+
         }
+    #else
+        private struct unsafe_closure<Arguments, Product>: @unchecked Sendable {
 
-        func callAsFunction(
-            _ argument: Arguments
-        ) throws(Failure) -> Product {
-            try closure(argument)
+            init(
+                closure: @escaping (Arguments) -> Product
+            ) {
+                self.closure = closure
+            }
+
+            func callAsFunction(
+                _ argument: Arguments
+            ) throws(Failure) -> Product {
+                try closure(argument)
+            }
+
+            func callAsFunction() -> Product where Arguments == Void {
+                try closure(())
+            }
+
+            private let closure: (Arguments) -> Product
+
         }
-
-        func callAsFunction() throws(Failure) -> Product where Arguments == Void {
-            try closure(())
-        }
-
-        private let closure: (Arguments) throws(Failure) -> Product
-
-    }
+    #endif
 
 }
 
