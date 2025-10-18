@@ -523,7 +523,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Retrieve a value from the JSON object using a specified path
     /// - Parameter path: The path to use for lookup
     /// - Returns: The JSON value at the specified path
-    /// - Throws: An error, if the JSON value does not contain a value at the provided path, or of the JSON value is incompatible with the provided JSON subscript.
+    /// - Throws: An error, if the JSON value does not contain a value at the provided path, or if the JSON value is incompatible with the provided JSON subscript.
     public func value<each PathComponent>(
         atPath path: repeat each PathComponent
     ) throws -> JSON where repeat each PathComponent: JSONSubscriptConvertible {
