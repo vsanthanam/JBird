@@ -810,7 +810,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         try arrayValue.map(transform)
     }
 
-    /// Returns a JSON arrary containing the result of mapping the given closure over the JSON array's values.
+    /// Returns a JSON array containing the result of mapping the given closure over the JSON array's values.
     /// - Parameter transform: A mapping closure. `transform` accepts a JSON value as its parameter and returns a transformed value of the same type.
     /// - Returns: A JSON array containing the transformed elements of this JSON array.
     /// - Throws: An error, if the JSON value is not an array, or if the `transform` closure throws an error.
