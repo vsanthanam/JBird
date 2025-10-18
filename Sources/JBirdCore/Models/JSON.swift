@@ -43,7 +43,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Create a `JSON` value by deserializing a byte buffer containing UTF-8 encoded JSON string
     ///
     /// For more advanced customization of the deserialization process, use the ``value(for:options:)-(Data,_)`` method, which lets you pass in your own ``DeserializationOptions``.
-    /// For asynhronous deserialization with parallelization, use the ``deserialize(_:options:)-(Data,_)`` method.
+    /// For asynchronous deserialization with parallelization, use the ``deserialize(_:options:)-(Data,_)`` method.
     ///
     /// - Parameter data: The byte buffer to deserialize
     public init(
