@@ -294,8 +294,7 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
 
             return result.lowercased()
         } else {
-            // Fallback implementation for platforms without RegexBuilder (macOS 12 and earlier)
-            // Convert CamelCase/PascalCase (and mixed with numbers) into snake_case.
+
             guard !name.isEmpty else { return "" }
 
             func isUppercase(_ ch: Character) -> Bool {
@@ -337,12 +336,9 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
                     }()
 
                     if !prevIsUnderscore {
-                        // lower -> UPPER (e.g., "userID" or "versionX")
                         if upper, prevLower {
                             result.append("_")
-                        }
-                        // UPPER followed by lower (e.g., "URLSession" -> "url_session")
-                        else if upper, nextLower {
+                        } else if upper, nextLower {
                             result.append("_")
                         }
                     }
