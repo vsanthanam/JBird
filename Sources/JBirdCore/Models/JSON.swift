@@ -731,15 +731,15 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// For example:
     ///
     /// ```swift
-    /// let json: JSON = ["foo": "bar", "baz"]
+    /// let json: JSON = ["foo", "bar", "baz"]
     /// let other: JSON = [24, 12, nil]
     ///
     /// let first = json.allSatisfy { value in
     ///     return value.isString
     /// }
     ///
-    /// let second = other.allSatisfy { key, value in
-    ///     return value.number
+    /// let second = other.allSatisfy { value in
+    ///     return value.isNumber
     /// }
     ///
     /// #expect(first == true)
