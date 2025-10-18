@@ -55,7 +55,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Create a `JSON` value by deserializing a Swift string
     ///
     /// For more advanced customization of the deserialization process, use the ``value(for:options:)-(String,_)`` method, which lets you pass in your own ``DeserializationOptions``.
-    /// For asynchronous deserialization with parallelizatition, use the ``deserialize(_:options:)-(String,_)`` method.
+    /// For asynchronous deserialization with parallelization, use the ``deserialize(_:options:)-(String,_)`` method.
     /// - Parameter jsonString: The string to deserialize
     public init(
         jsonString: String
