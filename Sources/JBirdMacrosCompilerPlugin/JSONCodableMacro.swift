@@ -23,12 +23,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import Foundation
 import RegexBuilder
 import SwiftCompilerPlugin
 import SwiftSyntax
 import SwiftSyntaxBuilder
 import SwiftSyntaxMacros
-import Foundation
 
 public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
 
@@ -309,7 +309,7 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
             }
 
             func isNumber(_ ch: Character) -> Bool {
-                return ch.unicodeScalars.allSatisfy { CharacterSet.decimalDigits.contains($0) }
+                ch.unicodeScalars.allSatisfy { CharacterSet.decimalDigits.contains($0) }
             }
 
             let chars = Array(name)
@@ -338,15 +338,15 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
 
                     if !prevIsUnderscore {
                         // lower|number -> UPPER (e.g., "userID" or "versionX")
-                        if upper && (prevLower || prevNumber) {
+                        if upper, (prevLower || prevNumber) {
                             result.append("_")
                         }
                         // UPPER followed by lower (e.g., "URLSession" -> "url_session")
-                        else if upper && nextLower {
+                        else if upper, nextLower {
                             result.append("_")
                         }
                         // letter -> number (e.g., "version2")
-                        else if number && (prevLower || prevUpper) {
+                        else if number, (prevLower || prevUpper) {
                             result.append("_")
                         }
                         // number -> letter (e.g., "v2Alpha")
