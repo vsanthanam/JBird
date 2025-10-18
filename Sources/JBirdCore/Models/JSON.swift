@@ -104,13 +104,13 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// It throws an error if the JSON value is not an array or an object.
     ///
     /// ```swift
-    /// let object: JSON = ["foo": 1, "bar", 2]
+    /// let object: JSON = ["foo": 1, "bar": 2]
     /// let array: JSON = ["foo", "bar", "baz"]
-    /// let bool: JSON = false
+    /// let boolValue: JSON = false
     ///
     /// let first = try object.count // returns 2
     /// let second = try array.count // returns 3
-    /// let bool = try bool.count // throws an error
+    /// let result = try boolValue.count // throws an error
     /// ```
     public var count: Int {
         get throws {
