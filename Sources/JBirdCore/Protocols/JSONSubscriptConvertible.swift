@@ -24,7 +24,7 @@
 // SOFTWARE.
 
 /// A type that can be converted into a JSON subscript
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 public protocol JSONSubscriptConvertible {
 
     /// The JSON subscript representation of this instance
@@ -32,21 +32,21 @@ public protocol JSONSubscriptConvertible {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 extension String: JSONSubscriptConvertible {
 
     public var jsonSubscript: JSON.Subscript { .key(self) }
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 extension Int: JSONSubscriptConvertible {
 
     public var jsonSubscript: JSON.Subscript { .index(self) }
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 extension JSONSubscriptConvertible where Self: RawRepresentable, RawValue: JSONSubscriptConvertible {
 
     public var jsonSubscript: JSON.Subscript { rawValue.jsonSubscript }
