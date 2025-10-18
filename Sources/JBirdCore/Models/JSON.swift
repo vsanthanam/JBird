@@ -845,6 +845,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Returns a JSON object containing the keys of this JSON object with the values transformed by the given closure
     /// - Parameter transform: A closure that transforms a value. `transform` accepts each JSON value as its parameter and returns a transformed value of the same type.
     /// - Returns: A JSON object containing the keys and the transformed JSON values of this JSON object.
+    /// - Throws: An error, if the JSON value is not an object, or if the `transform` closure throws an error.
     @_disfavoredOverload
     public func mapValues(
         _ transform: (JSON) throws -> JSON
@@ -954,6 +955,16 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         self = .array(array)
     }
 
+    /// Exchanges the values at the specified indices of the JSON array.
+    ///
+    /// Both parameters must be valid indices of the collection that are not
+    /// equal to `endIndex`. Calling `swapAt(_:_:)` with the same index as both
+    /// `i` and `j` has no effect.
+    ///
+    /// - Parameters:
+    ///   - i: The index of the first value to swap.
+    ///   - j: The index of the second value to swap.
+    /// - Throws: An error, if the JSON value is not an array, or if either of the provided indicies is out of bounds.
     public mutating func swapAt(
         _ i: some BinaryInteger,
         _ j: some BinaryInteger
