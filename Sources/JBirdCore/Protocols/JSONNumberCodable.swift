@@ -27,11 +27,11 @@
 ///
 /// `JSONNumberCodable` is a type alias for the `JSONNumberEncodable` and `JSONNumberDecodable` protocols.
 /// When you use `JSONNumberCodable` as a type or a generic constraint, it matches any type that conforms to both protocols.
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 public typealias JSONNumberCodable = JSONNumberDecodable & JSONNumberEncodable
 
 /// A type that can encode itself to an external  `JSON.Number` representation.
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 public protocol JSONNumberEncodable {
 
     /// Encode this value to a typed `JSON.Number` representation.
@@ -41,7 +41,7 @@ public protocol JSONNumberEncodable {
 }
 
 /// A type that can decode itself from an external `JSON.Number` representation.
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 public protocol JSONNumberDecodable {
 
     /// Create an instance of the type from an externaled `JSON.Number` representation.
@@ -50,7 +50,7 @@ public protocol JSONNumberDecodable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 extension JSON.Number: JSONNumberCodable {
 
     public func encodeToJSONNumber() -> JSON.Number {
@@ -63,7 +63,7 @@ extension JSON.Number: JSONNumberCodable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 extension Int: JSONNumberCodable {
 
     public func encodeToJSONNumber() -> JSON.Number {
@@ -86,7 +86,7 @@ extension Int: JSONNumberCodable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 extension Double: JSONNumberCodable {
 
     public func encodeToJSONNumber() -> JSON.Number {
@@ -104,7 +104,7 @@ extension Double: JSONNumberCodable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 extension UInt: JSONNumberCodable {
 
     public func encodeToJSONNumber() -> JSON.Number {
@@ -118,7 +118,7 @@ extension UInt: JSONNumberCodable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 extension UInt8: JSONNumberCodable {
 
     public func encodeToJSONNumber() -> JSON.Number {
@@ -132,7 +132,7 @@ extension UInt8: JSONNumberCodable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 extension UInt16: JSONNumberCodable {
 
     public func encodeToJSONNumber() -> JSON.Number {
@@ -146,7 +146,7 @@ extension UInt16: JSONNumberCodable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 extension UInt32: JSONNumberCodable {
 
     public func encodeToJSONNumber() -> JSON.Number {
@@ -160,7 +160,7 @@ extension UInt32: JSONNumberCodable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 extension UInt64: JSONNumberCodable {
 
     public func encodeToJSONNumber() -> JSON.Number {
@@ -174,7 +174,7 @@ extension UInt64: JSONNumberCodable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 extension Int8: JSONNumberCodable {
 
     public func encodeToJSONNumber() -> JSON.Number {
@@ -188,7 +188,7 @@ extension Int8: JSONNumberCodable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 extension Int16: JSONNumberCodable {
 
     public func encodeToJSONNumber() -> JSON.Number {
@@ -202,7 +202,7 @@ extension Int16: JSONNumberCodable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 extension Int32: JSONNumberCodable {
 
     public func encodeToJSONNumber() -> JSON.Number {
@@ -216,7 +216,7 @@ extension Int32: JSONNumberCodable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 extension Int64: JSONNumberCodable {
 
     public func encodeToJSONNumber() -> JSON.Number {
@@ -230,7 +230,7 @@ extension Int64: JSONNumberCodable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 extension Float: JSONNumberCodable {
 
     public func encodeToJSONNumber() -> JSON.Number {
