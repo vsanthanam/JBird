@@ -403,16 +403,16 @@ struct JSONTests {
                 ]
             ]
 
-            let value = try json.value(atPath: [.key("foo"), .key("bar"), .index(1)])
+            let value = try json.value(atPath: .key("foo"), .key("bar"), .index(1))
             #expect(value == 2)
             #expect(throws: JSONError.invalidSubscript(.key("qux"))) {
-                _ = try json.value(atPath: [.key("foo"), .key("bar"), .key("qux")])
+                _ = try json.value(atPath: .key("foo"), .key("bar"), .key("qux"))
             }
             #expect(throws: JSONError.keyNotFound("baz")) {
-                _ = try json.value(atPath: [.key("foo"), .key("baz")])
+                _ = try json.value(atPath: .key("foo"), .key("baz"))
             }
             #expect(throws: JSONError.indexOutOfBounds(5)) {
-                _ = try json.value(atPath: [.key("foo"), .key("bar"), .index(5)])
+                _ = try json.value(atPath: .key("foo"), .key("bar"), .index(5))
             }
         }
 

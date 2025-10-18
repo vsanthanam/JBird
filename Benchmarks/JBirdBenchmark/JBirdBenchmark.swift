@@ -29,7 +29,7 @@ import Foundation
     import Freddy
 #elseif USE_SWIFTY_JSON
     import SwiftyJSON
-#else
+#elseif USE_JBIRD || USE_JBIRD_PARALLEL
     import JBird
 #endif
 
@@ -68,10 +68,18 @@ nonisolated(unsafe) let benchmarks = {
                     _ = try Freddy.JSON(data: data)
                 #elseif USE_SWIFTY_JSON
                     _ = try SwiftyJSON.JSON(data: data)
-                #else
+                #elseif USE_JBIRD
                     _ = try JBird.JSON(data)
+                #elseif USE_JBIRD_PARALLEL
+                    _ = try await JBird.JSON.deserialize(data)
+                #else
+                    fatalError("NO FLAG WAS SET")
                 #endif
             }
+        } setup: {
+            #if USE_JBIRD || USE_JBIRD_PARALLEL
+                JBird.JSON.warmLimits()
+            #endif
         }
     }
 }

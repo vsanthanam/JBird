@@ -108,7 +108,7 @@ let steve: JSON = [
 
 - ``value(forSubscript:)-(JSON.Subscript)``
 - ``value(forSubscript:)-(JSONSubscriptConvertible)``
-- ``value(atPath:)-([JSON.Subscript])``
+- ``value(atPath:)-(JSON.Subscript...)``
 - ``value(atPath:)-(PathComponent)``
 - ``containsValue(forSubscript:)-(JSON.Subscript)``
 - ``containsValue(forSubscript:)-(JSONSubscriptConvertible)``
@@ -136,7 +136,8 @@ let steve: JSON = [
 - ``filterValues(_:)``
 - ``allSatisfy(_:)-((JSON.Object.Element)->Bool)``
 - ``map(_:)-((JSON.Object.Element)->T)``
-- ``mapValues(_:)``
+- ``mapValues(_:)-((JSON)->T)``
+- ``mapValues(_:)-((JSON)->JSON)``
 - ``compactMap(_:)-((JSON.Object.Element)->ElementOfResult?)``
 - ``compactMapValues(_:)``
 - ``reduce(into:_:)-(_,(Result,JSON.Object.Element)->Void)``
@@ -159,6 +160,7 @@ let steve: JSON = [
 - ``filter(_:)-((JSON)->Bool)``
 - ``allSatisfy(_:)-((JSON)->Bool)``
 - ``map(_:)-((JSON)->T)``
+- ``map(_:)-((JSON)->JSON)``
 - ``compactMap(_:)-((JSON)->ElementOfResult?)``
 - ``reduce(into:_:)-(_,(Result,JSON)->Void)``
 - ``reduce(_:_:)-(_,(Result,JSON)->Result)``
