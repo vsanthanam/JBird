@@ -114,8 +114,11 @@ jobs:
     name: Build JBird (macOS)
     strategy:
       matrix:
-        swift: ['6.0', '6.1', '6.2']
+        swift: ['5.10', '6.0', '6.1', '6.2']
         include:
+          - swift: '5.10'
+            runner: 'macos-14'
+            xcode: '15.4'
           - swift: '6.0'
             runner: 'macos-15'
             xcode: '16.0'
@@ -148,8 +151,11 @@ jobs:
     name: Test JBird (macOS)
     strategy:
       matrix:
-        swift: ['6.0', '6.1', '6.2']
+        swift: ['5.10', '6.0', '6.1', '6.2']
         include:
+          - swift: '5.10'
+            runner: 'macos-14'
+            xcode: '15.4'
           - swift: '6.0'
             runner: 'macos-15'
             xcode: '16.0'
@@ -180,7 +186,7 @@ jobs:
     name: Build JBird (Ubuntu)
     strategy:
       matrix:
-        swift: ['6.0', '6.1', '6.2']
+        swift: ['5.10', '6.0', '6.1', '6.2']
     needs: changes
     if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
     runs-on: ubuntu-latest
@@ -206,7 +212,7 @@ jobs:
     name: Test JBird (Ubuntu)
     strategy:
       matrix:
-        swift: ['6.0', '6.1', '6.2']
+        swift: ['5.10', '6.0', '6.1', '6.2']
     needs: [build-ubuntu-spm, changes]
     if: ${{ needs.changes.outputs.swift == 'true' || needs.changes.outputs.c == 'true' || needs.changes.outputs.yaml == 'true' }}
     runs-on: ubuntu-latest
