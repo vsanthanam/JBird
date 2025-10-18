@@ -108,7 +108,7 @@ let steve: JSON = [
 
 - ``value(forSubscript:)-(JSON.Subscript)``
 - ``value(forSubscript:)-(JSONSubscriptConvertible)``
-- ``value(atPath:)-([JSON.Subscript])``
+- ``value(atPath:)-(JSON.Subscript...)``
 - ``value(atPath:)-(PathComponent)``
 - ``containsValue(forSubscript:)-(JSON.Subscript)``
 - ``containsValue(forSubscript:)-(JSONSubscriptConvertible)``

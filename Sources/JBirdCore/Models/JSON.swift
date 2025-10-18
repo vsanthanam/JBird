@@ -496,6 +496,20 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameter path: The path to use for lookup
     /// - Returns: The JSON value at the specified path
     /// - Throws: An error, if the JSON value does not contain a value at the provided path, or of the JSON value is incompatible with the provided JSON subscript.
+    @available(*, deprecated, renamed: "value(atPath:)", message: "Use the variadic method instead. This method will be removed in a future release.")
+    @_disfavoredOverload
+    public func value(atPath path: [Subscript]) throws -> JSON {
+        var json = self
+        try path.forEach { component in
+            json = try json.value(forSubscript: component)
+        }
+        return json
+    }
+
+    /// Retrieve a value from the JSON object using a specified path
+    /// - Parameter path: The path to use for lookup
+    /// - Returns: The JSON value at the specified path
+    /// - Throws: An error, if the JSON value does not contain a value at the provided path, or of the JSON value is incompatible with the provided JSON subscript.
     public func value(
         atPath path: Subscript...
     ) throws -> JSON {
