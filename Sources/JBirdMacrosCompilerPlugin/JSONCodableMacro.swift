@@ -119,7 +119,7 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
                             case "copy":
                                 key = name
                             case "snakeCase":
-                                key = snakeCase(name)
+                                key = try snakeCase(name)
                             default:
                                 key = name
                             }
@@ -256,7 +256,7 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
 
     private static func snakeCase(
         _ name: String
-    ) -> String {
+    ) throws -> String {
         if #available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *) {
             let regex = Regex {
                 ChoiceOf {
@@ -295,31 +295,35 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
             }
             return result.lowercased()
         } else {
-            let camelSegmentPattern = "([a-z0-9])([A-Z])"
-            let acronymBoundaryPattern = "([A-Z])([A-Z][a-z])"
+            do {
+                let camelSegmentPattern = "([a-z0-9])([A-Z])"
+                let acronymBoundaryPattern = "([A-Z])([A-Z][a-z])"
 
-            let camelSegmentRegex = try! NSRegularExpression(pattern: camelSegmentPattern, options: [])
-            let acronymBoundaryRegex = try! NSRegularExpression(pattern: acronymBoundaryPattern, options: [])
+                let camelSegmentRegex = try NSRegularExpression(pattern: camelSegmentPattern, options: [])
+                let acronymBoundaryRegex = try NSRegularExpression(pattern: acronymBoundaryPattern, options: [])
 
-            var result = name
+                var result = name
 
-            let camelSegmentRange = NSRange(location: 0, length: result.utf16.count)
-            result = camelSegmentRegex.stringByReplacingMatches(
-                in: result,
-                options: [],
-                range: camelSegmentRange,
-                withTemplate: "$1_$2"
-            )
+                let camelSegmentRange = NSRange(location: 0, length: result.utf16.count)
+                result = camelSegmentRegex.stringByReplacingMatches(
+                    in: result,
+                    options: [],
+                    range: camelSegmentRange,
+                    withTemplate: "$1_$2"
+                )
 
-            let acronymBoundaryRange = NSRange(location: 0, length: result.utf16.count)
-            result = acronymBoundaryRegex.stringByReplacingMatches(
-                in: result,
-                options: [],
-                range: acronymBoundaryRange,
-                withTemplate: "$1_$2"
-            )
+                let acronymBoundaryRange = NSRange(location: 0, length: result.utf16.count)
+                result = acronymBoundaryRegex.stringByReplacingMatches(
+                    in: result,
+                    options: [],
+                    range: acronymBoundaryRange,
+                    withTemplate: "$1_$2"
+                )
 
-            return result.lowercased()
+                return result.lowercased()
+            } catch {
+                throw MacroExpansionErrorMessage("Unknown Macro Expansion Failure")
+            }
         }
     }
 
