@@ -764,11 +764,11 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// let other: JSON = ["foo": 12, "bar": 24, "qux": nil]
     ///
     /// let first = json.allSatisfy { key, value in
-    ///     return key.count == 3 && value.isBool &&
+    ///     return key.count == 3 && value.isBool
     /// }
     ///
     /// let second = other.allSatisfy { key, value in
-    ///     return key.count == 3 && value.number
+    ///     return key.count == 3 && value.isNumber
     /// }
     ///
     /// #expect(first == true)
