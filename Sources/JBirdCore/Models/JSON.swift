@@ -947,7 +947,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ) throws {
         let index = Int(index)
         var array = try arrayValue
-        guard array.indices.contains(index) || index != array.count else {
+        guard array.indices.contains(index) else {
             throw JSONError.indexOutOfBounds(index)
         }
         array.insert(value, at: index)
