@@ -85,7 +85,7 @@ public enum JSONKeyComputationRule {
 /// See ``JBirdMacros/JSONKey(_:)-3i5us``, ``JBirdMacros/JSONKey(_:)-uxxr``, and ``JBirdMacros/OmitIfNil(_:)`` for more information.
 ///
 /// - Note: If you are using this macro as part of `JBirdMacros`, you must also import `JBirdCore` and `JBirdBuilders` for the macro to properly expand.
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 @attached(
     extension,
     conformances: JSONEncodable, JSONDecodable
@@ -118,7 +118,7 @@ public macro JSONCodable() = #externalMacro(
 /// In this example, the JSON object used to represent instances of `User` will store the `firstName` property using a key called `"first_name"`, and the last `lastName` property using a key called `"last_name"`.
 ///
 /// See the ``JSONKeyComputationRule`` enumeration for more information
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 @attached(peer)
 public macro JSONKey(
     _ keyRule: JSONKeyComputationRule = .copy
@@ -141,7 +141,7 @@ public macro JSONKey(
 /// ```
 ///
 /// In this example, the JSON object used to represent instances of `User` will store the `name` property using a key called `"ldap"`, rather than the default value of `"name"`.
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 @attached(peer)
 public macro JSONKey(
     _ key: String
@@ -168,7 +168,7 @@ public macro JSONKey(
 ///
 /// In this example, when encoding a `User` to JSON where `nickname` is nil,
 /// the resulting JSON will not contain the `nickname` key.
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 @attached(peer)
 public macro OmitIfNil(
     _ omitIfNil: Bool = true

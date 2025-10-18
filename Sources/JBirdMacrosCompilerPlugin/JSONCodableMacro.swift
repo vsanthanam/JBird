@@ -30,6 +30,7 @@ import SwiftSyntax
 import SwiftSyntaxBuilder
 import SwiftSyntaxMacros
 
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
 
     // MARK: - ExtensionMacro
@@ -255,100 +256,42 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
     }
 
     private static func snakeCase(_ name: String) -> String {
-        if #available(macOS 13, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 9.0, visionOS 1.0, *) {
-            let regex = Regex {
-                ChoiceOf {
-                    Regex {
-                        Capture {
-                            ChoiceOf {
-                                CharacterClass.generalCategory(.lowercaseLetter)
-                                CharacterClass.generalCategory(.decimalNumber)
-                            }
-                        }
-                        Capture {
-                            CharacterClass.generalCategory(.uppercaseLetter)
-                        }
-                    }
-                    Regex {
-                        Capture {
-                            CharacterClass.generalCategory(.uppercaseLetter)
-                        }
-                        Capture {
-                            CharacterClass.generalCategory(.uppercaseLetter)
+        let regex = Regex {
+            ChoiceOf {
+                Regex {
+                    Capture {
+                        ChoiceOf {
                             CharacterClass.generalCategory(.lowercaseLetter)
+                            CharacterClass.generalCategory(.decimalNumber)
                         }
+                    }
+                    Capture {
+                        CharacterClass.generalCategory(.uppercaseLetter)
+                    }
+                }
+                Regex {
+                    Capture {
+                        CharacterClass.generalCategory(.uppercaseLetter)
+                    }
+                    Capture {
+                        CharacterClass.generalCategory(.uppercaseLetter)
+                        CharacterClass.generalCategory(.lowercaseLetter)
                     }
                 }
             }
-
-            var result = name
-
-            result = result.replacing(regex) { match in
-                if let first = match.output.1 {
-                    return "\(first)_\(match.output.2!)"
-                } else if let third = match.output.3 {
-                    return "\(third)_\(match.output.4!)"
-                }
-                return String(match.output.0)
-            }
-
-            return result.lowercased()
-        } else {
-
-            guard !name.isEmpty else { return "" }
-
-            func isUppercase(_ ch: Character) -> Bool {
-                let s = String(ch)
-                return s != s.lowercased() && s == s.uppercased()
-            }
-
-            func isLowercase(_ ch: Character) -> Bool {
-                let s = String(ch)
-                return s != s.uppercased() && s == s.lowercased()
-            }
-
-            func isNumber(_ ch: Character) -> Bool {
-                ch.unicodeScalars.allSatisfy { CharacterSet.decimalDigits.contains($0) }
-            }
-
-            let chars = Array(name)
-            var result = String()
-            result.reserveCapacity(chars.count * 2)
-
-            for i in chars.indices {
-                let c = chars[i]
-                let upper = isUppercase(c)
-                let lower = isLowercase(c)
-                let number = isNumber(c)
-
-                if i > 0 {
-                    let prev = chars[i - 1]
-                    let prevIsUnderscore = prev == "_"
-                    let prevUpper = isUppercase(prev)
-                    let prevLower = isLowercase(prev)
-                    let prevNumber = isNumber(prev)
-
-                    let nextLower: Bool = {
-                        if i + 1 < chars.count {
-                            return isLowercase(chars[i + 1])
-                        }
-                        return false
-                    }()
-
-                    if !prevIsUnderscore {
-                        if upper, prevLower {
-                            result.append("_")
-                        } else if upper, nextLower {
-                            result.append("_")
-                        }
-                    }
-                }
-
-                result.append(String(c).lowercased())
-            }
-
-            return result
         }
+
+        var result = name
+
+        result = result.replacing(regex) { match in
+            if let first = match.output.1 {
+                return "\(first)_\(match.output.2!)"
+            } else if let third = match.output.3 {
+                return "\(third)_\(match.output.4!)"
+            }
+            return String(match.output.0)
+        }
+        return result.lowercased()
     }
 
 }
