@@ -254,21 +254,19 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
             }
 
         let caseInfos: [EnumCaseInfo] = cases.map { element in
-            let associatedValues: [AssociatedValue]
-            if let parameters = element.parameterClause?.parameters {
-                associatedValues = parameters.enumerated().map { index, parameter in
-                    let labelText: String?
-                    if let firstName = parameter.firstName, firstName.text != "_" {
-                        labelText = firstName.text
+            let associatedValues: [AssociatedValue] = if let parameters = element.parameterClause?.parameters {
+                parameters.enumerated().map { index, parameter in
+                    let labelText: String? = if let firstName = parameter.firstName, firstName.text != "_" {
+                        firstName.text
                     } else {
-                        labelText = nil
+                        nil
                     }
                     let bindingName = labelText ?? "value\(index)"
                     let key = labelText ?? "_\(index)"
                     return AssociatedValue(label: labelText, key: key, bindingName: bindingName)
                 }
             } else {
-                associatedValues = []
+                []
             }
             return EnumCaseInfo(name: element.name.text, associatedValues: associatedValues)
         }
