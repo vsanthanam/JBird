@@ -793,7 +793,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// The values in a JSON object
-    /// - Throws: An error, of the JSON value is not an object
+    /// - Throws: An error, if the JSON value is not an object
     public var values: [JSON] {
         get throws {
             try objectValue.values.map(\.self)
