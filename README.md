@@ -74,6 +74,32 @@ Then, add the `JBird` dependency to your target or targets of choice:
 )
 ```
 
+### Xcode
+
+JBird supports the full range of Apple platforms, ensuring seamless integration with your iOS, macOS, watchOS, tvOS, and visionOS applications:
+
+| Platform | Minimum Version | Status |
+|----------|-----------------|--------|
+| macOS | 12.0+ | ✅ Supported |
+| Mac Catalyst | 15.0+ | ✅ Supported |
+| iOS | 15.0+ | ✅ Supported |
+| watchOS | 8.0+ | ✅ Supported |
+| tvOS | 15.0+ | ✅ Supported |
+| visionOS | 1.0+ | ✅ Supported |
+
+### Swift Package Manager
+
+JBird has been tested to work with the following platforms and Swift toolchains:
+
+| Platform | Swift Versions | Status |
+|----------|----------------|--------|
+| macOS | 6.0, 6.1, 6.2 | ✅ Supported & Tested |
+| Linux (Ubuntu) | 6.0, 6.1, 6.2 | ✅ Supported & Tested |
+| Windows | 6.1, 6.2 | ✅ Supported & Tested |
+| WebAssembly | 6.0, 6.1, 6.2 | ⚠️ Supported (No Tests) |
+
+All supported platforms undergo continuous integration testing to ensure compatibility across different environments. Other platforms such as Android may also work, but are not validated in the CI environment.
+
 For additional installation instructions, including installation methods without the Swift Package Manager, see [the documentation](https://www.usejbird.com/docs/documentation/jbird/setup).
 
 ## Performance
