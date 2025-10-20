@@ -178,20 +178,6 @@ let package = Package(
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("MemberImportVisibility"),
             ]
-        ),
-        .testTarget(
-            name: "JBirdMacrosCompilerPluginTests",
-            dependencies: [
-                "JBirdMacrosCompilerPlugin",
-                .product(
-                    name: "SwiftSyntaxMacrosTestSupport",
-                    package: "swift-syntax"
-                )
-            ],
-            swiftSettings: [
-                .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("MemberImportVisibility"),
-            ]
         )
     ],
     swiftLanguageModes: [.v6],

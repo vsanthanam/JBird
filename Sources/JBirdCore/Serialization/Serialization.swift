@@ -1102,23 +1102,24 @@ extension JSON {
             GetCurrentThreadStackLimits(&low, &high)
 
             let stackBytes = size_t(high &- low)
-
             return min(1024, max(16, stackBytes / 512))
+        }
+
+    #elseif os(WASI) || arch(wasm32)
+        @inline(__always)
+        private static func calculateMaxDepth() -> size_t {
+            // There is no way to do this on Web Assembly. Makes sense.
+            256
         }
     #else
         @inline(__always)
         private static func calculateMaxDepth() -> size_t {
             var attr = pthread_attr_t()
-
             pthread_attr_init(&attr)
-
-            defer {
-                pthread_attr_destroy(&attr)
-            }
+            defer { pthread_attr_destroy(&attr) }
 
             var size: size_t = 0
             pthread_attr_getstacksize(&attr, &size)
-
             return min(1024, max(16, size / 512))
         }
     #endif
