@@ -524,6 +524,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameter path: The path to use for lookup
     /// - Returns: The JSON value at the specified path
     /// - Throws: An error, if the JSON value does not contain a value at the provided path, or if the JSON value is incompatible with the provided JSON subscript.
+    @available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 1.0, *)
     public func value<each PathComponent>(
         atPath path: repeat each PathComponent
     ) throws -> JSON where repeat each PathComponent: JSONSubscriptConvertible {
@@ -1236,6 +1237,24 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Retrieve a value from the JSON object using a specified subscript
     /// - Parameter path: A subscript to use for lookup
     /// - Returns: The JSON value at the specified subscript
+    @available(macOS, introduced: 12.0, deprecated: 14.0, message: "Use the variadic subscript instead")
+    @available(macCatalyst, introduced: 15.0, deprecated: 17.0, message: "Use the variadic subscript instead")
+    @available(iOS, introduced: 15.0, deprecated: 17.0, message: "Use the variadic subscript instead")
+    @available(tvOS, introduced: 15.0, deprecated: 17.0, message: "Use the variadic subscript instead")
+    @available(watchOS, introduced: 8.0, deprecated: 10.0, message: "Use the variadic subscript instead")
+    @_disfavoredOverload
+    public subscript(
+        _ subscript: some JSONSubscriptConvertible
+    ) -> JSON {
+        get throws {
+            try value(forSubscript: `subscript`)
+        }
+    }
+
+    /// Retrieve a value from the JSON object using a specified path
+    /// - Parameter path: A path to use for lookup
+    /// - Returns: The JSON value at the specified path
+    @available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 1.0, *)
     public subscript<each PathComponent>(
         _ path: repeat each PathComponent
     ) -> JSON where repeat each PathComponent: JSONSubscriptConvertible {
@@ -1270,17 +1289,37 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Retrieve a value from the JSON object using a specified subscript
     /// - Parameters:
     ///   - subscript: A subscript to use for lookup
-    ///   - type: The type to decode into. This type can be inferred from the callsite.
+    ///   - type: The type to decode into. This argument can be inferred from the callsite.
     /// - Returns: The JSON value at the specified subscript
+    @available(macOS, introduced: 12.0, deprecated: 14.0, message: "Use the variadic subscript instead")
+    @available(macCatalyst, introduced: 15.0, deprecated: 17.0, message: "Use the variadic subscript instead")
+    @available(iOS, introduced: 15.0, deprecated: 17.0, message: "Use the variadic subscript instead")
+    @available(tvOS, introduced: 15.0, deprecated: 17.0, message: "Use the variadic subscript instead")
+    @available(watchOS, introduced: 8.0, deprecated: 10.0, message: "Use the variadic subscript instead")
+    @_disfavoredOverload
+    public subscript<T>(
+        _ subscript: some JSONSubscriptConvertible,
+        as type: T.Type = T.self
+    ) -> T where T: JSONDecodable {
+        get throws {
+            try value(forSubscript: `subscript`).decode(into: type)
+        }
+    }
+
+    /// Retrieve a value from the JSON object using a specified path
+    /// - Parameters:
+    ///   - path: A path to use for lookup
+    ///   - type: The type to decode into. This argument can be inferred from the callsite.
+    /// - Returns: The JSON value at the specified path
     @_disfavoredOverload
     public subscript<each PathComponent, T>(
-        _ subscript: repeat each PathComponent,
+        _ path: repeat each PathComponent,
         as type: T.Type = T.self
     ) -> T where repeat each PathComponent: JSONSubscriptConvertible, T: JSONDecodable {
         get throws {
             var json = self
-            for component in repeat each `subscript` {
-                json = try json[component]
+            for component in repeat each path {
+                json = try json.value(forSubscript: component)
             }
             return try json.decode(into: type)
         }

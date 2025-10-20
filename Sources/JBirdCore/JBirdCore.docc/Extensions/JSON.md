@@ -118,8 +118,10 @@ let steve: JSON = [
 - ``removeValue(forSubscript:)-(JSONSubscriptConvertible)``
 - ``subscript(_:)-(JSON.Subscript...)``
 - ``subscript(_:)-(PathComponent)``
+- ``subscript(_:)-(JSONSubscriptConvertible)``
 - ``subscript(_:as:)-(JSON.Subscript...,_)``
 - ``subscript(_:as:)-(PathComponent,_)``
+- ``subscript(_:as:)-(JSONSubscriptConvertible,_)``
 
 ### Working with JSON objects and arrays
 
