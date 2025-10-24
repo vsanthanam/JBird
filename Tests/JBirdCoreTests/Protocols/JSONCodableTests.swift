@@ -612,4 +612,36 @@ struct JSONCodableTests {
 
     }
 
+    @Suite("Decimal Conformance Tests")
+    struct DecimalTests {
+
+        @Test("Decimal Whole Encode")
+        func decimalWholeEncode() {
+            let decimal: Decimal = 21
+            let json = decimal.encodeToJSONNumber()
+            #expect(json == .int(21))
+        }
+
+        @Test("Decimal Whole Decode")
+        func decimalWholeDecode() throws {
+            let json = JSON.number(.int(21))
+            let decimal = try json.decode(into: Decimal.self)
+            #expect(decimal == 21)
+        }
+
+        @Test("Decimal Float Encode")
+        func decimalFloatEncode() {
+            let decimal: Decimal = 2.1
+            let json = decimal.encodeToJSONNumber()
+            #expect(json == .double(2.1))
+        }
+
+        @Test("Decimal Float Decode")
+        func decimalFloatDecode() throws {
+            let json = JSON.number(.double(2.1))
+            let decimal = try json.decode(into: Decimal.self)
+            #expect(decimal == 2.1)
+        }
+
+    }
 }
