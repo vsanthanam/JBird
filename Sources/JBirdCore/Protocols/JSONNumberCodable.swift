@@ -23,6 +23,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import Foundation
+
 /// A type that can convert itself into and out of an external `JSON.Number` representation.
 ///
 /// `JSONNumberCodable` is a type alias for the `JSONNumberEncodable` and `JSONNumberDecodable` protocols.
@@ -240,6 +242,37 @@ extension Float: JSONNumberCodable {
     public init(jsonNumber: JSON.Number) throws {
         let double = try Double(jsonNumber: jsonNumber)
         self = Float(double)
+    }
+
+}
+
+@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+extension Decimal: JSONNumberCodable {
+
+    public func encodeToJSONNumber() -> JSON.Number {
+        var original = self
+        var floored = Decimal()
+        NSDecimalRound(&floored, &original, 0, .down)
+        let isWhole = (floored == self)
+
+        if isWhole {
+            let ns = NSDecimalNumber(decimal: self)
+            let i64 = ns.int64Value
+            if Decimal(i64) == self,
+               i64 >= Int64(Int.min), i64 <= Int64(Int.max) {
+                return .int(Int(i64))
+            }
+        }
+        return .double(NSDecimalNumber(decimal: self).doubleValue)
+    }
+
+    public init(jsonNumber: JSON.Number) throws {
+        switch jsonNumber {
+        case let .int(number):
+            self = Decimal(number)
+        case let .double(number):
+            self = Decimal(number)
+        }
     }
 
 }

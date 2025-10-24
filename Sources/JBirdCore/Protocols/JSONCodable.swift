@@ -151,6 +151,9 @@ extension Int64: JSONCodable {}
 extension Float: JSONCodable {}
 
 @available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+extension Decimal: JSONCodable {}
+
+@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 extension String: JSONCodable {
 
     public func encodeToJSON() -> JSON {
