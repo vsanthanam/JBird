@@ -36,40 +36,65 @@ public enum JSONDeserializationError: Error, Equatable, Sendable, CustomStringCo
 
     // MARK: - API
 
+    /// Thrown when attempting to deserialize a JSON fragment that is not a complete JSON value.
+    /// You enable support for fragment parsing by using ``JSON/DeserializationOptions/fragmentsAllowed``
     case illegalFragment
 
+    /// Thrown when an unknown or unspecified deserialization error occurs.
     case unknown
 
+    /// Thrown when the JSON input ends unexpectedly before the value is complete.
     case unexpectedEndOfInput
 
+    /// Thrown when the input contains malformed or syntactically incorrect JSON.
     case invalidJSON
 
+    /// Thrown when an unexpected or illegal character is encountered in the JSON input.
     case invalidCharacter
 
+    /// Thrown when a colon (':') is expected after an object key but is missing or replaced by another character.
     case expectedColon
 
+    /// Thrown when a comma (',') or closing brace ('}') is expected in an object but neither is found.
     case expectedCommaOrBrace
 
+    /// Thrown when a comma (',') or closing bracket (']') is expected in an array but neither is found.
     case expectedCommaOrBracket
 
+    /// Thrown when a JSON literal (true, false, or null) is malformed or incomplete.
     case invalidLiteral
 
+    /// Thrown when a number in the JSON input is malformed or contains invalid numeric characters.
     case invalidNumber
 
+    /// Thrown when a string value in the JSON input is malformed, unterminated, or contains invalid characters.
     case invalidString
 
+    /// Thrown when an object has a value without a corresponding key.
     case missingObjectKey
 
+    /// Thrown when a Unicode escape sequence in a string is malformed or invalid.
     case invalidUnicode
 
+    /// Thrown when an escape sequence in a string is invalid or unrecognized.
     case invalidEscape
 
+    /// Thrown when the parser runs out of memory during deserialization.
     case outOfMemory
 
+    /// Thrown when the JSON structure exceeds the maximum allowed nesting depth.
+    /// By default, the depth limit is set for you automatically based a hueristic applied to the system profile
+    ///
+    /// See ``JSON/withRecursionDepthLimit(_:operation:)-8riei`` or ``JSON/withRecursionDepthLimit(_:operation:)-9u6jf`` for more information
     case depthLimitExceeded
 
+    /// Thrown when the size of the input exceeds the configured maximum input size limit.
+    /// By defaullt, the input size limit is set for you automatically based a hueristic applied to the system profile
+    ///
+    /// See ``JSON/withInputSizeLimit(_:operation:)-2sm2h`` or ``JSON/withInputSizeLimit(_:operation:)-7cgom``
     case inputSizeLimitExceeded
 
+    /// Thrown when a JSON object contains duplicate keys.
     case duplicateKey
 
     // MARK: - CustomStringConvertible
