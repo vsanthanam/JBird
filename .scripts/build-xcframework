@@ -194,7 +194,7 @@ if contains "ios" "${SELECTED_PLATFORMS[@]}"; then
 fi
 
 if contains "ios-simulator" "${SELECTED_PLATFORMS[@]}"; then
-  build_archive "ios-simulator" "platform=iOS Simulator,name=iPhone 17,OS=26.0" iphonesimulator
+  build_archive "ios-simulator" "generic/platform=iOS Simulator" iphonesimulator
   BUILT_PLATFORMS+=("ios-simulator")
 fi
 
@@ -204,7 +204,7 @@ if contains "tvos" "${SELECTED_PLATFORMS[@]}"; then
 fi
 
 if contains "tvos-simulator" "${SELECTED_PLATFORMS[@]}"; then
-  build_archive "tvos-simulator" "platform=tvOS Simulator,name=Apple TV 4K (3rd generation),OS=26.0" appletvsimulator
+  build_archive "tvos-simulator" "generic/platform=tvOS Simulator" appletvsimulator
   BUILT_PLATFORMS+=("tvos-simulator")
 fi
 
@@ -214,7 +214,7 @@ if contains "watchos" "${SELECTED_PLATFORMS[@]}"; then
 fi
 
 if contains "watchos-simulator" "${SELECTED_PLATFORMS[@]}"; then
-  build_archive "watchos-simulator" "platform=watchOS Simulator,name=Apple Watch Series 11 (46mm),OS=26.0" watchsimulator
+  build_archive "watchos-simulator" "generic/platform=watchOS Simulator" watchsimulator
   BUILT_PLATFORMS+=("watchos-simulator")
 fi
 
@@ -224,7 +224,7 @@ if contains "xros" "${SELECTED_PLATFORMS[@]}"; then
 fi
 
 if contains "xros-simulator" "${SELECTED_PLATFORMS[@]}"; then
-  build_archive "xros-simulator" "platform=visionOS Simulator,name=Apple Vision Pro,OS=26.0" xrsimulator
+  build_archive "xros-simulator" "generic/platform=visionOS Simulator" xrsimulator
   BUILT_PLATFORMS+=("xros-simulator")
 fi
 
