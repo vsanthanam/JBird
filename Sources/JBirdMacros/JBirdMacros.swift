@@ -185,9 +185,6 @@ enum TestEnum {
     case bar
     case baz(String)
     case Baz(Decimal, String)
-    init(json: JSON) throws {
-        fatalError()
-    }
 
 }
 
@@ -198,4 +195,17 @@ struct TestStruct {
 
     let bar: String
 
+}
+
+public struct JSONDecodingError: Error, CustomStringConvertible {
+
+    public init(_ message: String) {
+        self.message = message
+    }
+
+    public let message: String
+
+    public var description: String {
+        message
+    }
 }

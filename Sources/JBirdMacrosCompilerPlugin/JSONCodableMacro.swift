@@ -245,6 +245,8 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
                 throw MacroExpansionErrorMessage("Enums annotated with @JSONCodable must contain at least one enum case.")
             }
             var encodeItems = [String]()
+            var decodeFunctions = [String]()
+            var decodeAttempts = [String]()
             for element in enumCaseDecls.flatMap(\.elements) {
                 if let paramaterClause = element.parameterClause {
                     var useObject = false
@@ -275,6 +277,47 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
                                 \(varsAsBody)
                             }
                         """
+                        let associatedDecodeAttempts = vars
+                            .map { varName in
+                                """
+                                let \(varName) = try associatedValues["\(keys[varName]!)"]
+                                """
+                            }
+                            .joined(separator: "\n")
+                        let varsAsEnumCases = vars.map { varName in
+                            let key = keys[varName]!
+                            if UInt(key) != nil {
+                                return """
+                                try \(varName).decode()
+                                """
+                            } else {
+                                return """
+                                \(varName): try \(varName).decode()
+                                """
+                            }
+
+                        }
+                        .joined(separator: ", ")
+                        let decodeFunctionReturnStatement = """
+                        return .\(element.name.text)(\(varsAsEnumCases))
+                        """
+                        let decodeFunctionName = "decode_case_\(element.name.text)"
+                        let decodeFunction = """
+                        func \(decodeFunctionName)() throws -> Self {
+                            let associatedValues = try json["\(element.name.text)"]
+                            \(associatedDecodeAttempts)
+                            \(decodeFunctionReturnStatement)
+                        }
+                        """
+                        decodeFunctions.append(decodeFunction)
+                        decodeAttempts.append(
+                            """
+                            if let value = try? \(decodeFunctionName)() {
+                                self = value
+                                return
+                            }
+                            """
+                        )
                         encodeItems.append(encodeSwitch)
                     } else {
                         let vars = paramaterClause.parameters
@@ -290,6 +333,41 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
                             }
                         """
                         encodeItems.append(encodeSwitch)
+                        let indices = Array(0..<vars.count)
+                        let associatedDecodeAttempts = indices
+                            .map { index in
+                                """
+                                let \(vars[index]) = try associatedValues[\(index)]
+                                """
+                            }
+                            .joined(separator: "\n")
+                        let varsAsEnumCases = vars
+                            .map { varName in
+                                """
+                                try \(varName).decode()
+                                """
+                            }
+                            .joined(separator: ", ")
+                        let decodeFunctionReturnStatement = """
+                        return .\(element.name.text)(\(varsAsEnumCases))
+                        """
+                        let decodeFunctionName = "decode_case_\(element.name.text)"
+                        let decodeFunction = """
+                        func \(decodeFunctionName)() throws -> Self {
+                            let associatedValues = try json["\(element.name.text)"]
+                            \(associatedDecodeAttempts)
+                            \(decodeFunctionReturnStatement)
+                        }
+                        """
+                        decodeFunctions.append(decodeFunction)
+                        decodeAttempts.append(
+                            """
+                            if let value = try? \(decodeFunctionName)() {
+                                self = value
+                                return
+                            }
+                            """
+                        )
                     }
                 } else {
                     let encodeSwitch = """
@@ -297,6 +375,25 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
                         \"\(element.name.text)\"
                     """
                     encodeItems.append(encodeSwitch)
+                    let decodeFunctionName = "decode_case_\(element.name.text)"
+                    let decodeFunction = """
+                    func \(decodeFunctionName)() throws -> Self {
+                        let raw = try json.decode(into: String.self)
+                        guard raw == "\(element.name.text)" else {
+                            throw JBirdMacros.JSONDecodingError("Enum case decoding failure")
+                        }
+                        return .\(element.name.text)
+                    }
+                    """
+                    decodeFunctions.append(decodeFunction)
+                    decodeAttempts.append(
+                        """
+                        if let value = try? \(decodeFunctionName)() {
+                            self = value
+                            return
+                        }
+                        """
+                    )
                 }
             }
             let encodeSwitch = encodeItems.joined(separator: "\n")
@@ -309,7 +406,33 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
                 }
                 """
             )
-            return [encodable]
+
+            let decodeFunctionsTogether = decodeFunctions.joined(separator: "\n")
+            let decodeAttemptsBody = decodeAttempts.joined(separator: "\n")
+
+            var decodeBodySections = [String]()
+            if !decodeFunctionsTogether.isEmpty {
+                decodeBodySections.append(decodeFunctionsTogether)
+            }
+            if !decodeAttemptsBody.isEmpty {
+                decodeBodySections.append(decodeAttemptsBody)
+            }
+            decodeBodySections.append(
+                """
+                throw JBirdMacros.JSONDecodingError("Enum case decoding failure")
+                """
+            )
+            let decodeBody = decodeBodySections.joined(separator: "\n\n")
+
+            let decodable = DeclSyntax(
+                """
+                public init(json: JSON) throws {
+                    \(raw: decodeBody)
+                }
+                """
+            )
+
+            return [encodable, decodable]
         } else {
             throw MacroExpansionErrorMessage("@JSONCodable macro can only be applied to structs or enums.")
         }
