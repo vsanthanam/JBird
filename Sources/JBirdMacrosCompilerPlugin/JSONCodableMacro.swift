@@ -155,7 +155,9 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
         return [encodable, decodable]
     }
 
-    private static func parseStoredProperties(in structDecl: StructDeclSyntax) throws -> [StoredProperty] {
+    private static func parseStoredProperties(
+        in structDecl: StructDeclSyntax
+    ) throws -> [StoredProperty] {
         var result: [StoredProperty] = []
 
         for member in structDecl.memberBlock.members {
@@ -181,8 +183,14 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
         return result
     }
 
-    private static func resolveJSONKey(for property: VariableDeclSyntax, defaultName name: String) throws -> String {
-        guard let keyAttribute = try findAttribute(named: "JSONKey", in: property.attributes) else {
+    private static func resolveJSONKey(
+        for property: VariableDeclSyntax,
+        defaultName name: String
+    ) throws -> String {
+        guard let keyAttribute = try findAttribute(
+            named: "JSONKey",
+            in: property.attributes
+        ) else {
             return name
         }
 
@@ -207,8 +215,14 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
         return name
     }
 
-    private static func resolveOmitIfNil(for property: VariableDeclSyntax, binding: PatternBindingSyntax) throws -> Bool {
-        if let omitIfNilAttribute = try findAttribute(named: "OmitIfNil", in: property.attributes) {
+    private static func resolveOmitIfNil(
+        for property: VariableDeclSyntax,
+        binding: PatternBindingSyntax
+    ) throws -> Bool {
+        if let omitIfNilAttribute = try findAttribute(
+            named: "OmitIfNil",
+            in: property.attributes
+        ) {
             if let arguments = omitIfNilAttribute.arguments,
                let labeledList = arguments.as(LabeledExprListSyntax.self),
                let first = labeledList.first,
@@ -222,8 +236,15 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
         }
     }
 
-    private static func findAttribute(named name: String, in attributes: AttributeListSyntax?) throws -> AttributeSyntax? {
-        guard let attributes, !attributes.isEmpty else { return nil }
+    private static func findAttribute(
+        named name: String,
+        in attributes: AttributeListSyntax?
+    ) throws -> AttributeSyntax? {
+        guard let attributes,
+              !attributes.isEmpty else {
+            return nil
+        }
+        
         for attribute in attributes {
             let attr = try attribute.as(AttributeSyntax.self).mustExist()
             if let memberName = attr.attributeName.as(MemberTypeSyntax.self) {
@@ -235,10 +256,14 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
         return nil
     }
 
-    private static func buildEnumMembers(from enumDecl: EnumDeclSyntax) throws -> [DeclSyntax] {
-        let enumCases: [EnumCaseElementSyntax] = enumDecl.memberBlock.members.compactMap { member in
-            member.decl.as(EnumCaseDeclSyntax.self)?.elements
-        }.flatMap { Array($0) }
+    private static func buildEnumMembers(
+        from enumDecl: EnumDeclSyntax
+    ) throws -> [DeclSyntax] {
+        let enumCases: [EnumCaseElementSyntax] = enumDecl.memberBlock.members
+            .compactMap { member in
+                member.decl.as(EnumCaseDeclSyntax.self)
+            }
+            .flatMap(\.elements)
 
         guard !enumCases.isEmpty else {
             throw MacroExpansionErrorMessage("Enums annotated with @JSONCodable must contain at least one enum case.")
@@ -424,51 +449,54 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
         var vars: [String] = []
         var keys: [String: String] = [:]
 
-        // Track occurrences to make names unique: base, base2, base3, ...
         var occurrences: [String: Int] = [:]
         var used: Set<String> = []
 
         func sanitize(_ raw: String) -> String {
             let lowered = raw.lowercased()
-            let filteredScalars = lowered.unicodeScalars.map { scalar -> Character in
-                if CharacterSet.alphanumerics.contains(scalar) { return Character(scalar) }
-                if scalar == "_" { return Character("_") }
-                return Character("_")
-            }
+            let filteredScalars = lowered.unicodeScalars
+                .map { scalar -> Character in
+                    if CharacterSet.alphanumerics.contains(scalar) {
+                        return Character(scalar)
+                    }
+                    if scalar == "_" {
+                        return Character("_")
+                    }
+                    return Character("_")
+                }
             let candidate = String(filteredScalars).trimmingCharacters(in: CharacterSet(charactersIn: "_"))
             return candidate.isEmpty ? "value" : candidate
         }
 
         // Build a deterministic base name from a type by removing optional wrappers and flattening generics.
         func typeBaseName(_ type: TypeSyntax) -> String {
-            // T? optional sugar
             if let opt = type.as(OptionalTypeSyntax.self) {
                 return typeBaseName(opt.wrappedType)
             }
-            // T! implicitly unwrapped optional
+            
             if let iuo = type.as(ImplicitlyUnwrappedOptionalTypeSyntax.self) {
                 return typeBaseName(iuo.wrappedType)
             }
-            // Array sugar: [T]
+            
             if let array = type.as(ArrayTypeSyntax.self) {
                 return sanitize("array_\(typeBaseName(array.element))")
             }
-            // Dictionary sugar: [K: V]
+            
             if let dict = type.as(DictionaryTypeSyntax.self) {
                 let k = typeBaseName(dict.key)
                 let v = typeBaseName(dict.value)
                 return sanitize("dictionary_\(k)_\(v)")
             }
-            // Tuple types: (A, B, ...)
+            
             if let tuple = type.as(TupleTypeSyntax.self) {
                 let parts = tuple.elements.map { typeBaseName($0.type) }
                 return sanitize((["tuple"] + parts).joined(separator: "_"))
             }
-            // Member types like Foundation.URL -> use the last name component
+            
             if let member = type.as(MemberTypeSyntax.self) {
                 return sanitize(member.name.text)
             }
-            // Identifier with generics: Foo<Bar, Baz>
+            
             if let ident = type.as(IdentifierTypeSyntax.self) {
                 let base = ident.name.text
                 #if compiler(>=6.1)
@@ -491,7 +519,7 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
                 #else
                     if let clause = ident.genericArgumentClause {
                         let args: [String] = clause.arguments.map { ga in
-                            // On older SwiftSyntax, `argument` is directly a TypeSyntax
+                            // In Swift 6.1, `argument` is directly a TypeSyntax
                             typeBaseName(ga.argument)
                         }
                         // Special-case Optional<T> to strip the wrapper
@@ -504,7 +532,7 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
                 #endif
                 return sanitize(base)
             }
-            // Fallback to a sanitized description
+            
             return sanitize(type.description)
         }
 
@@ -524,7 +552,8 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
 
         for (i, param) in clause.parameters.enumerated() {
             let base: String = {
-                if let firstName = param.firstName?.text, !firstName.isEmpty {
+                if let firstName = param.firstName?.text,
+                   !firstName.isEmpty {
                     return firstName
                 } else {
                     let baseFromType = typeBaseName(param.type)
@@ -544,18 +573,15 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
     private static func isOptionalType(_ type: TypeSyntax?) -> Bool {
         guard let type else { return false }
 
-        // Check for Optional<T> syntax
         if let identifierType = type.as(IdentifierTypeSyntax.self),
            identifierType.name.text == "Optional" {
             return true
         }
 
-        // Check for T? syntax
         if type.is(OptionalTypeSyntax.self) {
             return true
         }
 
-        // Check for T! syntax
         if type.is(ImplicitlyUnwrappedOptionalTypeSyntax.self) {
             return true
         }
