@@ -471,22 +471,37 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
             // Identifier with generics: Foo<Bar, Baz>
             if let ident = type.as(IdentifierTypeSyntax.self) {
                 let base = ident.name.text
-                if let clause = ident.genericArgumentClause {
-                    let args: [String] = clause.arguments.map { ga in
-                        switch ga.argument {
-                        case let .type(ty):
-                            typeBaseName(ty)
-                        default:
-                            sanitize(ga.description)
+                #if compiler(>=6.1)
+                    if let clause = ident.genericArgumentClause {
+                        let args: [String] = clause.arguments.map { ga in
+                            switch ga.argument {
+                            case let .type(ty):
+                                typeBaseName(ty)
+                            default:
+                                sanitize(ga.description)
+                            }
                         }
+                        // Special-case Optional<T> to strip the wrapper
+                        if base == "Optional", args.count == 1 {
+                            return args[0]
+                        }
+                        let combined = ([sanitize(base)] + args).joined(separator: "_")
+                        return sanitize(combined)
                     }
-                    // Special-case Optional<T> to strip the wrapper
-                    if base == "Optional", args.count == 1 {
-                        return args[0]
+                #else
+                    if let clause = ident.genericArgumentClause {
+                        let args: [String] = clause.arguments.map { ga in
+                            // On older SwiftSyntax, `argument` is directly a TypeSyntax
+                            typeBaseName(ga.argument)
+                        }
+                        // Special-case Optional<T> to strip the wrapper
+                        if base == "Optional", args.count == 1 {
+                            return args[0]
+                        }
+                        let combined = ([sanitize(base)] + args).joined(separator: "_")
+                        return sanitize(combined)
                     }
-                    let combined = ([sanitize(base)] + args).joined(separator: "_")
-                    return sanitize(combined)
-                }
+                #endif
                 return sanitize(base)
             }
             // Fallback to a sanitized description
