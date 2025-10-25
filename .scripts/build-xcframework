@@ -228,6 +228,11 @@ if contains "xros-simulator" "${SELECTED_PLATFORMS[@]}"; then
   BUILT_PLATFORMS+=("xros-simulator")
 fi
 
+if contains "maccatalyst" "${SELECTED_PLATFORMS[@]}"; then
+  build_archive "maccatalyst" "platform=macOS,variant=Mac Catalyst" macosx
+  BUILT_PLATFORMS+=("maccatalyst")
+fi
+
 if [ ${#BUILT_PLATFORMS[@]} -eq 0 ]; then
   echo "❌ Error: No valid platforms selected. Exiting."
   exit 1
