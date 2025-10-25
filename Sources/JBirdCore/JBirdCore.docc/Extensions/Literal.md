@@ -56,12 +56,12 @@ if literal.isNull {
 - ``init(_:)-(JSONLiteralEncodable)``
 - ``init(_:)-(JSONLiteralConvertible)``
 
-### Decoding literal values into Swift types
+### Decoding JSON literal values into Swift types
 
 - ``unboxed()``
 - ``decode(into:)``
 
-### Inspecting literal values
+### Inspecting JOSN literal values
 
 - ``boolValue``
 - ``isBool``

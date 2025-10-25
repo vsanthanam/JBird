@@ -21,7 +21,7 @@ if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
    // Finally use the values after multiple casts
 }
 
-// JBird approach - clean and type-safe
+// JBird approach - cleaner and more type safe
 let json = try JSON(data)
 let name = try json["user"]["name"].stringValue
 let isActive = try json["user"]["isActive"].boolValue
@@ -47,9 +47,9 @@ JBird eliminates the verbosity of type casting chains and nested optional unwrap
 
 ## Features
 
-- ⚡️ **Blazing fast performance**: Built with a [C11](https://en.wikipedia.org/wiki/C11_(C_standard_revision)) core for optimized parsing with SIMD acceleration where appropriate.
-- 🛡️ **Ergonomic, type-safe APIs**: Rich, Swift-first API with proper type checking and error handling. Easily and safely convert between serialized JSON, type-safe JSON, and native Swift types.
-- 🧪 **Thoroughly tested**: Comprehensive test suite ensures thorough correctness and strict adherence to the [JSON RFC 8259](https://datatracker.ietf.org/doc/html/rfc8259).
+- **Blazing fast performance**: Built with a [C11](https://en.wikipedia.org/wiki/C11_(C_standard_revision)) core for optimized parsing with SIMD acceleration where appropriate.
+- **Ergonomic, type-safe APIs**: Rich, Swift-first API with proper type checking and error handling. Easily and safely convert between serialized JSON, type-safe JSON, and native Swift types.
+- **Thoroughly tested**: Comprehensive test suite ensures thorough correctness and strict adherence to the [JSON RFC 8259](https://datatracker.ietf.org/doc/html/rfc8259).
 
 ## Installation
 
@@ -59,7 +59,7 @@ To add JBird as a dependency to an existing Swift package, add the following lin
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/vsanthanam/JBird.git", from: "1.4.2")
+    .package(url: "https://github.com/vsanthanam/JBird.git", from: "1.5.0")
 ]
 ```
 
@@ -76,7 +76,7 @@ Then, add the `JBird` dependency to your target or targets of choice:
 
 ### Xcode
 
-JBird supports the full range of Apple platforms, ensuring seamless integration with your iOS, macOS, watchOS, tvOS, and visionOS applications:
+JBird supports the full range of Apple platforms when working with Xcode, whether you build from source or use an XCFramework:
 
 | Platform | Minimum Version | Status |
 |----------|-----------------|--------|
@@ -93,10 +93,11 @@ JBird has been tested to work with the following platforms and Swift toolchains:
 
 | Platform | Swift Versions | Status |
 |----------|----------------|--------|
-| macOS | 6.0, 6.1, 6.2 | ✅ Supported & Tested |
-| Linux (Ubuntu) | 6.0, 6.1, 6.2 | ✅ Supported & Tested |
-| Windows | 6.1, 6.2 | ✅ Supported & Tested |
-| WebAssembly | 6.0, 6.1, 6.2 | ⚠️ Supported (No Tests) |
+| macOS | 6.0, 6.1 and 6.2 | ✅ Supported & Tested |
+| Linux (Ubuntu) | 6.0, 6.1 and 6.2 | ✅ Supported & Tested |
+| Windows | 6.1 and 6.2 | ✅ Supported & Tested |
+| WebAssembly | 6.0, 6.1 and 6.2 | ⚠️ Supported (No Tests) |
+| Android | 6.2 | ⚠️ Supported ([SPI Build System](https://swiftpackageindex.com/docs/builds)) |
 
 All supported platforms undergo continuous integration testing to ensure compatibility across different environments. Other platforms such as Android may also work, but are not validated in the CI environment.
 

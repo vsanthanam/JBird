@@ -61,12 +61,12 @@ if number.isDouble {
 - ``init(_:)-(JSONNumberEncodable)``
 - ``init(_:)-(JSONNumberConvertible)``
 
-### Decoding number values into Swift types
+### Decoding JSON number values into Swift types
 
 - ``decode(into:)``
 - ``unboxed()``
 
-### Inspecting number values
+### Inspecting JSON number values
 
 - ``intValue``
 - ``isInt``
