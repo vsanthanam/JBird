@@ -77,7 +77,7 @@ enum TestEnum: Equatable {
 
     case foo, bar
     case baz(Int)
-    case qux(String)
+    case qux(String, String)
     case quux(foo: Int, Double)
     case corge(String, Int)
     case grault(foo: String, bar: String)
@@ -133,6 +133,15 @@ struct EnumSupport {
         let decoded = try TestEnum(json: json)
         #expect(model == decoded)
         #expect(json == ["corge": ["foo", 42]])
+    }
+
+    @Test("Enum with multiple unlabled values of the same type")
+    func multipleUnlabledSameTypeValue() throws {
+        let model = TestEnum.qux("foo", "bar")
+        let json = JSON(model)
+        let decoded = try TestEnum(json: json)
+        #expect(model == decoded)
+        #expect(json == ["qux": ["foo", "bar"]])
     }
 
     @Test("Enum with mixed label associated values")

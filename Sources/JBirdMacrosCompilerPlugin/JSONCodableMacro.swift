@@ -398,12 +398,42 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
         var vars: [String] = []
         var keys: [String: String] = [:]
 
-        for (i, param) in clause.parameters.enumerated() {
-            let varName: String = if let firstName = param.firstName?.text {
-                firstName.lowercased()
-            } else {
-                param.type.description.lowercased()
+        // Track occurrences to make names unique: base, base2, base3, ...
+        var occurrences: [String: Int] = [:]
+        var used: Set<String> = []
+
+        func sanitize(_ raw: String) -> String {
+            let lowered = raw.lowercased()
+            let filtered = lowered.unicodeScalars.map { scalar -> Character in
+                if CharacterSet.alphanumerics.contains(scalar) { return Character(scalar) }
+                if scalar == "_" { return Character("_") }
+                return "_"
             }
+            let candidate = String(filtered).trimmingCharacters(in: CharacterSet(charactersIn: "_"))
+            return candidate.isEmpty ? "value" : candidate
+        }
+
+        func uniqueName(for baseRaw: String) -> String {
+            let base = sanitize(baseRaw)
+            let nextCount = (occurrences[base] ?? 0) + 1
+            occurrences[base] = nextCount
+            var candidate = nextCount == 1 ? base : "\(base)\(nextCount)"
+            while used.contains(candidate) {
+                let bump = (occurrences[base] ?? nextCount) + 1
+                occurrences[base] = bump
+                candidate = "\(base)\(bump)"
+            }
+            used.insert(candidate)
+            return candidate
+        }
+
+        for (i, param) in clause.parameters.enumerated() {
+            let base: String = if let firstName = param.firstName?.text, !firstName.isEmpty {
+                firstName
+            } else {
+                param.type.description
+            }
+            let varName = uniqueName(for: base)
             vars.append(varName)
             keys[varName] = param.firstName?.text ?? String(i)
         }
