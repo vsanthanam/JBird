@@ -72,6 +72,18 @@ struct TestNested: Equatable {
 
 }
 
+@JSONCodable
+enum TestEnum: Equatable {
+
+    case foo, bar
+    case baz(Int)
+    case qux(String)
+    case quux(foo: Int, Double)
+    case corge(String, Int)
+    case grault(foo: String, bar: String)
+
+}
+
 @Test("Test @JSONCodable Sample")
 func jsonCodableSample() throws {
 
@@ -90,5 +102,57 @@ func jsonCodableSample() throws {
         "id": "123",
         "nilIfMissing": .null
     ])
+
+}
+
+@Suite("@JSONCodable Enum Support")
+struct EnumSupport {
+
+    @Test("Basic enum decode")
+    func basic() throws {
+        let model = TestEnum.foo
+        let json = JSON(model)
+        let decoded = try TestEnum(json: json)
+        #expect(model == decoded)
+        #expect(json == "foo")
+    }
+
+    @Test("Enum with unlabled value")
+    func singleUnlabledValue() throws {
+        let model = TestEnum.baz(12)
+        let json = JSON(model)
+        let decoded = try TestEnum(json: json)
+        #expect(model == decoded)
+        #expect(json == ["baz": 12])
+    }
+
+    @Test("Enum with multiple unlabled values")
+    func multipleUnlabledValue() throws {
+        let model = TestEnum.corge("foo", 42)
+        let json = JSON(model)
+        let decoded = try TestEnum(json: json)
+        #expect(model == decoded)
+        #expect(json == ["corge": ["foo", 42]])
+    }
+
+    @Test("Enum with mixed label associated values")
+    func mixedValues() throws {
+        let model = TestEnum.quux(foo: 12, 3.4)
+        let json = JSON(model)
+        print(json)
+        let decoded = try TestEnum(json: json)
+        #expect(model == decoded)
+        #expect(json == ["quux": ["foo": 12, "1": 3.4]])
+    }
+
+    @Test("Enum with multiple labeled associated values")
+    func labeledValues() throws {
+        let model = TestEnum.grault(foo: "bar", bar: "foo")
+        let json = JSON(model)
+        print(json)
+        let decoded = try TestEnum(json: json)
+        #expect(model == decoded)
+        #expect(json == ["grault": ["foo": "bar", "bar": "foo"]])
+    }
 
 }
