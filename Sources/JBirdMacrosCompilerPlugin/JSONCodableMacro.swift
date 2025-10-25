@@ -430,13 +430,67 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
 
         func sanitize(_ raw: String) -> String {
             let lowered = raw.lowercased()
-            let filtered = lowered.unicodeScalars.map { scalar -> Character in
+            let filteredScalars = lowered.unicodeScalars.map { scalar -> Character in
                 if CharacterSet.alphanumerics.contains(scalar) { return Character(scalar) }
                 if scalar == "_" { return Character("_") }
-                return "_"
+                return Character("_")
             }
-            let candidate = String(filtered).trimmingCharacters(in: CharacterSet(charactersIn: "_"))
+            let candidate = String(filteredScalars).trimmingCharacters(in: CharacterSet(charactersIn: "_"))
             return candidate.isEmpty ? "value" : candidate
+        }
+
+        // Build a deterministic base name from a type by removing optional wrappers and flattening generics.
+        func typeBaseName(_ type: TypeSyntax) -> String {
+            // T? optional sugar
+            if let opt = type.as(OptionalTypeSyntax.self) {
+                return typeBaseName(opt.wrappedType)
+            }
+            // T! implicitly unwrapped optional
+            if let iuo = type.as(ImplicitlyUnwrappedOptionalTypeSyntax.self) {
+                return typeBaseName(iuo.wrappedType)
+            }
+            // Array sugar: [T]
+            if let array = type.as(ArrayTypeSyntax.self) {
+                return sanitize("array_\(typeBaseName(array.element))")
+            }
+            // Dictionary sugar: [K: V]
+            if let dict = type.as(DictionaryTypeSyntax.self) {
+                let k = typeBaseName(dict.key)
+                let v = typeBaseName(dict.value)
+                return sanitize("dictionary_\(k)_\(v)")
+            }
+            // Tuple types: (A, B, ...)
+            if let tuple = type.as(TupleTypeSyntax.self) {
+                let parts = tuple.elements.map { typeBaseName($0.type) }
+                return sanitize((["tuple"] + parts).joined(separator: "_"))
+            }
+            // Member types like Foundation.URL -> use the last name component
+            if let member = type.as(MemberTypeSyntax.self) {
+                return sanitize(member.name.text)
+            }
+            // Identifier with generics: Foo<Bar, Baz>
+            if let ident = type.as(IdentifierTypeSyntax.self) {
+                let base = ident.name.text
+                if let clause = ident.genericArgumentClause {
+                    let args: [String] = clause.arguments.map { ga in
+                        switch ga.argument {
+                        case let .type(ty):
+                            typeBaseName(ty)
+                        default:
+                            sanitize(ga.description)
+                        }
+                    }
+                    // Special-case Optional<T> to strip the wrapper
+                    if base == "Optional", args.count == 1 {
+                        return args[0]
+                    }
+                    let combined = ([sanitize(base)] + args).joined(separator: "_")
+                    return sanitize(combined)
+                }
+                return sanitize(base)
+            }
+            // Fallback to a sanitized description
+            return sanitize(type.description)
         }
 
         func uniqueName(for baseRaw: String) -> String {
@@ -454,11 +508,14 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
         }
 
         for (i, param) in clause.parameters.enumerated() {
-            let base: String = if let firstName = param.firstName?.text, !firstName.isEmpty {
-                firstName
-            } else {
-                param.type.description
-            }
+            let base: String = {
+                if let firstName = param.firstName?.text, !firstName.isEmpty {
+                    return firstName
+                } else {
+                    let baseFromType = typeBaseName(param.type)
+                    return baseFromType
+                }
+            }()
             let varName = uniqueName(for: base)
             vars.append(varName)
             keys[varName] = param.firstName?.text ?? String(i)

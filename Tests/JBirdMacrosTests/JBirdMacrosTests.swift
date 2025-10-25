@@ -77,10 +77,12 @@ enum TestEnum: Equatable {
 
     case foo, bar
     case baz(Int)
-    case qux(String, String)
+    case qux(String, String?)
     case quux(foo: Int, Double)
-    case corge(String, Int)
-    case grault(foo: String, bar: String)
+    case corge(String, Int?)
+    case grault(foo: String?, bar: String)
+    case taco([Int])
+    case burrito([String: String])
 
 }
 
@@ -128,11 +130,11 @@ struct EnumSupport {
 
     @Test("Enum with multiple unlabled values")
     func multipleUnlabledValue() throws {
-        let model = TestEnum.corge("foo", 42)
+        let model = TestEnum.corge("foo", nil)
         let json = JSON(model)
         let decoded = try TestEnum(json: json)
         #expect(model == decoded)
-        #expect(json == ["corge": ["foo", 42]])
+        #expect(json == ["corge": ["foo", nil]])
     }
 
     @Test("Enum with multiple unlabled values of the same type")
