@@ -1,6 +1,5 @@
 # JBird vs. Freddy 
 
-```
 ## JBirdBenchmark
 
 ### Parse (1mb) metrics
