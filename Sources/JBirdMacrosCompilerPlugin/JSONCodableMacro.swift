@@ -301,42 +301,68 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
                     }
                     """)
                 } else {
-                    let varsAsBody = vars.joined(separator: "\n")
-                    encodeSwitchCases.append(
-                        """
-                        case let .\(element.name)(\(varsAsArgument)):
-                            JSON {
-                                "\(element.name.text)" => JSON {
-                                    \(varsAsBody)
+                    if vars.count == 1, let only = vars.first {
+                        encodeSwitchCases.append(
+                            """
+                            case let .\(element.name)(\(varsAsArgument)):
+                                JSON {
+                                    \"\(element.name.text)\" => \(only)
                                 }
-                            }
+                            """
+                        )
+
+                        let fnName = "decode_case_\(element.name.text)"
+                        let fn = """
+                        func \(fnName)() throws -> Self {
+                            let value = try json[\"\(element.name.text)\"]
+                            return .\(element.name.text)(try value.decode())
+                        }
                         """
-                    )
+                        decodeFunctions.append(fn)
+                        decodeAttempts.append("""
+                        if let value = try? \(fnName)() {
+                            self = value
+                            return
+                        }
+                        """)
+                    } else {
+                        let varsAsBody = vars.joined(separator: "\n")
+                        encodeSwitchCases.append(
+                            """
+                            case let .\(element.name)(\(varsAsArgument)):
+                                JSON {
+                                    \"\(element.name.text)\" => JSON {
+                                        \(varsAsBody)
+                                    }
+                                }
+                            """
+                        )
 
-                    let indices = Array(0..<vars.count)
-                    let associatedDecode = indices.map { idx in
-                        "let \(vars[idx]) = try associatedValues[\(idx)]"
-                    }.joined(separator: "\n")
+                        let indices = Array(0..<vars.count)
+                        let associatedDecode = indices.map { idx in
+                            "let \(vars[idx]) = try associatedValues[\(idx)]"
+                        }.joined(separator: "\n")
 
-                    let varsAsEnumCases = vars.map { varName in
-                        "try \(varName).decode()"
-                    }.joined(separator: ", ")
+                        let varsAsEnumCases = vars.map { varName in
+                            "try \(varName).decode()"
+                        }.joined(separator: ", ")
 
-                    let fnName = "decode_case_\(element.name.text)"
-                    let fn = """
-                    func \(fnName)() throws -> Self {
-                        let associatedValues = try json[\"\(element.name.text)\"]
-                        \(associatedDecode)
-                        return .\(element.name.text)(\(varsAsEnumCases))
+                        let fnName = "decode_case_\(element.name.text)"
+                        let fn = """
+                        func \(fnName)() throws -> Self {
+                            let associatedValues = try json[\"\(element.name.text)\"]
+                            \(associatedDecode)
+                            return .\(element.name.text)(\(varsAsEnumCases))
+                        }
+                        """
+                        decodeFunctions.append(fn)
+                        decodeAttempts.append("""
+                        if let value = try? \(fnName)() {
+                            self = value
+                            return
+                        }
+                        """)
                     }
-                    """
-                    decodeFunctions.append(fn)
-                    decodeAttempts.append("""
-                    if let value = try? \(fnName)() {
-                        self = value
-                        return
-                    }
-                    """)
                 }
             } else {
                 encodeSwitchCases.append(

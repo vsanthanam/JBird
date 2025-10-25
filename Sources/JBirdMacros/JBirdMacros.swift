@@ -178,32 +178,21 @@ public macro OmitIfNil(
     type: "OmitIfNilMacro"
 )
 
-@JSONCodable
-enum TestEnum {
-
-    case foo(Int, str: Double)
-    case bar
-    case baz(String)
-    case Baz(Decimal, String)
-
-}
-
-@JSONCodable
-struct TestStruct {
-
-    let foo: Int
-
-    let bar: String
-
-}
-
+/// An error type used by macro-synthesized ``JBirdCore/JSONCodable`` conformance.
 public struct JSONDecodingError: Error, CustomStringConvertible {
 
-    public init(_ message: String) {
+    /// Create a `JSONDecodingError`
+    /// - Parameter message: The error message
+    public init(
+        _ message: String
+    ) {
         self.message = message
     }
 
+    /// A message explaining the error
     public let message: String
+
+    // MARK: - CustomStringConvertible
 
     public var description: String {
         message
