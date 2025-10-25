@@ -24,6 +24,7 @@
 // SOFTWARE.
 
 import Foundation
+import JBirdBuilders
 import JBirdCore
 
 @available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
@@ -176,3 +177,25 @@ public macro OmitIfNil(
     module: "JBirdMacrosCompilerPlugin",
     type: "OmitIfNilMacro"
 )
+
+@JSONCodable
+enum TestEnum {
+
+    case foo(Int, str: Double)
+    case bar
+    case baz(String)
+    case Baz(Decimal, String)
+    init(json: JSON) throws {
+        fatalError()
+    }
+
+}
+
+@JSONCodable
+struct TestStruct {
+
+    let foo: Int
+
+    let bar: String
+
+}
