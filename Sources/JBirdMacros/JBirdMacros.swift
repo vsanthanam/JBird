@@ -178,7 +178,7 @@ public macro OmitIfNil(
     type: "OmitIfNilMacro"
 )
 
-/// An error type used by macro-synthesized ``JBirdCore/JSONCodable`` conformance.
+/// An error type used by macro-synthesized ``/JBirdCore/JSONCodable`` conformance.
 public struct JSONDecodingError: Error, CustomStringConvertible {
 
     /// Create a `JSONDecodingError`
