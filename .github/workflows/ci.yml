@@ -165,7 +165,7 @@ jobs:
     name: Build JBird (Windows)
     strategy:
       matrix:
-        swift: ['6.1', '6.2']
+        swift: ['6.0', '6.1', '6.2']
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -190,7 +190,7 @@ jobs:
     name: Test JBird (Windows)
     strategy:
       matrix:
-        swift: ['6.1', '6.2']
+        swift: ['6.0', '6.1', '6.2']
     needs: build-windows-spm
     runs-on: windows-latest
     steps:
