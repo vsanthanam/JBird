@@ -70,7 +70,7 @@ $ ./.scripts/build-xcframework JBirdCore
 
 By default, the script creates a dynamic framework that builds for all supported Apple platforms. You can force a static framework by using the `--static` flag. You can specifiy specific platforms to include with the `--platforms` flag. 
 
-*Note: You can only use the script to build either `JBirdCore` or `JBirdBuilders`. The combined `JBird` module with all APIs is not supported, because Swift macros cannot be distributed via XCFramework*
+*Note: You can only use the script to build either `JBird`, `JBirdCore` or `JBirdBuilders`. If you depend on `JBird`, you must also depend on `JBirdCore` and `JBirdBuilders`, since `JBird` is just an `@_exported` shim of the smaller modules. The `JBirdMacros` module is not supported, because Swift macros cannot be distributed via XCFramework.*
 
 ## Clone from Source
 
