@@ -135,6 +135,9 @@ extension UInt32: JSONCodable {}
 @available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 extension UInt64: JSONCodable {}
 
+@available(macOS 15.0, macCatalyst 18.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
+extension UInt128: JSONCodable {}
+
 @available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 extension Int8: JSONCodable {}
 
@@ -146,6 +149,9 @@ extension Int32: JSONCodable {}
 
 @available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 extension Int64: JSONCodable {}
+
+@available(macOS 15.0, macCatalyst 18.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
+extension Int128: JSONCodable {}
 
 @available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 extension Float: JSONCodable {}

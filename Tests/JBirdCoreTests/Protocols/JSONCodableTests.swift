@@ -498,6 +498,27 @@ struct JSONCodableTests {
 
     }
 
+    @Suite("Int128 Conformance Tests")
+    struct Int128Tests {
+
+        @Test("Int128 Encode")
+        @available(macOS 15.0, macCatalyst 18.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
+        func int128Encode() {
+            let int: Int128 = 21
+            let json = int.encodeToJSON()
+            #expect(json == .number(.int(21)))
+        }
+
+        @Test("Int128 Decode")
+        @available(macOS 15.0, macCatalyst 18.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
+        func int128Decode() throws {
+            let json = JSON.number(.int(21))
+            let int = try json.decode(into: Int128.self)
+            #expect(int == 21)
+        }
+
+    }
+
     @Suite("UInt Conformance Tests")
     struct UIntTests {
 
@@ -588,6 +609,27 @@ struct JSONCodableTests {
         func uint64Decode() throws {
             let json = JSON.number(.int(21))
             let int = try json.decode(into: UInt64.self)
+            #expect(int == 21)
+        }
+
+    }
+
+    @Suite("UInt128 Conformance Tests")
+    struct UInt128Tests {
+
+        @Test("UInt128 Encode")
+        @available(macOS 15.0, macCatalyst 18.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
+        func uint128Encode() {
+            let int: UInt128 = 21
+            let json = int.encodeToJSON()
+            #expect(json == .number(.int(21)))
+        }
+
+        @Test("UInt128 Decode")
+        @available(macOS 15.0, macCatalyst 18.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
+        func uint128Decode() throws {
+            let json = JSON.number(.int(21))
+            let int = try json.decode(into: UInt128.self)
             #expect(int == 21)
         }
 

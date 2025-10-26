@@ -176,6 +176,20 @@ extension UInt64: JSONNumberCodable {
 
 }
 
+@available(macOS 15.0, macCatalyst 18.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
+extension UInt128: JSONNumberCodable {
+
+    public func encodeToJSONNumber() -> JSON.Number {
+        .int(Int(self))
+    }
+
+    public init(jsonNumber: JSON.Number) throws {
+        let int = try Int(jsonNumber: jsonNumber)
+        self = UInt128(int)
+    }
+
+}
+
 @available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 extension Int8: JSONNumberCodable {
 
@@ -228,6 +242,20 @@ extension Int64: JSONNumberCodable {
     public init(jsonNumber: JSON.Number) throws {
         let int = try Int(jsonNumber: jsonNumber)
         self = Int64(int)
+    }
+
+}
+
+@available(macOS 15.0, macCatalyst 18.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
+extension Int128: JSONNumberCodable {
+
+    public func encodeToJSONNumber() -> JSON.Number {
+        .int(Int(self))
+    }
+
+    public init(jsonNumber: JSON.Number) throws {
+        let int = try Int(jsonNumber: jsonNumber)
+        self = Int128(int)
     }
 
 }
