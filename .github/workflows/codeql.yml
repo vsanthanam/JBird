@@ -91,7 +91,7 @@ jobs:
       name: Xcode Select
       shell: bash
       run: |
-        sudo xcode-select --switch /Applications/Xcode_16.4.app
+        sudo xcode-select --switch /Applications/Xcode_26.0app
     - if: matrix.build-mode == 'manual' && matrix.language == 'swift'
       name: Build JBird
       shell: bash
