@@ -24,6 +24,7 @@
 // SOFTWARE.
 
 import Foundation
+import JBirdBuilders
 import JBirdCore
 
 @available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
@@ -35,8 +36,9 @@ public enum JSONKeyComputationRule {
 /// A macro that automatically implements ``/JBirdCore/JSONCodable`` conformance to the types it annotates
 ///
 /// You can only apply this macro to types that meet the following conditions:
-/// - The type must be a `struct`
-/// - The type must only have stored properties that conform  `JSONCodable`.
+/// - The type must be a `struct` or an `enum`
+/// - If the type must only have stored properties that conform  `JSONCodable`.
+/// - If the type is an enum, it must only have associated values that conform to `JSONCodable`.
 ///
 /// When applied, this Swift code:
 ///
@@ -176,3 +178,35 @@ public macro OmitIfNil(
     module: "JBirdMacrosCompilerPlugin",
     type: "OmitIfNilMacro"
 )
+
+/// An error type used by macro-synthesized ``/JBirdCore/JSONCodable`` conformance.
+public struct JSONDecodingError: Error, CustomStringConvertible {
+
+    /// Create a `JSONDecodingError`
+    /// - Parameter message: The error message
+    public init(
+        _ message: String
+    ) {
+        self.message = message
+    }
+
+    /// A message explaining the error
+    public let message: String
+
+    // MARK: - CustomStringConvertible
+
+    public var description: String {
+        message
+    }
+}
+
+@JSONCodable
+enum Foo {
+
+    case foo, bar
+    case baz(String)
+    case qux(String?, [String: Int])
+    case quux(foo: String, Double)
+    case corge(foo: Int, bar: Double)
+
+}
