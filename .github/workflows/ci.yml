@@ -238,9 +238,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Swift
-        uses: SwiftyLab/setup-swift@latest
+        uses: compnerd/gha-setup-swift@main
         with:
-          swift-version: ${{ matrix.swift }}
+          swift-version: swift-${{ matrix.swift }}-release
+          swift-build: ${{ matrix.swift }}-RELEASE
       - name: Build JBird
         run: swift build -v --build-tests --disable-xctest --build-path .build -c debug -Xlinker /INCREMENTAL:NO
       - name: Compress Build
@@ -264,9 +265,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Swift
-        uses: SwiftyLab/setup-swift@latest
+        uses: compnerd/gha-setup-swift@main
         with:
-          swift-version: ${{ matrix.swift }}
+          swift-version: swift-${{ matrix.swift }}-release
+          swift-build: ${{ matrix.swift }}-RELEASE
       - name: Download Build
         uses: actions/download-artifact@v4
         with:
