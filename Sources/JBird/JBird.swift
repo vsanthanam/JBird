@@ -35,4 +35,8 @@
     @_exported import JBirdMacros
 #endif
 
+#if canImport(JBirdCoding)
+    import JBirdCoding
+#endif
+
 enum JBirdEnum {}

@@ -37,6 +37,12 @@ let package = Package(
             targets: [
                 "JBirdMacros"
             ]
+        ),
+        .library(
+            name: "JBirdCoding",
+            targets: [
+                "JBirdCoding"
+            ]
         )
     ],
     dependencies: [
@@ -59,7 +65,8 @@ let package = Package(
             dependencies: [
                 "JBirdCore",
                 "JBirdBuilders",
-                "JBirdMacros"
+                "JBirdMacros",
+                "JBirdCoding"
             ],
             resources: [
                 .copy("PrivacyInfo.xcprivacy")
@@ -223,7 +230,32 @@ let package = Package(
                 .enableUpcomingFeature("MemberImportVisibility"),
                 .treatAllWarnings(as: .error)
             ]
-        )
+        ),
+        .target(
+            name: "JBirdCoding",
+            dependencies: [
+                "JBirdCore"
+            ],
+            swiftSettings: [
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+                .enableUpcomingFeature("ExistentialAny"),
+                .enableUpcomingFeature("MemberImportVisibility"),
+                .treatAllWarnings(as: .error)
+            ]
+        ),
+        .testTarget(
+            name: "JBirdCodingTests",
+            dependencies: [
+                "JBirdCoding",
+                "JBirdCore"
+            ],
+            swiftSettings: [
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+                .enableUpcomingFeature("ExistentialAny"),
+                .enableUpcomingFeature("MemberImportVisibility"),
+                .treatAllWarnings(as: .error)
+            ]
+        ),
     ],
     swiftLanguageModes: [.v6],
     cLanguageStandard: .c11
