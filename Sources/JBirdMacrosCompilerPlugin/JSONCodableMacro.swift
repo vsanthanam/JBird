@@ -103,17 +103,22 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
     private static func buildStructMembers(
         from structDecl: StructDeclSyntax
     ) throws -> [DeclSyntax] {
-        try storedMembers(from: structDecl)
+        try storedMembers(from: structDecl, useRequiredInit: false)
     }
 
     private static func buildClassMembers(
         from classDecl: ClassDeclSyntax
     ) throws -> [DeclSyntax] {
-        try storedMembers(from: classDecl)
+        if classDecl.modifiers.map(\.trimmedDescription).contains("final") {
+            try storedMembers(from: classDecl, useRequiredInit: false)
+        } else {
+            try storedMembers(from: classDecl, useRequiredInit: true)
+        }
     }
 
     private static func storedMembers(
-        from decl: some DeclGroupSyntax
+        from decl: some DeclGroupSyntax,
+        useRequiredInit: Bool
     ) throws -> [DeclSyntax] {
         let stored = try parseStoredProperties(in: decl)
 
@@ -160,13 +165,23 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
             }
             .joined(separator: "\n")
 
-        let decodable = DeclSyntax(
-            """
-            public init(json: JSON) throws {
-                \(raw: decodeItems)
-            }
-            """
-        )
+        let decodable = if useRequiredInit {
+            DeclSyntax(
+                """
+                public required init(json: JSON) throws {
+                    \(raw: decodeItems)
+                }
+                """
+            )
+        } else {
+            DeclSyntax(
+                """
+                public init(json: JSON) throws {
+                    \(raw: decodeItems)
+                }
+                """
+            )
+        }
 
         return [encodable, decodable]
     }
