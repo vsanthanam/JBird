@@ -32,80 +32,6 @@ import Testing
 @Suite("@JSONCodable Tests")
 struct JSONCodableTests {
 
-    @JSONCodable
-    struct Foo: Equatable {
-
-        init(
-            fooBar: Int?,
-            nested: TestNested?,
-            id: String,
-            optionalWithoutAnnotation: Int?,
-            nilIfMissing: Double?
-        ) {
-            self.fooBar = fooBar
-            self.nested = nested
-            self.id = id
-            self.optionalWithoutAnnotation = optionalWithoutAnnotation
-            self.nilIfMissing = nilIfMissing
-        }
-
-        @JSONKey(.snakeCase)
-        let fooBar: Int?
-
-        @OmitIfNil
-        let nested: TestNested?
-
-        let id: String
-
-        let optionalWithoutAnnotation: Int?
-
-        @OmitIfNil(false)
-        let nilIfMissing: Double?
-
-    }
-
-    @JSONCodable
-    struct TestNested: Equatable {
-
-        init(name: String) {
-            self.name = name
-        }
-
-        let name: String
-
-    }
-
-    @JSONCodable
-    enum TestEnum: Equatable {
-
-        case foo, bar
-        case baz(Int)
-        case qux(String, String?)
-        case quux(foo: Int, Double)
-        case corge(String, Int?)
-        case grault(foo: String?, bar: String)
-        case taco([Int])
-        case burrito([String: String])
-
-    }
-
-    @JSONCodable
-    class TestClass {
-
-        init(foo: Int?, bar: String) {
-            self.foo = foo
-            self.bar = bar
-        }
-
-        @OmitIfNil(false)
-        let foo: Int?
-
-        let bar: String
-
-    }
-
-    final class TestSubClass: TestClass {}
-
     @Test("@JSONCodable Class Support")
     func classSupport() throws {
         let model = TestSubClass(foo: nil, bar: "foo")
@@ -202,3 +128,77 @@ struct JSONCodableTests {
     }
 
 }
+
+@JSONCodable
+struct Foo: Equatable {
+
+    init(
+        fooBar: Int?,
+        nested: TestNested?,
+        id: String,
+        optionalWithoutAnnotation: Int?,
+        nilIfMissing: Double?
+    ) {
+        self.fooBar = fooBar
+        self.nested = nested
+        self.id = id
+        self.optionalWithoutAnnotation = optionalWithoutAnnotation
+        self.nilIfMissing = nilIfMissing
+    }
+
+    @JSONKey(.snakeCase)
+    let fooBar: Int?
+
+    @OmitIfNil
+    let nested: TestNested?
+
+    let id: String
+
+    let optionalWithoutAnnotation: Int?
+
+    @OmitIfNil(false)
+    let nilIfMissing: Double?
+
+}
+
+@JSONCodable
+struct TestNested: Equatable {
+
+    init(name: String) {
+        self.name = name
+    }
+
+    let name: String
+
+}
+
+@JSONCodable
+enum TestEnum: Equatable {
+
+    case foo, bar
+    case baz(Int)
+    case qux(String, String?)
+    case quux(foo: Int, Double)
+    case corge(String, Int?)
+    case grault(foo: String?, bar: String)
+    case taco([Int])
+    case burrito([String: String])
+
+}
+
+@JSONCodable
+class TestClass {
+
+    init(foo: Int?, bar: String) {
+        self.foo = foo
+        self.bar = bar
+    }
+
+    @OmitIfNil(false)
+    let foo: Int?
+
+    let bar: String
+
+}
+
+final class TestSubClass: TestClass {}
