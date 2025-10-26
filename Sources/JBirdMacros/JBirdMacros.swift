@@ -36,8 +36,9 @@ public enum JSONKeyComputationRule {
 /// A macro that automatically implements ``/JBirdCore/JSONCodable`` conformance to the types it annotates
 ///
 /// You can only apply this macro to types that meet the following conditions:
-/// - The type must be a `struct`
-/// - The type must only have stored properties that conform  `JSONCodable`.
+/// - The type must be a `struct` or an `enum`
+/// - If the type must only have stored properties that conform  `JSONCodable`.
+/// - If the type is an enum, it must only have associated values that conform to `JSONCodable`.
 ///
 /// When applied, this Swift code:
 ///
