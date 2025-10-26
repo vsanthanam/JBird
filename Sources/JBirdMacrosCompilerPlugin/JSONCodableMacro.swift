@@ -244,7 +244,7 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
               !attributes.isEmpty else {
             return nil
         }
-        
+
         for attribute in attributes {
             let attr = try attribute.as(AttributeSyntax.self).mustExist()
             if let memberName = attr.attributeName.as(MemberTypeSyntax.self) {
@@ -473,30 +473,30 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
             if let opt = type.as(OptionalTypeSyntax.self) {
                 return typeBaseName(opt.wrappedType)
             }
-            
+
             if let iuo = type.as(ImplicitlyUnwrappedOptionalTypeSyntax.self) {
                 return typeBaseName(iuo.wrappedType)
             }
-            
+
             if let array = type.as(ArrayTypeSyntax.self) {
                 return sanitize("array_\(typeBaseName(array.element))")
             }
-            
+
             if let dict = type.as(DictionaryTypeSyntax.self) {
                 let k = typeBaseName(dict.key)
                 let v = typeBaseName(dict.value)
                 return sanitize("dictionary_\(k)_\(v)")
             }
-            
+
             if let tuple = type.as(TupleTypeSyntax.self) {
                 let parts = tuple.elements.map { typeBaseName($0.type) }
                 return sanitize((["tuple"] + parts).joined(separator: "_"))
             }
-            
+
             if let member = type.as(MemberTypeSyntax.self) {
                 return sanitize(member.name.text)
             }
-            
+
             if let ident = type.as(IdentifierTypeSyntax.self) {
                 let base = ident.name.text
                 #if compiler(>=6.1)
@@ -532,7 +532,7 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
                 #endif
                 return sanitize(base)
             }
-            
+
             return sanitize(type.description)
         }
 

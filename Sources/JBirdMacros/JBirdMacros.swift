@@ -198,3 +198,14 @@ public struct JSONDecodingError: Error, CustomStringConvertible {
         message
     }
 }
+
+@JSONCodable
+enum Foo {
+
+    case foo, bar
+    case baz(String)
+    case qux(String?, [String: Int])
+    case quux(foo: String, Double)
+    case corge(foo: Int, bar: Double)
+
+}

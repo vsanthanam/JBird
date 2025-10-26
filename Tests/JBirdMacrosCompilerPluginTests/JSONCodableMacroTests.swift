@@ -351,4 +351,143 @@ final class JSONCodableMacroTests: XCTestCase {
         #endif
     }
 
+    func test_enums() throws {
+        #if canImport(JBirdMacrosCompilerPlugin)
+            assertMacroExpansion(
+                """
+                @JSONCodable
+                enum Foo {
+
+                    case foo, bar
+                    case baz(String)
+                    case qux(String?, [String: Int])
+                    case quux(foo: String, Double)
+                    case corge(foo: Int, bar: Double)
+
+                }
+                """,
+                expandedSource: """
+                enum Foo {
+
+                    case foo, bar
+                    case baz(String)
+                    case qux(String?, [String: Int])
+                    case quux(foo: String, Double)
+                    case corge(foo: Int, bar: Double)
+
+                    public func encodeToJSON() -> JSON {
+                        switch self {
+                            case .foo:
+                        "foo"
+                        case .bar:
+                            "bar"
+                        case let .baz(string):
+                            JSON {
+                                "baz" => string
+                            }
+                        case let .qux(string, dictionary_string_int):
+                            JSON {
+                                "qux" => JSON {
+                                    string
+                                dictionary_string_int
+                                }
+                            }
+                        case let .quux(foo, double):
+                            JSON {
+                                "quux" => JSON {
+                                    "foo" => foo
+                                "1" => double
+                                }
+                            }
+                        case let .corge(foo, bar):
+                            JSON {
+                                "corge" => JSON {
+                                    "foo" => foo
+                                "bar" => bar
+                                }
+                            }
+                        }
+                    }
+
+                    public init(json: JSON) throws {
+                        func decode_case_foo() throws -> Self {
+                        let raw = try json.decode(into: String.self)
+                        guard raw == "foo" else {
+                            throw JBirdMacros.JSONDecodingError("Enum case decoding failure")
+                        }
+                        return .foo
+                        }
+                        func decode_case_bar() throws -> Self {
+                            let raw = try json.decode(into: String.self)
+                            guard raw == "bar" else {
+                                throw JBirdMacros.JSONDecodingError("Enum case decoding failure")
+                            }
+                            return .bar
+                        }
+                        func decode_case_baz() throws -> Self {
+                            let value = try json["baz"]
+                            return .baz(try value.decode())
+                        }
+                        func decode_case_qux() throws -> Self {
+                            let associatedValues = try json["qux"]
+                            let string = try associatedValues[0]
+                        let dictionary_string_int = try associatedValues[1]
+                            return .qux(try string.decode(), try dictionary_string_int.decode())
+                        }
+                        func decode_case_quux() throws -> Self {
+                            let associatedValues = try json["quux"]
+                            let foo = try associatedValues["foo"]
+                        let double = try associatedValues["1"]
+                            return .quux(foo: try foo.decode(), try double.decode())
+                        }
+                        func decode_case_corge() throws -> Self {
+                            let associatedValues = try json["corge"]
+                            let foo = try associatedValues["foo"]
+                        let bar = try associatedValues["bar"]
+                            return .corge(foo: try foo.decode(), bar: try bar.decode())
+                        }
+
+                        if let value = try? decode_case_foo() {
+                            self = value
+                            return
+                        }
+                        if let value = try? decode_case_bar() {
+                            self = value
+                            return
+                        }
+                        if let value = try? decode_case_baz() {
+                            self = value
+                            return
+                        }
+                        if let value = try? decode_case_qux() {
+                            self = value
+                            return
+                        }
+                        if let value = try? decode_case_quux() {
+                            self = value
+                            return
+                        }
+                        if let value = try? decode_case_corge() {
+                            self = value
+                            return
+                        }
+
+                        throw JBirdMacros.JSONDecodingError("Enum case decoding failure")
+                    }
+
+                }
+
+                extension Foo: JBirdCore.JSONEncodable {
+                }
+
+                extension Foo: JBirdCore.JSONDecodable {
+                }
+                """,
+                macros: testMacros
+            )
+        #else
+            throw XCTSkip("macros are only supported when running tests for the host platform")
+        #endif
+    }
+
 }
