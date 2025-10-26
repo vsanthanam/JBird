@@ -29,8 +29,108 @@ import JBirdCore
 import JBirdMacros
 import Testing
 
+@Suite("@JSONCodable Tests")
+struct JSONCodableTests {
+
+    @Test("@JSONCodable Class Support")
+    func classSupport() throws {
+        let model = TestSubClass(foo: nil, bar: "foo")
+        let json = JSON(model)
+        let decoded = try TestClass(json: json)
+        #expect(decoded.foo == model.foo)
+        #expect(decoded.bar == model.bar)
+        #expect(json == [
+            "foo": nil,
+            "bar": "foo"
+        ])
+    }
+
+    @Test("@JSONCodable Struct Support")
+    func structSupport() throws {
+
+        let model = Foo(
+            fooBar: 12,
+            nested: nil,
+            id: "123",
+            optionalWithoutAnnotation: nil,
+            nilIfMissing: nil
+        )
+        let json = JSON(model)
+        let decoded = try Foo(json: json)
+        #expect(model == decoded)
+        #expect(json == [
+            "foo_bar": 12,
+            "id": "123",
+            "nilIfMissing": .null
+        ])
+
+    }
+
+    @Suite("@JSONCodable Enum Support")
+    struct EnumSupport {
+
+        @Test("Basic enum decode")
+        func basic() throws {
+            let model = TestEnum.foo
+            let json = JSON(model)
+            let decoded = try TestEnum(json: json)
+            #expect(model == decoded)
+            #expect(json == "foo")
+        }
+
+        @Test("Enum with unlabled value")
+        func singleUnlabledValue() throws {
+            let model = TestEnum.baz(12)
+            let json = JSON(model)
+            let decoded = try TestEnum(json: json)
+            #expect(model == decoded)
+            #expect(json == ["baz": 12])
+        }
+
+        @Test("Enum with multiple unlabled values")
+        func multipleUnlabledValue() throws {
+            let model = TestEnum.corge("foo", nil)
+            let json = JSON(model)
+            let decoded = try TestEnum(json: json)
+            #expect(model == decoded)
+            #expect(json == ["corge": ["foo", nil]])
+        }
+
+        @Test("Enum with multiple unlabled values of the same type")
+        func multipleUnlabledSameTypeValue() throws {
+            let model = TestEnum.qux("foo", "bar")
+            let json = JSON(model)
+            let decoded = try TestEnum(json: json)
+            #expect(model == decoded)
+            #expect(json == ["qux": ["foo", "bar"]])
+        }
+
+        @Test("Enum with mixed label associated values")
+        func mixedValues() throws {
+            let model = TestEnum.quux(foo: 12, 3.4)
+            let json = JSON(model)
+            print(json)
+            let decoded = try TestEnum(json: json)
+            #expect(model == decoded)
+            #expect(json == ["quux": ["foo": 12, "1": 3.4]])
+        }
+
+        @Test("Enum with multiple labeled associated values")
+        func labeledValues() throws {
+            let model = TestEnum.grault(foo: "bar", bar: "foo")
+            let json = JSON(model)
+            print(json)
+            let decoded = try TestEnum(json: json)
+            #expect(model == decoded)
+            #expect(json == ["grault": ["foo": "bar", "bar": "foo"]])
+        }
+
+    }
+
+}
+
 @JSONCodable
-private struct Foo: Equatable {
+struct Foo: Equatable {
 
     init(
         fooBar: Int?,
@@ -86,84 +186,19 @@ enum TestEnum: Equatable {
 
 }
 
-@Test("Test @JSONCodable Sample")
-func jsonCodableSample() throws {
+@JSONCodable
+class TestClass {
 
-    let model = Foo(
-        fooBar: 12,
-        nested: nil,
-        id: "123",
-        optionalWithoutAnnotation: nil,
-        nilIfMissing: nil
-    )
-    let json = JSON(model)
-    let decoded = try Foo(json: json)
-    #expect(model == decoded)
-    #expect(json == [
-        "foo_bar": 12,
-        "id": "123",
-        "nilIfMissing": .null
-    ])
+    init(foo: Int?, bar: String) {
+        self.foo = foo
+        self.bar = bar
+    }
+
+    @OmitIfNil(false)
+    let foo: Int?
+
+    let bar: String
 
 }
 
-@Suite("@JSONCodable Enum Support")
-struct EnumSupport {
-
-    @Test("Basic enum decode")
-    func basic() throws {
-        let model = TestEnum.foo
-        let json = JSON(model)
-        let decoded = try TestEnum(json: json)
-        #expect(model == decoded)
-        #expect(json == "foo")
-    }
-
-    @Test("Enum with unlabled value")
-    func singleUnlabledValue() throws {
-        let model = TestEnum.baz(12)
-        let json = JSON(model)
-        let decoded = try TestEnum(json: json)
-        #expect(model == decoded)
-        #expect(json == ["baz": 12])
-    }
-
-    @Test("Enum with multiple unlabled values")
-    func multipleUnlabledValue() throws {
-        let model = TestEnum.corge("foo", nil)
-        let json = JSON(model)
-        let decoded = try TestEnum(json: json)
-        #expect(model == decoded)
-        #expect(json == ["corge": ["foo", nil]])
-    }
-
-    @Test("Enum with multiple unlabled values of the same type")
-    func multipleUnlabledSameTypeValue() throws {
-        let model = TestEnum.qux("foo", "bar")
-        let json = JSON(model)
-        let decoded = try TestEnum(json: json)
-        #expect(model == decoded)
-        #expect(json == ["qux": ["foo", "bar"]])
-    }
-
-    @Test("Enum with mixed label associated values")
-    func mixedValues() throws {
-        let model = TestEnum.quux(foo: 12, 3.4)
-        let json = JSON(model)
-        print(json)
-        let decoded = try TestEnum(json: json)
-        #expect(model == decoded)
-        #expect(json == ["quux": ["foo": 12, "1": 3.4]])
-    }
-
-    @Test("Enum with multiple labeled associated values")
-    func labeledValues() throws {
-        let model = TestEnum.grault(foo: "bar", bar: "foo")
-        let json = JSON(model)
-        print(json)
-        let decoded = try TestEnum(json: json)
-        #expect(model == decoded)
-        #expect(json == ["grault": ["foo": "bar", "bar": "foo"]])
-    }
-
-}
+final class TestSubClass: TestClass {}

@@ -46,10 +46,12 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
 
         if let structDecl = declaration.as(StructDeclSyntax.self) {
             name = structDecl.name.text
+        } else if let classDecl = declaration.as(ClassDeclSyntax.self) {
+            name = classDecl.name.text
         } else if let enumDecl = declaration.as(EnumDeclSyntax.self) {
             name = enumDecl.name.text
         } else {
-            throw MacroExpansionErrorMessage("@JSONCodable macro can only be applied to structs or enums.")
+            throw MacroExpansionErrorMessage("@JSONCodable macro can only be applied to structs, enums or classes.")
         }
 
         let encodable = try DeclSyntax(
@@ -81,10 +83,12 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
     ) throws -> [DeclSyntax] {
         if let structDecl = declaration.as(StructDeclSyntax.self) {
             return try buildStructMembers(from: structDecl)
+        } else if let classDecl = declaration.as(ClassDeclSyntax.self) {
+            return try buildClassMembers(from: classDecl)
         } else if let enumDecl = declaration.as(EnumDeclSyntax.self) {
             return try buildEnumMembers(from: enumDecl)
         } else {
-            throw MacroExpansionErrorMessage("@JSONCodable macro can only be applied to structs or enums.")
+            throw MacroExpansionErrorMessage("@JSONCodable macro can only be applied to structs, enums or classes.")
         }
     }
 
@@ -99,7 +103,24 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
     private static func buildStructMembers(
         from structDecl: StructDeclSyntax
     ) throws -> [DeclSyntax] {
-        let stored = try parseStoredProperties(in: structDecl)
+        try storedMembers(from: structDecl, useRequiredInit: false)
+    }
+
+    private static func buildClassMembers(
+        from classDecl: ClassDeclSyntax
+    ) throws -> [DeclSyntax] {
+        if classDecl.modifiers.map(\.trimmedDescription).contains("final") {
+            try storedMembers(from: classDecl, useRequiredInit: false)
+        } else {
+            try storedMembers(from: classDecl, useRequiredInit: true)
+        }
+    }
+
+    private static func storedMembers(
+        from decl: some DeclGroupSyntax,
+        useRequiredInit: Bool
+    ) throws -> [DeclSyntax] {
+        let stored = try parseStoredProperties(in: decl)
 
         if Set(stored.map(\.key)).count != stored.count {
             throw MacroExpansionErrorMessage("Cannot generate JSONCodable conformance. Duplicate keys found.")
@@ -144,19 +165,29 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
             }
             .joined(separator: "\n")
 
-        let decodable = DeclSyntax(
-            """
-            public init(json: JSON) throws {
-                \(raw: decodeItems)
-            }
-            """
-        )
+        let decodable = if useRequiredInit {
+            DeclSyntax(
+                """
+                public required init(json: JSON) throws {
+                    \(raw: decodeItems)
+                }
+                """
+            )
+        } else {
+            DeclSyntax(
+                """
+                public init(json: JSON) throws {
+                    \(raw: decodeItems)
+                }
+                """
+            )
+        }
 
         return [encodable, decodable]
     }
 
     private static func parseStoredProperties(
-        in structDecl: StructDeclSyntax
+        in structDecl: some DeclGroupSyntax
     ) throws -> [StoredProperty] {
         var result: [StoredProperty] = []
 

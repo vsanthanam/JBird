@@ -490,4 +490,84 @@ final class JSONCodableMacroTests: XCTestCase {
         #endif
     }
 
+    func test_nonfinal_class() throws {
+        #if canImport(JBirdMacrosCompilerPlugin)
+            assertMacroExpansion(
+                """
+                @JSONCodable
+                class Foo {
+
+                    let name: String
+
+                }
+                """,
+                expandedSource: """
+                class Foo {
+
+                    let name: String
+
+                    @JBirdCore.JSON.ObjectBuilder
+                    public func encodeToJSON() -> JSON {
+                        "name" => name
+                    }
+
+                    public required init(json: JSON) throws {
+                        self.name = try json["name"]
+                    }
+
+                }
+
+                extension Foo: JBirdCore.JSONEncodable {
+                }
+
+                extension Foo: JBirdCore.JSONDecodable {
+                }
+                """,
+                macros: testMacros
+            )
+        #else
+            throw XCTSkip("macros are only supported when running tests for the host platform")
+        #endif
+    }
+
+    func test_final_class() throws {
+        #if canImport(JBirdMacrosCompilerPlugin)
+            assertMacroExpansion(
+                """
+                @JSONCodable
+                final class Foo {
+
+                    let name: String
+
+                }
+                """,
+                expandedSource: """
+                final class Foo {
+
+                    let name: String
+
+                    @JBirdCore.JSON.ObjectBuilder
+                    public func encodeToJSON() -> JSON {
+                        "name" => name
+                    }
+
+                    public init(json: JSON) throws {
+                        self.name = try json["name"]
+                    }
+
+                }
+
+                extension Foo: JBirdCore.JSONEncodable {
+                }
+
+                extension Foo: JBirdCore.JSONDecodable {
+                }
+                """,
+                macros: testMacros
+            )
+        #else
+            throw XCTSkip("macros are only supported when running tests for the host platform")
+        #endif
+    }
+
 }
