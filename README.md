@@ -5,6 +5,7 @@
 [![Build Status](https://img.shields.io/github/check-runs/vsanthanam/JBird/main)](https://github.com/vsanthanam/JBird/actions)
 [![Swift Version](https://img.shields.io/badge/swift-%206.0%20%7C%206.1%20%7C%206.2-critical)](https://swift.org)
 [![Documentation](https://img.shields.io/badge/documentation-GitHub-8A2BE2)](https://usejbird.com/docs/documentation/jbird)
+[![Test Coverage](https://codecov.io/gh/vsanthanam/JBird/graph/badge.svg?token=11GDRKPRLF)](https://codecov.io/gh/vsanthanam/JBird)
 
 A blazing fast, type-safe library for working with JSON in Swift
 
