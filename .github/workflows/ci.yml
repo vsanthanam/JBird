@@ -1,6 +1,7 @@
 name: JBird CI
 permissions:
   contents: read
+  pull-requests: write
 on:
   push:
     branches:
@@ -292,6 +293,76 @@ jobs:
       run: ./.scripts/xcode-select
     - name: Build XCFramework
       run: ./.scripts/build-xcframework ${{ matrix.target }}
+  coverage:
+    name: Measure Test Coverage
+    runs-on: macos-26
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Select Xcode Version
+        run: ./.scripts/xcode-select
+      - name: Run llvm-cov
+        env:
+          FAIL_ON_THRESHOLD: "true"
+          COVERAGE_THRESHOLD: "80"
+          REPORT_DIR: "coverage"
+        run: .scripts/coverage
+      - name: Upload Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ github.sha }}
+          path: |
+            coverage/
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload to codecov.io
+        if: ${{ always() }}
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage/coverage.lcov
+          flags: swiftpm,llvm-cov
+          name: ${{ github.workflow }}-${{ github.run_id }}
+          fail_ci_if_error: false
+          verbose: true
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      - name: Comment coverage on PR
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = 'coverage/summary.txt';
+            let total = 'N/A';
+            if (fs.existsSync(path)) {
+              const txt = fs.readFileSync(path, 'utf8');
+              const lines = txt.trim().split('\n');
+              // Find TOTAL line and last percentage
+              for (const line of lines) {
+                if (line.startsWith('TOTAL')) {
+                  const match = line.match(/(\d+(\.\d+)?)%/g);
+                  if (match && match.length) {
+                    total = match[match.length-1];
+                  }
+                }
+              }
+            }
+            const body = `### Code Coverage\n\n` +
+                         `**Total line coverage:** ${total}\n\n` +
+                         `Artifacts: **coverage/** (HTML, lcov, summary.txt)`;
+            // Create or update a single sticky comment
+            const { owner, repo } = context.repo;
+            const pr = context.issue.number;
+            const list = await github.rest.issues.listComments({ owner, repo, issue_number: pr });
+            const marker = '<!-- coverage-comment -->';
+            const existing = list.data.find(c => c.body && c.body.includes(marker));
+            const newBody = `${marker}\n${body}`;
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body: newBody });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number: pr, body: newBody });
+            }
+    
   validate-pr:
     name: Validate Pull Request
     if: ${{ always() && github.event_name == 'pull_request' }}
@@ -308,6 +379,7 @@ jobs:
       - swiftformat
       - clang-format
       - lint-docc
+      - coverage
     runs-on: ubuntu-latest
     steps:
       - name: Check upstream jobs
@@ -324,7 +396,8 @@ jobs:
             [[ "${{ needs.build-xcframework.result }}" == "failure" ]] || \
             [[ "${{ needs.swiftformat.result }}" == "failure" ]] || \
             [[ "${{ needs.clang-format.result }}" == "failure" ]] || \
-            [[ "${{ needs.lint-docc.result }}" == "failure" ]]; then
+            [[ "${{ needs.lint-docc.result }}" == "failure" ]] || \
+            [[ "${{ needs.coverage.result }}" == "failure" ]]; then
             echo "❌ Upstream job failed."
             exit 1
           else

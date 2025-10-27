@@ -1,0 +1,160 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# -------- config (overridable via env) --------
+REPORT_DIR="${REPORT_DIR:-coverage}"
+FAIL_ON_THRESHOLD="${FAIL_ON_THRESHOLD:-false}"   # true/false
+COVERAGE_THRESHOLD="${COVERAGE_THRESHOLD:-0}"     # integer % (0..100)
+LLVM_COV_BIN="${LLVM_COV_BIN:-llvm-cov}"
+LLVM_PROFDATA_BIN="${LLVM_PROFDATA_BIN:-llvm-profdata}"
+
+# IMPORTANT: no surrounding quotes inside the value.
+IGNORE_REGEX="${IGNORE_REGEX:-(^|/)(Tests|\\.build|Carthage|Packages)(/|$)}"
+
+# Optional path rewrite for mismatched build vs checkout roots:
+# Example (GitHub mac runner):
+#   PATH_EQUIV="/Users/runner/work/YourRepo/YourRepo=$PWD"
+PATH_EQUIV="${PATH_EQUIV:-}"
+
+# Prefer Xcode’s tools if available
+if command -v xcrun >/dev/null 2>&1; then
+  if xcrun -f llvm-cov >/dev/null 2>&1; then LLVM_COV_BIN="xcrun llvm-cov"; fi
+  if xcrun -f llvm-profdata >/dev/null 2>&1; then LLVM_PROFDATA_BIN="xcrun llvm-profdata"; fi
+fi
+
+# -------- sanity checks --------
+if ! ${LLVM_COV_BIN} --version >/dev/null 2>&1; then
+  echo "error: llvm-cov not found." >&2
+  exit 1
+fi
+if ! ${LLVM_PROFDATA_BIN} --version >/dev/null 2>&1; then
+  echo "error: llvm-profdata not found." >&2
+  exit 1
+fi
+
+# -------- run tests with coverage --------
+swift test --enable-code-coverage
+
+# -------- locate or build a valid .profdata --------
+PROFDATA="$(find .build -type f -name '*.profdata' -print0 2>/dev/null | xargs -0 ls -t 2>/dev/null | head -n 1 || true)"
+if [ -z "${PROFDATA}" ]; then
+  if ! find .build -type f -name '*.profraw' | grep -q . ; then
+    echo "error: no coverage data found under .build/" >&2
+    exit 1
+  fi
+  mkdir -p .build/codecov
+  PROFDATA=".build/codecov/merged.profdata"
+  find .build -type f -name '*.profraw' -print0 \
+    | xargs -0 ${LLVM_PROFDATA_BIN} merge -sparse -o "${PROFDATA}"
+fi
+if file "${PROFDATA}" | grep -q 'JSON'; then
+  echo "error: resolved coverage path is JSON, not .profdata: ${PROFDATA}" >&2
+  exit 1
+fi
+
+# -------- gather instrumented Mach-O objects (NUL-safe) --------
+OBJ0="$(mktemp)"; FIL0="$(mktemp)"
+trap 'rm -f "$OBJ0" "$FIL0"' EXIT
+
+find .build -type d -name '*.xctest' -print0 2>/dev/null \
+| while IFS= read -r -d '' bundle; do
+    find "$bundle/Contents/MacOS" -type f -perm -111 -print0 2>/dev/null || true
+  done >>"$OBJ0"
+find .build -type f -perm -111 ! -path '*/.dSYM/*' -print0 2>/dev/null >>"$OBJ0" || true
+
+if [ -s "$OBJ0" ]; then
+  while IFS= read -r -d '' f; do
+    [ -e "$f" ] || continue
+    if file "$f" | grep -qE 'Mach-O (64-bit|universal)|current ar archive'; then
+      printf '%s\0' "$f" >>"$FIL0"
+    fi
+  done <"$OBJ0"
+fi
+if [ ! -s "$FIL0" ]; then
+  echo "error: no instrumented Mach-O files found under .build/" >&2
+  exit 1
+fi
+
+# -------- generate reports --------
+rm -rf "$REPORT_DIR"
+mkdir -p "$REPORT_DIR"
+
+SHOW_ARGS=(
+  -instr-profile "${PROFDATA}"
+  -ignore-filename-regex "${IGNORE_REGEX}"
+  -compilation-dir "$PWD"
+  -format=html
+  -output-dir "${REPORT_DIR}"
+)
+REPORT_ARGS=(
+  -instr-profile "${PROFDATA}"
+  -compilation-dir "$PWD"
+)
+EXPORT_ARGS=(
+  -format=lcov
+  -instr-profile "${PROFDATA}"
+  -compilation-dir "$PWD"
+)
+
+# Optional path equivalence mapping if provided
+if [ -n "$PATH_EQUIV" ]; then
+  SHOW_ARGS+=( -path-equivalence "$PATH_EQUIV" )
+  REPORT_ARGS+=( -path-equivalence "$PATH_EQUIV" )
+  EXPORT_ARGS+=( -path-equivalence "$PATH_EQUIV" )
+fi
+
+# HTML (navigable)
+xargs -0 ${LLVM_COV_BIN} show "${SHOW_ARGS[@]}" -- <"$FIL0"
+
+# Text summary (also used for % extraction)
+SUMMARY_TXT="${REPORT_DIR}/summary.txt"
+xargs -0 ${LLVM_COV_BIN} report "${REPORT_ARGS[@]}" -- <"$FIL0" > "$SUMMARY_TXT"
+
+# LCOV (optional)
+xargs -0 ${LLVM_COV_BIN} export "${EXPORT_ARGS[@]}" -- <"$FIL0" > "${REPORT_DIR}/coverage.lcov" || true
+
+# Extract total % for CI
+TOTAL_LINE_PCT="$(
+  awk '
+    BEGIN{pct=""}
+    $1=="TOTAL"{
+      for(i=1;i<=NF;i++){ if ($i ~ /%$/){ pct=$i } }
+      gsub("%","",pct); print pct
+    }
+  ' "$SUMMARY_TXT" | tail -n1
+)"
+TOTAL_LINE_PCT="${TOTAL_LINE_PCT:-0}"
+
+# GitHub Job Summary
+if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+  {
+    echo "## Code Coverage"
+    echo ""
+    echo "**Total line coverage:** ${TOTAL_LINE_PCT}%"
+    echo ""
+    echo "| Artifact | Path |"
+    echo "|---|---|"
+    echo "| HTML report | \`${REPORT_DIR}/index.html\` |"
+    echo "| Summary (text) | \`${SUMMARY_TXT}\` |"
+    echo "| LCOV | \`${REPORT_DIR}/coverage.lcov\` |"
+  } >> "$GITHUB_STEP_SUMMARY"
+fi
+
+# Threshold
+if [ "${FAIL_ON_THRESHOLD}" = "true" ]; then
+  FLOOR_TOTAL="$(printf '%.0f' "$(echo "$TOTAL_LINE_PCT" | awk '{print $1+0}')")"
+  if [ "${FLOOR_TOTAL}" -lt "${COVERAGE_THRESHOLD}" ]; then
+    echo "Coverage ${TOTAL_LINE_PCT}% is below threshold ${COVERAGE_THRESHOLD}%." >&2
+    exit 2
+  fi
+fi
+
+# Local convenience
+if [ -z "${GITHUB_ACTIONS:-}" ] && command -v open >/dev/null 2>&1; then
+  open "${REPORT_DIR}/index.html" || true
+fi
+
+echo "✅ Coverage HTML: ${REPORT_DIR}/index.html"
+echo "📝 Summary:       ${SUMMARY_TXT}"
+echo "📦 LCOV:          ${REPORT_DIR}/coverage.lcov"
+echo "📊 Total line %:  ${TOTAL_LINE_PCT}%"
