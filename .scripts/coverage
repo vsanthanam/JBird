@@ -88,11 +88,13 @@ SHOW_ARGS=(
 )
 REPORT_ARGS=(
   -instr-profile "${PROFDATA}"
+  -ignore-filename-regex "${IGNORE_REGEX}"
   -compilation-dir "$PWD"
 )
 EXPORT_ARGS=(
   -format=lcov
   -instr-profile "${PROFDATA}"
+  -ignore-filename-regex "${IGNORE_REGEX}"
   -compilation-dir "$PWD"
 )
 
