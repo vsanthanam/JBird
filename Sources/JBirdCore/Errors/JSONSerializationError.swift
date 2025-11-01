@@ -27,7 +27,7 @@ import Foundation
 
 /// An error thrown when serializing ``JSON`` into a Swift string or UTF-8 encoded byte buffer
 @available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
-public enum JSONSerializationError: Error, CustomStringConvertible {
+public enum JSONSerializationError: Error, Equatable, Sendable, CustomStringConvertible {
 
     // MARK: - API
 
