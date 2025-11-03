@@ -102,7 +102,7 @@ jobs:
       name: Build JBird
       shell: bash
       run: |
-        /usr/bin/swift build -v --package-path /Users/runner/work/JBird/JBird/
+        swift build -v
     - if: matrix.build-mode == 'manual' && matrix.language == 'c-cpp'
       name: Build JBirdParser
       shell: bash
