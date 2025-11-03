@@ -14,7 +14,7 @@ A blazing fast, type-safe library for working with JSON in Swift
 JBird brings type safety to unstructured JSON with an elegant, ergonomic API that dramatically improves developer experience compared to Foundation's JSONSerialization:
 
 ```swift
-// Foundation approach - verbose casting and optional chaining
+// With Foundation, you need to cast and unwrap repeatedly
 if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
    let user = json["user"] as? [String: Any],
    let name = user["name"] as? String,
@@ -22,7 +22,7 @@ if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
    // Finally use the values after multiple casts
 }
 
-// JBird approach - cleaner and more type safe
+// With JBird, you get natural, type-safe accessor syntax
 let json = try JSON(data)
 let name = try json["user"]["name"].stringValue
 let isActive = try json["user"]["isActive"].boolValue
@@ -32,14 +32,14 @@ let user = try json["user"].decode(into: User.self)
 JBird also simplifies mutation, which is cumbersome with Foundation:
 
 ```swift
-// Modifying JSON with Foundation requires recreating structures
+// With Foundation, you must re-create and re-assign 
 var jsonDict = json as? [String: Any] ?? [:]
 if var user = jsonDict["user"] as? [String: Any] {
     user["status"] = "active" 
     jsonDict["user"] = user
 }
 
-// Simple modification with JBird
+// With JBird, you can traverse and mutate in a single expression
 var mutableJSON = try JSON(data)
 try mutableJSON["user"].setValue(true, forKey: "isActive")
 ```
