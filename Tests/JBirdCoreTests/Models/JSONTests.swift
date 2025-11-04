@@ -1159,5 +1159,27 @@ struct JSONTests {
                 try array.filter { key, _ in key != "qux" }
             }
         }
+
+        @Test("Object Value Filtering")
+        func objectValueFiltering() throws {
+            let object: JSON = ["foo": "bar", "baz": 2.0, "qux": 1]
+            let array: JSON = ["foo", "baz", "qux", "qux"]
+            let filteredObject = try object.filterValues(\.isString)
+            #expect(filteredObject == ["foo": "bar"])
+            #expect(throws: JSONError.illegalObjectConversion) {
+                try array.filter { key, _ in key != "qux" }
+            }
+        }
+
+        @Test("Array Filter Nils Filtering")
+        func arrayNilFiltering() throws {
+            let array: JSON = ["foo", "bar", nil, "baz", nil]
+            let object: JSON = ["foo": "bar", "baz": 2.0, "qux": 1]
+            let filteredArray = try array.filterNils()
+            #expect(filteredArray == ["foo", "bar", "baz"])
+            #expect(throws: JSONError.illegalArrayConversion) {
+                try object.filterNils()
+            }
+        }
     }
 }
