@@ -94,15 +94,6 @@ extension JSON {
             }
         }
 
-        /// Decode the JSON literal into a ``JSONLiteralDecodable`` type
-        /// - Parameter type: The type to decode into
-        /// - Returns: The decoded literal
-        public func decode<T>(
-            into type: T.Type = T.self
-        ) throws -> T where T: JSONLiteralDecodable {
-            try T(jsonLiteral: self)
-        }
-
         /// The untyped representation of the JSON literal
         ///
         /// This property returns the JSON literal as a native Swift type:

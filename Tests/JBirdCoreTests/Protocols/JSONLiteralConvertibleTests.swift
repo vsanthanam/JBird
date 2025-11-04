@@ -29,6 +29,17 @@ import Testing
 @Suite("JSONLiteralConvertible Tests")
 struct JSONLiteralConvertibleTests {
 
+    @Test("Deprecated Initializer", arguments: [JSON.Literal.true, JSON.Literal.false, JSON.Literal.null])
+    @available(*, deprecated)
+    func deprecatedInit(_ literal: JSON.Literal) {
+        struct Test: JSONLiteralConvertible {
+            let jsonLiteral: JSON.Literal
+        }
+        let test = Test(jsonLiteral: literal)
+        let fromConvertible = JSON.Literal(test)
+        #expect(fromConvertible == literal)
+    }
+
     @Test("Bool True Convertible")
     @available(*, deprecated)
     func boolTrue() {

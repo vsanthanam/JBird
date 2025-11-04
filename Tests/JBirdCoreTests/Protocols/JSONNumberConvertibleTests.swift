@@ -29,6 +29,17 @@ import Testing
 @Suite("JSONNumberConvertible Tests")
 struct JSONNumberConvertibleTests {
 
+    @Test("Deprecated Initializer", arguments: [JSON.Number.int(42), JSON.Number.double(4.2)])
+    @available(*, deprecated)
+    func deprecatedInit(_ number: JSON.Number) {
+        struct Test: JSONNumberConvertible {
+            let jsonNumber: JSON.Number
+        }
+        let test = Test(jsonNumber: number)
+        let fromConvertible = JSON.Number(test)
+        #expect(fromConvertible == number)
+    }
+
     @Test("Int Convertible")
     @available(*, deprecated)
     func int() {
