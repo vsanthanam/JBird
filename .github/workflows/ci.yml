@@ -17,6 +17,7 @@ concurrency:
 jobs:
   build-xcode:
     strategy:
+      fail-fast: false
       matrix:
         platform: ['macos', 'maccatalyst', 'ios', 'watchos', 'tvos', 'visionos']
         include:
@@ -55,6 +56,7 @@ jobs:
   build-macos-spm:
     name: Build JBird (macOS)
     strategy:
+      fail-fast: false
       matrix:
         swift: ['6.0', '6.1', '6.2']
         include:
@@ -87,6 +89,7 @@ jobs:
   test-macos-spm:
     name: Test JBird (macOS)
     strategy:
+      fail-fast: false
       matrix:
         swift: ['6.0', '6.1', '6.2']
         include:
@@ -118,6 +121,7 @@ jobs:
   build-ubuntu-spm:
     name: Build JBird (Ubuntu)
     strategy:
+      fail-fast: false
       matrix:
         swift: ['6.0', '6.1', '6.2']
     runs-on: ubuntu-latest
@@ -142,6 +146,7 @@ jobs:
   test-ubuntu-spm:
     name: Test JBird (Ubuntu)
     strategy:
+      fail-fast: false
       matrix:
         swift: ['6.0', '6.1', '6.2']
     needs: build-ubuntu-spm
@@ -165,6 +170,7 @@ jobs:
   build-windows-spm:
     name: Build JBird (Windows)
     strategy:
+      fail-fast: false
       matrix:
         swift: ['6.1', '6.2']
     runs-on: windows-latest
@@ -190,6 +196,7 @@ jobs:
   test-windows-spm:
     name: Test JBird (Windows)
     strategy:
+      fail-fast: false
       matrix:
         swift: ['6.1', '6.2']
     needs: build-windows-spm
@@ -216,6 +223,7 @@ jobs:
   build-wasm-spm:
     name: Build JBird (WASM)
     strategy:
+      fail-fast: false
       matrix:
         swift: ['6.0.3', '6.1', '6.2']
     runs-on: ubuntu-latest
@@ -262,12 +270,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
       - name: Install clang-format
         run: |
           sudo apt-get update
           sudo apt-get install -y clang-format
-
       - name: Validate formatting
         run: ./.scripts/lint-clang-format
   lint-docc:
@@ -282,6 +288,7 @@ jobs:
       run: ./.scripts/lint-docc
   build-xcframework:
     strategy:
+      fail-fast: false
       matrix:
         target: [JBird, JBirdCore, JBirdBuilders]
     name: Build XCFramework (${{ matrix.target }})
