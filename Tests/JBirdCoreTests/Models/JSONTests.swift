@@ -416,6 +416,28 @@ struct JSONTests {
             }
         }
 
+        @Test("Value at path tests (deprecated)")
+        @available(*, deprecated, renamed: "valueAtPath()", message: "Deprecated API coverage")
+        func valueAtPathDeprecated() throws {
+            let json: JSON = [
+                "foo": [
+                    "bar": [1, 2, 3]
+                ]
+            ]
+
+            let value = try json.value(atPath: [.key("foo"), .key("bar"), .index(1)])
+            #expect(value == 2)
+            #expect(throws: JSONError.invalidSubscript(.key("qux"))) {
+                _ = try json.value(atPath: [.key("foo"), .key("bar"), .key("qux")])
+            }
+            #expect(throws: JSONError.keyNotFound("baz")) {
+                _ = try json.value(atPath: [.key("foo"), .key("baz")])
+            }
+            #expect(throws: JSONError.indexOutOfBounds(5)) {
+                _ = try json.value(atPath: [.key("foo"), .key("bar"), .index(5)])
+            }
+        }
+
         @Test("Value at path tests (parameter packs)")
         func valueAtPathWithPacks() throws {
             let json: JSON = [
@@ -885,6 +907,19 @@ struct JSONTests {
             }
         }
 
+        @Test("Map Values Into JSON Tests")
+        func mapValuesIntoJSONTests() throws {
+            let object: JSON = ["foo": "bar", "baz": 42]
+            let array: JSON = ["a", "b", "c", "d"]
+            let mapped: JSON = try object.mapValues { value in
+                JSON.null
+            }
+            #expect(mapped == ["foo": nil, "baz": nil])
+            #expect(throws: JSONError.illegalObjectConversion) {
+                _ = try array.mapValues(\.isInt)
+            }
+        }
+
     }
 
     @Suite("Compact Map Tests")
@@ -1109,6 +1144,17 @@ struct JSONTests {
             let array: JSON = ["foo", "baz", "qux", "qux"]
             let filteredObject = try object.filter { key, _ in key != "qux" }
             #expect(filteredObject == ["foo": "bar", "baz": "qux"])
+            #expect(throws: JSONError.illegalObjectConversion) {
+                try array.filter { key, _ in key != "qux" }
+            }
+        }
+
+        @Test("Object Key Filtering")
+        func objectKeyFiltering() throws {
+            let object: JSON = ["foo": "bar", "baz": "qux", "qux": "corge"]
+            let array: JSON = ["foo", "baz", "qux", "qux"]
+            let filteredObject = try object.filterKeys { key in key.starts(with: "q") }
+            #expect(filteredObject == ["qux": "corge"])
             #expect(throws: JSONError.illegalObjectConversion) {
                 try array.filter { key, _ in key != "qux" }
             }
