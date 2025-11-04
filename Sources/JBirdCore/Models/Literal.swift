@@ -41,14 +41,6 @@ extension JSON {
             self = encodable.encodeToJSONLiteral()
         }
 
-        @available(*, deprecated, renamed: "init(_:)", message: "Use `init(_:)` instead")
-        @_disfavoredOverload
-        public init(
-            _ convertible: some JSONLiteralConvertible
-        ) {
-            self = convertible.jsonLiteral
-        }
-
         // MARK: - API
 
         /// A `true` literal
@@ -101,23 +93,6 @@ extension JSON {
             into type: T.Type = T.self
         ) throws -> T where T: JSONLiteralDecodable {
             try T(jsonLiteral: self)
-        }
-
-        /// The untyped representation of the JSON literal
-        ///
-        /// This property returns the JSON literal as a native Swift type:
-        /// - `true` and `false` literals are represented as `Bool`
-        /// - `null` literals are represented as `nil`
-        @available(*, deprecated, renamed: "unboxed()", message: "Use unboxed() instead. This property will be removed in a future version.")
-        public var untyped: Any? {
-            switch self {
-            case .true:
-                true
-            case .false:
-                false
-            case .null:
-                nil
-            }
         }
 
         /// The untyped representation of the JSON literal

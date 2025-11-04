@@ -39,14 +39,6 @@ extension JSON {
             self = encodable.encodeToJSONNumber()
         }
 
-        @available(*, deprecated, renamed: "init(_:)", message: "")
-        @_disfavoredOverload
-        public init(
-            _ convertible: some JSONNumberConvertible
-        ) {
-            self = convertible.jsonNumber
-        }
-
         // MARK: - API
 
         case int(Int)
@@ -104,22 +96,6 @@ extension JSON {
             into type: T.Type = T.self
         ) throws -> T where T: JSONNumberDecodable {
             try T(jsonNumber: self)
-        }
-
-        /// The untyped representation of the JSON number value
-        ///
-        /// This property returns the JSON number value as a native Swift type:
-        /// - Strings are represented as `String`
-        /// - Integers are represented as `Int`
-        /// - Floating point numbers are represented as `Double`
-        @available(*, deprecated, renamed: "unboxed()", message: "Use unboxed() instead. This property will be removed in a future version.")
-        public var untyped: Any? {
-            switch self {
-            case let .int(int):
-                int
-            case let .double(double):
-                double
-            }
         }
 
         /// The untyped representation of the JSON literal
