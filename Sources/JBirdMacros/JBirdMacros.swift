@@ -181,24 +181,3 @@ public macro OmitIfNil(
     module: "JBirdMacrosCompilerPlugin",
     type: "OmitIfNilMacro"
 )
-
-/// An error type used by macro-synthesized ``/JBirdCore/JSONCodable`` conformance.
-public struct JSONDecodingError: Error, CustomStringConvertible {
-
-    /// Create a `JSONDecodingError`
-    /// - Parameter message: The error message
-    public init(
-        _ message: String
-    ) {
-        self.message = message
-    }
-
-    /// A message explaining the error
-    public let message: String
-
-    // MARK: - CustomStringConvertible
-
-    public var description: String {
-        message
-    }
-}
