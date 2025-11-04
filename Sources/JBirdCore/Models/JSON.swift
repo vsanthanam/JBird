@@ -1093,7 +1093,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Remove `null` values from a JSON array
     /// - Returns: A JSON array with no null values
     public func filterNils() throws -> JSON {
-        try filter(\.isNull)
+        try filter { json in !json.isNull }
     }
 
     /// Remove the value at the provided subscript
