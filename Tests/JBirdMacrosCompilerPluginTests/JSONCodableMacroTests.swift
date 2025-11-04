@@ -413,14 +413,14 @@ final class JSONCodableMacroTests: XCTestCase {
                         func decode_case_foo() throws -> Self {
                         let raw = try json.decode(into: String.self)
                         guard raw == "foo" else {
-                            throw JBirdMacros.JSONDecodingError("Enum case decoding failure")
+                            throw JBirdMacros.JSONMacroDecodingError("Enum case decoding failure")
                         }
                         return .foo
                         }
                         func decode_case_bar() throws -> Self {
                             let raw = try json.decode(into: String.self)
                             guard raw == "bar" else {
-                                throw JBirdMacros.JSONDecodingError("Enum case decoding failure")
+                                throw JBirdMacros.JSONMacroDecodingError("Enum case decoding failure")
                             }
                             return .bar
                         }
@@ -472,7 +472,7 @@ final class JSONCodableMacroTests: XCTestCase {
                             return
                         }
 
-                        throw JBirdMacros.JSONDecodingError("Enum case decoding failure")
+                        throw JBirdMacros.JSONMacroDecodingError("Enum case decoding failure")
                     }
 
                 }

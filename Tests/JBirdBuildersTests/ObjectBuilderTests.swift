@@ -36,6 +36,15 @@ struct ObjectBuilderTests {
         #expect(json == [:])
     }
 
+    @Test("Void Expression")
+    func voidExpression() {
+        let json = JSON(fields: {
+            ()
+            "foo" => "bar"
+        })
+        #expect(json == ["foo": "bar"])
+    }
+
     @Test("Tuple Expression")
     func tupleExpression() {
         let json = JSON {

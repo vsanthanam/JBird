@@ -1,5 +1,5 @@
 // JBird
-// JSONNumericConvertible.swift
+// JSONNumberConvertible.swift
 //
 // MIT License
 //

@@ -175,6 +175,8 @@ public enum JSONDeserializationError: Error, Equatable, Sendable, CustomStringCo
             self = .depthLimitExceeded
         case JSON_DUPLICATE_KEY:
             self = .duplicateKey
+        case JSON_NO_ERROR:
+            self = .unknown
         default:
             self = .unknown
         }

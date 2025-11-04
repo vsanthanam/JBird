@@ -94,4 +94,8 @@ func cInitializer() {
     #expect(JSONDeserializationError(JSON_INVALID_ESCAPE) == .invalidEscape)
     #expect(JSONDeserializationError(JSON_OUT_OF_MEMORY) == .outOfMemory)
     #expect(JSONDeserializationError(JSON_MAX_DEPTH_EXCEEDED) == .depthLimitExceeded)
+    #expect(JSONDeserializationError(JSON_DUPLICATE_KEY) == .duplicateKey)
+    #expect(JSONDeserializationError(JSON_NO_ERROR) == .unknown)
+    let bogusErrorCode = json_error_t(42)
+    #expect(JSONDeserializationError(bogusErrorCode) == .unknown)
 }

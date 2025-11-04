@@ -433,7 +433,7 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
                 func \(fnName)() throws -> Self {
                     let raw = try json.decode(into: String.self)
                     guard raw == \"\(element.name.text)\" else {
-                        throw JBirdMacros.JSONDecodingError(\"Enum case decoding failure\")
+                        throw JBirdMacros.JSONMacroDecodingError(\"Enum case decoding failure\")
                     }
                     return .\(element.name.text)
                 }
@@ -463,7 +463,7 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
         if !decodeFunctionsTogether.isEmpty { decodeBodySections.append(decodeFunctionsTogether) }
         let decodeAttemptsBody = decodeAttempts.joined(separator: "\n")
         if !decodeAttemptsBody.isEmpty { decodeBodySections.append(decodeAttemptsBody) }
-        decodeBodySections.append("throw JBirdMacros.JSONDecodingError(\"Enum case decoding failure\")")
+        decodeBodySections.append("throw JBirdMacros.JSONMacroDecodingError(\"Enum case decoding failure\")")
 
         let decodable = DeclSyntax(
             """
