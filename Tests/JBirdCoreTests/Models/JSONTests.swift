@@ -417,7 +417,7 @@ struct JSONTests {
         }
 
         @Test("Value at path tests (deprecated)")
-        @available(*, deprecated, renamed: "valueAtPath()", message: "Deprecated API coverage")
+        @available(*, deprecated)
         func valueAtPathDeprecated() throws {
             let json: JSON = [
                 "foo": [
