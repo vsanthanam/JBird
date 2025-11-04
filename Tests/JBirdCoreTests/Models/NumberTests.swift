@@ -1,5 +1,5 @@
 // JBird
-// NumericTests.swift
+// NumberTests.swift
 //
 // MIT License
 //
@@ -70,6 +70,18 @@ struct NumberTests {
 
         let double: JSON.Number = 12.34
         let untypedDouble = try #require(double.unboxed().base as? Double)
+        #expect(untypedDouble == 12.34)
+    }
+
+    @Test("Untyped Number")
+    @available(*, deprecated)
+    func untypedNumber() throws {
+        let int: JSON.Number = 12
+        let untypedInt = try #require(int.untyped as? Int)
+        #expect(untypedInt == 12)
+
+        let double: JSON.Number = 12.34
+        let untypedDouble = try #require(double.untyped as? Double)
         #expect(untypedDouble == 12.34)
     }
 
