@@ -37,6 +37,16 @@ struct ArrayBuilderTests {
         #expect(json == [])
     }
 
+    @Test("Void Expression")
+    func voidExpression() {
+        let json = JSON(elements: {
+            ()
+            "foo"
+            nil
+        })
+        #expect(json == ["foo", nil])
+    }
+
     @Test("JSON Expression")
     func jsonExpression() {
         let json = JSON {
