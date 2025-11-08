@@ -23,16 +23,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#if canImport(JBirdBuilders)
-    @_exported import JBirdBuilders
-#endif
-
-#if canImport(JBirdCore)
+#if SWIFT_PACKAGE
     @_exported import JBirdCore
-#endif
 
-#if canImport(JBirdMacros)
-    @_exported import JBirdMacros
+    #if DeclarativeAPI
+        @_exported import JBirdBuilders
+    #endif
+
+    #if ConformanceMacros
+        @_exported import JBirdMacros
+    #endif
+#else
+    #if canImport(JBirdBuilders)
+        @_exported import JBirdBuilders
+    #endif
+
+    #if canImport(JBirdCore)
+        @_exported import JBirdCore
+    #endif
+
+    #if canImport(JBirdMacros)
+        @_exported import JBirdMacros
+    #endif
 #endif
 
 enum JBirdEnum {}
