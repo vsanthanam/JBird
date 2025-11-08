@@ -39,6 +39,11 @@ let package = Package(
             ]
         )
     ],
+    traits: [
+        .default(enabledTraits: ["DeclarativeAPI", "ConformanceMacros"]),
+        "DeclarativeAPI",
+        "ConformanceMacros"
+    ],
     dependencies: [
         .package(
             url: "https://github.com/swiftlang/swift-syntax.git",
@@ -50,8 +55,18 @@ let package = Package(
             name: "JBird",
             dependencies: [
                 "JBirdCore",
-                "JBirdBuilders",
-                "JBirdMacros"
+                .target(
+                    name: "JBirdBuilders",
+                    condition: .when(
+                        traits: ["DeclarativeAPI"]
+                    )
+                ),
+                .target(
+                    name: "JBirdMacros",
+                    condition: .when(
+                        traits: ["ConformanceMacros"]
+                    )
+                )
             ],
             resources: [
                 .process("PrivacyInfo.xcprivacy")
