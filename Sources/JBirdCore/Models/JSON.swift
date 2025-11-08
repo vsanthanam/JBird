@@ -734,11 +734,11 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// let json: JSON = ["foo", "bar", "baz"]
     /// let other: JSON = [24, 12, nil]
     ///
-    /// let first = json.allSatisfy { value in
+    /// let first = try json.allSatisfy { value in
     ///     return value.isString
     /// }
     ///
-    /// let second = other.allSatisfy { value in
+    /// let second = try other.allSatisfy { value in
     ///     return value.isNumber
     /// }
     ///
@@ -763,11 +763,11 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// let json: JSON = ["foo": true, "bar": false, "qux": true]
     /// let other: JSON = ["foo": 12, "bar": 24, "qux": nil]
     ///
-    /// let first = json.allSatisfy { key, value in
+    /// let first = try json.allSatisfy { key, value in
     ///     return key.count == 3 && value.isBool
     /// }
     ///
-    /// let second = other.allSatisfy { key, value in
+    /// let second = try other.allSatisfy { key, value in
     ///     return key.count == 3 && value.isNumber
     /// }
     ///
@@ -891,6 +891,12 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         try objectValue.compactMapValues(transform)
     }
 
+    /// Returns the result of combining the elements of the JSON array using the given closure.
+    /// - Parameters:
+    ///   - initialResult: The value to use as the initial accumulating value. `initialResult` is passed to `nextPartialResult` the first time the closure is executed.
+    ///   - nextPartialResult: A closure that combines an accumulating value and an element of the sequence into a new accumulating value, to be used in the next call of the `nextPartialResult` closure or returned to the caller.
+    /// - Returns: The final accumulated value. If the sequence has no elements, the result is `initialResult`.
+    /// - Throws: An error, if the JSON value is not an array, or of the `nextPartialResult` closure throws an error.
     public func reduce<Result>(
         _ initialResult: Result,
         _ nextPartialResult: (Result, JSON) throws -> Result
@@ -898,6 +904,12 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         try arrayValue.reduce(initialResult, nextPartialResult)
     }
 
+    /// Returns the result of combining the elements of the JSON array using the given closure.
+    /// - Parameters:
+    ///   - initialResult: The value to use as the initial accumulating value.
+    ///   - updateAccumulatingResult: A closure that updates the accumulating value with an element of the sequence.
+    /// - Returns: The final accumulated value. If the sequence has no elements, the result is `initialResult`.
+    /// - Throws: An error, if the JSON value is not an array, or of the `nextPartialResult` closure throws an error.
     public func reduce<Result>(
         into initialResult: Result,
         _ updateAccumulatingResult: (inout Result, JSON) throws -> Void
@@ -905,6 +917,12 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         try arrayValue.reduce(into: initialResult, updateAccumulatingResult)
     }
 
+    /// Returns the result of combining the elements of the JSON object using the given closure.
+    /// - Parameters:
+    ///   - initialResult: The value to use as the initial accumulating value. `initialResult` is passed to `nextPartialResult` the first time the closure is executed.
+    ///   - nextPartialResult: A closure that combines an accumulating value and an element of the sequence into a new accumulating value, to be used in the next call of the `nextPartialResult` closure or returned to the caller.
+    /// - Returns: The final accumulated value. If the sequence has no elements, the result is `initialResult`.
+    /// - Throws: An error, if the JSON value is not an object, or of the `nextPartialResult` closure throws an error.
     public func reduce<Result>(
         _ initialResult: Result,
         _ nextPartialResult: (Result, Object.Element) throws -> Result
@@ -912,6 +930,12 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         try objectValue.reduce(initialResult, nextPartialResult)
     }
 
+    /// Returns the result of combining the elements of the JSON object using the given closure.
+    /// - Parameters:
+    ///   - initialResult: The value to use as the initial accumulating value.
+    ///   - updateAccumulatingResult: A closure that updates the accumulating value with an element of the sequence.
+    /// - Returns: The final accumulated value. If the sequence has no elements, the result is `initialResult`.
+    /// - Throws: An error, if the JSON value is not an object, or of the `nextPartialResult` closure throws an error.
     public func reduce<Result>(
         into initialResult: Result,
         _ updateAccumulatingResult: (inout Result, Object.Element) throws -> Void
