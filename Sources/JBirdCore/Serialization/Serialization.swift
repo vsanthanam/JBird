@@ -329,7 +329,7 @@ extension JSON {
         return Data(bytes)
     }
 
-    #if swift(>=6.2)
+    #if swift(>=6.2) && hasFeature(NonisolatedNonsendingByDefault)
         @concurrent
         private static func startSerializationAsync(
             from json: JSON,
@@ -769,7 +769,7 @@ extension JSON {
         return json
     }
 
-    #if swift(>=6.2)
+    #if swift(>=6.2) && hasFeature(NonisolatedNonsendingByDefault)
         @concurrent
         private static func parseAsync(
             _ data: Data,
