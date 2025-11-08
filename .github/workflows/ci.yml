@@ -333,7 +333,28 @@ jobs:
           verbose: true
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-    
+  static-analyzer:
+    name: Run Static Analyzer
+    runs-on: macos-26
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Select Xcode Version
+        run: ./.scripts/xcode-select
+      - name: Analyze C parsing core
+        env:
+          DERIVED_DATA: ${{ runner.temp }}/analyzer-derived-data
+        run: |
+          set -eo pipefail
+          rm -rf "$DERIVED_DATA"
+          xcodebuild \
+            -project JBird.xcodeproj \
+            -scheme JBirdParser \
+            -configuration Debug \
+            -destination 'platform=macOS' \
+            -derivedDataPath "$DERIVED_DATA" \
+            clean analyze
+          rm -rf "$DERIVED_DATA"
   validate-pr:
     name: Validate Pull Request
     if: ${{ always() && github.event_name == 'pull_request' }}
@@ -351,6 +372,7 @@ jobs:
       - clang-format
       - lint-docc
       - coverage
+      - static-analyzer
     runs-on: ubuntu-latest
     steps:
       - name: Check upstream jobs
@@ -368,7 +390,8 @@ jobs:
             [[ "${{ needs.swiftformat.result }}" == "failure" ]] || \
             [[ "${{ needs.clang-format.result }}" == "failure" ]] || \
             [[ "${{ needs.lint-docc.result }}" == "failure" ]] || \
-            [[ "${{ needs.coverage.result }}" == "failure" ]]; then
+            [[ "${{ needs.coverage.result }}" == "failure" ]] || \
+            [[ "${{ needs.static-analyzer.result }}" == "failure" ]]; then
             echo "❌ Upstream job failed."
             exit 1
           else
