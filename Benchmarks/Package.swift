@@ -49,7 +49,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/ordo-one/package-benchmark",
-            exact: "1.29.4"
+            exact: "1.29.6"
         ),
         jbird,
         .package(
