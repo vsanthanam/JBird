@@ -5,19 +5,15 @@
     @CallToAction(url: "https://www.github.com/vsanthanam/JBird", purpose: link, label: "View on GitHub")
 }
 
-Add JBird to an existing project
+## Basic Setup
 
-## Add to an Xcode Project via SPM
+### Add to an Xcode Project via Swift Package Manager
 
-To add JBird as a dependency to an Xcode Project, open the project in Xcode and perform the following steps:
+To add JBird to an existing Xcode project, open the project and choose `File` → `Add Packages...`. Enter `https://github.com/vsanthanam/JBird.git`, pick the desired release, and select the required products.
 
-1. Choose `File` → `Add Packages...`
+### Add to a Swift Package
 
-2. Enter package URL `https://github.com/vsanthanam/JBird.git` and select your release and product of choice.
-
-## Add to a Swift Package
-
-To add JBird as a dependency to an existing Swift package, add the following line of code to the `dependencies` parameter of your `Package.swift` file:
+Add the package reference to the `dependencies` parameter of `Package.swift`:
 
 ```swift
 dependencies: [
@@ -28,7 +24,7 @@ dependencies: [
 ]
 ```
 
-Then, add the dependency to your target:
+Then declare `JBird` (or any specific product) as a target dependency:
 
 ```swift
 .target(
@@ -39,48 +35,70 @@ Then, add the dependency to your target:
 )
 ```
 
-### Smaller Sub-modules
+## Advanced Setup
 
-JBird uses macros, custom infix operators, and result builders, all of which can add considerably time to your builds. This will be fine for many projects, but if you intentionally do not want the overhead of theses features, you can depend three smaller modules:
+JBird is intentionally divided into smaller modules so you can opt into advanced language features only when you need them. Macros, custom infix operators, and result builders can lengthen build times or increase code size, so each capability sits behind its own target:
 
-- `JBirdCore`, which features the core JBird API
-- `JBirdBuilders`, which features a declarative API for composing JSON values directly in Swift. *This module depends on `JBirdCore`.*
-- `JBirdMacros`, which enables the compiler to automatically implement `JSONCodable` conformance for your custom Swift types. *This module depends on `JBirdCore`, `JBirdBuilders`, and `SwiftSyntax`*
+- `JBirdCore` supplies the runtime types, parser, and serializer and is always required.
+- `JBirdBuilders` adds declarative builders and operators. *Depends on `JBirdCore`.*
+- `JBirdMacros` provides the `JSONCodable` synthesis macros. *Depends on `JBirdCore`, `JBirdBuilders`, and the macro compiler plugin.*
 
-If you depend on `JBird`, you will get all three of these modules automatically, but if you want to depend on them individually, you can use explicitly call out the products that you want to use in your `Package.swift` files:
+The `JBird` product re-exports all three so you can import the umbrella module when you want the entire surface area, or reference individual products to stay lean.
+
+### Swift Package Traits
+
+JBird publishes two traits: `DeclarativeAPI` (which controls `JBirdBuilders`) and `ConformanceMacros` (which controls `JBirdMacros`). Both are enabled by the package’s default trait, so you keep importing the umbrella product but configure its features on the dependency declaration:
 
 ```swift
-.target(
-    name: "YourTarget",
+let package = Package(
+    name: "YourPackage",
     dependencies: [
-        .product(name: "JBirdCore", package: "JBird"),
-        .product(name: "JBirdBuilders", package: "JBird")
+        .package(
+            url: "https://github.com/vsanthanam/JBird.git",
+            from: "1.5.3",
+            traits: [
+                .defaults // Enables `DeclarativeAPI` and `ConformanceMacros`. Alternatively, you could explicit opt into only `DeclarativeAPI`, only `ConformanceMacros`, or neither.
+            ]
+        )
+    ],
+    targets: [
+        .target(
+            name: "YourTarget",
+            dependencies: [
+                .product(name: "JBird", package: "JBird")
+            ]
+        )
     ]
 )
 ```
 
-## Binary Distribution via XCFramework
+Replace `.defaults` with a smaller set to trim functionality—for example, `traits: ["DeclarativeAPI"]` keeps the declarative API but leaves macros disabled, and an empty set limits the dependency to `JBirdCore`. Traits are evaluated only for SwiftPM clients; XCFramework and source-based consumers still declare the modules they embed.
 
-JBirdCore and JBirdBuilders are available as precompiled XCFrameworks for macOS, iOS, watchOS, tvOS, and visionOS. You can download an XCFramework for a particular version of JBird from the [GitHub Releases](https://github.com/vsanthanam/JBird/release) page. To build the framework from source, you can clone the repository, and run the built-in script:
+- Note: Packagge traits are only support from Swift 6.1 and newer. For consumers who are using Swift 6.0, declare the products you need for each target dependency. Import `JBird` for the umbrella API, or reference products such as `.product(name: "JBirdCore", package: "JBird")` and `.product(name: "JBirdBuilders", package: "JBird")` directly to avoid shipping macros or builders.
+
+### Binary distribution via XCFramework
+
+`JBird`, `JBirdCore` and `JBirdBuilders` are shipped as precompiled XCFrameworks for macOS, iOS, watchOS, tvOS, and visionOS. Download the artifacts from [GitHub Releases](https://github.com/vsanthanam/JBird/releases) or create them locally using the provided script:
 
 ```shell
-$ path/to/jbird/repo
-$ ./.scripts/build-xcframework JBirdCore
+$ cd path/to/JBird
+$ ./.scripts/build-xcframework <module_name>
 ```
 
-By default, the script creates a dynamic framework that builds for all supported Apple platforms. You can force a static framework by using the `--static` flag. You can specifiy specific platforms to include with the `--platforms` flag. 
+The script produces dynamic frameworks for every supported Apple platform by default. Use `--static` for static libraries and `--platforms` to restrict the build for particular Apple platformns. XCFrameworks do not support Swift macros, so `JBirdMacros` is unavailable in this format.
 
-*Note: You can only use the script to build either `JBird`, `JBirdCore` or `JBirdBuilders`. If you depend on `JBird`, you must also depend on `JBirdCore` and `JBirdBuilders`, since `JBird` is just an `@_exported` shim of the smaller modules. The `JBirdMacros` module is not supported, because Swift macros cannot be distributed via XCFramework.*
+You can run the same script for `JBird`, `JBirdCore` or `JBirdBuilders`. Because `JBird` is an `@_exported` shim, any consumer of that XCFramework should also embed the `JBirdCore` and `JBirdBuilders` frameworks that it re-exports.
 
-## Clone from Source
+### Compile from source
 
-To add JBird source code directly without any intermediary, you can clone the repository directly from GitHub:
+Clone the repository or fetch a release archive to work directly with the sources:
 
 ```shell
 $ git clone https://github.com/vsanthanam/JBird.git
 ```
 
-From there, you can copy the contents of `JBirdCore` and `JBirdParser` to the destination of your choice. You can optionally copy the contents of `JBirdBuilders` or `JBirdMacros`, if you want those features as well.
+Copy the `Sources/JBirdCore` and `Sources/JBirdParser` directories into your project to use the core runtime. Include `Sources/JBirdBuilders` if you need the declarative builders, and `Sources/JBirdMacros` plus the compiler plugin targets if you plan to compile macros yourself. As with XCFramework consumption, choose whether to import the umbrella module or the individual targets based on the features you require.
+
 You can also download a specific version of the package from the [GitHub Releases](https://github.com/vsanthanam/JBird/releases) page, or from the [Swift Package Index](https://swiftpackageindex.com/vsanthanam/JBird).
 
 @Small {
