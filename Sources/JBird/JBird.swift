@@ -23,7 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#if SWIFT_PACKAGE
+#if SWIFT_PACKAGE && swift(>=6.1)
     @_exported import JBirdCore
 
     #if DeclarativeAPI
