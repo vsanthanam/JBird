@@ -1118,7 +1118,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     #if canImport(Darwin)
-        #if swift(>=6.2)
+        #if swift(>=6.2) && hasFeature(NonisolatedNonsendingByDefault)
             /// Write the JSON model to disk
             /// - Parameters:
             ///   - fileURL: The file URL to write to
