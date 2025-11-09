@@ -103,6 +103,28 @@ jobs:
       run: ./.scripts/xcode-select ${{ matrix.xcode }}
     - name: Build JBird for macOS ${{ matrix.version }}
       run: ./.scripts/build-macos-xcode JBird ${{ matrix.version }}
+  build-visionos-xcode:
+    name: Build JBird (visionOS)
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ["26.0", "2.6", "1.7"]
+        swift: ["6.2", "6.1"]
+        include:
+          - swift: "6.2"
+            runner: macos-26
+            xcode: "26.0"
+          - swift: "6.1"
+            runner: macos-15
+            xcode: "16.4"
+    runs-on: ${{ matrix.runner }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Select Xcode Version
+      run: ./.scripts/xcode-select ${{ matrix.xcode }}
+    - name: Build JBird for visionOS ${{ matrix.version }}
+      run: ./.scripts/build-visionos-xcode JBird ${{ matrix.version }}
   swiftformat:
     name: Run SwiftFormat 
     runs-on: macos-26
@@ -423,6 +445,7 @@ jobs:
       - build-tvos-xcode
       - build-watchos-xcode
       - build-macos-xcode
+      - build-visionos-xcode
       - build-macos-spm
       - test-macos-spm
       - build-ubuntu-spm
@@ -445,6 +468,7 @@ jobs:
             [[ "${{ needs.build-tvos-xcode.result }}" == "failure" ]] || \
             [[ "${{ needs.build-watchos-xcode.result }}" == "failure" ]] || \
             [[ "${{ needs.build-macos-xcode.result }}" == "failure" ]] || \
+            [[ "${{ needs.build-visionos-xcode.result }}" == "failure" ]] || \
             [[ "${{ needs.build-macos-spm.result }}" == "failure" ]] || \
             [[ "${{ needs.test-macos-spm.result }}" == "failure" ]] || \
             [[ "${{ needs.build-ubuntu-spm.result }}" == "failure" ]] || \
