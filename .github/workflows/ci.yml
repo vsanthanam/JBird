@@ -37,10 +37,6 @@ jobs:
       run: ./.scripts/xcode-select ${{ matrix.xcode }}
     - name: Build JBird for iOS ${{ matrix.version }}
       run: ./.scripts/build-ios-xcode JBird ${{ matrix.version }}
-    - name: Build JBirdCore for iOS ${{ matrix.version }}
-      run: ./.scripts/build-ios-xcode JBirdCore ${{ matrix.version }}
-    - name: Build JBirdBuilders for iOS ${{ matrix.version }}
-      run: ./.scripts/build-ios-xcode JBirdBuilders ${{ matrix.version }}
   build-tvos-xcode:
     name: Build JBird (tvOS)
     strategy:
@@ -63,10 +59,6 @@ jobs:
       run: ./.scripts/xcode-select ${{ matrix.xcode }}
     - name: Build JBird for tvOS ${{ matrix.version }}
       run: ./.scripts/build-tvos-xcode JBird ${{ matrix.version }}
-    - name: Build JBirdCore for tvOS ${{ matrix.version }}
-      run: ./.scripts/build-tvos-xcode JBirdCore ${{ matrix.version }}
-    - name: Build JBirdBuilders for tvOS ${{ matrix.version }}
-      run: ./.scripts/build-tvos-xcode JBirdBuilders ${{ matrix.version }}
   build-watchos-xcode:
     name: Build JBird (watchOS)
     strategy:
@@ -89,10 +81,28 @@ jobs:
       run: ./.scripts/xcode-select ${{ matrix.xcode }}
     - name: Build JBird for watchOS ${{ matrix.version }}
       run: ./.scripts/build-watchos-xcode JBird ${{ matrix.version }}
-    - name: Build JBirdCore for watchOS ${{ matrix.version }}
-      run: ./.scripts/build-watchos-xcode JBirdCore ${{ matrix.version }}
-    - name: Build JBirdBuilders for watchOS ${{ matrix.version }}
-      run: ./.scripts/build-watchos-xcode JBirdBuilders ${{ matrix.version }}
+  build-macos-xcode:
+    name: Build JBird (macOS)
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ["26.0", "15.6", "14.7", "13.6", "12.7"]
+        swift: ["6.2", "6.1"]
+        include:
+          - swift: "6.2"
+            runner: macos-26
+            xcode: "26.0"
+          - swift: "6.1"
+            runner: macos-15
+            xcode: "16.4"
+    runs-on: ${{ matrix.runner }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Select Xcode Version
+      run: ./.scripts/xcode-select ${{ matrix.xcode }}
+    - name: Build JBird for macOS ${{ matrix.version }}
+      run: ./.scripts/build-macos-xcode JBird ${{ matrix.version }}
   swiftformat:
     name: Run SwiftFormat 
     runs-on: macos-26
@@ -412,6 +422,7 @@ jobs:
       - build-ios-xcode
       - build-tvos-xcode
       - build-watchos-xcode
+      - build-macos-xcode
       - build-macos-spm
       - test-macos-spm
       - build-ubuntu-spm
@@ -432,6 +443,8 @@ jobs:
           # If any job failed, this status will not be 'success'
           if [[ "${{ needs.build-ios-xcode.result }}" == "failure" ]] || \
             [[ "${{ needs.build-tvos-xcode.result }}" == "failure" ]] || \
+            [[ "${{ needs.build-watchos-xcode.result }}" == "failure" ]] || \
+            [[ "${{ needs.build-macos-xcode.result }}" == "failure" ]] || \
             [[ "${{ needs.build-macos-spm.result }}" == "failure" ]] || \
             [[ "${{ needs.test-macos-spm.result }}" == "failure" ]] || \
             [[ "${{ needs.build-ubuntu-spm.result }}" == "failure" ]] || \
