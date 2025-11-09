@@ -62,8 +62,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["26.0", "15.5", "14.5"]
-        # swift: ["6.2", "6.1"]
+        version: ["26.0", "15.5"]
         include:
           - version: "26.0"
             runner: macos-26
@@ -71,9 +70,6 @@ jobs:
           - version: "15.5"
             runner: macos-15
             xcode: "16.4"
-          - version: "14.5"
-            runner: macos-14
-            xcode: "15.4"
     runs-on: ${{ matrix.runner }}
     steps:
     - name: Checkout
@@ -84,18 +80,17 @@ jobs:
       run: xcodebuild -showsdks | grep macosx
     - name: Build JBird for macOS ${{ matrix.version }}
       run: ./.scripts/build-macos-xcode JBird ${{ matrix.version }}
-  build-visionos-xcode:
-    name: Build JBird (visionOS)
+  build-maccatalyst-xcode:
+    name: Build JBird (Mac Catalyst)
     strategy:
       fail-fast: false
       matrix:
-        version: ["26.0", "2.6", "1.7"]
-        swift: ["6.2", "6.1"]
+        version: ["26.0", "15.5"]
         include:
-          - swift: "6.2"
+          - version: "26.0"
             runner: macos-26
             xcode: "26.0"
-          - swift: "6.1"
+          - version: "15.5"
             runner: macos-15
             xcode: "16.4"
     runs-on: ${{ matrix.runner }}
@@ -104,6 +99,22 @@ jobs:
       uses: actions/checkout@v4
     - name: Select Xcode Version
       run: ./.scripts/xcode-select ${{ matrix.xcode }}
+    - name: List SDKs
+      run: xcodebuild -showsdks | grep macosx
+    - name: Build JBird for Mac Catalyst ${{ matrix.version }}
+      run: ./.scripts/build-maccatalyst-xcode JBird ${{ matrix.version }}
+  build-visionos-xcode:
+    name: Build JBird (visionOS)
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ["26.0", "2.6", "1.7"]
+    runs-on: macos-26
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Select Xcode Version
+      run: ./.scripts/xcode-select 26.0
     - name: Build JBird for visionOS ${{ matrix.version }}
       run: ./.scripts/build-visionos-xcode JBird ${{ matrix.version }}
   swiftformat:

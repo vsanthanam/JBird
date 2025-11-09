@@ -3,7 +3,7 @@
 xcodebuild \
   -scheme $1 \
   -configuration Release \
-  -sdk macosx \
+  -sdk macosx$2 \
   -destination 'platform=macOS,variant=Mac Catalyst' \
   BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
   MACOSX_DEPLOYMENT_TARGET=12.0 \
