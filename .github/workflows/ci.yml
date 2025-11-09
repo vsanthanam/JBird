@@ -21,20 +21,12 @@ jobs:
       fail-fast: false
       matrix:
         version: ["26.0", "18.6", "17.7", "16.6", "15.7"]
-        swift: ["6.2", "6.1"]
-        include:
-          - swift: "6.2"
-            runner: macos-26
-            xcode: "26.0"
-          - swift: "6.1"
-            runner: macos-15
-            xcode: "16.4"
-    runs-on: ${{ matrix.runner }}
+    runs-on: macos-26
     steps:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Select Xcode Version
-      run: ./.scripts/xcode-select ${{ matrix.xcode }}
+      run: ./.scripts/xcode-select 26.0
     - name: Build JBird for iOS ${{ matrix.version }}
       run: ./.scripts/build-ios-xcode JBird ${{ matrix.version }}
   build-tvos-xcode:
@@ -43,20 +35,12 @@ jobs:
       fail-fast: false
       matrix:
         version: ["26.0", "18.6", "17.7", "16.6", "15.7"]
-        swift: ["6.2", "6.1"]
-        include:
-          - swift: "6.2"
-            runner: macos-26
-            xcode: "26.0"
-          - swift: "6.1"
-            runner: macos-15
-            xcode: "16.4"
-    runs-on: ${{ matrix.runner }}
+    runs-on: macos-26
     steps:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Select Xcode Version
-      run: ./.scripts/xcode-select ${{ matrix.xcode }}
+      run: ./.scripts/xcode-select 26.0
     - name: Build JBird for tvOS ${{ matrix.version }}
       run: ./.scripts/build-tvos-xcode JBird ${{ matrix.version }}
   build-watchos-xcode:
@@ -65,20 +49,12 @@ jobs:
       fail-fast: false
       matrix:
         version: ["26.0", "11.6", "10.7", "9.6", "8.7"]
-        swift: ["6.2", "6.1"]
-        include:
-          - swift: "6.2"
-            runner: macos-26
-            xcode: "26.0"
-          - swift: "6.1"
-            runner: macos-15
-            xcode: "16.4"
-    runs-on: ${{ matrix.runner }}
+    runs-on: macos-26
     steps:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Select Xcode Version
-      run: ./.scripts/xcode-select ${{ matrix.xcode }}
+      run: ./.scripts/xcode-select 26.0
     - name: Build JBird for watchOS ${{ matrix.version }}
       run: ./.scripts/build-watchos-xcode JBird ${{ matrix.version }}
   build-macos-xcode:
@@ -86,21 +62,26 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["26.0", "15.6", "14.7", "13.6", "12.7"]
-        swift: ["6.2", "6.1"]
+        version: ["26.0", "15.5", "14.5"]
+        # swift: ["6.2", "6.1"]
         include:
-          - swift: "6.2"
+          - version: "26.0"
             runner: macos-26
             xcode: "26.0"
-          - swift: "6.1"
+          - version: "15.5"
             runner: macos-15
             xcode: "16.4"
+          - version: "14.5"
+            runner: macos-14
+            xcode: "15.4"
     runs-on: ${{ matrix.runner }}
     steps:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Select Xcode Version
       run: ./.scripts/xcode-select ${{ matrix.xcode }}
+    - name: List SDKs
+      run: xcodebuild -showsdks | grep macosx
     - name: Build JBird for macOS ${{ matrix.version }}
       run: ./.scripts/build-macos-xcode JBird ${{ matrix.version }}
   build-visionos-xcode:
@@ -276,7 +257,7 @@ jobs:
           name: windows-build-${{ matrix.swift }}
           path: build.zip
   test-windows-spm:
-    name: Test JBird (Windows)
+    name: Test  (Windows)
     strategy:
       fail-fast: false
       matrix:
