@@ -15,34 +15,108 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  build-xcode:
+  build-ios-xcode:
+    name: Build JBird (iOS)
     strategy:
       fail-fast: false
       matrix:
-        platform: ['macos', 'maccatalyst', 'ios', 'watchos', 'tvos', 'visionos']
-        include:
-          - platform: 'macos'
-            name: 'macOS'
-          - platform: 'maccatalyst'
-            name: 'Mac Catalyst'
-          - platform: 'ios'
-            name: 'iOS'
-          - platform: 'watchos'
-            name: 'watchOS'
-          - platform: 'tvos'
-            name: 'tvOS'
-          - platform: 'visionos'
-            name: 'visionOS'
-        scheme: [JBird, JBirdCore, JBirdBuilders]
-    name: Build with Xcode (${{ matrix.scheme }}, ${{ matrix.name }})
+        version: ["26.0", "18.6", "17.7", "16.6", "15.7"]
     runs-on: macos-26
     steps:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Select Xcode Version
-      run: ./.scripts/xcode-select
-    - name: Build ${{ matrix.scheme }} for ${{ matrix.name }}
-      run: ./.scripts/build-${{ matrix.platform }}-xcode ${{ matrix.scheme }}
+      run: ./.scripts/xcode-select 26.0
+    - name: Build JBird for iOS ${{ matrix.version }}
+      run: ./.scripts/build-ios-xcode JBird ${{ matrix.version }}
+  build-tvos-xcode:
+    name: Build JBird (tvOS)
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ["26.0", "18.6", "17.7", "16.6", "15.7"]
+    runs-on: macos-26
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Select Xcode Version
+      run: ./.scripts/xcode-select 26.0
+    - name: Build JBird for tvOS ${{ matrix.version }}
+      run: ./.scripts/build-tvos-xcode JBird ${{ matrix.version }}
+  build-watchos-xcode:
+    name: Build JBird (watchOS)
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ["26.0", "11.6", "10.7", "9.6", "8.7"]
+    runs-on: macos-26
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Select Xcode Version
+      run: ./.scripts/xcode-select 26.0
+    - name: Build JBird for watchOS ${{ matrix.version }}
+      run: ./.scripts/build-watchos-xcode JBird ${{ matrix.version }}
+  build-macos-xcode:
+    name: Build JBird (macOS)
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ["26.0", "15.5"]
+        include:
+          - version: "26.0"
+            runner: macos-26
+            xcode: "26.0"
+          - version: "15.5"
+            runner: macos-15
+            xcode: "16.4"
+    runs-on: ${{ matrix.runner }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Select Xcode Version
+      run: ./.scripts/xcode-select ${{ matrix.xcode }}
+    - name: List SDKs
+      run: xcodebuild -showsdks | grep macosx
+    - name: Build JBird for macOS ${{ matrix.version }}
+      run: ./.scripts/build-macos-xcode JBird ${{ matrix.version }}
+  build-maccatalyst-xcode:
+    name: Build JBird (Mac Catalyst)
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ["26.0", "15.5"]
+        include:
+          - version: "26.0"
+            runner: macos-26
+            xcode: "26.0"
+          - version: "15.5"
+            runner: macos-15
+            xcode: "16.4"
+    runs-on: ${{ matrix.runner }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Select Xcode Version
+      run: ./.scripts/xcode-select ${{ matrix.xcode }}
+    - name: List SDKs
+      run: xcodebuild -showsdks | grep macosx
+    - name: Build JBird for Mac Catalyst ${{ matrix.version }}
+      run: ./.scripts/build-maccatalyst-xcode JBird ${{ matrix.version }}
+  build-visionos-xcode:
+    name: Build JBird (visionOS)
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ["26.0", "2.6", "1.7"]
+    runs-on: macos-26
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Select Xcode Version
+      run: ./.scripts/xcode-select 26.0
+    - name: Build JBird for visionOS ${{ matrix.version }}
+      run: ./.scripts/build-visionos-xcode JBird ${{ matrix.version }}
   swiftformat:
     name: Run SwiftFormat 
     runs-on: macos-26
@@ -194,7 +268,7 @@ jobs:
           name: windows-build-${{ matrix.swift }}
           path: build.zip
   test-windows-spm:
-    name: Test JBird (Windows)
+    name: Test  (Windows)
     strategy:
       fail-fast: false
       matrix:
@@ -221,7 +295,7 @@ jobs:
       - name: Test JBird
         run: swift test --disable-xctest --skip-build
   build-wasm-spm:
-    name: Build JBird (WASM)
+    name: Build JBird (WebAssembly)
     strategy:
       fail-fast: false
       matrix:
@@ -287,11 +361,11 @@ jobs:
     - name: Validate Documentation
       run: ./.scripts/lint-docc
   build-xcframework:
+    name: Build XCFrameworks
     strategy:
       fail-fast: false
       matrix:
         target: [JBird, JBirdCore, JBirdBuilders]
-    name: Build XCFramework (${{ matrix.target }})
     runs-on: macos-26
     steps:
     - name: Checkout
@@ -359,7 +433,11 @@ jobs:
     name: Validate Pull Request
     if: ${{ always() && github.event_name == 'pull_request' }}
     needs:
-      - build-xcode
+      - build-ios-xcode
+      - build-tvos-xcode
+      - build-watchos-xcode
+      - build-macos-xcode
+      - build-visionos-xcode
       - build-macos-spm
       - test-macos-spm
       - build-ubuntu-spm
@@ -378,7 +456,11 @@ jobs:
       - name: Check upstream jobs
         run: |
           # If any job failed, this status will not be 'success'
-          if [[ "${{ needs.build-xcode.result }}" == "failure" ]] || \
+          if [[ "${{ needs.build-ios-xcode.result }}" == "failure" ]] || \
+            [[ "${{ needs.build-tvos-xcode.result }}" == "failure" ]] || \
+            [[ "${{ needs.build-watchos-xcode.result }}" == "failure" ]] || \
+            [[ "${{ needs.build-macos-xcode.result }}" == "failure" ]] || \
+            [[ "${{ needs.build-visionos-xcode.result }}" == "failure" ]] || \
             [[ "${{ needs.build-macos-spm.result }}" == "failure" ]] || \
             [[ "${{ needs.test-macos-spm.result }}" == "failure" ]] || \
             [[ "${{ needs.build-ubuntu-spm.result }}" == "failure" ]] || \
@@ -392,7 +474,7 @@ jobs:
             [[ "${{ needs.lint-docc.result }}" == "failure" ]] || \
             [[ "${{ needs.coverage.result }}" == "failure" ]] || \
             [[ "${{ needs.static-analyzer.result }}" == "failure" ]]; then
-            echo "❌ Upstream job failed."
+            echo "❌ Required job failed."
             exit 1
           else
             echo "✅ All required jobs completed successfully."

@@ -1148,11 +1148,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             ///   - fileURL: The file URL to write to
             ///   - options: Serialization options to use when writing the JSON model to disk
             ///   - shouldOverwrite: Whether or not existing content should be overwritten
-            @available(macOS 13.0, macCatalyst 16.0, *)
-            @available(iOS, unavailable)
-            @available(watchOS, unavailable)
-            @available(tvOS, unavailable)
-            @available(visionOS, unavailable)
+            @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *)
             @discardableResult
             @concurrent
             public func write(
@@ -1186,11 +1182,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             ///   - fileURL: The file URL to write to
             ///   - options: Serialization options to use when writing the JSON model to disk
             ///   - shouldOverwrite: Whether or not existing content should be overwritten
-            @available(macOS 13.0, macCatalyst 16.0, *)
-            @available(iOS, unavailable)
-            @available(watchOS, unavailable)
-            @available(tvOS, unavailable)
-            @available(visionOS, unavailable)
+            @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *)
             @discardableResult
             public func write(
                 fileURL: URL,
