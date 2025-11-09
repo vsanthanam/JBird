@@ -6,6 +6,7 @@ xcodebuild \
   -sdk iphoneos \
   -destination 'generic/platform=iOS' \
   BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
+  IPHONEOS_DEPLOYMENT_TARGET=15.0 \
   SKIP_INSTALL=NO \
   CODE_SIGN_IDENTITY="" \
   CODE_SIGNING_REQUIRED=NO \
