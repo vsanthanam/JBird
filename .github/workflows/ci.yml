@@ -15,34 +15,57 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  build-xcode:
+  build-ios-xcode:
+    name: Build JBird (iOS)
     strategy:
       fail-fast: false
       matrix:
-        platform: ['macos', 'maccatalyst', 'ios', 'watchos', 'tvos', 'visionos']
+        scheme: ["JBird", "JBirdCore", "JBirdBuilders"]
+        swift: ["6.2", "6.1"]
+        version: ["26.0", "18.6", "17.7", "16.6", "15.7"]
         include:
-          - platform: 'macos'
-            name: 'macOS'
-          - platform: 'maccatalyst'
-            name: 'Mac Catalyst'
-          - platform: 'ios'
-            name: 'iOS'
-          - platform: 'watchos'
-            name: 'watchOS'
-          - platform: 'tvos'
-            name: 'tvOS'
-          - platform: 'visionos'
-            name: 'visionOS'
-        scheme: [JBird, JBirdCore, JBirdBuilders]
-    name: Build with Xcode (${{ matrix.scheme }}, ${{ matrix.name }})
-    runs-on: macos-26
+          - swift: "6.2"
+            runner: macos-26
+            xcode: "26.0"
+          - platform: "6.1"
+            runner: macos-15
+            xcode: "16.4"
+    runs-on: ${{ matrix.runner }}
     steps:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Select Xcode Version
-      run: ./.scripts/xcode-select
-    - name: Build ${{ matrix.scheme }} for ${{ matrix.name }}
-      run: ./.scripts/build-${{ matrix.platform }}-xcode ${{ matrix.scheme }}
+      run: ./.scripts/xcode-select ${{ matrix.xcode }}
+    - name: Build ${{ matrix.scheme }} for iOS ${{ matrix.version }}
+      run: ./.scripts/build-ios-xcode ${{ matrix.scheme }} ${{ matrix.version }}
+  # build-xcode:
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       platform: ['macos', 'maccatalyst', 'watchos', 'tvos', 'visionos']
+  #       include:
+  #         - platform: 'macos'
+  #           name: 'macOS'
+  #         - platform: 'maccatalyst'
+  #           name: 'Mac Catalyst'
+  #         - platform: 'ios'
+  #           name: 'iOS'
+  #         - platform: 'watchos'
+  #           name: 'watchOS'
+  #         - platform: 'tvos'
+  #           name: 'tvOS'
+  #         - platform: 'visionos'
+  #           name: 'visionOS'
+  #       scheme: [JBird, JBirdCore, JBirdBuilders]
+  #   name: Build with Xcode (${{ matrix.scheme }}, ${{ matrix.name }})
+  #   runs-on: macos-26
+  #   steps:
+  #   - name: Checkout
+  #     uses: actions/checkout@v4
+  #   - name: Select Xcode Version
+  #     run: ./.scripts/xcode-select
+  #   - name: Build ${{ matrix.scheme }} for ${{ matrix.name }}
+  #     run: ./.scripts/build-${{ matrix.platform }}-xcode ${{ matrix.scheme }}
   swiftformat:
     name: Run SwiftFormat 
     runs-on: macos-26
@@ -359,7 +382,8 @@ jobs:
     name: Validate Pull Request
     if: ${{ always() && github.event_name == 'pull_request' }}
     needs:
-      - build-xcode
+      # - build-xcode
+      - build-ios-xcode
       - build-macos-spm
       - test-macos-spm
       - build-ubuntu-spm

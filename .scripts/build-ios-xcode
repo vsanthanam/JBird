@@ -1,10 +1,10 @@
 #!/bin/bash
 
 xcodebuild \
-  -scheme $1 \
+  -scheme "$1" \
   -configuration Release \
-  -sdk iphoneos \
-  -destination 'generic/platform=iOS' \
+  -sdk iphonesimulator \
+  -destination "generic/platform=iOS Simulator,OS=$2" \
   BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
   IPHONEOS_DEPLOYMENT_TARGET=15.0 \
   SKIP_INSTALL=NO \
