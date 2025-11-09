@@ -3,8 +3,8 @@
 xcodebuild \
   -scheme $1 \
   -configuration Release \
-  -sdk watchos \
-  -destination 'generic/platform=watchOS' \
+  -sdk watchsimulator \
+  -destination "generic/platform=watchOS Simulator,OS=$2" \
   BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
   WATCHOS_DEPLOYMENT_TARGET=8.0 \
   SKIP_INSTALL=NO \
