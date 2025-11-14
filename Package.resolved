@@ -1,5 +1,5 @@
 {
-  "originHash" : "989a4c52b16fcf1a5a82dc6301044d9ce144ad1b6e9c47d55bf510965a7c3dc5",
+  "originHash" : "65c4c5fcb1167393faa49e7164352ae22f76dc2ca471a4f3d47a5ed7da60b7e2",
   "pins" : [
     {
       "identity" : "swift-docc-plugin",
@@ -33,8 +33,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/nicklockwood/SwiftFormat.git",
       "state" : {
-        "revision" : "9c82dcb15307ba06795d31788d3467d9a375e3e7",
-        "version" : "0.58.5"
+        "revision" : "e6fe3e445b95bca110da34e42c15d7c23ecef29a",
+        "version" : "0.58.6"
       }
     }
   ],
