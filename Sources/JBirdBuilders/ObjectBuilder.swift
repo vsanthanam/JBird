@@ -42,7 +42,7 @@ extension JSON {
 
         public static func buildExpression(
             _ expression: Void
-        ) -> [(String, JSON)] {
+        ) -> [(JSON.Key, JSON)] {
             []
         }
 
@@ -51,67 +51,67 @@ extension JSON {
         ) -> Never {}
 
         public static func buildExpression(
-            _ expression: (String, JSON)
-        ) -> [(String, JSON)] {
+            _ expression: (JSON.Key, JSON)
+        ) -> [(JSON.Key, JSON)] {
             [expression]
         }
 
         @_disfavoredOverload
-        public static func buildExpression<T>(
-            _ expression: (String, T)
-        ) -> [(String, JSON)] where T: JSONEncodable {
+        public static func buildExpression<Key, Value>(
+            _ expression: (Key, Value)
+        ) -> [(JSON.Key, JSON)] where Key: JSONKeyCodable, Value: JSONEncodable {
             let (key, value) = expression
-            return [(key, JSON(value))]
+            return [(JSON.Key(key), JSON(value))]
         }
 
-        public static func buildBlock() -> [(String, JSON)] {
+        public static func buildBlock() -> [(JSON.Key, JSON)] {
             []
         }
 
         public static func buildExpression(
             _ expression: Object
-        ) -> [(String, JSON)] {
+        ) -> [(JSON.Key, JSON)] {
             expression.map(\.self)
         }
 
         public static func buildBlock(
-            _ components: [(String, JSON)]
-        ) -> [(String, JSON)] {
+            _ components: [(JSON.Key, JSON)]
+        ) -> [(JSON.Key, JSON)] {
             components
         }
 
         public static func buildBlock(
-            _ components: [(String, JSON)]...
-        ) -> [(String, JSON)] {
+            _ components: [(JSON.Key, JSON)]...
+        ) -> [(JSON.Key, JSON)] {
             components.flatMap(\.self)
         }
 
         public static func buildEither(
-            first component: [(String, JSON)]
-        ) -> [(String, JSON)] {
+            first component: [(JSON.Key, JSON)]
+        ) -> [(JSON.Key, JSON)] {
             component
         }
 
         public static func buildEither(
-            second component: [(String, JSON)]
-        ) -> [(String, JSON)] {
+            second component: [(JSON.Key, JSON)]
+        ) -> [(JSON.Key, JSON)] {
             component
         }
 
         public static func buildOptional(
-            _ component: [(String, JSON)]?
-        ) -> [(String, JSON)] {
+            _ component: [(JSON.Key, JSON)]?
+        ) -> [(JSON.Key, JSON)] {
             component ?? []
         }
 
         public static func buildArray(
-            _ components: [[(String, JSON)]]
-        ) -> [(String, JSON)] {
+            _ components: [[(JSON.Key, JSON)]]
+        ) -> [(JSON.Key, JSON)] {
             components.flatMap(\.self)
         }
 
         public static func buildFinalResult(
-            _ component: [(String, JSON)]
+            _ component: [(JSON.Key, JSON)]
         ) -> JSON {
             let dict = component.reduce(into: Object()) { prev, pair in
                 let (key, value) = pair

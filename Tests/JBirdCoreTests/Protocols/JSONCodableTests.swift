@@ -263,9 +263,14 @@ struct JSONCodableTests {
     @Suite("Dictionary Conformance Tests")
     struct DictionaryTests {
 
+        enum CustomKey: String, JSONKeyCodable {
+            case foo
+            case bar
+        }
+
         @Test("Dictionary Encode")
         func dictionaryEncode() {
-            let dictionary = ["foo": true, "bar": false]
+            let dictionary = [CustomKey.foo: true, CustomKey.bar: false]
             let json = dictionary.encodeToJSON()
             #expect(json == .object(["foo": .literal(.true), "bar": .literal(.false)]))
         }
@@ -273,8 +278,8 @@ struct JSONCodableTests {
         @Test("Dictionary Decode")
         func dictionaryDecode() throws {
             let json = JSON.object(["foo": .literal(.true), "bar": .literal(.false)])
-            let dictionary = try json.decode(into: [String: Bool].self)
-            #expect(dictionary == ["foo": true, "bar": false])
+            let dictionary = try json.decode(into: [CustomKey: Bool].self)
+            #expect(dictionary == [.foo: true, .bar: false])
         }
 
     }

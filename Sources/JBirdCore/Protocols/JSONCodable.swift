@@ -185,19 +185,26 @@ extension Array: JSONDecodable where Element: JSONDecodable {
 }
 
 @available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
-extension Dictionary: JSONEncodable where Key == String, Value: JSONEncodable {
+extension Dictionary: JSONEncodable where Key: JSONKeyEncodable, Value: JSONEncodable {
 
     public func encodeToJSON() -> JSON {
-        .object(mapValues { value in JSON(value) })
+        let dict = reduce(into: JSON.Object()) { object, pair in
+            let (key, value) = pair
+            object[JSON.Key(key)] = JSON(value)
+        }
+        return .object(dict)
     }
 
 }
 
 @available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
-extension Dictionary: JSONDecodable where Key == String, Value: JSONDecodable {
+extension Dictionary: JSONDecodable where Key: JSONKeyDecodable, Value: JSONDecodable {
 
     public init(json: JSON) throws {
-        self = try json.objectValue.mapValues(Value.init)
+        self = try json.objectValue.reduce(into: Self()) { dictionary, pair in
+            let (key, value) = pair
+            try dictionary[Key(jsonKey: key)] = Value(json: value)
+        }
     }
 
 }
