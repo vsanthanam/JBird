@@ -60,7 +60,7 @@ To add JBird as a dependency to an existing Swift package, add the following lin
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/vsanthanam/JBird.git", from: "1.5.4")
+    .package(url: "https://github.com/vsanthanam/JBird.git", from: "1.5.5")
 ]
 ```
 
