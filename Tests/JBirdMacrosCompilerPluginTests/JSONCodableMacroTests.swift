@@ -33,7 +33,7 @@ import XCTest
 #if canImport(JBirdMacrosCompilerPlugin)
     import JBirdMacrosCompilerPlugin
 
-    let testMacros: [String: any Macro.Type] = [
+    fileprivate let testMacros: [String: any Macro.Type] = [
         "JSONCodable": JSONCodableMacro.self,
     ]
 #endif
