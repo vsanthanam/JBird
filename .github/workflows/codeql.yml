@@ -14,10 +14,6 @@ name: "CodeQL"
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches:
-      - "main"
-      - "*release*"
   schedule:
     - cron: '15 7 * * 6'
 concurrency:
