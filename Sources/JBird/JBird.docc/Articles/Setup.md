@@ -19,7 +19,7 @@ Add the package reference to the `dependencies` parameter of `Package.swift`:
 dependencies: [
     .package(
         url: "https://github.com/vsanthanam/JBird.git",
-        from: "1.5.4"
+        from: "1.5.5"
     )
 ]
 ```
