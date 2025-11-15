@@ -40,22 +40,19 @@
 #else
     #if canImport(JBirdCore)
         @_exported import JBirdCore
-    #endif
-
-    #if canImport(JBirdBuilders)
-        #if canImport(JBirdCore)
+        #if canImport(JBirdBuilders)
             @_exported import JBirdBuilders
-        #else
-            #error("You cannot use JBirdBuilders without JBirdCore")
         #endif
-    #endif
 
-    #if canImport(JBirdMacros)
-        #if canImport(JBirdBuilders) && canImport(JBirdCore)
-            @_exported import JBirdMacros
-        #else
-            #error("You cannot use JBirdMacros without JBirdCore or JBirdBuilders")
+        #if canImport(JBirdMacros)
+            #if canImport(JBirdBuilders)
+                @_exported import JBirdMacros
+            #else
+                #error("You cannot use JBirdMacros without JBirdBuilders")
+            #endif
         #endif
+    #else
+        #error("The umbrella module JBird requires JBirdCore")
     #endif
 #endif
 
