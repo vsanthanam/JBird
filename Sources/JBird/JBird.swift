@@ -31,19 +31,31 @@
     #endif
 
     #if ConformanceMacros
-        @_exported import JBirdMacros
+        #if DeclarativeAPI
+            @_exported import JBirdMacros
+        #else
+            #error("You cannot use the ConformanceMacro trait without the Declarative API trait!")
+        #endif
     #endif
 #else
-    #if canImport(JBirdBuilders)
-        @_exported import JBirdBuilders
-    #endif
-
     #if canImport(JBirdCore)
         @_exported import JBirdCore
     #endif
 
+    #if canImport(JBirdBuilders)
+        #if canImport(JBirdCore)
+            @_exported import JBirdBuilders
+        #else
+            #error("You cannot use JBirdBuilders without JBirdCore")
+        #endif
+    #endif
+
     #if canImport(JBirdMacros)
-        @_exported import JBirdMacros
+        #if canImport(JBirdBuilders) && canImport(JBirdCore)
+            @_exported import JBirdMacros
+        #else
+            #error("You cannot use JBirdMacros without JBirdCore or JBirdBuilders")
+        #endif
     #endif
 #endif
 
