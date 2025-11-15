@@ -40,7 +40,7 @@ public protocol JSONKeyEncodable {
 
 }
 
-/// A type that can decode itself from an external `JSON` representation.
+/// A type that can decode itself from an external `JSON.Key` representation.
 @available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 public protocol JSONKeyDecodable {
 
@@ -88,6 +88,7 @@ extension JSONKeyDecodable where Self: RawRepresentable, RawValue: JSONKeyDecoda
 @available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 extension JSON.Key {
 
+    @_disfavoredOverload
     public init(
         _ encodable: some JSONKeyEncodable
     ) {
