@@ -142,7 +142,7 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
 
         let encodable = DeclSyntax(
             """
-            @JBirdCore.JSON.ObjectBuilder
+            @JBirdCore.JSON.Builder
             public func encodeToJSON() -> JSON {
                 \(raw: encodeItems)
             }

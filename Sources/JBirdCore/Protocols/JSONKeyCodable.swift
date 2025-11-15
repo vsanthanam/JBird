@@ -25,7 +25,7 @@
 
 /// A type that can convert itself into and out of an external `JSON.Key` representation.
 ///
-/// `JSONKeyCodable` is a type alias for the `JSONKeyEncodable` and `JSONKeyDecodable` protocols.
+/// `JSONKeyCodable` is a type alias for the ``JSONKeyEncodable`` and ``JSONKeyDecodable`` protocols.
 /// When you use `JSONKeyCodable` as a type or a generic constraint, it matches any type that conforms to both protocols.
 @available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 public typealias JSONKeyCodable = JSONKeyDecodable & JSONKeyEncodable

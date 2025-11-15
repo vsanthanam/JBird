@@ -30,6 +30,8 @@ extension JSON {
 
     /// Create a JSON object declaratively
     /// - Parameter fields: The fields in the object
+    @available(*, deprecated, renamed: "init(builder:)", message: "Use the univeral builder initializer intead. This initializer will be removed in a future release.")
+    @_disfavoredOverload
     public init(
         @ObjectBuilder fields: () -> JSON
     ) {
@@ -37,12 +39,13 @@ extension JSON {
     }
 
     /// A result builder for JSON objects
+    @available(*, deprecated, renamed: "Builder", message: "Use the universal builder instead. This builder will be removed in a future release.")
     @resultBuilder
     public enum ObjectBuilder {
 
         public static func buildExpression(
             _ expression: Void
-        ) -> [(JSON.Key, JSON)] {
+        ) -> [(Key, Value)] {
             []
         }
 
@@ -51,67 +54,67 @@ extension JSON {
         ) -> Never {}
 
         public static func buildExpression(
-            _ expression: (JSON.Key, JSON)
-        ) -> [(JSON.Key, JSON)] {
+            _ expression: (Key, Value)
+        ) -> [(Key, Value)] {
             [expression]
         }
 
         @_disfavoredOverload
         public static func buildExpression<Key, Value>(
             _ expression: (Key, Value)
-        ) -> [(JSON.Key, JSON)] where Key: JSONKeyCodable, Value: JSONEncodable {
+        ) -> [(JSON.Key, JSON.Value)] where Key: JSONKeyCodable, Value: JSONEncodable {
             let (key, value) = expression
-            return [(JSON.Key(key), JSON(value))]
+            return [(JSON.Key(key), JSON.Value(value))]
         }
 
-        public static func buildBlock() -> [(JSON.Key, JSON)] {
+        public static func buildBlock() -> [(Key, Value)] {
             []
         }
 
         public static func buildExpression(
             _ expression: Object
-        ) -> [(JSON.Key, JSON)] {
+        ) -> [(Key, Value)] {
             expression.map(\.self)
         }
 
         public static func buildBlock(
-            _ components: [(JSON.Key, JSON)]
-        ) -> [(JSON.Key, JSON)] {
+            _ components: [(Key, Value)]
+        ) -> [(Key, Value)] {
             components
         }
 
         public static func buildBlock(
-            _ components: [(JSON.Key, JSON)]...
-        ) -> [(JSON.Key, JSON)] {
+            _ components: [(Key, Value)]...
+        ) -> [(Key, Value)] {
             components.flatMap(\.self)
         }
 
         public static func buildEither(
-            first component: [(JSON.Key, JSON)]
-        ) -> [(JSON.Key, JSON)] {
+            first component: [(Key, Value)]
+        ) -> [(Key, Value)] {
             component
         }
 
         public static func buildEither(
-            second component: [(JSON.Key, JSON)]
-        ) -> [(JSON.Key, JSON)] {
+            second component: [(Key, Value)]
+        ) -> [(Key, Value)] {
             component
         }
 
         public static func buildOptional(
-            _ component: [(JSON.Key, JSON)]?
-        ) -> [(JSON.Key, JSON)] {
+            _ component: [(Key, Value)]?
+        ) -> [(Key, Value)] {
             component ?? []
         }
 
         public static func buildArray(
-            _ components: [[(JSON.Key, JSON)]]
-        ) -> [(JSON.Key, JSON)] {
+            _ components: [[(Key, Value)]]
+        ) -> [(Key, Value)] {
             components.flatMap(\.self)
         }
 
         public static func buildFinalResult(
-            _ component: [(JSON.Key, JSON)]
+            _ component: [(Key, Value)]
         ) -> JSON {
             let dict = component.reduce(into: Object()) { prev, pair in
                 let (key, value) = pair
@@ -122,22 +125,4 @@ extension JSON {
 
     }
 
-}
-
-/// An infix operator for creating key-value pairs in JSON objects, designed to be used with the `ObjectBuilder`.
-infix operator => : AdditionPrecedence
-public func => (
-    lhs: String,
-    rhs: JSON
-) -> (String, JSON) {
-    (lhs, rhs)
-}
-
-/// An infix operator for creating key-value pairs in JSON objects, designed to be used with the `ObjectBuilder`.
-@_disfavoredOverload
-public func => <T>(
-    lhs: String,
-    rhs: T
-) -> (String, T) where T: JSONEncodable {
-    (lhs, rhs)
 }

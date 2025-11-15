@@ -30,6 +30,8 @@ extension JSON {
 
     /// Create a JSON array declaratively
     /// - Parameter elements: The elements in the array
+    @available(*, deprecated, renamed: "init(builder:)", message: "Use the univeral builder initializer intead. This initializer will be removed in a future release.")
+    @_disfavoredOverload
     public init(
         @ArrayBuilder elements: () -> JSON
     ) {
@@ -37,6 +39,7 @@ extension JSON {
     }
 
     /// A result builder for JSON arrays
+    @available(*, deprecated, renamed: "Builder", message: "Use the universal builder instead. This builder will be removed in a future release.")
     @resultBuilder
     public enum ArrayBuilder {
 

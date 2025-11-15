@@ -67,7 +67,7 @@ public enum JSONKeyComputationRule {
 ///
 ///     let tags: [String]
 ///
-///     @JSON.ObjectBuilder
+///     @JSON.Builder
 ///     public func encodeToJSON() -> JSON {
 ///         "username" => username
 ///         "age" => age

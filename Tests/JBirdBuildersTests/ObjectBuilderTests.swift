@@ -31,12 +31,14 @@ import Testing
 struct ObjectBuilderTests {
 
     @Test("Empty Expression")
+    @available(*, deprecated)
     func emptyExpression() {
         let json = JSON(fields: {})
         #expect(json == [:])
     }
 
     @Test("Void Expression")
+    @available(*, deprecated)
     func voidExpression() {
         let json = JSON(fields: {
             ()
@@ -46,14 +48,16 @@ struct ObjectBuilderTests {
     }
 
     @Test("Tuple Expression")
+    @available(*, deprecated)
     func tupleExpression() {
-        let json = JSON {
+        let json = JSON(fields: {
             "key" => "value"
-        }
+        })
         #expect(json == ["key": "value"])
     }
 
     @Test("Dictionary Expression")
+    @available(*, deprecated)
     func dictionaryExpression() {
         let json = JSON(fields: {
             [
@@ -65,36 +69,39 @@ struct ObjectBuilderTests {
     }
 
     @Test("Conditional Expression", arguments: [(true, JSON(["foo": true])), (false, JSON(["bar": false]))])
+    @available(*, deprecated)
     func conditionalExpression(useFoo: Bool, result: JSON) {
-        let json = JSON {
+        let json = JSON(fields: {
             if useFoo {
                 "foo" => true
             } else {
                 "bar" => false
             }
-        }
+        })
         #expect(json == result)
     }
 
     @Test("Optional Expression", arguments: [(true, JSON(["foo": true, "bar": false])), (false, JSON(["bar": false]))])
+    @available(*, deprecated)
     func optionalExpression(useFoo: Bool, result: JSON) {
-        let json = JSON {
+        let json = JSON(fields: {
             if useFoo {
                 "foo" => true
             }
             "bar" => false
-        }
+        })
         #expect(json == result)
     }
 
     @Test("For Expression")
+    @available(*, deprecated)
     func forExpression() {
         let keys = ["a", "b", "c"]
-        let json = JSON {
+        let json = JSON(fields: {
             for key in keys {
                 key => key
             }
-        }
+        })
         #expect(json == ["a": "a", "b": "b", "c": "c"])
     }
 
@@ -169,11 +176,14 @@ struct ObjectBuilderTests {
             )
         ]
     )
+
+    @available(*, deprecated)
     func complexBuilder(darkTheme: Bool, hasNotifications: Bool, tags: [String], json: JSON) {
         let user = buildUser(darkTheme: darkTheme, hasNotifications: hasNotifications, tags: tags)
         #expect(user == json)
     }
 
+    @available(*, deprecated)
     @JSON.ObjectBuilder
     private func buildUser(darkTheme: Bool, hasNotifications: Bool, tags: [String]) -> JSON {
         "id" => 123
