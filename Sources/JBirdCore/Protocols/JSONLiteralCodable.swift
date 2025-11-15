@@ -25,7 +25,7 @@
 
 /// A type that can convert itself into and out of an external `JSON.Literal` representation.
 ///
-/// `JSONLiteralCodable` is a type alias for the `JSONLiteralEncodable` and `JSONLiteralDecodable` protocols.
+/// `JSONLiteralCodable` is a type alias for the ``JSONLiteralEncodable`` and ``JSONLiteralDecodable`` protocols.
 /// When you use `JSONLiteralCodable` as a type or a generic constraint, it matches any type that conforms to both protocols.
 @available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 public typealias JSONLiteralCodable = JSONLiteralDecodable & JSONLiteralEncodable

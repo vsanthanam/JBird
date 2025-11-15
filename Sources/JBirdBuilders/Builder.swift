@@ -1,5 +1,5 @@
 // JBird
-// ObjectBuilder.swift
+// Builder.swift
 //
 // MIT License
 //
@@ -25,47 +25,70 @@
 
 import JBirdCore
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 extension JSON {
 
-    /// Create a JSON object declaratively
-    /// - Parameter fields: The fields in the object
-    public init(
-        @ObjectBuilder fields: () -> JSON
-    ) {
-        self = fields()
-    }
-
-    /// A result builder for JSON objects
     @resultBuilder
-    public enum ObjectBuilder {
+    public enum Builder {
 
         public static func buildExpression(
-            _ expression: Void
-        ) -> [(Key, Value)] {
-            []
+            _ expression: [JSON]
+        ) -> [JSON] {
+            expression
         }
 
         public static func buildExpression(
-            _ expression: Never
-        ) -> Never {}
-
-        public static func buildExpression(
-            _ expression: (Key, Value)
-        ) -> [(Key, Value)] {
+            _ expression: JSON
+        ) -> [JSON] {
             [expression]
         }
 
         @_disfavoredOverload
-        public static func buildExpression<Key, Value>(
-            _ expression: (Key, Value)
-        ) -> [(JSON.Key, JSON.Value)] where Key: JSONKeyCodable, Value: JSONEncodable {
-            let (key, value) = expression
-            return [(JSON.Key(key), JSON.Value(value))]
+        public static func buildExpression(
+            _ expression: some JSONEncodable
+        ) -> [JSON] {
+            [JSON(expression)]
         }
 
-        public static func buildBlock() -> [(Key, Value)] {
-            []
+        public static func buildExpression(
+            @Builder _ expression: () -> JSON
+        ) -> [JSON] {
+            [expression()]
+        }
+
+        public static func buildBlock(
+            _ components: [JSON]...
+        ) -> [JSON] {
+            components.flatMap(\.self)
+        }
+
+        public static func buildArray(
+            _ components: [[JSON]]
+        ) -> [JSON] {
+            components.flatMap(\.self)
+        }
+
+        public static func buildEither(
+            first component: [JSON]
+        ) -> [JSON] {
+            component
+        }
+
+        public static func buildEither(
+            second component: [JSON]
+        ) -> [JSON] {
+            component
+        }
+
+        public static func buildOptional(
+            _ component: [JSON]?
+        ) -> [JSON] {
+            component ?? []
+        }
+
+        public static func buildFinalResult(
+            _ component: [JSON]
+        ) -> JSON {
+            .array(component)
         }
 
         public static func buildExpression(
@@ -74,14 +97,28 @@ extension JSON {
             expression.map(\.self)
         }
 
-        public static func buildBlock(
-            _ components: [(Key, Value)]
+        public static func buildExpression(
+            _ expression: (Key, Value)
         ) -> [(Key, Value)] {
-            components
+            [expression]
+        }
+
+        @_disfavoredOverload
+        public static func buildExpression(
+            _ expression: (some JSONKeyEncodable, some JSONEncodable)
+        ) -> [(Key, Value)] {
+            let (key, value) = expression
+            return [(Key(key), Value(value))]
         }
 
         public static func buildBlock(
             _ components: [(Key, Value)]...
+        ) -> [(Key, Value)] {
+            components.flatMap(\.self)
+        }
+
+        public static func buildArray(
+            _ components: [[(Key, Value)]]
         ) -> [(Key, Value)] {
             components.flatMap(\.self)
         }
@@ -104,12 +141,6 @@ extension JSON {
             component ?? []
         }
 
-        public static func buildArray(
-            _ components: [[(Key, Value)]]
-        ) -> [(Key, Value)] {
-            components.flatMap(\.self)
-        }
-
         public static func buildFinalResult(
             _ component: [(Key, Value)]
         ) -> JSON {
@@ -117,9 +148,41 @@ extension JSON {
                 let (key, value) = pair
                 prev[key] = value
             }
-            return JSON(dict)
+            return .object(dict)
         }
 
     }
 
+}
+
+infix operator => : AdditionPrecedence
+
+public func => (
+    lhs: JSON.Key,
+    rhs: JSON.Value
+) -> (JSON.Key, JSON.Value) {
+    (lhs, rhs)
+}
+
+@_disfavoredOverload
+public func => <Key, Value>(
+    lhs: Key,
+    rhs: Value
+) -> (Key, Value) where Key: JSONKeyEncodable, Value: JSONEncodable {
+    (lhs, rhs)
+}
+
+public func => (
+    lhs: JSON.Key,
+    @JSON.Builder rhs: () -> JSON
+) -> (JSON.Key, JSON.Value) {
+    (lhs, rhs())
+}
+
+@_disfavoredOverload
+public func => <Key>(
+    lhs: Key,
+    @JSON.Builder rhs: () -> JSON
+) -> (Key, JSON.Value) where Key: JSONKeyEncodable {
+    (lhs, rhs())
 }

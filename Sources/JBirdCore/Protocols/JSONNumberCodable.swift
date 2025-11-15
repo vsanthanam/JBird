@@ -27,7 +27,7 @@ import Foundation
 
 /// A type that can convert itself into and out of an external `JSON.Number` representation.
 ///
-/// `JSONNumberCodable` is a type alias for the `JSONNumberEncodable` and `JSONNumberDecodable` protocols.
+/// `JSONNumberCodable` is a type alias for the ``JSONNumberEncodable`` and ``JSONNumberDecodable`` protocols.
 /// When you use `JSONNumberCodable` as a type or a generic constraint, it matches any type that conforms to both protocols.
 @available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 public typealias JSONNumberCodable = JSONNumberDecodable & JSONNumberEncodable
