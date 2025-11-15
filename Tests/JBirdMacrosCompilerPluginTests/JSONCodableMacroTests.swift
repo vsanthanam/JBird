@@ -56,7 +56,7 @@ final class JSONCodableMacroTests: XCTestCase {
 
                     let name: String
 
-                    @JBirdCore.JSON.ObjectBuilder
+                    @JBirdCore.JSON.Builder
                     public func encodeToJSON() -> JSON {
                         "name" => name
                     }
@@ -99,7 +99,7 @@ final class JSONCodableMacroTests: XCTestCase {
                     @JSONKey("custom_name")
                     let name: String
 
-                    @JBirdCore.JSON.ObjectBuilder
+                    @JBirdCore.JSON.Builder
                     public func encodeToJSON() -> JSON {
                         "custom_name" => name
                     }
@@ -142,7 +142,7 @@ final class JSONCodableMacroTests: XCTestCase {
                     @JSONKey(.snakeCase)
                     let fooBar: String
 
-                    @JBirdCore.JSON.ObjectBuilder
+                    @JBirdCore.JSON.Builder
                     public func encodeToJSON() -> JSON {
                         "foo_bar" => fooBar
                     }
@@ -183,7 +183,7 @@ final class JSONCodableMacroTests: XCTestCase {
 
                     let name: String?
 
-                    @JBirdCore.JSON.ObjectBuilder
+                    @JBirdCore.JSON.Builder
                     public func encodeToJSON() -> JSON {
                         if let name {
                         "name" => name
@@ -231,7 +231,7 @@ final class JSONCodableMacroTests: XCTestCase {
                     @OmitIfNil
                     let name: String?
 
-                    @JBirdCore.JSON.ObjectBuilder
+                    @JBirdCore.JSON.Builder
                     public func encodeToJSON() -> JSON {
                         if let name {
                         "name" => name
@@ -279,7 +279,7 @@ final class JSONCodableMacroTests: XCTestCase {
                     @OmitIfNil(true)
                     let name: String?
 
-                    @JBirdCore.JSON.ObjectBuilder
+                    @JBirdCore.JSON.Builder
                     public func encodeToJSON() -> JSON {
                         if let name {
                         "name" => name
@@ -327,7 +327,7 @@ final class JSONCodableMacroTests: XCTestCase {
                     @OmitIfNil(false)
                     let name: String?
 
-                    @JBirdCore.JSON.ObjectBuilder
+                    @JBirdCore.JSON.Builder
                     public func encodeToJSON() -> JSON {
                         "name" => name
                     }
@@ -506,7 +506,7 @@ final class JSONCodableMacroTests: XCTestCase {
 
                     let name: String
 
-                    @JBirdCore.JSON.ObjectBuilder
+                    @JBirdCore.JSON.Builder
                     public func encodeToJSON() -> JSON {
                         "name" => name
                     }
@@ -546,7 +546,7 @@ final class JSONCodableMacroTests: XCTestCase {
 
                     let name: String
 
-                    @JBirdCore.JSON.ObjectBuilder
+                    @JBirdCore.JSON.Builder
                     public func encodeToJSON() -> JSON {
                         "name" => name
                     }

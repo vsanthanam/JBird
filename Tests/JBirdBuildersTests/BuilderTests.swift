@@ -30,7 +30,7 @@ import Testing
 @Test
 func universalBuilder() throws {
 
-    let array = JSON.build {
+    let array = JSON {
         "12"
         "nast"
         1.2
@@ -41,7 +41,7 @@ func universalBuilder() throws {
         }
     }
 
-    let object = JSON.build {
+    let object = JSON {
         "string" => 12
         "plop" => [nil, 12, "asd"]
     }

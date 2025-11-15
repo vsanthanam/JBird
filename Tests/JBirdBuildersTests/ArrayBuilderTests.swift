@@ -32,12 +32,14 @@ import Testing
 struct ArrayBuilderTests {
 
     @Test("Empty Expression")
+    @available(*, deprecated)
     func emptyExpression() {
         let json = JSON(elements: {})
         #expect(json == [])
     }
 
     @Test("Void Expression")
+    @available(*, deprecated)
     func voidExpression() {
         let json = JSON(elements: {
             ()
@@ -48,62 +50,68 @@ struct ArrayBuilderTests {
     }
 
     @Test("JSON Expression")
+    @available(*, deprecated)
     func jsonExpression() {
-        let json = JSON {
+        let json = JSON(elements: {
             .string("foo")
-        }
+        })
         #expect(json == ["foo"])
     }
 
     @Test("Multiple JSON Elements")
+    @available(*, deprecated)
     func multipleJSONElementsExpression() {
-        let json = JSON {
+        let json = JSON(elements: {
             JSON.string("foo")
             JSON.literal(.null)
-        }
+        })
         #expect(json == ["foo", nil])
     }
 
     @Test("Encodable Expression")
+    @available(*, deprecated)
     func dictionaryExpression() {
-        let json = JSON {
+        let json = JSON(elements: {
             "foo"
             true
-        }
+        })
         #expect(json == ["foo", true])
     }
 
     @Test("Conditional Expression", arguments: [(true, JSON(["foo"])), (false, JSON(["bar"]))])
+    @available(*, deprecated)
     func conditionalExpression(useFoo: Bool, result: JSON) {
-        let json = JSON {
+        let json = JSON(elements: {
             if useFoo {
                 "foo"
             } else {
                 "bar"
             }
-        }
+        })
         #expect(json == result)
     }
 
     @Test("Optional Expression", arguments: [(true, JSON(["foo", "bar"])), (false, JSON(["bar"]))])
+    @available(*, deprecated)
     func optionalExpression(useFoo: Bool, result: JSON) {
-        let json = JSON {
+        let json = JSON(elements: {
             if useFoo {
                 "foo"
             }
             "bar"
-        }
+        })
         #expect(json == result)
     }
 
     @Test("For Expression")
+    @available(*, deprecated)
     func forExpression() {
         let elements = ["a", "b", "c"]
-        let json = JSON {
+        let json = JSON(elements: {
             for element in elements {
                 element
             }
-        }
+        })
         #expect(json == ["a", "b", "c"])
     }
 

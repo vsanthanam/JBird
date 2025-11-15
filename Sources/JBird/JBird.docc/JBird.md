@@ -20,7 +20,7 @@ For more information, see the ``/JBirdCore`` API reference, and the ``/JBirdCore
 
 ##### Declarative JSON composition with result builders
 
-Create JSON structures using Swift's result builder syntax with `ArrayBuilder` and `ObjectBuilder`. Build arrays and objects declaratively without manual dictionary or array construction. The `=>` operator provides clean key-value pair syntax for objects, while array builders support mixed-type elements naturally.
+Create JSON structures using Swift's result builder syntax with `JSON.Builder`. Build arrays and objects declaratively without manual dictionary or array construction. The `=>` operator provides clean key-value pair syntax for objects, while array builders support mixed-type elements naturally.
 
 For more information, see the ``/JBirdBuilders`` API reference.
 
