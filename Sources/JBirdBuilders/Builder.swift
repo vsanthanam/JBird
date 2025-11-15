@@ -28,6 +28,8 @@ import JBirdCore
 @available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
 extension JSON {
 
+    /// Declaratively create a JSON value
+    /// - Parameter builder: The builder closure
     public init(
         @Builder builder: () -> JSON
     ) {
@@ -38,62 +40,66 @@ extension JSON {
     public enum Builder {
 
         public static func buildExpression(
-            _ expression: [JSON]
-        ) -> [JSON] {
+            _ expression: Never
+        ) -> Never {}
+
+        public static func buildExpression(
+            _ expression: Array
+        ) -> Array {
             expression
         }
 
         public static func buildExpression(
             _ expression: JSON
-        ) -> [JSON] {
+        ) -> Array {
             [expression]
         }
 
         @_disfavoredOverload
         public static func buildExpression(
             _ expression: some JSONEncodable
-        ) -> [JSON] {
+        ) -> Array {
             [JSON(expression)]
         }
 
         public static func buildExpression(
             @Builder _ expression: () -> JSON
-        ) -> [JSON] {
+        ) -> Array {
             [expression()]
         }
 
         public static func buildBlock(
-            _ components: [JSON]...
-        ) -> [JSON] {
+            _ components: Array...
+        ) -> Array {
             components.flatMap(\.self)
         }
 
         public static func buildArray(
-            _ components: [[JSON]]
-        ) -> [JSON] {
+            _ components: [Array]
+        ) -> Array {
             components.flatMap(\.self)
         }
 
         public static func buildEither(
-            first component: [JSON]
-        ) -> [JSON] {
+            first component: Array
+        ) -> Array {
             component
         }
 
         public static func buildEither(
-            second component: [JSON]
-        ) -> [JSON] {
+            second component: Array
+        ) -> Array {
             component
         }
 
         public static func buildOptional(
-            _ component: [JSON]?
-        ) -> [JSON] {
+            _ component: Array?
+        ) -> Array {
             component ?? []
         }
 
         public static func buildFinalResult(
-            _ component: [JSON]
+            _ component: Array
         ) -> JSON {
             .array(component)
         }
@@ -116,6 +122,10 @@ extension JSON {
         ) -> [(Key, Value)] {
             let (key, value) = expression
             return [(Key(key), Value(value))]
+        }
+
+        public static func buildBlock() -> [(Key, Value)] {
+            []
         }
 
         public static func buildBlock(
@@ -162,8 +172,10 @@ extension JSON {
 
 }
 
+/// An infix operator allowing key value assignment, for use with a ``JBirdCore/JSON/Builder``
 infix operator => : AdditionPrecedence
 
+/// An infix operator allowing key value assignment, for use with a ``JBirdCore/JSON/Builder``
 public func => (
     lhs: JSON.Key,
     rhs: JSON.Value
@@ -171,6 +183,7 @@ public func => (
     (lhs, rhs)
 }
 
+/// An infix operator allowing key value assignment, for use with a ``JBirdCore/JSON/Builder``
 @_disfavoredOverload
 public func => <Key, Value>(
     lhs: Key,
@@ -179,6 +192,7 @@ public func => <Key, Value>(
     (lhs, rhs)
 }
 
+/// An infix operator allowing key value assignment, for use with a ``JBirdCore/JSON/Builder``
 public func => (
     lhs: JSON.Key,
     @JSON.Builder rhs: () -> JSON
