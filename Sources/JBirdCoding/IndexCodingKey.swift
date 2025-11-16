@@ -1,5 +1,5 @@
 // JBird
-// Decoder.swift
+// IndexCodingKey.swift
 //
 // MIT License
 //
@@ -23,30 +23,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Foundation
-import JBirdCore
+struct IndexCodingKey: CodingKey {
 
-extension JSON {
+    // MARK: - Initializers
 
-    public final class Decoder {
-
-        public init(
-            _ options: JSON.DeserializationOptions = .default
-        ) {
-            self.options = options
-        }
-
-        public let options: JSON.DeserializationOptions
-
-        public func decode<T>(
-            _ type: T.Type,
-            from data: Data
-        ) throws -> T where T: Decodable {
-            let json = try JSON.value(for: data, options: options)
-            let decoder = InternalDecoder(value: json)
-            return try T(from: decoder)
-        }
-
+    init(_ index: Int) {
+        self.index = index
     }
+
+    // MARK: - CodingKey
+
+    init?(intValue: Int) {
+        self.init(intValue)
+    }
+
+    init?(stringValue: String) {
+        fatalError()
+    }
+
+    var intValue: Int? {
+        index
+    }
+
+    var stringValue: String {
+        index.description
+    }
+
+    // MARK: - Privte
+
+    private let index: Int
 
 }

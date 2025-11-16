@@ -1,5 +1,5 @@
 // JBird
-// Decoder.swift
+// SuperCodingKey.swift
 //
 // MIT License
 //
@@ -23,30 +23,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Foundation
-import JBirdCore
+struct SuperCodingKey: CodingKey {
 
-extension JSON {
+    // MARK: - Initializers
 
-    public final class Decoder {
+    init() {}
 
-        public init(
-            _ options: JSON.DeserializationOptions = .default
-        ) {
-            self.options = options
-        }
+    // MARK: - CodingKey
 
-        public let options: JSON.DeserializationOptions
-
-        public func decode<T>(
-            _ type: T.Type,
-            from data: Data
-        ) throws -> T where T: Decodable {
-            let json = try JSON.value(for: data, options: options)
-            let decoder = InternalDecoder(value: json)
-            return try T(from: decoder)
-        }
-
+    init?(intValue: Int) {
+        fatalError()
     }
+
+    init?(stringValue: String) {
+        fatalError()
+    }
+
+    let stringValue: String = "super"
+
+    let intValue: Int? = nil
 
 }

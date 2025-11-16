@@ -1,5 +1,5 @@
 // JBird
-// Decoder.swift
+// DecodingErrorHelpers.swift
 //
 // MIT License
 //
@@ -23,30 +23,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Foundation
-import JBirdCore
+func typeMismatch<T>(
+    for target: T.Type,
+    value: JSON,
+    codingPath: [any CodingKey],
+    _ error: (any Error)? = nil,
+    message: String? = nil
+) -> DecodingError {
+    let context = DecodingError.Context(
+        codingPath: codingPath,
+        debugDescription: message ?? "Expected to decode \(T.self) but found \(value.description) instead.",
+        underlyingError: error
+    )
+    return DecodingError.typeMismatch(target, context)
+}
 
-extension JSON {
-
-    public final class Decoder {
-
-        public init(
-            _ options: JSON.DeserializationOptions = .default
-        ) {
-            self.options = options
-        }
-
-        public let options: JSON.DeserializationOptions
-
-        public func decode<T>(
-            _ type: T.Type,
-            from data: Data
-        ) throws -> T where T: Decodable {
-            let json = try JSON.value(for: data, options: options)
-            let decoder = InternalDecoder(value: json)
-            return try T(from: decoder)
-        }
-
-    }
-
+func makeValueNotFound<T>(
+    for target: T.Type,
+    codingPath: [any CodingKey],
+    _ error: (any Error)? = nil,
+    message: String
+) -> DecodingError {
+    let context = DecodingError.Context(
+        codingPath: codingPath,
+        debugDescription: message
+    )
+    return DecodingError.valueNotFound(target, context)
 }
