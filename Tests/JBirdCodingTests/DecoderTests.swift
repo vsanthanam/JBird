@@ -23,6 +23,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import JBirdBuilders
 import JBirdCoding
 import JBirdCore
 import Testing
+
+@Test
+func decodeSandbox() throws {
+
+    struct TestCodable: Codable, Equatable {
+        let foo: String
+        let bar: [Int]
+    }
+
+    let testJSON = JSON {
+        "foo" => "bar"
+        "bar" => [1, 2, 3]
+    }
+
+    let testData = try testJSON.serialize()
+
+    let expected = TestCodable(foo: "bar", bar: [1, 2, 3])
+    let returned = try JSON.Decoder().decode(TestCodable.self, from: testData)
+    #expect(expected == returned)
+}

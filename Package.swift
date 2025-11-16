@@ -270,7 +270,9 @@ let package = Package(
         .testTarget(
             name: "JBirdCodingTests",
             dependencies: [
-                "JBirdCoding"
+                "JBirdCoding",
+                "JBirdCore",
+                "JBirdBuilders"
             ],
             swiftSettings: [
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
