@@ -365,7 +365,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [JBird, JBirdCore, JBirdBuilders]
+        target: [JBird, JBirdCore, JBirdBuilders, JBirdCoding]
     runs-on: macos-26
     steps:
     - name: Checkout

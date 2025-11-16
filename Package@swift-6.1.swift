@@ -40,9 +40,10 @@ let package = Package(
         )
     ],
     traits: [
-        .default(enabledTraits: ["DeclarativeAPI", "ConformanceMacros"]),
+        .default(enabledTraits: ["DeclarativeAPI", "ConformanceMacros", "CodableSupport"]),
         "DeclarativeAPI",
-        "ConformanceMacros"
+        "ConformanceMacros",
+        "CodableSupport"
     ],
     dependencies: [
         .package(
@@ -66,6 +67,12 @@ let package = Package(
                     condition: .when(
                         traits: ["ConformanceMacros"]
                     )
+                ),
+                .target(
+                    name: "JBirdCoding",
+                    condition: .when(
+                        traits: ["CodableSupport"]
+                    )
                 )
             ],
             resources: [
@@ -73,7 +80,7 @@ let package = Package(
             ],
             swiftSettings: [
                 .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("MemberImportVisibility"),
+                .enableUpcomingFeature("MemberImportVisibility")
             ]
         ),
         .testTarget(
@@ -83,7 +90,7 @@ let package = Package(
             ],
             swiftSettings: [
                 .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("MemberImportVisibility"),
+                .enableUpcomingFeature("MemberImportVisibility")
             ]
         ),
         .target(
@@ -96,7 +103,7 @@ let package = Package(
             ],
             swiftSettings: [
                 .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("MemberImportVisibility"),
+                .enableUpcomingFeature("MemberImportVisibility")
             ]
         ),
         .testTarget(
@@ -107,7 +114,7 @@ let package = Package(
             ],
             swiftSettings: [
                 .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("MemberImportVisibility"),
+                .enableUpcomingFeature("MemberImportVisibility")
             ]
         ),
         .target(
@@ -115,7 +122,7 @@ let package = Package(
             publicHeadersPath: "include",
             swiftSettings: [
                 .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("MemberImportVisibility"),
+                .enableUpcomingFeature("MemberImportVisibility")
             ]
         ),
         .testTarget(
@@ -125,7 +132,7 @@ let package = Package(
             ],
             swiftSettings: [
                 .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("MemberImportVisibility"),
+                .enableUpcomingFeature("MemberImportVisibility")
             ]
         ),
         .target(
@@ -138,7 +145,7 @@ let package = Package(
             ],
             swiftSettings: [
                 .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("MemberImportVisibility"),
+                .enableUpcomingFeature("MemberImportVisibility")
             ]
         ),
         .testTarget(
@@ -149,7 +156,7 @@ let package = Package(
             ],
             swiftSettings: [
                 .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("MemberImportVisibility"),
+                .enableUpcomingFeature("MemberImportVisibility")
             ]
         ),
         .target(
@@ -164,7 +171,7 @@ let package = Package(
             ],
             swiftSettings: [
                 .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("MemberImportVisibility"),
+                .enableUpcomingFeature("MemberImportVisibility")
             ]
         ),
         .testTarget(
@@ -174,7 +181,7 @@ let package = Package(
             ],
             swiftSettings: [
                 .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("MemberImportVisibility"),
+                .enableUpcomingFeature("MemberImportVisibility")
             ]
         ),
         .macro(
@@ -191,7 +198,30 @@ let package = Package(
             ],
             swiftSettings: [
                 .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("MemberImportVisibility"),
+                .enableUpcomingFeature("MemberImportVisibility")
+            ]
+        ),
+        .target(
+            name: "JBirdCoding",
+            dependencies: [
+                "JBirdCore"
+            ],
+            resources: [
+                .process("PrivacyInfo.xcprivacy")
+            ],
+            swiftSettings: [
+                .enableUpcomingFeature("ExistentialAny"),
+                .enableUpcomingFeature("MemberImportVisibility")
+            ]
+        ),
+        .testTarget(
+            name: "JBirdCodingTests",
+            dependencies: [
+                "JBirdCoding"
+            ],
+            swiftSettings: [
+                .enableUpcomingFeature("ExistentialAny"),
+                .enableUpcomingFeature("MemberImportVisibility")
             ]
         )
     ],

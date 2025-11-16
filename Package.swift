@@ -37,12 +37,19 @@ let package = Package(
             targets: [
                 "JBirdMacros"
             ]
+        ),
+        .library(
+            name: "JBirdCoding",
+            targets: [
+                "JBirdCoding"
+            ]
         )
     ],
     traits: [
-        .default(enabledTraits: ["DeclarativeAPI", "ConformanceMacros"]),
+        .default(enabledTraits: ["DeclarativeAPI", "ConformanceMacros", "CodableSupport"]),
         "DeclarativeAPI",
-        "ConformanceMacros"
+        "ConformanceMacros",
+        "CodableSupport"
     ],
     dependencies: [
         .package(
@@ -73,6 +80,12 @@ let package = Package(
                     name: "JBirdMacros",
                     condition: .when(
                         traits: ["ConformanceMacros"]
+                    )
+                ),
+                .target(
+                    name: "JBirdCoding",
+                    condition: .when(
+                        traits: ["CodableSupport"]
                     )
                 )
             ],
@@ -231,6 +244,33 @@ let package = Package(
                     name: "SwiftSyntaxMacrosTestSupport",
                     package: "swift-syntax"
                 )
+            ],
+            swiftSettings: [
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+                .enableUpcomingFeature("ExistentialAny"),
+                .enableUpcomingFeature("MemberImportVisibility"),
+                .treatAllWarnings(as: .error)
+            ]
+        ),
+        .target(
+            name: "JBirdCoding",
+            dependencies: [
+                "JBirdCore"
+            ],
+            resources: [
+                .process("PrivacyInfo.xcprivacy")
+            ],
+            swiftSettings: [
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+                .enableUpcomingFeature("ExistentialAny"),
+                .enableUpcomingFeature("MemberImportVisibility"),
+                .treatAllWarnings(as: .error)
+            ]
+        ),
+        .testTarget(
+            name: "JBirdCodingTests",
+            dependencies: [
+                "JBirdCoding"
             ],
             swiftSettings: [
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault"),

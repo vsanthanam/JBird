@@ -1,5 +1,5 @@
 // JBird
-// JBird.swift
+// Decoder.swift
 //
 // MIT License
 //
@@ -23,45 +23,4 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#if SWIFT_PACKAGE && swift(>=6.1)
-    @_exported import JBirdCore
-
-    #if DeclarativeAPI
-        @_exported import JBirdBuilders
-    #endif
-
-    #if ConformanceMacros
-        #if DeclarativeAPI
-            @_exported import JBirdMacros
-        #else
-            #error("You cannot use the ConformanceMacro trait without the Declarative API trait!")
-        #endif
-    #endif
-
-    #if CodableSupport
-        @_exported import JBirdCoding
-    #endif
-#else
-    #if canImport(JBirdCore)
-        @_exported import JBirdCore
-        #if canImport(JBirdBuilders)
-            @_exported import JBirdBuilders
-        #endif
-
-        #if canImport(JBirdMacros)
-            #if canImport(JBirdBuilders)
-                @_exported import JBirdMacros
-            #else
-                #error("You cannot use JBirdMacros without JBirdBuilders")
-            #endif
-        #endif
-
-        #if canImport(JBirdCoding)
-            @_exported import JBirdCoding
-        #endif
-    #else
-        #error("The umbrella module JBird requires JBirdCore")
-    #endif
-#endif
-
-enum JBirdEnum {}
+import Foundation
