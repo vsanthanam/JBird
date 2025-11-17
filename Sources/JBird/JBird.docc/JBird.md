@@ -30,6 +30,10 @@ JBird provides seamless conversion between `JSON` values and native Swift types 
 
 For more information, see <doc:/JBirdCore/EncodeDecode>
 
+The framework also includes an implementation of Swift's `Encoder` and `Decoder` types, you can use existing `Codable` models without making any changes.
+
+For more information, see ``/JBirdCoding``
+
 ##### Using macros to easily implement `JSONCodable` conformance
 
 The `@JSONCodable` macro automatically generates encoding and decoding implementations for Swift types. Use `@JSONKey` to customize property names, `@OmitIfNil` to exclude nil values during encoding, and support for snake_case conversion. The macro system eliminates boilerplate while providing full control over the JSON representation.
@@ -48,3 +52,4 @@ For more information, see the ``/JBirdMacros`` API reference.
 - ``/JBirdCore``
 - ``/JBirdBuilders``
 - ``/JBirdMacros``
+- ``/JBirdCoding``
