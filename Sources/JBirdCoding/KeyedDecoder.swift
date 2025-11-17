@@ -1,5 +1,5 @@
 // JBird
-// KeyedContainer.swift
+// KeyedDecoder.swift
 //
 // MIT License
 //
@@ -25,7 +25,7 @@
 
 import JBirdCore
 
-final class KeyedContainer<Key>: KeyedDecodingContainerProtocol where Key: CodingKey {
+final class KeyedDecoder<Key>: KeyedDecodingContainerProtocol where Key: CodingKey {
 
     // MARK: - Initilizers
 

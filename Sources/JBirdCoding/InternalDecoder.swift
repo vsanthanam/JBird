@@ -60,7 +60,7 @@ final class InternalDecoder: Decoder {
     ) throws -> KeyedDecodingContainer<Key> where Key: CodingKey {
         do {
             let object = try value.objectValue
-            let container = KeyedContainer<Key>(
+            let container = KeyedDecoder<Key>(
                 decoder: self,
                 object: object
             )
@@ -77,7 +77,7 @@ final class InternalDecoder: Decoder {
     func unkeyedContainer() throws -> any UnkeyedDecodingContainer {
         do {
             let array = try value.arrayValue
-            return UnkeyedContainer(
+            return UnkeyedDecoder(
                 decoder: self,
                 array: array
             )
@@ -91,7 +91,7 @@ final class InternalDecoder: Decoder {
     }
 
     func singleValueContainer() throws -> any SingleValueDecodingContainer {
-        SingleValueContainer(
+        SingleDecoder(
             decoder: self,
             value: value
         )

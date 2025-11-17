@@ -1,5 +1,5 @@
 // JBird
-// SingleValueContainer.swift
+// UnkeyedDecoder.swift
 //
 // MIT License
 //
@@ -25,252 +25,321 @@
 
 import JBirdCore
 
-final class SingleValueContainer: SingleValueDecodingContainer {
+struct UnkeyedDecoder: UnkeyedDecodingContainer {
 
     // MARK: - Initializers
 
     init(
         decoder: InternalDecoder,
-        value: JSON
+        array: JSON.Array
     ) {
         self.decoder = decoder
-        self.value = value
+        self.array = array
     }
 
-    // MARK: - SingleValueDecodingContainer
+    // MARK: - UnkeyedDecodingContainer
+
+    var currentIndex: Int = 0
+
+    var count: Int? {
+        array.count
+    }
+
+    var isAtEnd: Bool {
+        currentIndex >= array.count
+    }
 
     var codingPath: [any CodingKey] {
         decoder.codingPath
     }
 
-    func decodeNil() -> Bool {
-        value.isNull
+    mutating func decodeNil() throws -> Bool {
+        guard !isAtEnd else {
+            throw makeValueNotFound(
+                for: Any?.self,
+                codingPath: codingPath + [IndexCodingKey(currentIndex)],
+                message: "Unkeyed container is at end."
+            )
+        }
+        let value = array[currentIndex]
+        if value.isNull {
+            currentIndex += 1
+            return true
+        }
+        return false
     }
 
-    func decode(
+    mutating func decode(
         _ type: Bool.Type
     ) throws -> Bool {
+        let (value, path) = try nextValue()
         do {
             return try value.decode()
         } catch {
             throw typeMismatch(
                 for: type,
                 value: value,
-                codingPath: codingPath,
-                error
+                codingPath: path
             )
         }
     }
 
-    func decode(
+    mutating func decode(
         _ type: String.Type
     ) throws -> String {
+        let (value, path) = try nextValue()
         do {
             return try value.decode()
         } catch {
             throw typeMismatch(
                 for: type,
                 value: value,
-                codingPath: codingPath,
-                error
+                codingPath: path
             )
         }
     }
 
-    func decode(
+    mutating func decode(
         _ type: Float.Type
     ) throws -> Float {
+        let (value, path) = try nextValue()
         do {
             return try value.decode()
         } catch {
             throw typeMismatch(
                 for: type,
                 value: value,
-                codingPath: codingPath,
-                error
+                codingPath: path
             )
         }
     }
 
-    func decode(
+    mutating func decode(
         _ type: Double.Type
     ) throws -> Double {
+        let (value, path) = try nextValue()
         do {
             return try value.decode()
         } catch {
             throw typeMismatch(
                 for: type,
                 value: value,
-                codingPath: codingPath,
-                error
+                codingPath: path
             )
         }
     }
 
-    func decode(
+    mutating func decode(
         _ type: Int.Type
     ) throws -> Int {
+        let (value, path) = try nextValue()
         do {
             return try value.decode()
         } catch {
             throw typeMismatch(
                 for: type,
                 value: value,
-                codingPath: codingPath,
-                error
+                codingPath: path
             )
         }
     }
 
-    func decode(
+    mutating func decode(
         _ type: Int8.Type
     ) throws -> Int8 {
+        let (value, path) = try nextValue()
         do {
             return try value.decode()
         } catch {
             throw typeMismatch(
                 for: type,
                 value: value,
-                codingPath: codingPath,
-                error
+                codingPath: path
             )
         }
     }
 
-    func decode(
+    mutating func decode(
         _ type: Int16.Type
     ) throws -> Int16 {
+        let (value, path) = try nextValue()
         do {
             return try value.decode()
         } catch {
             throw typeMismatch(
                 for: type,
                 value: value,
-                codingPath: codingPath,
-                error
+                codingPath: path
             )
         }
     }
 
-    func decode(
+    mutating func decode(
         _ type: Int32.Type
     ) throws -> Int32 {
+        let (value, path) = try nextValue()
         do {
             return try value.decode()
         } catch {
             throw typeMismatch(
                 for: type,
                 value: value,
-                codingPath: codingPath,
-                error
+                codingPath: path
             )
         }
     }
 
-    func decode(
+    mutating func decode(
         _ type: Int64.Type
     ) throws -> Int64 {
+        let (value, path) = try nextValue()
         do {
             return try value.decode()
         } catch {
             throw typeMismatch(
                 for: type,
                 value: value,
-                codingPath: codingPath,
-                error
+                codingPath: path
             )
         }
     }
 
-    func decode(
+    mutating func decode(
         _ type: UInt.Type
     ) throws -> UInt {
+        let (value, path) = try nextValue()
         do {
             return try value.decode()
         } catch {
             throw typeMismatch(
                 for: type,
                 value: value,
-                codingPath: codingPath,
-                error
+                codingPath: path
             )
         }
     }
 
-    func decode(
+    mutating func decode(
         _ type: UInt8.Type
     ) throws -> UInt8 {
+        let (value, path) = try nextValue()
         do {
             return try value.decode()
         } catch {
             throw typeMismatch(
                 for: type,
                 value: value,
-                codingPath: codingPath,
-                error
+                codingPath: path
             )
         }
     }
 
-    func decode(
+    mutating func decode(
         _ type: UInt16.Type
     ) throws -> UInt16 {
+        let (value, path) = try nextValue()
         do {
             return try value.decode()
         } catch {
             throw typeMismatch(
                 for: type,
                 value: value,
-                codingPath: codingPath,
-                error
+                codingPath: path
             )
         }
     }
 
-    func decode(
+    mutating func decode(
         _ type: UInt32.Type
     ) throws -> UInt32 {
+        let (value, path) = try nextValue()
         do {
             return try value.decode()
         } catch {
             throw typeMismatch(
                 for: type,
                 value: value,
-                codingPath: codingPath,
-                error
+                codingPath: path
             )
         }
     }
 
-    func decode(
+    mutating func decode(
         _ type: UInt64.Type
     ) throws -> UInt64 {
+        let (value, path) = try nextValue()
         do {
             return try value.decode()
         } catch {
             throw typeMismatch(
                 for: type,
                 value: value,
-                codingPath: codingPath,
-                error
+                codingPath: path
             )
         }
     }
 
-    func decode<T>(
+    mutating func decode<T>(
         _ type: T.Type
     ) throws -> T where T: Decodable {
+        let (value, path) = try nextValue()
         let decoder = InternalDecoder(
             value: value,
-            codingPath: codingPath,
+            codingPath: path,
             userInfo: decoder.userInfo
         )
         return try T(from: decoder)
     }
 
+    mutating func nestedContainer<NestedKey>(
+        keyedBy type: NestedKey.Type
+    ) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
+        let (value, path) = try nextValue()
+        let decoder = InternalDecoder(
+            value: value,
+            codingPath: path,
+            userInfo: decoder.userInfo
+        )
+        return try decoder.container(keyedBy: type)
+    }
+
+    mutating func nestedUnkeyedContainer() throws -> any UnkeyedDecodingContainer {
+        let (value, path) = try nextValue()
+        let decoder = InternalDecoder(
+            value: value,
+            codingPath: path,
+            userInfo: decoder.userInfo
+        )
+        return try decoder.unkeyedContainer()
+    }
+
+    mutating func superDecoder() throws -> any Decoder {
+        let (value, path) = try nextValue()
+        return InternalDecoder(
+            value: value,
+            codingPath: path,
+            userInfo: decoder.userInfo
+        )
+    }
+
     // MARK: - Private
 
     private let decoder: InternalDecoder
-    private let value: JSON
+    private let array: JSON.Array
+
+    private mutating func nextValue() throws -> (JSON, [any CodingKey]) {
+        guard !isAtEnd else {
+            throw makeValueNotFound(
+                for: JSON.self,
+                codingPath: codingPath + [IndexCodingKey(currentIndex)],
+                message: "Unkeyed container is at end."
+            )
+        }
+        let index = currentIndex
+        let value = array[index]
+        currentIndex += 1
+        let path = decoder.codingPath + [IndexCodingKey(index)]
+        return (value, path)
+    }
 
 }
