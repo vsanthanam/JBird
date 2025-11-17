@@ -30,14 +30,24 @@ extension JSON {
 
     public final class Encoder {
 
-        public init(_ options: JSON.SerializationOptions = .default) {
+        public init(
+            _ options: JSON.SerializationOptions = .default
+        ) {
             self.options = options
         }
 
         public let options: JSON.SerializationOptions
 
-        public func encode(_ value: some Encodable) throws -> Data {
-            fatalError()
+        public func encode(
+            _ value: some Encodable
+        ) throws -> Data {
+            let encoder = InternalEncoder(
+                codingPath: [],
+                userInfo: [:]
+            )
+            try value.encode(to: encoder)
+            let json = try encoder.finalize()
+            return try JSON.data(from: json, options: options)
         }
 
     }
