@@ -338,6 +338,34 @@ jobs:
         with:
           name: wasm-build-${{ matrix.swift }}
           path: build.zip
+  build-android-spm:
+    name: Build JBird (Android)
+    strategy:
+      fail-fast: false
+      matrix:
+        swift: ['6.0', '6.1', '6.2']
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-name: android-build-${{ matrix.swift }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build JBird
+        uses: skiptools/swift-android-action@v2
+        with:
+          swift-version: ${{ matrix.swift }}
+          build-package: true
+          build-tests: false
+          run-tests: false
+      - name: Install `zip`
+        run: sudo apt-get update && sudo apt-get install -y zip
+      - name: Compress Build
+        run: zip -r build.zip .build
+      - name: Upload Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-build-${{ matrix.swift }}
+          path: build.zip
   clang-format:
     name: Run clang-format
     runs-on: ubuntu-latest
@@ -445,6 +473,7 @@ jobs:
       - build-windows-spm
       - test-windows-spm
       - build-wasm-spm
+      - build-android-spm
       - build-xcframework
       - swiftformat
       - clang-format
@@ -468,6 +497,7 @@ jobs:
             [[ "${{ needs.build-windows-spm.result }}" == "failure" ]] || \
             [[ "${{ needs.test-windows-spm.result }}" == "failure" ]] || \
             [[ "${{ needs.build-wasm-spm.result }}" == "failure" ]] || \
+            [[ "${{ needs.build-android-spm.result }}" == "failure" ]] || \
             [[ "${{ needs.build-xcframework.result }}" == "failure" ]] || \
             [[ "${{ needs.swiftformat.result }}" == "failure" ]] || \
             [[ "${{ needs.clang-format.result }}" == "failure" ]] || \
