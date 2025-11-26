@@ -34,7 +34,7 @@
         #if DeclarativeAPI
             @_exported import JBirdMacros
         #else
-            #error("You cannot use the ConformanceMacro trait without the Declarative API trait!")
+            #error("You cannot use the `ConformanceMacros` trait without the `DeclarativeAPI` trait.")
         #endif
     #endif
 #else
@@ -48,11 +48,11 @@
             #if canImport(JBirdBuilders)
                 @_exported import JBirdMacros
             #else
-                #error("You cannot use JBirdMacros without JBirdBuilders")
+                #error("You cannot use JBirdMacros without JBirdBuilders.")
             #endif
         #endif
     #else
-        #error("The umbrella module JBird requires JBirdCore")
+        #error("The umbrella module JBird requires JBirdCore.")
     #endif
 #endif
 
