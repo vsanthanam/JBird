@@ -329,7 +329,7 @@ extension JSON {
         return Data(bytes)
     }
 
-    #if swift(>=6.2) && hasFeature(NonisolatedNonsendingByDefault)
+    #if compiler(>=6.2) && hasFeature(NonisolatedNonsendingByDefault)
         @concurrent
         private static func startSerializationAsync(
             from json: JSON,
@@ -769,7 +769,7 @@ extension JSON {
         return json
     }
 
-    #if swift(>=6.2) && hasFeature(NonisolatedNonsendingByDefault)
+    #if compiler(>=6.2) && hasFeature(NonisolatedNonsendingByDefault)
         @concurrent
         private static func parseAsync(
             _ data: Data,
@@ -955,7 +955,7 @@ extension JSON {
                     return .string(str)
                 case JSON_ARRAY:
                     let count = json_get_array_size(value)
-                    #if swift(>=6.1)
+                    #if compiler(>=6.1)
                         let array = try await withThrowingTaskGroup { group in
                             for i in 0..<count {
                                 let element = unsafe_closure {
@@ -1015,7 +1015,7 @@ extension JSON {
                     return .array(array)
                 case JSON_OBJECT:
                     let count = json_get_object_size(value)
-                    #if swift(>=6.1)
+                    #if compiler(>=6.1)
                         let object = try await withThrowingTaskGroup { group in
                             for i in 0..<count {
                                 let key = unsafe_closure {
