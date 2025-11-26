@@ -25,22 +25,25 @@
 
 import SwiftSyntax
 import SwiftSyntaxBuilder
+import SwiftSyntaxMacroExpansion
 import SwiftSyntaxMacros
-import SwiftSyntaxMacrosTestSupport
-import XCTest
+import SwiftSyntaxMacrosGenericTestSupport
+import Testing
 
 // Macro implementations build for the host, so the corresponding module is not available when cross-compiling. Cross-compiled tests may still make use of the macro itself in end-to-end tests.
 #if canImport(JBirdMacrosCompilerPlugin)
     import JBirdMacrosCompilerPlugin
 
-    fileprivate let testMacros: [String: any Macro.Type] = [
-        "JSONCodable": JSONCodableMacro.self,
+    fileprivate let macroSpecs: [String: MacroSpec] = [
+        "JSONCodable": MacroSpec(type: JSONCodableMacro.self)
     ]
 #endif
 
-final class JSONCodableMacroTests: XCTestCase {
+@Suite("@JSONCodable Tests")
+struct JSONCodableMacroTestsV2 {
 
-    func test_basic() throws {
+    @Test("Basic")
+    func basic() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -73,15 +76,18 @@ final class JSONCodableMacroTests: XCTestCase {
                 extension Foo: JBirdCore.JSONDecodable {
                 }
                 """,
-                macros: testMacros
+                macroSpecs: macroSpecs,
+                failureHandler: { failures in
+                    Issue.record("An unexpected failure occured")
+                }
             )
         #else
-            throw XCTSkip("macros are only supported when running tests for the host platform")
+            Issue.record("macros are only supported when running tests for the host platform")
         #endif
-
     }
 
-    func test_customKey() throws {
+    @Test("Custom Key")
+    func customKey() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -116,15 +122,18 @@ final class JSONCodableMacroTests: XCTestCase {
                 extension Foo: JBirdCore.JSONDecodable {
                 }
                 """,
-                macros: testMacros
+                macroSpecs: macroSpecs,
+                failureHandler: { failures in
+                    Issue.record("An unexpected failure occured")
+                }
             )
         #else
-            throw XCTSkip("macros are only supported when running tests for the host platform")
+            Issue.record("macros are only supported when running tests for the host platform")
         #endif
-
     }
 
-    func test_snakeCase() throws {
+    @Test("Snake Case")
+    func snakeCase() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -159,15 +168,18 @@ final class JSONCodableMacroTests: XCTestCase {
                 extension Foo: JBirdCore.JSONDecodable {
                 }
                 """,
-                macros: testMacros
+                macroSpecs: macroSpecs,
+                failureHandler: { failures in
+                    Issue.record("An unexpected failure occured")
+                }
             )
         #else
-            throw XCTSkip("macros are only supported when running tests for the host platform")
+            Issue.record("macros are only supported when running tests for the host platform")
         #endif
-
     }
 
-    func test_omitIfNil_noAnnotation() throws {
+    @Test("Omit If Nil No Annotation")
+    func omitIfNilNoAnnotation() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -206,14 +218,18 @@ final class JSONCodableMacroTests: XCTestCase {
                 extension Foo: JBirdCore.JSONDecodable {
                 }
                 """,
-                macros: testMacros
+                macroSpecs: macroSpecs,
+                failureHandler: { failures in
+                    Issue.record("An unexpected failure occured")
+                }
             )
         #else
-            throw XCTSkip("macros are only supported when running tests for the host platform")
+            Issue.record("macros are only supported when running tests for the host platform")
         #endif
     }
 
-    func test_omitIfNil_withAnnotation() throws {
+    @Test("Omit If Nil With Annotation")
+    func omitIfNilWithAnnotation() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -254,14 +270,18 @@ final class JSONCodableMacroTests: XCTestCase {
                 extension Foo: JBirdCore.JSONDecodable {
                 }
                 """,
-                macros: testMacros
+                macroSpecs: macroSpecs,
+                failureHandler: { failures in
+                    Issue.record("An unexpected failure occured")
+                }
             )
         #else
-            throw XCTSkip("macros are only supported when running tests for the host platform")
+            Issue.record("macros are only supported when running tests for the host platform")
         #endif
     }
 
-    func test_omitIfNil_withAnnotation_true() throws {
+    @Test("Omit If Nil With Annotation True")
+    func omitIfNilWithAnnotationTrue() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -302,14 +322,18 @@ final class JSONCodableMacroTests: XCTestCase {
                 extension Foo: JBirdCore.JSONDecodable {
                 }
                 """,
-                macros: testMacros
+                macroSpecs: macroSpecs,
+                failureHandler: { failures in
+                    Issue.record("An unexpected failure occured")
+                }
             )
         #else
-            throw XCTSkip("macros are only supported when running tests for the host platform")
+            Issue.record("macros are only supported when running tests for the host platform")
         #endif
     }
 
-    func test_omitIfNil_withAnnotation_false() throws {
+    @Test("Omit If Nil With Annotation False")
+    func omitIfNilWithAnnotationFalse() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -344,14 +368,18 @@ final class JSONCodableMacroTests: XCTestCase {
                 extension Foo: JBirdCore.JSONDecodable {
                 }
                 """,
-                macros: testMacros
+                macroSpecs: macroSpecs,
+                failureHandler: { failures in
+                    Issue.record("An unexpected failure occured")
+                }
             )
         #else
-            throw XCTSkip("macros are only supported when running tests for the host platform")
+            Issue.record("macros are only supported when running tests for the host platform")
         #endif
     }
 
-    func test_enums() throws {
+    @Test("Enums")
+    func enums() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -483,14 +511,18 @@ final class JSONCodableMacroTests: XCTestCase {
                 extension Foo: JBirdCore.JSONDecodable {
                 }
                 """,
-                macros: testMacros
+                macroSpecs: macroSpecs,
+                failureHandler: { failures in
+                    Issue.record("An unexpected failure occured")
+                }
             )
         #else
-            throw XCTSkip("macros are only supported when running tests for the host platform")
+            Issue.record("macros are only supported when running tests for the host platform")
         #endif
     }
 
-    func test_nonfinal_class() throws {
+    @Test("Non-Final Class")
+    func nonFinalClass() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -523,14 +555,18 @@ final class JSONCodableMacroTests: XCTestCase {
                 extension Foo: JBirdCore.JSONDecodable {
                 }
                 """,
-                macros: testMacros
+                macroSpecs: macroSpecs,
+                failureHandler: { failures in
+                    Issue.record("An unexpected failure occured")
+                }
             )
         #else
-            throw XCTSkip("macros are only supported when running tests for the host platform")
+            Issue.record("macros are only supported when running tests for the host platform")
         #endif
     }
 
-    func test_final_class() throws {
+    @Test("Final Class")
+    func finalClass() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -563,10 +599,13 @@ final class JSONCodableMacroTests: XCTestCase {
                 extension Foo: JBirdCore.JSONDecodable {
                 }
                 """,
-                macros: testMacros
+                macroSpecs: macroSpecs,
+                failureHandler: { failures in
+                    Issue.record("An unexpected failure occured")
+                }
             )
         #else
-            throw XCTSkip("macros are only supported when running tests for the host platform")
+            Issue.record("macros are only supported when running tests for the host platform")
         #endif
     }
 
