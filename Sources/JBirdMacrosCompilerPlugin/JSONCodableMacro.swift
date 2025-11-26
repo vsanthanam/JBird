@@ -530,7 +530,7 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
 
             if let ident = type.as(IdentifierTypeSyntax.self) {
                 let base = ident.name.text
-                #if swift(>=6.1)
+                #if compiler(>=6.1)
                     if let clause = ident.genericArgumentClause {
                         let args: [String] = clause.arguments.map { ga in
                             switch ga.argument {
