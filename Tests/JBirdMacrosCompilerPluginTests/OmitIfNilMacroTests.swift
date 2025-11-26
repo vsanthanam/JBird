@@ -25,44 +25,25 @@
 
 import SwiftSyntax
 import SwiftSyntaxBuilder
+import SwiftSyntaxMacroExpansion
 import SwiftSyntaxMacros
 import SwiftSyntaxMacrosGenericTestSupport
-import SwiftSyntaxMacrosTestSupport
-import XCTest
+import Testing
 
 // Macro implementations build for the host, so the corresponding module is not available when cross-compiling. Cross-compiled tests may still make use of the macro itself in end-to-end tests.
 #if canImport(JBirdMacrosCompilerPlugin)
     import JBirdMacrosCompilerPlugin
 
-    fileprivate let testMacros: [String: any Macro.Type] = [
-        "OmitIfNil": OmitIfNilMacro.self,
+    fileprivate let macroSpecs: [String: MacroSpec] = [
+        "OmitIfNil": MacroSpec(type: OmitIfNilMacro.self)
     ]
 #endif
 
-final class OmitIfNilMacroTests: XCTestCase {
+@Suite("@OmitIfNull Tests")
+struct OmitIfNullMacroTestsV2 {
 
-    func test_optionalType() throws {
-        #if canImport(JBirdMacrosCompilerPlugin)
-            assertMacroExpansion(
-                """
-                struct Foo {
-                    @OmitIfNil
-                    let name: String?
-                }
-                """,
-                expandedSource: """
-                struct Foo {
-                    let name: String?
-                }
-                """,
-                macros: testMacros
-            )
-        #else
-            throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-
-    func test_optionalTypeWithQuestionMark() throws {
+    @Test("Annotated Optional Type With Question Mark")
+    func optionalTypeWithQuestionMark() throws {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -76,35 +57,18 @@ final class OmitIfNilMacroTests: XCTestCase {
                     var age: Int?
                 }
                 """,
-                macros: testMacros
+                macroSpecs: macroSpecs,
+                failureHandler: { failures in
+                    Issue.record("An unexpected failure occured")
+                }
             )
         #else
-            throw XCTSkip("macros are only supported when running tests for the host platform")
+            Issue.record("macros are only supported when running tests for the host platform")
         #endif
     }
 
-    func test_implicitlyUnwrappedOptional() throws {
-        #if canImport(JBirdMacrosCompilerPlugin)
-            assertMacroExpansion(
-                """
-                struct Foo {
-                    @OmitIfNil
-                    let value: String!
-                }
-                """,
-                expandedSource: """
-                struct Foo {
-                    let value: String!
-                }
-                """,
-                macros: testMacros
-            )
-        #else
-            throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-
-    func test_optionalTypeWithOptionalKeyword() throws {
+    @Test("Annotated Explicit Optional")
+    func optionalTypeWithOptionalKeyword() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -118,14 +82,43 @@ final class OmitIfNilMacroTests: XCTestCase {
                     let data: Optional<Data>
                 }
                 """,
-                macros: testMacros
+                macroSpecs: macroSpecs,
+                failureHandler: { failures in
+                    Issue.record("An unexpected failure occured")
+                }
             )
         #else
-            throw XCTSkip("macros are only supported when running tests for the host platform")
+            Issue.record("macros are only supported when running tests for the host platform")
         #endif
     }
 
-    func test_nonOptionalType() throws {
+    @Test("Annotated IUO")
+    func implicitlyUnwrappedOptional() {
+        #if canImport(JBirdMacrosCompilerPlugin)
+            assertMacroExpansion(
+                """
+                struct Foo {
+                    @OmitIfNil
+                    let value: String!
+                }
+                """,
+                expandedSource: """
+                struct Foo {
+                    let value: String!
+                }
+                """,
+                macroSpecs: macroSpecs,
+                failureHandler: { failures in
+                    Issue.record("An unexpected failure occured")
+                }
+            )
+        #else
+            Issue.record("macros are only supported when running tests for the host platform")
+        #endif
+    }
+
+    @Test("Annotated non-optional")
+    func nonOptionalType() throws {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -142,14 +135,18 @@ final class OmitIfNilMacroTests: XCTestCase {
                 diagnostics: [
                     DiagnosticSpec(message: "@OmitIfNil can only be applied to properties with optional types", line: 2, column: 5)
                 ],
-                macros: testMacros
+                macroSpecs: macroSpecs,
+                failureHandler: { failures in
+                    Issue.record("An unexpected failure occured")
+                }
             )
         #else
-            throw XCTSkip("macros are only supported when running tests for the host platform")
+            Issue.record("macros are only supported when running tests for the host platform")
         #endif
     }
 
-    func test_computedProperty() throws {
+    @Test("Annotated computed property")
+    func computedProperty() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -170,14 +167,18 @@ final class OmitIfNilMacroTests: XCTestCase {
                 diagnostics: [
                     DiagnosticSpec(message: "@OmitIfNil can only be applied to stored properties, not computed properties", line: 2, column: 5)
                 ],
-                macros: testMacros
+                macroSpecs: macroSpecs,
+                failureHandler: { failures in
+                    Issue.record("An unexpected failure occured")
+                }
             )
         #else
-            throw XCTSkip("macros are only supported when running tests for the host platform")
+            Issue.record("macros are only supported when running tests for the host platform")
         #endif
     }
 
-    func test_multipleBindings() throws {
+    @Test("Annotated multiple bindings at once")
+    func multipleBindings() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -194,14 +195,18 @@ final class OmitIfNilMacroTests: XCTestCase {
                 diagnostics: [
                     DiagnosticSpec(message: "peer macro can only be applied to a single variable", line: 2, column: 5)
                 ],
-                macros: testMacros
+                macroSpecs: macroSpecs,
+                failureHandler: { failures in
+                    Issue.record("An unexpected failure occured")
+                }
             )
         #else
-            throw XCTSkip("macros are only supported when running tests for the host platform")
+            Issue.record("macros are only supported when running tests for the host platform")
         #endif
     }
 
-    func test_noTypeAnnotation() throws {
+    @Test("Annotated without type annotation")
+    func noTypeAnnotation() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -218,14 +223,18 @@ final class OmitIfNilMacroTests: XCTestCase {
                 diagnostics: [
                     DiagnosticSpec(message: "@OmitIfNil can only be applied to properties with explicit type annotations", line: 2, column: 5)
                 ],
-                macros: testMacros
+                macroSpecs: macroSpecs,
+                failureHandler: { failures in
+                    Issue.record("An unexpected failure occured")
+                }
             )
         #else
-            throw XCTSkip("macros are only supported when running tests for the host platform")
+            Issue.record("macros are only supported when running tests for the host platform")
         #endif
     }
 
-    func test_appliedToFunction() throws {
+    @Test("Annotated on function")
+    func appliedToFunction() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -246,14 +255,18 @@ final class OmitIfNilMacroTests: XCTestCase {
                 diagnostics: [
                     DiagnosticSpec(message: "@OmitIfNil can only be applied to stored properties", line: 2, column: 5)
                 ],
-                macros: testMacros
+                macroSpecs: macroSpecs,
+                failureHandler: { failures in
+                    Issue.record("An unexpected failure occured")
+                }
             )
         #else
-            throw XCTSkip("macros are only supported when running tests for the host platform")
+            Issue.record("macros are only supported when running tests for the host platform")
         #endif
     }
 
-    func test_nestedOptionalType() throws {
+    @Test("Annotated nested optional type")
+    func nestedOptionalType() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -267,11 +280,13 @@ final class OmitIfNilMacroTests: XCTestCase {
                     let value: [String?]?
                 }
                 """,
-                macros: testMacros
+                macroSpecs: macroSpecs,
+                failureHandler: { failures in
+                    Issue.record("An unexpected failure occured")
+                }
             )
         #else
-            throw XCTSkip("macros are only supported when running tests for the host platform")
+            Issue.record("macros are only supported when running tests for the host platform")
         #endif
     }
-
 }
