@@ -39,14 +39,6 @@ extension JSON {
             self = encodable.encodeToJSONNumber()
         }
 
-        @available(*, deprecated, renamed: "init(_:)", message: "")
-        @_disfavoredOverload
-        public init(
-            _ convertible: some JSONNumberConvertible
-        ) {
-            self = convertible.jsonNumber
-        }
-
         // MARK: - API
 
         case int(Int)
