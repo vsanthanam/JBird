@@ -60,7 +60,7 @@ extension Array: JSONInitializable where Element: JSONInitializable {
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension Dictionary: JSONInitializable where Key: JSONKeyDecodable, Value: JSONInitializable {
+extension Dictionary: JSONInitializable where Key: JSONKeyInitializable, Value: JSONInitializable {
 
     public init(json: JSON) throws {
         self = try json.objectValue.reduce(into: Self()) { dictionary, pair in

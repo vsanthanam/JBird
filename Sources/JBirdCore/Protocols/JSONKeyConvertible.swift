@@ -1,5 +1,5 @@
 // JBird
-// Object.swift
+// JSONKeyConvertible.swift
 //
 // MIT License
 //
@@ -24,9 +24,29 @@
 // SOFTWARE.
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension JSON {
+public protocol JSONKeyConvertible {
 
-    /// A JSON object
-    public typealias Object = [Key: Value]
+    var jsonKey: JSON.Key { get }
+
+}
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension JSONKeyConvertible where Self: RawRepresentable, RawValue: JSONKeyConvertible {
+
+    public var jsonKey: JSON.Key {
+        JSON.Key(rawValue)
+    }
+
+}
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension JSON.Key {
+
+    @_disfavoredOverload
+    public init(
+        _ encodable: some JSONKeyConvertible
+    ) {
+        self = encodable.jsonKey
+    }
 
 }

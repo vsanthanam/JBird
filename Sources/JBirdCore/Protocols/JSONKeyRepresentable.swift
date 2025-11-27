@@ -1,5 +1,5 @@
 // JBird
-// Object.swift
+// JSONKeyRepresentable.swift
 //
 // MIT License
 //
@@ -24,9 +24,17 @@
 // SOFTWARE.
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension JSON {
+public typealias JSONKeyRepresentable = JSONKeyConvertible & JSONKeyInitializable
 
-    /// A JSON object
-    public typealias Object = [Key: Value]
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension String: JSONKeyRepresentable {
+
+    public var jsonKey: JSON.Key {
+        self
+    }
+
+    public init(jsonKey: JSON.Key) throws {
+        self = jsonKey
+    }
 
 }

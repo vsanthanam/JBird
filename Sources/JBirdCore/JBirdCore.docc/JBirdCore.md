@@ -26,9 +26,9 @@ APIs to create, deserialize, manipulate, and serialize JSON data in Swift
 - ``JSONLiteralEncodable``
 - ``JSONLiteralDecodable``
 - ``JSONLiteralCodable``
-- ``JSONKeyEncodable``
-- ``JSONKeyDecodable``
-- ``JSONKeyCodable``
+- ``JSONKeyConvertible``
+- ``JSONKeyInitializable``
+- ``JSONKeyRepresentable``
 
 ### Errors
 

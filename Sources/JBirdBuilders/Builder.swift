@@ -118,7 +118,7 @@ extension JSON {
 
         @_disfavoredOverload
         public static func buildExpression(
-            _ expression: (some JSONKeyEncodable, some JSONConvertible)
+            _ expression: (some JSONKeyConvertible, some JSONConvertible)
         ) -> [(Key, Value)] {
             let (key, value) = expression
             return [(Key(key), Value(value))]
@@ -190,7 +190,7 @@ public func => (
 public func => <Key, Value>(
     lhs: Key,
     rhs: Value
-) -> (Key, Value) where Key: JSONKeyEncodable, Value: JSONConvertible {
+) -> (Key, Value) where Key: JSONKeyConvertible, Value: JSONConvertible {
     (lhs, rhs)
 }
 
@@ -208,6 +208,6 @@ public func => (
 public func => <Key>(
     lhs: Key,
     @JSON.Builder rhs: () -> JSON
-) -> (Key, JSON.Value) where Key: JSONKeyEncodable {
+) -> (Key, JSON.Value) where Key: JSONKeyConvertible {
     (lhs, rhs())
 }

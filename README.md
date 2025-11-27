@@ -26,7 +26,7 @@ if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
 let json = try JSON(data)
 let name = try json["user"]["name"].stringValue
 let isActive = try json["user"]["isActive"].boolValue
-let user = try json["user"].decode(into: User.self)
+let user = try json["user"].convert(into: User.self)
 ```
 
 JBird also simplifies mutation, which is cumbersome with Foundation:

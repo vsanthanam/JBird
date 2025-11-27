@@ -231,7 +231,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ///
     /// This property will throw an error if the JSON value is anything other than a JSON integer, even if the JSON contains a double value that could be legally represented an integer, such as `4.0`.
     ///
-    /// To coerce such doubles into integers, use the ``decode(into:)`` method instead.
+    /// To coerce such doubles into integers, use the ``convert(into:)`` method instead.
     ///
     /// - Throws: An error, if the JSON value is not an integer
     public var intValue: Int {
@@ -244,7 +244,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ///
     /// Thie property will throw an error if the JSON value is anything other than a JSON double, even if the JSON contains an integer value that can be represented as a double.
     ///
-    /// To coerce integers into doubles, use the ``decode(into:)`` method instead
+    /// To coerce integers into doubles, use the ``convert(into:)`` method instead
     ///
     /// - Throws: An error, if the JSON value is not a double
     public var doubleValue: Double {

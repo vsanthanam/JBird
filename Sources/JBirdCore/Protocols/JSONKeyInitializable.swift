@@ -1,5 +1,5 @@
 // JBird
-// Object.swift
+// JSONKeyInitializable.swift
 //
 // MIT License
 //
@@ -24,9 +24,23 @@
 // SOFTWARE.
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension JSON {
+public protocol JSONKeyInitializable {
 
-    /// A JSON object
-    public typealias Object = [Key: Value]
+    /// Create an instance of the type from an externaled `JSON.Key` representation.
+    /// - Parameter jsonKey: The `JSON.Key` value to decode from.
+    init(jsonKey: JSON.Key) throws
+
+}
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension JSONKeyInitializable where Self: RawRepresentable, RawValue: JSONKeyInitializable {
+
+    public init(jsonKey: JSON.Key) throws {
+        let rawValue = try RawValue(jsonKey: jsonKey)
+        guard let val = Self(rawValue: rawValue) else {
+            throw JSONError.invalidRawRepresentable
+        }
+        self = val
+    }
 
 }

@@ -61,10 +61,10 @@ JBird provides a fully typed `JSON` enum that accurately represents JSON's data 
 ```swift
 // JBird approach
 let json = try JSON(data)
-let name = try json["user"]["name"].decode(into: String.self)
-let age = try json["user"]["age"].decode(into: Int.self)
-let isActive = try json["user"]["isActive"].decode(into: Bool.self)
-let user = try json["user"].decode(into: User.self)
+let name = try json["user"]["name"].convert(into: String.self)
+let age = try json["user"]["age"].convert(into: Int.self)
+let isActive = try json["user"]["isActive"].convert(into: Bool.self)
+let user = try json["user"].convert(into: User.self)
 ```
 
 Type safety is enforced at compile-time, with clear error handling for runtime issues.

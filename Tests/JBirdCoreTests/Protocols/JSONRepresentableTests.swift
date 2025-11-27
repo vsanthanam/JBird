@@ -263,7 +263,7 @@ struct JSONRepresentableTests {
     @Suite("Dictionary Conformance Tests")
     struct DictionaryTests {
 
-        enum CustomKey: String, JSONKeyCodable {
+        enum CustomKey: String, JSONKeyRepresentable {
             case foo
             case bar
         }
