@@ -27,11 +27,11 @@
 ///
 /// `JSONKeyCodable` is a type alias for the ``JSONKeyEncodable`` and ``JSONKeyDecodable`` protocols.
 /// When you use `JSONKeyCodable` as a type or a generic constraint, it matches any type that conforms to both protocols.
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 public typealias JSONKeyCodable = JSONKeyDecodable & JSONKeyEncodable
 
 /// A type that can encode itself to an external  `JSON.Key` representation.
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 public protocol JSONKeyEncodable {
 
     /// Encode this value to a typed `JSON.Key` representation.
@@ -41,7 +41,7 @@ public protocol JSONKeyEncodable {
 }
 
 /// A type that can decode itself from an external `JSON.Key` representation.
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 public protocol JSONKeyDecodable {
 
     /// Create an instance of the type from an externaled `JSON.Key` representation.
@@ -50,7 +50,7 @@ public protocol JSONKeyDecodable {
 
 }
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension String: JSONKeyCodable {
 
     public func encodeToJSONKey() -> JSON.Key {
@@ -63,7 +63,7 @@ extension String: JSONKeyCodable {
 
 }
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSONKeyEncodable where Self: RawRepresentable, RawValue: JSONKeyEncodable {
 
     public func encodeToJSONKey() -> JSON.Key {
@@ -72,7 +72,7 @@ extension JSONKeyEncodable where Self: RawRepresentable, RawValue: JSONKeyEncoda
 
 }
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSONKeyDecodable where Self: RawRepresentable, RawValue: JSONKeyDecodable {
 
     public init(jsonKey: JSON.Key) throws {
@@ -85,7 +85,7 @@ extension JSONKeyDecodable where Self: RawRepresentable, RawValue: JSONKeyDecoda
 
 }
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON.Key {
 
     @_disfavoredOverload

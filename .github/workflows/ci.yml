@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["26.1", "18.6", "17.7", "16.6", "15.7"]
+        version: ["26.1", "18.6", "17.7", "16.6"]
     runs-on: macos-26
     steps:
     - name: Checkout
@@ -34,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["26.1", "18.6", "17.7", "16.6", "15.7"]
+        version: ["26.1", "18.6", "17.7", "16.6"]
     runs-on: macos-26
     steps:
     - name: Checkout
@@ -48,7 +48,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["26.1", "11.6", "10.7", "9.6", "8.7"]
+        version: ["26.1", "11.6", "10.7", "9.6"]
     runs-on: macos-26
     steps:
     - name: Checkout

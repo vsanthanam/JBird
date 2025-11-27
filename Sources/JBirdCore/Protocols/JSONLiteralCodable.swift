@@ -27,11 +27,11 @@
 ///
 /// `JSONLiteralCodable` is a type alias for the ``JSONLiteralEncodable`` and ``JSONLiteralDecodable`` protocols.
 /// When you use `JSONLiteralCodable` as a type or a generic constraint, it matches any type that conforms to both protocols.
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 public typealias JSONLiteralCodable = JSONLiteralDecodable & JSONLiteralEncodable
 
 /// A type that can encode itself to an external  `JSON.Literal` representation.
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 public protocol JSONLiteralEncodable {
 
     /// Encode this value to a typed `JSON.Literal` representation.
@@ -41,7 +41,7 @@ public protocol JSONLiteralEncodable {
 }
 
 /// A type that can decode itself from an external `JSON.Literal` representation.
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 public protocol JSONLiteralDecodable {
 
     /// Create an instance of the type from an externaled `JSON.Literal` representation.
@@ -50,7 +50,7 @@ public protocol JSONLiteralDecodable {
 
 }
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension Bool: JSONLiteralCodable {
 
     public func encodeToJSONLiteral() -> JSON.Literal {
@@ -63,7 +63,7 @@ extension Bool: JSONLiteralCodable {
 
 }
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON.Literal: JSONLiteralCodable {
 
     public func encodeToJSONLiteral() -> JSON.Literal {

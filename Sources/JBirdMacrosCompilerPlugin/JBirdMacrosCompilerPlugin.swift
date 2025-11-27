@@ -31,7 +31,20 @@ import SwiftSyntaxMacros
 @main
 struct JBirdMacrosCompilerPlugin: CompilerPlugin {
 
-    let providingMacros: [any Macro.Type] = [
+    // MARK: - CompilerPlugin
+
+    var providingMacros: [any Macro.Type] {
+        if #available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *) {
+            macros
+        } else {
+            []
+        }
+    }
+
+    // MARK: - Private
+
+    @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+    private var macros: [any Macro.Type] = [
         JSONCodableMacro.self,
         JSONKeyMacro.self,
         OmitIfNilMacro.self
@@ -39,6 +52,7 @@ struct JBirdMacrosCompilerPlugin: CompilerPlugin {
 
 }
 
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension Optional {
 
     func mustExist(
