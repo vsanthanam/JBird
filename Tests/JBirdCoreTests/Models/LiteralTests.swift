@@ -80,22 +80,6 @@ struct LiteralTests {
         #expect(null.unboxed().base is NSNull)
     }
 
-    @Test("Literal Untyped Tests")
-    @available(*, deprecated)
-    func untypedTests() throws {
-        let `true` = JSON.Literal.true
-        let trueUntyped = try #require(`true`.untyped as? Bool)
-        #expect(trueUntyped)
-
-        let `false` = JSON.Literal.false
-        let falseUntyped = try #require(`false`.untyped as? Bool)
-        #expect(!falseUntyped)
-
-        let null = JSON.Literal.null
-        let nullUntyped = null.untyped as Any?
-        #expect(nullUntyped == nil)
-    }
-
     @Test("Literal Expression Tests")
     func nilExpression() {
         let `true`: JSON.Literal = true

@@ -376,32 +376,6 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// The untyped representation of the JSON value
-    ///
-    /// This property returns the JSON value as a native Swift type:
-    /// - `true` and `false` literals are represented as `Bool`
-    /// - `null` literals are represented as `nil`
-    /// - Strings are represented as `String`
-    /// - Integers are represented as `Int`
-    /// - Floating point numbers are represented as `Double`
-    /// - Arrays are represented as `[Any?]`
-    /// - Objects are represented as `[String: Any?]`
-    @available(*, deprecated, renamed: "unboxed()", message: "Use unboxed() instead. This property will be removed in a future version.")
-    public var untyped: Any? {
-        switch self {
-        case let .literal(literal):
-            literal.untyped
-        case let .string(string):
-            string
-        case let .number(number):
-            number.untyped
-        case let .array(array):
-            array.map(\.untyped)
-        case let .object(object):
-            object.mapValues(\.untyped)
-        }
-    }
-
-    /// The untyped representation of the JSON value
     /// - Returns: An `AnyHashable` containing a `String`, `Int`, `Double`, `Bool`, `[AnyHashable]`, `[String: AnyHashable]`, or `NSNull` representing the JSON value.
     public func unboxed() -> AnyHashable {
         switch self {
