@@ -29,11 +29,11 @@ import Foundation
 ///
 /// `JSONCodable` is a type alias for the `JSONEncodable` and `JSONDecodable` protocols.
 /// When you use `JSONCodable` as a type or a generic constraint, it matches any type that conforms to both protocols.
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 public typealias JSONCodable = JSONDecodable & JSONEncodable
 
 /// A type that can encode itself to an external  `JSON` representation.
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 public protocol JSONEncodable {
 
     /// Encode this value to a typed `JSON` representation.
@@ -43,7 +43,7 @@ public protocol JSONEncodable {
 }
 
 /// A type that can decode itself from an external `JSON` representation.
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 public protocol JSONDecodable {
 
     /// Create an instance of the type from an externaled `JSON` representation.
@@ -52,7 +52,7 @@ public protocol JSONDecodable {
 
 }
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON: JSONCodable {
 
     public func encodeToJSON() -> JSON {
@@ -65,7 +65,7 @@ extension JSON: JSONCodable {
 
 }
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSONEncodable where Self: JSONLiteralEncodable {
 
     public func encodeToJSON() -> JSON {
@@ -75,7 +75,7 @@ extension JSONEncodable where Self: JSONLiteralEncodable {
 
 }
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSONDecodable where Self: JSONLiteralDecodable {
 
     public init(json: JSON) throws {
@@ -85,13 +85,13 @@ extension JSONDecodable where Self: JSONLiteralDecodable {
 
 }
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON.Literal: JSONCodable {}
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension Bool: JSONCodable {}
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSONEncodable where Self: JSONNumberEncodable {
 
     public func encodeToJSON() -> JSON {
@@ -101,7 +101,7 @@ extension JSONEncodable where Self: JSONNumberEncodable {
 
 }
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSONDecodable where Self: JSONNumberDecodable {
 
     public init(json: JSON) throws {
@@ -111,49 +111,49 @@ extension JSONDecodable where Self: JSONNumberDecodable {
 
 }
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON.Number: JSONCodable {}
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension Int: JSONCodable {}
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension Double: JSONCodable {}
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension UInt: JSONCodable {}
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension UInt8: JSONCodable {}
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension UInt16: JSONCodable {}
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension UInt32: JSONCodable {}
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension UInt64: JSONCodable {}
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension Int8: JSONCodable {}
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension Int16: JSONCodable {}
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension Int32: JSONCodable {}
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension Int64: JSONCodable {}
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension Float: JSONCodable {}
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension Decimal: JSONCodable {}
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension String: JSONCodable {
 
     public func encodeToJSON() -> JSON {
@@ -166,7 +166,7 @@ extension String: JSONCodable {
 
 }
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension Array: JSONEncodable where Element: JSONEncodable {
 
     public func encodeToJSON() -> JSON {
@@ -175,7 +175,7 @@ extension Array: JSONEncodable where Element: JSONEncodable {
 
 }
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension Array: JSONDecodable where Element: JSONDecodable {
 
     public init(json: JSON) throws {
@@ -184,7 +184,7 @@ extension Array: JSONDecodable where Element: JSONDecodable {
 
 }
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension Dictionary: JSONEncodable where Key: JSONKeyEncodable, Value: JSONEncodable {
 
     public func encodeToJSON() -> JSON {
@@ -197,7 +197,7 @@ extension Dictionary: JSONEncodable where Key: JSONKeyEncodable, Value: JSONEnco
 
 }
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension Dictionary: JSONDecodable where Key: JSONKeyDecodable, Value: JSONDecodable {
 
     public init(json: JSON) throws {
@@ -209,7 +209,7 @@ extension Dictionary: JSONDecodable where Key: JSONKeyDecodable, Value: JSONDeco
 
 }
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSONEncodable where Self: RawRepresentable, RawValue: JSONEncodable {
 
     public func encodeToJSON() -> JSON {
@@ -218,7 +218,7 @@ extension JSONEncodable where Self: RawRepresentable, RawValue: JSONEncodable {
 
 }
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSONDecodable where Self: RawRepresentable, RawValue: JSONDecodable {
 
     public init(json: JSON) throws {
@@ -231,7 +231,7 @@ extension JSONDecodable where Self: RawRepresentable, RawValue: JSONDecodable {
 
 }
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension Optional: JSONEncodable where Wrapped: JSONEncodable {
 
     public func encodeToJSON() -> JSON {
@@ -245,7 +245,7 @@ extension Optional: JSONEncodable where Wrapped: JSONEncodable {
 
 }
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension Optional: JSONDecodable where Wrapped: JSONDecodable {
 
     public init(json: JSON) throws {
@@ -258,7 +258,7 @@ extension Optional: JSONDecodable where Wrapped: JSONDecodable {
 
 }
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension Set: JSONEncodable where Element: JSONEncodable {
 
     public func encodeToJSON() -> JSON {
@@ -267,7 +267,7 @@ extension Set: JSONEncodable where Element: JSONEncodable {
 
 }
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension Set: JSONDecodable where Element: JSONDecodable {
 
     public init(json: JSON) throws {
@@ -276,7 +276,7 @@ extension Set: JSONDecodable where Element: JSONDecodable {
 
 }
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension URL: JSONCodable {
 
     public func encodeToJSON() -> JSON {
@@ -293,7 +293,7 @@ extension URL: JSONCodable {
 
 }
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension UUID: JSONCodable {
 
     public func encodeToJSON() -> JSON {
