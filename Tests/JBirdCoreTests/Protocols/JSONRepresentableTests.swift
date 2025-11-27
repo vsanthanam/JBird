@@ -623,8 +623,8 @@ struct JSONRepresentableTests {
         @Test("Decimal Whole JSON Value")
         func decimalWholeJSONValue() {
             let decimal: Decimal = 21
-            let json = decimal.encodeToJSONNumber()
-            #expect(json == .int(21))
+            let json = decimal.jsonValue
+            #expect(json == .number(.int(21)))
         }
 
         @Test("Decimal Whole Convert")
@@ -637,8 +637,8 @@ struct JSONRepresentableTests {
         @Test("Decimal Float JSON Value")
         func decimalFloatJSONValue() {
             let decimal: Decimal = 2.1
-            let json = decimal.encodeToJSONNumber()
-            #expect(json == .double(2.1))
+            let json = decimal.jsonValue
+            #expect(json == .number(.double(2.1)))
         }
 
         @Test("Decimal Float Convert")

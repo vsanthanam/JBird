@@ -33,10 +33,8 @@ extension JSON {
 
         // MARK: - Initializers
 
-        /// Create a `JSON.Number` value from a ``JSONNumberEncodable`` type
-        /// - Parameter encodable: The encodable type to convert to a JSON number
-        public init(_ encodable: some JSONNumberEncodable) {
-            self = encodable.encodeToJSONNumber()
+        public init(_ convertible: some JSONNumberConvertible) {
+            self = convertible.jsonNumber
         }
 
         // MARK: - API
@@ -98,6 +96,12 @@ extension JSON {
             case let .double(double):
                 double
             }
+        }
+
+        public func convert<T>(
+            into type: T.Type = T.self
+        ) throws -> T where T: JSONNumberInitializable {
+            try T(jsonNumber: self)
         }
 
         // MARK: - ExpressibleByIntegerLiteral

@@ -53,12 +53,12 @@ if literal.isNull {
 
 ### Initializers
 
-- ``init(_:)-(JSONLiteralEncodable)``
+- ``init(_:)``
 
 ### Decoding JSON literal values into Swift types
 
 - ``unboxed()``
-- ``decode(into:)``
+- ``convert(into:)``
 
 ### Inspecting JOSN literal values
 

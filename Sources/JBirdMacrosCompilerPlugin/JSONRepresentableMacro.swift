@@ -140,7 +140,7 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
             }
             .joined(separator: "\n")
 
-        let encodable = DeclSyntax(
+        let convertible = DeclSyntax(
             """
             @JBirdCore.JSON.Builder
             public var jsonValue: JBirdCore.JSON {
@@ -165,7 +165,7 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
             }
             .joined(separator: "\n")
 
-        let decodable = if useRequiredInit {
+        let initializable = if useRequiredInit {
             DeclSyntax(
                 """
                 public required init(json: JSON) throws {
@@ -183,7 +183,7 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
             )
         }
 
-        return [encodable, decodable]
+        return [convertible, initializable]
     }
 
     private static func parseStoredProperties(
@@ -448,7 +448,7 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
             }
         }
 
-        let encodable = DeclSyntax(
+        let convertible = DeclSyntax(
             """
             public var jsonValue: JBirdCore.JSON {
                 switch self {
@@ -465,7 +465,7 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
         if !convertAttemptsBody.isEmpty { convertBodySections.append(convertAttemptsBody) }
         convertBodySections.append("throw JBirdMacros.JSONMacroDecodingError(\"Enum case decoding failure\")")
 
-        let decodable = DeclSyntax(
+        let initializable = DeclSyntax(
             """
             public init(json: JSON) throws {
                 \(raw: convertBodySections.joined(separator: "\n\n"))
@@ -473,7 +473,7 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
             """
         )
 
-        return [encodable, decodable]
+        return [convertible, initializable]
     }
 
     private static func enumAssociatedVarsAndKeys(from clause: EnumCaseParameterClauseSyntax) -> ([String], [String: String]) {

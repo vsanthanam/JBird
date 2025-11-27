@@ -81,11 +81,11 @@ JBird supports the full range of Apple platforms when working with Xcode, whethe
 
 | Platform | Minimum Version | Status |
 |----------|-----------------|--------|
-| macOS | 12.0+ | ✅ Supported |
-| Mac Catalyst | 15.0+ | ✅ Supported |
-| iOS | 15.0+ | ✅ Supported |
-| watchOS | 8.0+ | ✅ Supported |
-| tvOS | 15.0+ | ✅ Supported |
+| macOS | 13.0+ | ✅ Supported |
+| Mac Catalyst | 16.0+ | ✅ Supported |
+| iOS | 16.0+ | ✅ Supported |
+| watchOS | 9.0+ | ✅ Supported |
+| tvOS | 16.0+ | ✅ Supported |
 | visionOS | 1.0+ | ✅ Supported |
 
 ### Swift Package Manager

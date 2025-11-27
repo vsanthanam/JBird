@@ -1,5 +1,5 @@
 // JBird
-// JSONNumberCodable.swift
+// JSONNumberRepresentable.swift
 //
 // MIT License
 //
@@ -25,37 +25,13 @@
 
 import Foundation
 
-/// A type that can convert itself into and out of an external `JSON.Number` representation.
-///
-/// `JSONNumberCodable` is a type alias for the ``JSONNumberEncodable`` and ``JSONNumberDecodable`` protocols.
-/// When you use `JSONNumberCodable` as a type or a generic constraint, it matches any type that conforms to both protocols.
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-public typealias JSONNumberCodable = JSONNumberDecodable & JSONNumberEncodable
-
-/// A type that can encode itself to an external  `JSON.Number` representation.
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-public protocol JSONNumberEncodable {
-
-    /// Encode this value to a typed `JSON.Number` representation.
-    /// - Returns: The `JSON.Number` value that represents the current instance.
-    func encodeToJSONNumber() -> JSON.Number
-
-}
-
-/// A type that can decode itself from an external `JSON.Number` representation.
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-public protocol JSONNumberDecodable {
-
-    /// Create an instance of the type from an externaled `JSON.Number` representation.
-    /// - Parameter jsonNumber: The `JSON.Number` value to decode from.
-    init(jsonNumber: JSON.Number) throws
-
-}
+public typealias JSONNumberRepresentable = JSONNumberConvertible & JSONNumberInitializable
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension JSON.Number: JSONNumberCodable {
+extension JSON.Number: JSONNumberRepresentable {
 
-    public func encodeToJSONNumber() -> JSON.Number {
+    public var jsonNumber: JSON.Number {
         self
     }
 
@@ -66,9 +42,9 @@ extension JSON.Number: JSONNumberCodable {
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension Int: JSONNumberCodable {
+extension Int: JSONNumberRepresentable {
 
-    public func encodeToJSONNumber() -> JSON.Number {
+    public var jsonNumber: JSON.Number {
         .int(self)
     }
 
@@ -89,9 +65,9 @@ extension Int: JSONNumberCodable {
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension Double: JSONNumberCodable {
+extension Double: JSONNumberRepresentable {
 
-    public func encodeToJSONNumber() -> JSON.Number {
+    public var jsonNumber: JSON.Number {
         .double(self)
     }
 
@@ -107,9 +83,9 @@ extension Double: JSONNumberCodable {
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension UInt: JSONNumberCodable {
+extension UInt: JSONNumberRepresentable {
 
-    public func encodeToJSONNumber() -> JSON.Number {
+    public var jsonNumber: JSON.Number {
         .int(Int(self))
     }
 
@@ -121,9 +97,9 @@ extension UInt: JSONNumberCodable {
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension UInt8: JSONNumberCodable {
+extension UInt8: JSONNumberRepresentable {
 
-    public func encodeToJSONNumber() -> JSON.Number {
+    public var jsonNumber: JSON.Number {
         .int(Int(self))
     }
 
@@ -135,9 +111,9 @@ extension UInt8: JSONNumberCodable {
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension UInt16: JSONNumberCodable {
+extension UInt16: JSONNumberRepresentable {
 
-    public func encodeToJSONNumber() -> JSON.Number {
+    public var jsonNumber: JSON.Number {
         .int(Int(self))
     }
 
@@ -149,9 +125,9 @@ extension UInt16: JSONNumberCodable {
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension UInt32: JSONNumberCodable {
+extension UInt32: JSONNumberRepresentable {
 
-    public func encodeToJSONNumber() -> JSON.Number {
+    public var jsonNumber: JSON.Number {
         .int(Int(self))
     }
 
@@ -163,9 +139,9 @@ extension UInt32: JSONNumberCodable {
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension UInt64: JSONNumberCodable {
+extension UInt64: JSONNumberRepresentable {
 
-    public func encodeToJSONNumber() -> JSON.Number {
+    public var jsonNumber: JSON.Number {
         .int(Int(self))
     }
 
@@ -177,9 +153,9 @@ extension UInt64: JSONNumberCodable {
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension Int8: JSONNumberCodable {
+extension Int8: JSONNumberRepresentable {
 
-    public func encodeToJSONNumber() -> JSON.Number {
+    public var jsonNumber: JSON.Number {
         .int(Int(self))
     }
 
@@ -191,9 +167,9 @@ extension Int8: JSONNumberCodable {
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension Int16: JSONNumberCodable {
+extension Int16: JSONNumberRepresentable {
 
-    public func encodeToJSONNumber() -> JSON.Number {
+    public var jsonNumber: JSON.Number {
         .int(Int(self))
     }
 
@@ -205,9 +181,9 @@ extension Int16: JSONNumberCodable {
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension Int32: JSONNumberCodable {
+extension Int32: JSONNumberRepresentable {
 
-    public func encodeToJSONNumber() -> JSON.Number {
+    public var jsonNumber: JSON.Number {
         .int(Int(self))
     }
 
@@ -219,9 +195,9 @@ extension Int32: JSONNumberCodable {
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension Int64: JSONNumberCodable {
+extension Int64: JSONNumberRepresentable {
 
-    public func encodeToJSONNumber() -> JSON.Number {
+    public var jsonNumber: JSON.Number {
         .int(Int(self))
     }
 
@@ -233,9 +209,9 @@ extension Int64: JSONNumberCodable {
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension Float: JSONNumberCodable {
+extension Float: JSONNumberRepresentable {
 
-    public func encodeToJSONNumber() -> JSON.Number {
+    public var jsonNumber: JSON.Number {
         .double(Double(self))
     }
 
@@ -247,9 +223,9 @@ extension Float: JSONNumberCodable {
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension Decimal: JSONNumberCodable {
+extension Decimal: JSONNumberRepresentable {
 
-    public func encodeToJSONNumber() -> JSON.Number {
+    public var jsonNumber: JSON.Number {
         var original = self
         var floored = Decimal()
         NSDecimalRound(&floored, &original, 0, .down)

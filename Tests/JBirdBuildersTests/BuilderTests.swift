@@ -56,8 +56,8 @@ struct BuilderTests {
             #expect(json == ["foo", nil])
         }
 
-        @Test("Encodable Expression")
-        func encodableExpression() {
+        @Test("Convrtible Expression")
+        func convertibleExpression() {
             let json = JSON {
                 "foo"
                 true

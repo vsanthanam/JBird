@@ -31,21 +31,21 @@ public protocol JSONInitializable {
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension JSONInitializable where Self: JSONLiteralDecodable {
+extension JSONInitializable where Self: JSONLiteralInitializable {
 
     public init(json: JSON) throws {
         let literal = try json.literalValue
-        try self.init(jsonLiteral: literal)
+        self = try literal.convert()
     }
 
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension JSONInitializable where Self: JSONNumberDecodable {
+extension JSONInitializable where Self: JSONNumberInitializable {
 
     public init(json: JSON) throws {
         let number = try json.numberValue
-        try self.init(jsonNumber: number)
+        self = try number.convert()
     }
 
 }

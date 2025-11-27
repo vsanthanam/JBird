@@ -68,7 +68,9 @@ let steve: JSON = [
 
 ### Initializers
 
-- ``init(_:)``
+- ``init(_:)-(JSONConvertible)``
+- ``init(_:)-(Data)``
+- ``init(jsonString:)``
 
 ### Subtypes
 

@@ -31,7 +31,7 @@ public protocol JSONConvertible {
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension JSONConvertible where Self: JSONLiteralEncodable {
+extension JSONConvertible where Self: JSONLiteralConvertible {
 
     public var jsonValue: JSON {
         let literal = JSON.Literal(self)
@@ -41,7 +41,7 @@ extension JSONConvertible where Self: JSONLiteralEncodable {
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension JSONConvertible where Self: JSONNumberEncodable {
+extension JSONConvertible where Self: JSONNumberConvertible {
 
     public var jsonValue: JSON {
         let number = JSON.Number(self)
