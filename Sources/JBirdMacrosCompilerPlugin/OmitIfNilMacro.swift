@@ -28,6 +28,7 @@ import SwiftSyntax
 import SwiftSyntaxBuilder
 import SwiftSyntaxMacros
 
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 public struct OmitIfNilMacro: PeerMacro {
 
     // MARK: - PeerMacro

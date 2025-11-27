@@ -25,7 +25,7 @@
 
 import JBirdCore
 
-@available(macOS 12.0, macCatalyst 15.0, iOS 15.0, watchOS 8.0, tvOS 15.0, visionOS 1.0, *)
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON {
 
     /// Declaratively create a JSON value
@@ -176,6 +176,7 @@ extension JSON {
 infix operator => : AdditionPrecedence
 
 /// An infix operator allowing key value assignment, for use with a ``JBirdCore/JSON/Builder``
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 public func => (
     lhs: JSON.Key,
     rhs: JSON.Value
@@ -184,6 +185,7 @@ public func => (
 }
 
 /// An infix operator allowing key value assignment, for use with a ``JBirdCore/JSON/Builder``
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 @_disfavoredOverload
 public func => <Key, Value>(
     lhs: Key,
@@ -193,6 +195,7 @@ public func => <Key, Value>(
 }
 
 /// An infix operator allowing key value assignment, for use with a ``JBirdCore/JSON/Builder``
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 public func => (
     lhs: JSON.Key,
     @JSON.Builder rhs: () -> JSON
@@ -200,6 +203,7 @@ public func => (
     (lhs, rhs())
 }
 
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 @_disfavoredOverload
 public func => <Key>(
     lhs: Key,
