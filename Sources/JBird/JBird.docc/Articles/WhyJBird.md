@@ -75,7 +75,7 @@ Access nested values with straightforward, chainable syntax:
 
 ```swift
 // Accessing nested values
-let nestedValue: Theme = try json["user"]["settings"]["theme"].decode()
+let nestedValue: Theme = try json["user"]["settings"]["theme"].convert()
 ```
 
 #### Simpler Introspection and Mutation

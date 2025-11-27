@@ -41,7 +41,7 @@ JBird is intentionally divided into smaller modules so you can opt into advanced
 
 - `JBirdCore` supplies the runtime types, parser, and serializer and is always required.
 - `JBirdBuilders` adds declarative builders and operators. *Depends on `JBirdCore`.*
-- `JBirdMacros` provides the `JSONCodable` synthesis macros. *Depends on `JBirdCore`, `JBirdBuilders`, and the macro compiler plugin.*
+- `JBirdMacros` provides the `JSONRepresentable` synthesis macros. *Depends on `JBirdCore`, `JBirdBuilders`, and the macro compiler plugin.*
 
 The `JBird` product re-exports all three so you can import the umbrella module when you want the entire surface area, or reference individual products to stay lean.
 

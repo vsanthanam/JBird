@@ -26,7 +26,7 @@
 import JBird
 import Testing
 
-@JSONCodable
+@JSONRepresentable
 struct User: Equatable {
 
     init(

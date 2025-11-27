@@ -31,13 +31,13 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
 
     // MARK: - Initializers
 
-    /// Create a `JSON` value from a ``JSONEncodable`` type
+    /// Create a `JSON` value from a ``JSONConvertible`` type
     ///
-    /// - Parameter encodable: The encodable type to convert to JSON
+    /// - Parameter convertible: An instance of the type to convert to JSON
     public init(
-        _ encodable: some JSONEncodable
+        _ convertible: some JSONConvertible
     ) {
-        self = encodable.encodeToJSON()
+        self = convertible.jsonValue
     }
 
     /// Create a `JSON` value by deserializing a byte buffer containing UTF-8 encoded JSON string
@@ -398,13 +398,13 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         }
     }
 
-    /// Decode the JSON value into a ``JSONDecodable`` type
+    /// Convert the JSON value into a ``JSONInitializable`` type
     /// - Parameter type: The type to decode into
     /// - Returns: The decoded value
     /// - Throws: An error, if the JSON value cannot be decoded into the provided type
-    public func decode<T>(
+    public func convert<T>(
         into type: T.Type = T.self
-    ) throws -> T where T: JSONDecodable {
+    ) throws -> T where T: JSONInitializable {
         try T(json: self)
     }
 
@@ -1236,13 +1236,13 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     public subscript<T>(
         _ subscript: Subscript...,
         as type: T.Type = T.self
-    ) -> T where T: JSONDecodable {
+    ) -> T where T: JSONInitializable {
         get throws {
             var json = self
             try `subscript`.forEach { `subscript` in
                 json = try json[`subscript`]
             }
-            return try json.decode(into: type)
+            return try json.convert(into: type)
         }
     }
 
@@ -1255,13 +1255,13 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     public subscript<each PathComponent, T>(
         _ subscript: repeat each PathComponent,
         as type: T.Type = T.self
-    ) -> T where repeat each PathComponent: JSONSubscriptConvertible, T: JSONDecodable {
+    ) -> T where repeat each PathComponent: JSONSubscriptConvertible, T: JSONInitializable {
         get throws {
             var json = self
             for component in repeat each `subscript` {
                 json = try json[component]
             }
-            return try json.decode(into: type)
+            return try json.convert(into: type)
         }
     }
 

@@ -1,6 +1,6 @@
 # Encoding and Decoding
 
-Use `JSONCodable` to easily move between typed JSON and other Swift types.
+Use `JSONRepresentable` to easily move between typed JSON and other Swift types.
 
 ## Overview
 

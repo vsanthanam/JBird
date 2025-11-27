@@ -1,3 +1,3 @@
 # ``JBirdMacros``
 
-Use JBird macros add `JSONCodable` conformance to your Swift structs.
+Use JBird macros add `JSONRepresentable` conformance to your Swift structs, classes, and enums.

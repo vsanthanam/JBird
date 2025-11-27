@@ -15,11 +15,11 @@ APIs to create, deserialize, manipulate, and serialize JSON data in Swift
 - ``JSON/Subscript``
 - ``JSONSubscriptConvertible``
 
-### Encoding & Decoding
+### Converting between JSON and other Swift types
 
-- ``JSONEncodable``
-- ``JSONDecodable``
-- ``JSONCodable``
+- ``JSONConvertible``
+- ``JSONInitializable``
+- ``JSONRepresentable``
 - ``JSONNumberEncodable``
 - ``JSONNumberDecodable``
 - ``JSONNumberCodable``

@@ -33,20 +33,20 @@ public enum JSONKeyComputationRule {
     case snakeCase
 }
 
-/// A macro that automatically implements ``/JBirdCore/JSONCodable`` conformance to the types it annotates
+/// A macro that automatically implements ``/JBirdCore/JSONRepresentable`` conformance to the types it annotates
 ///
 /// You can only apply this macro to types that meet the following conditions:
 /// - The type must be a `struct`, `class`, or `enum`
-/// - If the type must only have stored properties that conform  `JSONCodable`.
-/// - If the type is an enum, it must only have associated values that conform to `JSONCodable`.
+/// - If the type must only have stored properties that conform  `JSONRepresentable`.
+/// - If the type is an enum, it must only have associated values that conform to `JSONRepresentable`.
 ///
 /// - Note: The macro may not work correctly when applied to a class with a superclass, depending on its initializer requirements.
-/// When applying `@JSONCodable` to a non-final class, a the macro will generate a `required` initializer. Subclasses will need to manually implement conformance and ensure that it works correctly.
+/// When applying `@JSONRepresentable` to a non-final class, a the macro will generate a `required` initializer. Subclasses will need to manually implement conformance and ensure that it works correctly.
 ///
 /// When applied, this Swift code:
 ///
 /// ```swift
-/// @JSONCodable struct User {
+/// @JSONRepresentable struct User {
 ///
 ///     let username: String
 ///
@@ -59,7 +59,7 @@ public enum JSONKeyComputationRule {
 /// would be expanded to this Swift code:
 ///
 /// ```swift
-/// @JSONCodable struct User {
+/// @JSONRepresentable struct User {
 ///
 ///     let username: String
 ///
@@ -82,8 +82,7 @@ public enum JSONKeyComputationRule {
 ///
 /// }
 ///
-/// extension User: JSONEncodable {}
-/// extension User: JSONDecodable {}
+/// extension User: JSONRepresentable {}
 /// ```
 ///
 /// You can further customize what keys are used to represent stored properties.
@@ -93,25 +92,25 @@ public enum JSONKeyComputationRule {
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 @attached(
     extension,
-    conformances: JSONEncodable, JSONDecodable
+    conformances: JSONConvertible, JSONInitializable
 )
 @attached(
     member,
-    names: named(init(json:)), named(encodeToJSON)
+    names: named(init(json:)), named(jsonValue)
 )
-public macro JSONCodable() = #externalMacro(
+public macro JSONRepresentable() = #externalMacro(
     module: "JBirdMacrosCompilerPlugin",
-    type: "JSONCodableMacro"
+    type: "JSONRepresentableMacro"
 )
 
-/// A macro that allows you to determine how the key for for a stored property of a `@JSONCodable` type is computed.
+/// A macro that allows you to determine how the key for for a stored property of a `@JSONRepresentable` type is computed.
 ///
-/// This macro enables a stored property in a ``JBirdMacros/JSONCodable()`` annotated struct to determine what kind of key computation rule is used.
+/// This macro enables a stored property in a ``JBirdMacros/JSONRepresentable()`` annotated struct to determine what kind of key computation rule is used.
 ///
 /// Example:
 ///
 /// ```swift
-/// @JSONCodable struct User {
+/// @JSONRepresentable struct User {
 ///
 ///     @JSONKey(.snakeCase) let firstName: String
 ///
@@ -132,14 +131,14 @@ public macro JSONKey(
     type: "JSONKeyMacro"
 )
 
-/// A macro that allows you to use a custom key name for a stored property of a `@JSONCodable` type.
+/// A macro that allows you to use a custom key name for a stored property of a `@JSONRepresentable` type.
 ///
-/// This macro enables a stored property in a ``JBirdMacros/JSONCodable()`` annotated struct to determine what key is used encode the value when it is represented as JSON
+/// This macro enables a stored property in a ``JBirdMacros/JSONRepresentable()`` annotated struct to determine what key is used encode the value when it is represented as JSON
 ///
 /// Example:
 ///
 /// ```swift
-/// @JSONCodable struct User {
+/// @JSONRepresentable struct User {
 ///
 ///     @JSONKey("ldap") let name: String
 /// }
@@ -162,7 +161,7 @@ public macro JSONKey(
 /// Example:
 ///
 /// ```swift
-/// @JSONCodable struct User {
+/// @JSONRepresentable struct User {
 ///
 ///     let id: String
 ///

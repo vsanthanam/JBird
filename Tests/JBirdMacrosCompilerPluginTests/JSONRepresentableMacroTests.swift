@@ -1,5 +1,5 @@
 // JBird
-// JSONCodableMacroTests.swift
+// JSONRepresentableMacroTests.swift
 //
 // MIT License
 //
@@ -35,19 +35,19 @@ import Testing
     import JBirdMacrosCompilerPlugin
 
     fileprivate let macroSpecs: [String: MacroSpec] = [
-        "JSONCodable": MacroSpec(type: JSONCodableMacro.self)
+        "JSONRepresentable": MacroSpec(type: JSONRepresentableMacro.self)
     ]
 #endif
 
-@Suite("@JSONCodable Tests")
-struct JSONCodableMacroTestsV2 {
+@Suite("@JSONRepresentable Tests")
+struct JSONRepresentableMacroTests {
 
     @Test("Basic")
     func basic() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
-                @JSONCodable
+                @JSONRepresentable
                 struct Foo {
 
                     let name: String
@@ -60,7 +60,7 @@ struct JSONCodableMacroTestsV2 {
                     let name: String
 
                     @JBirdCore.JSON.Builder
-                    public func encodeToJSON() -> JSON {
+                    public var jsonValue: JBirdCore.JSON {
                         "name" => name
                     }
 
@@ -70,10 +70,10 @@ struct JSONCodableMacroTestsV2 {
 
                 }
 
-                extension Foo: JBirdCore.JSONEncodable {
+                extension Foo: JBirdCore.JSONConvertible {
                 }
 
-                extension Foo: JBirdCore.JSONDecodable {
+                extension Foo: JBirdCore.JSONInitializable {
                 }
                 """,
                 macroSpecs: macroSpecs,
@@ -91,7 +91,7 @@ struct JSONCodableMacroTestsV2 {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
-                @JSONCodable
+                @JSONRepresentable
                 struct Foo {
 
                     @JSONKey("custom_name")
@@ -106,7 +106,7 @@ struct JSONCodableMacroTestsV2 {
                     let name: String
 
                     @JBirdCore.JSON.Builder
-                    public func encodeToJSON() -> JSON {
+                    public var jsonValue: JBirdCore.JSON {
                         "custom_name" => name
                     }
 
@@ -116,10 +116,10 @@ struct JSONCodableMacroTestsV2 {
 
                 }
 
-                extension Foo: JBirdCore.JSONEncodable {
+                extension Foo: JBirdCore.JSONConvertible {
                 }
 
-                extension Foo: JBirdCore.JSONDecodable {
+                extension Foo: JBirdCore.JSONInitializable {
                 }
                 """,
                 macroSpecs: macroSpecs,
@@ -137,7 +137,7 @@ struct JSONCodableMacroTestsV2 {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
-                @JSONCodable
+                @JSONRepresentable
                 struct Foo {
 
                     @JSONKey(.snakeCase)
@@ -152,7 +152,7 @@ struct JSONCodableMacroTestsV2 {
                     let fooBar: String
 
                     @JBirdCore.JSON.Builder
-                    public func encodeToJSON() -> JSON {
+                    public var jsonValue: JBirdCore.JSON {
                         "foo_bar" => fooBar
                     }
 
@@ -162,10 +162,10 @@ struct JSONCodableMacroTestsV2 {
 
                 }
 
-                extension Foo: JBirdCore.JSONEncodable {
+                extension Foo: JBirdCore.JSONConvertible {
                 }
 
-                extension Foo: JBirdCore.JSONDecodable {
+                extension Foo: JBirdCore.JSONInitializable {
                 }
                 """,
                 macroSpecs: macroSpecs,
@@ -183,7 +183,7 @@ struct JSONCodableMacroTestsV2 {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
-                @JSONCodable
+                @JSONRepresentable
                 struct Foo {
 
                     let name: String?
@@ -196,7 +196,7 @@ struct JSONCodableMacroTestsV2 {
                     let name: String?
 
                     @JBirdCore.JSON.Builder
-                    public func encodeToJSON() -> JSON {
+                    public var jsonValue: JBirdCore.JSON {
                         if let name {
                         "name" => name
                         }
@@ -204,7 +204,7 @@ struct JSONCodableMacroTestsV2 {
 
                     public init(json: JSON) throws {
                         if let name = try? json["name"] {
-                        self.name = try name.decode()
+                        self.name = try name.convert()
                         } else {
                         self.name = nil
                         }
@@ -212,10 +212,10 @@ struct JSONCodableMacroTestsV2 {
 
                 }
 
-                extension Foo: JBirdCore.JSONEncodable {
+                extension Foo: JBirdCore.JSONConvertible {
                 }
 
-                extension Foo: JBirdCore.JSONDecodable {
+                extension Foo: JBirdCore.JSONInitializable {
                 }
                 """,
                 macroSpecs: macroSpecs,
@@ -233,7 +233,7 @@ struct JSONCodableMacroTestsV2 {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
-                @JSONCodable
+                @JSONRepresentable
                 struct Foo {
 
                     @OmitIfNil
@@ -248,7 +248,7 @@ struct JSONCodableMacroTestsV2 {
                     let name: String?
 
                     @JBirdCore.JSON.Builder
-                    public func encodeToJSON() -> JSON {
+                    public var jsonValue: JBirdCore.JSON {
                         if let name {
                         "name" => name
                         }
@@ -256,7 +256,7 @@ struct JSONCodableMacroTestsV2 {
 
                     public init(json: JSON) throws {
                         if let name = try? json["name"] {
-                        self.name = try name.decode()
+                        self.name = try name.convert()
                         } else {
                         self.name = nil
                         }
@@ -264,10 +264,10 @@ struct JSONCodableMacroTestsV2 {
 
                 }
 
-                extension Foo: JBirdCore.JSONEncodable {
+                extension Foo: JBirdCore.JSONConvertible {
                 }
 
-                extension Foo: JBirdCore.JSONDecodable {
+                extension Foo: JBirdCore.JSONInitializable {
                 }
                 """,
                 macroSpecs: macroSpecs,
@@ -285,7 +285,7 @@ struct JSONCodableMacroTestsV2 {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
-                @JSONCodable(true)
+                @JSONRepresentable(true)
                 struct Foo {
 
                     @OmitIfNil(true)
@@ -300,7 +300,7 @@ struct JSONCodableMacroTestsV2 {
                     let name: String?
 
                     @JBirdCore.JSON.Builder
-                    public func encodeToJSON() -> JSON {
+                    public var jsonValue: JBirdCore.JSON {
                         if let name {
                         "name" => name
                         }
@@ -308,7 +308,7 @@ struct JSONCodableMacroTestsV2 {
 
                     public init(json: JSON) throws {
                         if let name = try? json["name"] {
-                        self.name = try name.decode()
+                        self.name = try name.convert()
                         } else {
                         self.name = nil
                         }
@@ -316,10 +316,10 @@ struct JSONCodableMacroTestsV2 {
 
                 }
 
-                extension Foo: JBirdCore.JSONEncodable {
+                extension Foo: JBirdCore.JSONConvertible {
                 }
 
-                extension Foo: JBirdCore.JSONDecodable {
+                extension Foo: JBirdCore.JSONInitializable {
                 }
                 """,
                 macroSpecs: macroSpecs,
@@ -337,7 +337,7 @@ struct JSONCodableMacroTestsV2 {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
-                @JSONCodable
+                @JSONRepresentable
                 struct Foo {
 
                     @OmitIfNil(false)
@@ -352,7 +352,7 @@ struct JSONCodableMacroTestsV2 {
                     let name: String?
 
                     @JBirdCore.JSON.Builder
-                    public func encodeToJSON() -> JSON {
+                    public var jsonValue: JBirdCore.JSON {
                         "name" => name
                     }
 
@@ -362,10 +362,10 @@ struct JSONCodableMacroTestsV2 {
 
                 }
 
-                extension Foo: JBirdCore.JSONEncodable {
+                extension Foo: JBirdCore.JSONConvertible {
                 }
 
-                extension Foo: JBirdCore.JSONDecodable {
+                extension Foo: JBirdCore.JSONInitializable {
                 }
                 """,
                 macroSpecs: macroSpecs,
@@ -383,7 +383,7 @@ struct JSONCodableMacroTestsV2 {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
-                @JSONCodable
+                @JSONRepresentable
                 enum Foo {
 
                     case foo, bar
@@ -403,7 +403,7 @@ struct JSONCodableMacroTestsV2 {
                     case quux(foo: String, Double)
                     case corge(foo: Int, bar: Double)
 
-                    public func encodeToJSON() -> JSON {
+                    public var jsonValue: JBirdCore.JSON {
                         switch self {
                             case .foo:
                         "foo"
@@ -438,64 +438,64 @@ struct JSONCodableMacroTestsV2 {
                     }
 
                     public init(json: JSON) throws {
-                        func decode_case_foo() throws -> Self {
-                        let raw = try json.decode(into: String.self)
+                        func convert_case_foo() throws -> Self {
+                        let raw = try json.convert(into: String.self)
                         guard raw == "foo" else {
                             throw JBirdMacros.JSONMacroDecodingError("Enum case decoding failure")
                         }
                         return .foo
                         }
-                        func decode_case_bar() throws -> Self {
-                            let raw = try json.decode(into: String.self)
+                        func convert_case_bar() throws -> Self {
+                            let raw = try json.convert(into: String.self)
                             guard raw == "bar" else {
                                 throw JBirdMacros.JSONMacroDecodingError("Enum case decoding failure")
                             }
                             return .bar
                         }
-                        func decode_case_baz() throws -> Self {
+                        func convert_case_baz() throws -> Self {
                             let value = try json["baz"]
-                            return .baz(try value.decode())
+                            return .baz(try value.convert())
                         }
-                        func decode_case_qux() throws -> Self {
+                        func convert_case_qux() throws -> Self {
                             let associatedValues = try json["qux"]
                             let string = try associatedValues[0]
                         let dictionary_string_int = try associatedValues[1]
-                            return .qux(try string.decode(), try dictionary_string_int.decode())
+                            return .qux(try string.convert(), try dictionary_string_int.convert())
                         }
-                        func decode_case_quux() throws -> Self {
+                        func convert_case_quux() throws -> Self {
                             let associatedValues = try json["quux"]
                             let foo = try associatedValues["foo"]
                         let double = try associatedValues["1"]
-                            return .quux(foo: try foo.decode(), try double.decode())
+                            return .quux(foo: try foo.convert(), try double.convert())
                         }
-                        func decode_case_corge() throws -> Self {
+                        func convert_case_corge() throws -> Self {
                             let associatedValues = try json["corge"]
                             let foo = try associatedValues["foo"]
                         let bar = try associatedValues["bar"]
-                            return .corge(foo: try foo.decode(), bar: try bar.decode())
+                            return .corge(foo: try foo.convert(), bar: try bar.convert())
                         }
 
-                        if let value = try? decode_case_foo() {
+                        if let value = try? convert_case_foo() {
                             self = value
                             return
                         }
-                        if let value = try? decode_case_bar() {
+                        if let value = try? convert_case_bar() {
                             self = value
                             return
                         }
-                        if let value = try? decode_case_baz() {
+                        if let value = try? convert_case_baz() {
                             self = value
                             return
                         }
-                        if let value = try? decode_case_qux() {
+                        if let value = try? convert_case_qux() {
                             self = value
                             return
                         }
-                        if let value = try? decode_case_quux() {
+                        if let value = try? convert_case_quux() {
                             self = value
                             return
                         }
-                        if let value = try? decode_case_corge() {
+                        if let value = try? convert_case_corge() {
                             self = value
                             return
                         }
@@ -505,10 +505,10 @@ struct JSONCodableMacroTestsV2 {
 
                 }
 
-                extension Foo: JBirdCore.JSONEncodable {
+                extension Foo: JBirdCore.JSONConvertible {
                 }
 
-                extension Foo: JBirdCore.JSONDecodable {
+                extension Foo: JBirdCore.JSONInitializable {
                 }
                 """,
                 macroSpecs: macroSpecs,
@@ -526,7 +526,7 @@ struct JSONCodableMacroTestsV2 {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
-                @JSONCodable
+                @JSONRepresentable
                 class Foo {
 
                     let name: String
@@ -539,7 +539,7 @@ struct JSONCodableMacroTestsV2 {
                     let name: String
 
                     @JBirdCore.JSON.Builder
-                    public func encodeToJSON() -> JSON {
+                    public var jsonValue: JBirdCore.JSON {
                         "name" => name
                     }
 
@@ -549,10 +549,10 @@ struct JSONCodableMacroTestsV2 {
 
                 }
 
-                extension Foo: JBirdCore.JSONEncodable {
+                extension Foo: JBirdCore.JSONConvertible {
                 }
 
-                extension Foo: JBirdCore.JSONDecodable {
+                extension Foo: JBirdCore.JSONInitializable {
                 }
                 """,
                 macroSpecs: macroSpecs,
@@ -570,7 +570,7 @@ struct JSONCodableMacroTestsV2 {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
-                @JSONCodable
+                @JSONRepresentable
                 final class Foo {
 
                     let name: String
@@ -583,7 +583,7 @@ struct JSONCodableMacroTestsV2 {
                     let name: String
 
                     @JBirdCore.JSON.Builder
-                    public func encodeToJSON() -> JSON {
+                    public var jsonValue: JBirdCore.JSON {
                         "name" => name
                     }
 
@@ -593,10 +593,10 @@ struct JSONCodableMacroTestsV2 {
 
                 }
 
-                extension Foo: JBirdCore.JSONEncodable {
+                extension Foo: JBirdCore.JSONConvertible {
                 }
 
-                extension Foo: JBirdCore.JSONDecodable {
+                extension Foo: JBirdCore.JSONInitializable {
                 }
                 """,
                 macroSpecs: macroSpecs,

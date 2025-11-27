@@ -35,7 +35,7 @@ func JBirdMacrosCompilerPluginTests() {
     #if canImport(JBirdMacrosCompilerPlugin)
         let plugin = JBirdMacrosCompilerPlugin()
         #expect(plugin.providingMacros.count == 3)
-        #expect(plugin.providingMacros[0] is JSONCodableMacro.Type)
+        #expect(plugin.providingMacros[0] is JSONRepresentableMacro.Type)
         #expect(plugin.providingMacros[1] is JSONKeyMacro.Type)
         #expect(plugin.providingMacros[2] is OmitIfNilMacro.Type)
     #else
