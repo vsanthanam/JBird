@@ -41,14 +41,6 @@ extension JSON {
             self = encodable.encodeToJSONLiteral()
         }
 
-        @available(*, deprecated, renamed: "init(_:)", message: "Use `init(_:)` instead")
-        @_disfavoredOverload
-        public init(
-            _ convertible: some JSONLiteralConvertible
-        ) {
-            self = convertible.jsonLiteral
-        }
-
         // MARK: - API
 
         /// A `true` literal

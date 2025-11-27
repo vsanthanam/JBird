@@ -54,7 +54,6 @@ if literal.isNull {
 ### Initializers
 
 - ``init(_:)-(JSONLiteralEncodable)``
-- ``init(_:)-(JSONLiteralConvertible)``
 
 ### Decoding JSON literal values into Swift types
 
