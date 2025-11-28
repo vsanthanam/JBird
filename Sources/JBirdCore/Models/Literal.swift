@@ -33,12 +33,10 @@ extension JSON {
 
         // MARK: - Initializers
 
-        /// Create a `JSON.Literal` value from a ``JSONLiteralEncodable`` type
-        /// - Parameter encodable: The encodable type to convert to a JSON literal
         public init(
-            _ encodable: some JSONLiteralEncodable
+            _ convertible: some JSONLiteralConvertible
         ) {
-            self = encodable.encodeToJSONLiteral()
+            self = convertible.jsonLiteral
         }
 
         // MARK: - API
@@ -97,6 +95,12 @@ extension JSON {
             case .null:
                 NSNull()
             }
+        }
+
+        public func convert<T>(
+            into type: T.Type = T.self
+        ) throws -> T where T: JSONLiteralInitializable {
+            try T(jsonLiteral: self)
         }
 
         // MARK: - ExpressibleByBooleanLiteral

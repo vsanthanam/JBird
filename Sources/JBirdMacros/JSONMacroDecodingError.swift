@@ -23,7 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-/// An error type used by macro-synthesized ``/JBirdCore/JSONCodable`` conformance.
+/// An error type used by macro-synthesized ``/JBirdCore/JSONRepresentable`` conformance.
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 public struct JSONMacroDecodingError: Error, CustomStringConvertible {
 

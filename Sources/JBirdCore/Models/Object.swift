@@ -27,6 +27,6 @@
 extension JSON {
 
     /// A JSON object
-    public typealias Object = [String: JSON]
+    public typealias Object = [Key: Value]
 
 }

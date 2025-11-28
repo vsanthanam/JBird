@@ -1,5 +1,5 @@
 // JBird
-// ExportedImportTests.swift
+// JSONKeyInitializable.swift
 //
 // MIT License
 //
@@ -23,40 +23,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import JBird
-import Testing
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+public protocol JSONKeyInitializable {
 
-@JSONRepresentable
-struct User: Equatable {
-
-    init(
-        username: String,
-        age: Int,
-        tags: [String]
-    ) {
-        self.username = username
-        self.age = age
-        self.tags = tags
-    }
-
-    let username: String
-    let age: Int
-    let tags: [String]
+    /// Create an instance of the type from an externaled `JSON.Key` representation.
+    /// - Parameter jsonKey: The `JSON.Key` value to decode from.
+    init(jsonKey: JSON.Key) throws
 
 }
 
-// Ensures the API surface of `JBirdCore`, `JBirdBuilders` and `JBirdMacros` is available through the single `JBird` import
-@Test("Test user encode/decode")
-func userEncode() throws {
-    let json = JSON {
-        "username" => "sjobs"
-        "age" => 50
-        "tags" => {
-            "ios"
-            "swift"
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension JSONKeyInitializable where Self: RawRepresentable, RawValue: JSONKeyInitializable {
+
+    public init(jsonKey: JSON.Key) throws {
+        let rawValue = try RawValue(jsonKey: jsonKey)
+        guard let val = Self(rawValue: rawValue) else {
+            throw JSONError.invalidRawRepresentable
         }
+        self = val
     }
-    let user = try User(json: json)
-    let expected = User(username: "sjobs", age: 50, tags: ["ios", "swift"])
-    #expect(user == expected)
+
 }

@@ -22,7 +22,7 @@ let intValue = JSON.Number.int(42)
 let doubleValue = JSON.Number.double(3.14)
 ```
 
-You can also initialize numbers from types conforming to ``JSONNumberEncodable``:
+You can also initialize numbers from types conforming to ``JSONNumberConvertible``:
 
 ```swift
 let fromInt = JSON.Number(42)
@@ -58,12 +58,12 @@ if number.isDouble {
 
 ### Initializers
 
-- ``init(_:)-(JSONNumberEncodable)``
+- ``init(_:)``
 
 ### Decoding JSON number values into Swift types
 
-- ``decode(into:)``
 - ``unboxed()``
+- ``convert(into:)``
 
 ### Inspecting JSON number values
 

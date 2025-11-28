@@ -26,7 +26,7 @@ if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
 let json = try JSON(data)
 let name = try json["user"]["name"].stringValue
 let isActive = try json["user"]["isActive"].boolValue
-let user = try json["user"].decode(into: User.self)
+let user = try json["user"].convert(into: User.self)
 ```
 
 JBird also simplifies mutation, which is cumbersome with Foundation:
@@ -81,11 +81,11 @@ JBird supports the full range of Apple platforms when working with Xcode, whethe
 
 | Platform | Minimum Version | Status |
 |----------|-----------------|--------|
-| macOS | 12.0+ | ✅ Supported |
-| Mac Catalyst | 15.0+ | ✅ Supported |
-| iOS | 15.0+ | ✅ Supported |
-| watchOS | 8.0+ | ✅ Supported |
-| tvOS | 15.0+ | ✅ Supported |
+| macOS | 13.0+ | ✅ Supported |
+| Mac Catalyst | 16.0+ | ✅ Supported |
+| iOS | 16.0+ | ✅ Supported |
+| watchOS | 9.0+ | ✅ Supported |
+| tvOS | 16.0+ | ✅ Supported |
 | visionOS | 1.0+ | ✅ Supported |
 
 ### Swift Package Manager

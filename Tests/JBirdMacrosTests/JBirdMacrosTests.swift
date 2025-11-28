@@ -29,10 +29,10 @@ import JBirdCore
 import JBirdMacros
 import Testing
 
-@Suite("@JSONCodable Tests")
-struct JSONCodableTests {
+@Suite("@JSONRepresentable Tests")
+struct JSONRepresentableTests {
 
-    @Test("@JSONCodable Class Support")
+    @Test("@JSONRepresentable Class Support")
     func classSupport() throws {
         let model = TestSubClass(foo: nil, bar: "foo")
         let json = JSON(model)
@@ -45,7 +45,7 @@ struct JSONCodableTests {
         ])
     }
 
-    @Test("@JSONCodable Struct Support")
+    @Test("@JSONRepresentable Struct Support")
     func structSupport() throws {
 
         let model = Foo(
@@ -66,7 +66,7 @@ struct JSONCodableTests {
 
     }
 
-    @Suite("@JSONCodable Enum Support")
+    @Suite("@JSONRepresentable Enum Support")
     struct EnumSupport {
 
         @Test("Basic enum decode")
@@ -129,7 +129,7 @@ struct JSONCodableTests {
 
 }
 
-@JSONCodable
+@JSONRepresentable
 struct Foo: Equatable {
 
     init(
@@ -161,7 +161,7 @@ struct Foo: Equatable {
 
 }
 
-@JSONCodable
+@JSONRepresentable
 struct TestNested: Equatable {
 
     init(name: String) {
@@ -172,7 +172,7 @@ struct TestNested: Equatable {
 
 }
 
-@JSONCodable
+@JSONRepresentable
 enum TestEnum: Equatable {
 
     case foo, bar
@@ -186,7 +186,7 @@ enum TestEnum: Equatable {
 
 }
 
-@JSONCodable
+@JSONRepresentable
 class TestClass {
 
     init(foo: Int?, bar: String) {

@@ -68,7 +68,9 @@ let steve: JSON = [
 
 ### Initializers
 
-- ``init(_:)-(JSONEncodable)``
+- ``init(_:)-(JSONConvertible)``
+- ``init(_:)-(Data)``
+- ``init(jsonString:)``
 
 ### Subtypes
 
@@ -77,10 +79,10 @@ let steve: JSON = [
 - ``Object``
 - ``Array``
 
-### Decoding JSON values into Swift types
+### Converting JSON values into Swift types
 
 - ``unboxed()``
-- ``decode(into:)``
+- ``convert(into:)``
 
 ### Inspecting JSON values
 

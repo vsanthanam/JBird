@@ -1,5 +1,5 @@
 // JBird
-// JSONCodableMacro.swift
+// JSONRepresentableMacro.swift
 //
 // MIT License
 //
@@ -30,7 +30,7 @@ import SwiftSyntax
 import SwiftSyntaxBuilder
 import SwiftSyntaxMacros
 
-public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
+public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
 
     // MARK: - ExtensionMacro
 
@@ -51,26 +51,26 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
         } else if let enumDecl = declaration.as(EnumDeclSyntax.self) {
             name = enumDecl.name.text
         } else {
-            throw MacroExpansionErrorMessage("@JSONCodable macro can only be applied to structs, enums or classes.")
+            throw MacroExpansionErrorMessage("@JSONRepresentable macro can only be applied to structs, enums or classes.")
         }
 
-        let encodable = try DeclSyntax(
+        let convertible = try DeclSyntax(
             """
-            extension \(raw: name): JBirdCore.JSONEncodable {}
-            """
-        )
-        .as(ExtensionDeclSyntax.self)
-        .mustExist()
-
-        let decodable = try DeclSyntax(
-            """
-            extension \(raw: name): JBirdCore.JSONDecodable {}
+            extension \(raw: name): JBirdCore.JSONConvertible {}
             """
         )
         .as(ExtensionDeclSyntax.self)
         .mustExist()
 
-        return [encodable, decodable]
+        let initializable = try DeclSyntax(
+            """
+            extension \(raw: name): JBirdCore.JSONInitializable {}
+            """
+        )
+        .as(ExtensionDeclSyntax.self)
+        .mustExist()
+
+        return [convertible, initializable]
     }
 
     // MARK: - MemberMacro
@@ -88,7 +88,7 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
         } else if let enumDecl = declaration.as(EnumDeclSyntax.self) {
             return try buildEnumMembers(from: enumDecl)
         } else {
-            throw MacroExpansionErrorMessage("@JSONCodable macro can only be applied to structs, enums or classes.")
+            throw MacroExpansionErrorMessage("@JSONRepresentable macro can only be applied to structs, enums or classes.")
         }
     }
 
@@ -123,7 +123,7 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
         let stored = try parseStoredProperties(in: decl)
 
         if Set(stored.map(\.key)).count != stored.count {
-            throw MacroExpansionErrorMessage("Cannot generate JSONCodable conformance. Duplicate keys found.")
+            throw MacroExpansionErrorMessage("Cannot generate JSONRepresentable conformance. Duplicate keys found.")
         }
 
         let encodeItems = stored
@@ -140,21 +140,21 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
             }
             .joined(separator: "\n")
 
-        let encodable = DeclSyntax(
+        let convertible = DeclSyntax(
             """
             @JBirdCore.JSON.Builder
-            public func encodeToJSON() -> JSON {
+            public var jsonValue: JBirdCore.JSON {
                 \(raw: encodeItems)
             }
             """
         )
 
-        let decodeItems = stored
+        let convertItems = stored
             .map { prop in
                 if prop.omitIfNil {
                     """
                     if let \(prop.name) = try? json["\(prop.key)"] {
-                        self.\(prop.name) = try \(prop.name).decode()
+                        self.\(prop.name) = try \(prop.name).convert()
                     } else {
                         self.\(prop.name) = nil
                     }
@@ -165,11 +165,11 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
             }
             .joined(separator: "\n")
 
-        let decodable = if useRequiredInit {
+        let initializable = if useRequiredInit {
             DeclSyntax(
                 """
                 public required init(json: JSON) throws {
-                    \(raw: decodeItems)
+                    \(raw: convertItems)
                 }
                 """
             )
@@ -177,13 +177,13 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
             DeclSyntax(
                 """
                 public init(json: JSON) throws {
-                    \(raw: decodeItems)
+                    \(raw: convertItems)
                 }
                 """
             )
         }
 
-        return [encodable, decodable]
+        return [convertible, initializable]
     }
 
     private static func parseStoredProperties(
@@ -194,7 +194,7 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
         for member in structDecl.memberBlock.members {
             guard let property = member.decl.as(VariableDeclSyntax.self) else { continue }
             guard property.bindings.count == 1 else {
-                throw MacroExpansionErrorMessage("@JSONCodable can only be applied to single-value stored properties")
+                throw MacroExpansionErrorMessage("@JSONRepresentable can only be applied to single-value stored properties")
             }
 
             let binding = try property.bindings.first.mustExist()
@@ -297,12 +297,12 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
             .flatMap(\.elements)
 
         guard !enumCases.isEmpty else {
-            throw MacroExpansionErrorMessage("Enums annotated with @JSONCodable must contain at least one enum case.")
+            throw MacroExpansionErrorMessage("Enums annotated with @JSONRepresentable must contain at least one enum case.")
         }
 
         var encodeSwitchCases: [String] = []
-        var decodeFunctions: [String] = []
-        var decodeAttempts: [String] = []
+        var convertFunctions: [String] = []
+        var convertAttempts: [String] = []
 
         for element in enumCases {
             if let parameterClause = element.parameterClause {
@@ -335,13 +335,13 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
                     let varsAsEnumCases = vars.map { varName in
                         let key = keys[varName]!
                         if UInt(key) != nil {
-                            return "try \(varName).decode()"
+                            return "try \(varName).convert()"
                         } else {
-                            return "\(varName): try \(varName).decode()"
+                            return "\(varName): try \(varName).convert()"
                         }
                     }.joined(separator: ", ")
 
-                    let fnName = "decode_case_\(element.name.text)"
+                    let fnName = "convert_case_\(element.name.text)"
                     let fn = """
                     func \(fnName)() throws -> Self {
                         let associatedValues = try json[\"\(element.name.text)\"]
@@ -349,8 +349,8 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
                         return .\(element.name.text)(\(varsAsEnumCases))
                     }
                     """
-                    decodeFunctions.append(fn)
-                    decodeAttempts.append("""
+                    convertFunctions.append(fn)
+                    convertAttempts.append("""
                     if let value = try? \(fnName)() {
                         self = value
                         return
@@ -367,15 +367,15 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
                             """
                         )
 
-                        let fnName = "decode_case_\(element.name.text)"
+                        let fnName = "convert_case_\(element.name.text)"
                         let fn = """
                         func \(fnName)() throws -> Self {
                             let value = try json[\"\(element.name.text)\"]
-                            return .\(element.name.text)(try value.decode())
+                            return .\(element.name.text)(try value.convert())
                         }
                         """
-                        decodeFunctions.append(fn)
-                        decodeAttempts.append("""
+                        convertFunctions.append(fn)
+                        convertAttempts.append("""
                         if let value = try? \(fnName)() {
                             self = value
                             return
@@ -400,10 +400,10 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
                         }.joined(separator: "\n")
 
                         let varsAsEnumCases = vars.map { varName in
-                            "try \(varName).decode()"
+                            "try \(varName).convert()"
                         }.joined(separator: ", ")
 
-                        let fnName = "decode_case_\(element.name.text)"
+                        let fnName = "convert_case_\(element.name.text)"
                         let fn = """
                         func \(fnName)() throws -> Self {
                             let associatedValues = try json[\"\(element.name.text)\"]
@@ -411,8 +411,8 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
                             return .\(element.name.text)(\(varsAsEnumCases))
                         }
                         """
-                        decodeFunctions.append(fn)
-                        decodeAttempts.append("""
+                        convertFunctions.append(fn)
+                        convertAttempts.append("""
                         if let value = try? \(fnName)() {
                             self = value
                             return
@@ -428,18 +428,18 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
                     """
                 )
 
-                let fnName = "decode_case_\(element.name.text)"
+                let fnName = "convert_case_\(element.name.text)"
                 let fn = """
                 func \(fnName)() throws -> Self {
-                    let raw = try json.decode(into: String.self)
+                    let raw = try json.convert(into: String.self)
                     guard raw == \"\(element.name.text)\" else {
                         throw JBirdMacros.JSONMacroDecodingError(\"Enum case decoding failure\")
                     }
                     return .\(element.name.text)
                 }
                 """
-                decodeFunctions.append(fn)
-                decodeAttempts.append("""
+                convertFunctions.append(fn)
+                convertAttempts.append("""
                 if let value = try? \(fnName)() {
                     self = value
                     return
@@ -448,9 +448,9 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
             }
         }
 
-        let encodable = DeclSyntax(
+        let convertible = DeclSyntax(
             """
-            public func encodeToJSON() -> JSON {
+            public var jsonValue: JBirdCore.JSON {
                 switch self {
                     \(raw: encodeSwitchCases.joined(separator: "\n"))
                 }
@@ -458,22 +458,22 @@ public struct JSONCodableMacro: ExtensionMacro, MemberMacro {
             """
         )
 
-        var decodeBodySections: [String] = []
-        let decodeFunctionsTogether = decodeFunctions.joined(separator: "\n")
-        if !decodeFunctionsTogether.isEmpty { decodeBodySections.append(decodeFunctionsTogether) }
-        let decodeAttemptsBody = decodeAttempts.joined(separator: "\n")
-        if !decodeAttemptsBody.isEmpty { decodeBodySections.append(decodeAttemptsBody) }
-        decodeBodySections.append("throw JBirdMacros.JSONMacroDecodingError(\"Enum case decoding failure\")")
+        var convertBodySections: [String] = []
+        let convertFunctionsTogether = convertFunctions.joined(separator: "\n")
+        if !convertFunctionsTogether.isEmpty { convertBodySections.append(convertFunctionsTogether) }
+        let convertAttemptsBody = convertAttempts.joined(separator: "\n")
+        if !convertAttemptsBody.isEmpty { convertBodySections.append(convertAttemptsBody) }
+        convertBodySections.append("throw JBirdMacros.JSONMacroDecodingError(\"Enum case decoding failure\")")
 
-        let decodable = DeclSyntax(
+        let initializable = DeclSyntax(
             """
             public init(json: JSON) throws {
-                \(raw: decodeBodySections.joined(separator: "\n\n"))
+                \(raw: convertBodySections.joined(separator: "\n\n"))
             }
             """
         )
 
-        return [encodable, decodable]
+        return [convertible, initializable]
     }
 
     private static func enumAssociatedVarsAndKeys(from clause: EnumCaseParameterClauseSyntax) -> ([String], [String: String]) {
