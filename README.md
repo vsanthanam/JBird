@@ -1,4 +1,4 @@
-# JBird
+# JBird @ 2.0.0-beta.1
 
 [![MIT License](https://img.shields.io/github/license/vsanthanam/JBird)](https://github.com/vsanthanam/JBird/blob/main/LICENSE)
 [![GitHub Release](https://img.shields.io/github/v/release/vsanthanam/JBird?include_prereleases)](https://github.com/vsanthanam/JBird/releases)
@@ -60,7 +60,7 @@ To add JBird as a dependency to an existing Swift package, add the following lin
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/vsanthanam/JBird.git", from: "1.5.5")
+    .package(url: "https://github.com/vsanthanam/JBird.git", branch: "2.0.0-beta.1")
 ]
 ```
 
