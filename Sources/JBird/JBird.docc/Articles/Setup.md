@@ -74,8 +74,6 @@ let package = Package(
 
 Replace `.defaults` with a smaller set to trim functionality—for example, `traits: ["DeclarativeAPI"]` keeps the declarative API but leaves macros disabled, and an empty set limits the dependency to `JBirdCore`. Traits are evaluated only for SwiftPM clients; XCFramework and source-based consumers still declare the modules they embed.
 
-- Note: Packagge traits are only support from Swift 6.1 and newer. For consumers who are using Swift 6.0, declare the products you need for each target dependency. Import `JBird` for the umbrella API, or reference products such as `.product(name: "JBirdCore", package: "JBird")` and `.product(name: "JBirdBuilders", package: "JBird")` directly to avoid shipping macros or builders.
-
 ### Binary distribution via XCFramework
 
 `JBird`, `JBirdCore` and `JBirdBuilders` are shipped as precompiled XCFrameworks for macOS, iOS, watchOS, tvOS, and visionOS. Download the artifacts from [GitHub Releases](https://github.com/vsanthanam/JBird/releases) or create them locally using the provided script:
