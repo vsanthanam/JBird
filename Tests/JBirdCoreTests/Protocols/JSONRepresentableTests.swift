@@ -385,17 +385,13 @@ struct JSONRepresentableTests {
             #expect(url == expected)
         }
 
-        #if canImport(Darwin) || swift(>=6.1)
-            @Test("Illegal URL Convert")
-            func illegalUrlConvert() throws {
-                // For some reason, you can init a URL with an empty string with Foundation on Swift 6.0 on Linux
-                // This is fixed in Swift 6.1
-                let json = JSON.string("")
-                #expect(throws: JSONError.urlDecodingFailure("")) {
-                    _ = try json.convert(into: URL.self)
-                }
+        @Test("Illegal URL Convert")
+        func illegalUrlConvert() throws {
+            let json = JSON.string("")
+            #expect(throws: JSONError.urlDecodingFailure("")) {
+                _ = try json.convert(into: URL.self)
             }
-        #endif
+        }
 
     }
 
