@@ -1,5 +1,5 @@
 // JBird
-// JBird.swift
+// Decoder.swift
 //
 // MIT License
 //
@@ -23,46 +23,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#if SWIFT_PACKAGE
-    @_exported import JBirdCore
-
-    #if DeclarativeAPI
-        @_exported import JBirdBuilders
-    #endif
-
-    #if ConformanceMacros
-        #if DeclarativeAPI
-            @_exported import JBirdMacros
-        #else
-            #error("You cannot use the `ConformanceMacros` trait without the `DeclarativeAPI` trait.")
-        #endif
-    #endif
-
-    #if CodableSupport
-        @_exported import JBirdCodableSupport
-    #endif
-#else
-    #if canImport(JBirdCore)
-        @_exported import JBirdCore
-        #if canImport(JBirdBuilders)
-            @_exported import JBirdBuilders
-        #endif
-
-        #if canImport(JBirdMacros)
-            #if canImport(JBirdBuilders)
-                @_exported import JBirdMacros
-            #else
-                #error("You cannot use JBirdMacros without JBirdBuilders.")
-            #endif
-        #endif
-
-        #if canImport(JBirdCodableSupport)
-            @_exported import JBirdCodableSupport
-        #endif
-    #else
-        #error("The umbrella module JBird requires JBirdCore.")
-    #endif
-#endif
+import Foundation
+import JBirdCore
+import Synchronization
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-enum JBirdUmbrellaModule {}
+extension JSON {
+
+    public final class Decoder {
+
+        // MARK: - Initializers
+
+        public init(
+            options: JSON.DeserializationOptions = .default
+        ) {
+            self.options = options
+        }
+
+        // MARK: - API
+
+        public var options: JSON.DeserializationOptions
+
+        public func decode<T>(
+            _ type: T.Type,
+            from data: Data,
+        ) throws -> T where T: Decodable {
+            let json = try JSON.value(for: data, options: options)
+            let decoder = InternalDecoder(value: json, codingPath: [], userInfo: [:])
+            return try T(from: decoder)
+        }
+
+    }
+
+}

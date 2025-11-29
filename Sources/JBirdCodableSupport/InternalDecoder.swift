@@ -1,5 +1,5 @@
 // JBird
-// JBird.swift
+// InternalDecoder.swift
 //
 // MIT License
 //
@@ -23,46 +23,35 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#if SWIFT_PACKAGE
-    @_exported import JBirdCore
-
-    #if DeclarativeAPI
-        @_exported import JBirdBuilders
-    #endif
-
-    #if ConformanceMacros
-        #if DeclarativeAPI
-            @_exported import JBirdMacros
-        #else
-            #error("You cannot use the `ConformanceMacros` trait without the `DeclarativeAPI` trait.")
-        #endif
-    #endif
-
-    #if CodableSupport
-        @_exported import JBirdCodableSupport
-    #endif
-#else
-    #if canImport(JBirdCore)
-        @_exported import JBirdCore
-        #if canImport(JBirdBuilders)
-            @_exported import JBirdBuilders
-        #endif
-
-        #if canImport(JBirdMacros)
-            #if canImport(JBirdBuilders)
-                @_exported import JBirdMacros
-            #else
-                #error("You cannot use JBirdMacros without JBirdBuilders.")
-            #endif
-        #endif
-
-        #if canImport(JBirdCodableSupport)
-            @_exported import JBirdCodableSupport
-        #endif
-    #else
-        #error("The umbrella module JBird requires JBirdCore.")
-    #endif
-#endif
+import JBirdCore
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-enum JBirdUmbrellaModule {}
+final class InternalDecoder: Decoder {
+
+    init(value: JSON, codingPath: [any CodingKey], userInfo: [CodingUserInfoKey : Any]) {
+        self.value = value
+        self.codingPath = codingPath
+        self.userInfo = userInfo
+    }
+
+    let value: JSON
+
+    var codingPath: [any CodingKey]
+
+    var userInfo: [CodingUserInfoKey : Any]
+
+    func container<Key>(
+        keyedBy type: Key.Type
+    ) throws -> KeyedDecodingContainer<Key> where Key : CodingKey {
+        fatalError()
+    }
+
+    func unkeyedContainer() throws -> any UnkeyedDecodingContainer {
+        fatalError()
+    }
+
+    func singleValueContainer() throws -> any SingleValueDecodingContainer {
+        fatalError()
+    }
+
+}
