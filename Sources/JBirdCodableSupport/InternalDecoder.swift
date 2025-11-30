@@ -28,13 +28,23 @@ import JBirdCore
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 final class InternalDecoder: Decoder {
 
-    init(value: JSON, codingPath: [any CodingKey], userInfo: [CodingUserInfoKey : Any]) {
+    // MARK: - Initializers
+
+    init(
+        value: JSON,
+        codingPath: [any CodingKey],
+        userInfo: [CodingUserInfoKey: Any]
+    ) {
         self.value = value
         self.codingPath = codingPath
         self.userInfo = userInfo
     }
 
+    // MARK: - API
+
     let value: JSON
+
+    // MARK: - Decoder
 
     var codingPath: [any CodingKey]
 
@@ -42,7 +52,7 @@ final class InternalDecoder: Decoder {
 
     func container<Key>(
         keyedBy type: Key.Type
-    ) throws -> KeyedDecodingContainer<Key> where Key : CodingKey {
+    ) throws -> KeyedDecodingContainer<Key> where Key: CodingKey {
         fatalError()
     }
 
@@ -51,7 +61,7 @@ final class InternalDecoder: Decoder {
     }
 
     func singleValueContainer() throws -> any SingleValueDecodingContainer {
-        fatalError()
+        SingleDecoder(decoder: self, value: value)
     }
 
 }
