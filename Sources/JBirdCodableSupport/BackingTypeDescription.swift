@@ -1,5 +1,5 @@
 // JBird
-// Decoder.swift
+// BackingTypeDescription.swift
 //
 // MIT License
 //
@@ -23,36 +23,38 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Foundation
 import JBirdCore
-import Synchronization
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON {
 
-    public final class Decoder {
+    enum BackingTypeDescription: String, Equatable, Sendable {
+        case null
+        case string
+        case object
+        case array
+        case number
+        case bool
+        case unknown
+    }
 
-        // MARK: - Initializers
-
-        public init(
-            options: JSON.DeserializationOptions = .default
-        ) {
-            self.options = options
+    var backingTypeDescription: BackingTypeDescription {
+        switch self {
+        case .literal(.null):
+            .null
+        case .literal(.true), .literal(.false):
+            .bool
+        case .object:
+            .object
+        case .array:
+            .array
+        case .number:
+            .number
+        case .string:
+            .string
+        @unknown default:
+            .unknown
         }
-
-        // MARK: - API
-
-        public var options: JSON.DeserializationOptions
-
-        public func decode<T>(
-            _ type: T.Type,
-            from data: Data,
-        ) throws -> T where T: Decodable {
-            let json = try JSON.value(for: data, options: options)
-            let decoder = InternalDecoder(value: json, codingPath: [], userInfo: [:])
-            return try T(from: decoder)
-        }
-
     }
 
 }

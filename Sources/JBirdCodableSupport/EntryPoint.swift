@@ -1,5 +1,5 @@
 // JBird
-// InternalDecoder.swift
+// EntryPoint.swift
 //
 // MIT License
 //
@@ -23,45 +23,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import Foundation
 import JBirdCore
+import Synchronization
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-final class InternalDecoder: Decoder {
+extension JSON {
 
-    // MARK: - Initializers
+    public final class Decoder {
 
-    init(
-        value: JSON,
-        codingPath: [any CodingKey],
-        userInfo: [CodingUserInfoKey: Any]
-    ) {
-        self.value = value
-        self.codingPath = codingPath
-        self.userInfo = userInfo
-    }
+        // MARK: - Initializers
 
-    // MARK: - API
+        public init() {}
 
-    let value: JSON
+        // MARK: - API
 
-    // MARK: - Decoder
+        public func decode<T>(
+            _ type: T.Type,
+            from data: Data,
+        ) throws -> T where T: Decodable {
+            let json = try JSON.value(for: data)
+            let decoder = InternalDecoder(value: json, codingPath: [], userInfo: [:])
+            return try T(from: decoder)
+        }
 
-    var codingPath: [any CodingKey]
-
-    var userInfo: [CodingUserInfoKey : Any]
-
-    func container<Key>(
-        keyedBy type: Key.Type
-    ) throws -> KeyedDecodingContainer<Key> where Key: CodingKey {
-        fatalError()
-    }
-
-    func unkeyedContainer() throws -> any UnkeyedDecodingContainer {
-        fatalError()
-    }
-
-    func singleValueContainer() throws -> any SingleValueDecodingContainer {
-        SingleDecoder(decoder: self, value: value)
     }
 
 }
