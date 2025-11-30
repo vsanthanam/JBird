@@ -48,13 +48,16 @@ final class InternalDecoder: Decoder {
 
     var codingPath: [any CodingKey]
 
-    var userInfo: [CodingUserInfoKey : Any]
+    var userInfo: [CodingUserInfoKey: Any]
 
     func container<Key>(
         keyedBy type: Key.Type
     ) throws -> KeyedDecodingContainer<Key> where Key: CodingKey {
         do {
-            let container = try ObjectDecoder<Key>(decoder: self, object: value.objectValue)
+            let container = try ObjectDecoder<Key>(
+                decoder: self,
+                object: value.objectValue
+            )
             return KeyedDecodingContainer(container)
         } catch {
             let context = DecodingError.Context(
@@ -71,11 +74,14 @@ final class InternalDecoder: Decoder {
 
     func unkeyedContainer() throws -> any UnkeyedDecodingContainer {
         do {
-            return try ArrayDecoder(decoder: self, array: value.arrayValue)
+            return try ArrayDecoder(
+                decoder: self,
+                array: value.arrayValue
+            )
         } catch {
             let context = DecodingError.Context(
                 codingPath: codingPath,
-                debugDescription: "Expectef \(JSON.Array.self) but found \(value.backingTypeDescription)"
+                debugDescription: "Expected \(JSON.Array.self) but found \(value.backingTypeDescription)"
             )
             throw DecodingError.typeMismatch(
                 JSON.Array.self,
@@ -85,7 +91,10 @@ final class InternalDecoder: Decoder {
     }
 
     func singleValueContainer() throws -> any SingleValueDecodingContainer {
-        ValueDecoder(decoder: self, value: value)
+        ValueDecoder(
+            decoder: self,
+            value: value
+        )
     }
 
 }

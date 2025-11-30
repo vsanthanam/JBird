@@ -1,5 +1,5 @@
 // JBird
-// EncoderTests.swift
+// InternalDecoderTests.swift
 //
 // MIT License
 //
@@ -23,13 +23,31 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import Foundation
 import JBirdCodableSupport
+import JBirdCore
 import Testing
 
-@Suite("Encoder Tests")
-struct EncoderTests {
+@Suite("Internal Decoder Tests")
+struct InternalDecoderTests {
 
-    @Test("Test Foo")
-    func foo() {}
+    @Test("Unavailable Keyed Decoder")
+    func unavailableKeyedDecoder() throws {
+        struct Keyed: Codable {
+            let foo: String
+        }
+        let data = try JSONEncoder().encode(3)
+        #expect(throws: DecodingError.self) {
+            _ = try JSON.Decoder().decode(Keyed.self, from: data)
+        }
+    }
+
+    @Test("Unavailable Unkeyed Decoder")
+    func unavailableUnkeyedDecoder() throws {
+        let data = try JSONEncoder().encode(12)
+        #expect(throws: DecodingError.self) {
+            _ = try JSON.Decoder().decode([Int].self, from: data)
+        }
+    }
 
 }

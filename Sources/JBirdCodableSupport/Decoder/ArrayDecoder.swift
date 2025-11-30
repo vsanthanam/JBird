@@ -23,16 +23,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Foundation
 import JBirdCore
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 struct ArrayDecoder: UnkeyedDecodingContainer {
 
-    init(decoder: InternalDecoder, array: JSON.Array) {
+    // MARK: - Initializers
+
+    init(
+        decoder: InternalDecoder,
+        array: JSON.Array
+    ) {
         self.decoder = decoder
         self.array = array
     }
+
+    // MARK: - UnkeyedDecodingContainer
 
     var count: Int? {
         array.count
@@ -384,7 +390,10 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
         _ type: T.Type = T.self
     ) throws -> (JSON, Int) {
         guard !isAtEnd else {
-            let context = DecodingError.Context(codingPath: codingPath + [IndexKey(currentIndex)], debugDescription: "Couldn't find value")
+            let context = DecodingError.Context(
+                codingPath: codingPath + [IndexKey(currentIndex)],
+                debugDescription: "Couldn't find value"
+            )
             throw DecodingError.valueNotFound(type, context)
         }
         let value = array[currentIndex]

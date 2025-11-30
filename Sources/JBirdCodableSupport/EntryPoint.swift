@@ -25,12 +25,11 @@
 
 import Foundation
 import JBirdCore
-import Synchronization
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON {
 
-    public final class Decoder {
+    public final class Decoder: Sendable {
 
         // MARK: - Initializers
 
@@ -39,11 +38,15 @@ extension JSON {
         // MARK: - API
 
         public func decode<T>(
-            _ type: T.Type,
+            _ type: T.Type = T.self,
             from data: Data,
         ) throws -> T where T: Decodable {
             let json = try JSON.value(for: data)
-            let decoder = InternalDecoder(value: json, codingPath: [], userInfo: [:])
+            let decoder = InternalDecoder(
+                value: json,
+                codingPath: [],
+                userInfo: [:]
+            )
             return try T(from: decoder)
         }
 

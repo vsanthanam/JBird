@@ -46,7 +46,7 @@ struct User: Equatable {
 }
 
 // Ensures the API surface of `JBirdCore`, `JBirdBuilders` and `JBirdMacros` is available through the single `JBird` import
-@Test("Test user encode/decode")
+@Test("Test user convert")
 func userEncode() throws {
     let json = JSON {
         "username" => "sjobs"
@@ -59,4 +59,6 @@ func userEncode() throws {
     let user = try User(json: json)
     let expected = User(username: "sjobs", age: 50, tags: ["ios", "swift"])
     #expect(user == expected)
+    let converted = user.jsonValue
+    #expect(converted == json)
 }
