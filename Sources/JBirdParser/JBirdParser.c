@@ -145,6 +145,13 @@ static inline bool is_whitespace(uint8_t c) {
     return char_class[c] == CHAR_CLASS_WHITESPACE;
 }
 
+static const double pow10_table[23] = {
+    1e0, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8, 1e9,
+    1e10, 1e11, 1e12, 1e13, 1e14, 1e15, 1e16, 1e17, 1e18, 1e19,
+    1e20, 1e21, 1e22};
+
+#define POW10_TABLE_SIZE 23
+
 struct json_memory_arena;
 
 typedef struct json_memory_arena json_memory_arena_t;
@@ -1191,7 +1198,7 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
         }
 
         if (exp_value > 0) {
-            double scale = pow(10.0, (double)exp_value);
+            double scale = (exp_value < POW10_TABLE_SIZE) ? pow10_table[exp_value] : pow(10.0, (double)exp_value);
             if (exp_negative) {
                 double_value /= scale;
             } else {
