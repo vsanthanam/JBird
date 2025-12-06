@@ -980,13 +980,8 @@ static json_error_t json_parse_string_into_temp_buffer(json_parser_t *parser) {
 }
 
 static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_value) {
-
     const size_t start_index = parser->index;
     bool is_negative = false;
-    bool is_double = false;
-    double double_value = 0.0;
-    int64_t int_value = 0;
-    bool integer_overflow = false;
 
     if (json_peek(parser) == '-') {
         is_negative = true;
@@ -999,11 +994,21 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
     if (!is_digit(c))
         return JSON_INVALID_NUMBER;
 
+    uint64_t mantissa = 0;
+    int mantissa_digits = 0;
+    int decimal_exponent = 0;
+    bool is_double = false;
+    bool integer_overflow = false;
+    const int max_mantissa_digits = 19;
+    const uint64_t max_mantissa_before_overflow = UINT64_MAX / 10;
+
+    // Handle leading zero
     if (c == '0') {
         json_next(parser);
         if (json_has_more(parser) && is_digit(json_peek(parser))) {
             return JSON_INVALID_NUMBER;
         }
+
     } else {
         size_t remaining_bytes = parser->length - parser->index;
 
@@ -1011,35 +1016,28 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
             size_t digit_run_length = 0;
 
 #if defined(JBird_USE_SSE2)
-            // Constants for SSE2
             const __m128i nine = _mm_set1_epi8('9');
             const __m128i zero_char = _mm_set1_epi8('0');
 
             while (parser->index + digit_run_length + 16 <= parser->length) {
                 __m128i input = _mm_loadu_si128((const __m128i *)(parser->input + parser->index + digit_run_length));
-
                 __m128i gt_or_eq_zero = _mm_cmpgt_epi8(input, _mm_sub_epi8(zero_char, _mm_set1_epi8(1)));
                 __m128i lt_or_eq_nine = _mm_cmplt_epi8(input, _mm_add_epi8(nine, _mm_set1_epi8(1)));
                 __m128i is_digit_vec = _mm_and_si128(gt_or_eq_zero, lt_or_eq_nine);
-
                 uint16_t mask = _mm_movemask_epi8(is_digit_vec);
 
                 if (mask != 0xFFFF) {
-                    unsigned int trailing_zeros = __builtin_ctz(~mask);
-                    digit_run_length += trailing_zeros;
+                    digit_run_length += __builtin_ctz(~mask);
                     break;
                 }
-
                 digit_run_length += 16;
             }
 #elif defined(JBird_USE_NEON)
-            // Constants for NEON
             const uint8x16_t zero_char = vdupq_n_u8('0');
             const uint8x16_t nine = vdupq_n_u8('9');
 
             while (parser->index + digit_run_length + 16 <= parser->length) {
                 uint8x16_t input = vld1q_u8(parser->input + parser->index + digit_run_length);
-
                 uint8x16_t gt_or_eq_zero = vcgeq_u8(input, zero_char);
                 uint8x16_t lt_or_eq_nine = vcleq_u8(input, nine);
                 uint8x16_t is_digit_vec = vandq_u8(gt_or_eq_zero, lt_or_eq_nine);
@@ -1050,104 +1048,93 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
                 if (high != 0xFFFFFFFFFFFFFFFF || low != 0xFFFFFFFFFFFFFFFF) {
                     uint8_t bytes[16];
                     vst1q_u8(bytes, is_digit_vec);
-                    int i;
-                    for (i = 0; i < 16; i++) {
-                        if (bytes[i] == 0)
-                            break;
+                    for (int i = 0; i < 16; i++) {
+                        if (bytes[i] == 0) {
+                            digit_run_length += i;
+                            goto neon_done;
+                        }
                     }
-                    digit_run_length += i;
-                    break;
                 }
-
                 digit_run_length += 16;
             }
+            neon_done:;
 #else
-            size_t i = 0;
             while (parser->index + digit_run_length < parser->length &&
                    is_digit(parser->input[parser->index + digit_run_length])) {
                 digit_run_length++;
             }
 #endif
-
             if (digit_run_length > 0) {
-                const size_t safe_int_digits = 18;
-
-                size_t digits_to_process = digit_run_length;
-                if (!integer_overflow && digits_to_process > safe_int_digits) {
-                    digits_to_process = safe_int_digits;
-                }
-
-                for (size_t i = 0; i < digits_to_process; i++) {
-                    uint8_t digit = parser->input[parser->index++] - '0';
-
-                    if (!integer_overflow) {
-                        int_value = int_value * 10 + digit;
-                    } else {
-                        double_value = double_value * 10.0 + (double)digit;
+                if (digit_run_length <= 18) {
+                    for (size_t i = 0; i < digit_run_length; i++) {
+                        mantissa = mantissa * 10 + (parser->input[parser->index++] - '0');
                     }
-                }
-
-                if (!integer_overflow && digit_run_length > digits_to_process) {
-                    integer_overflow = true;
-                    double_value = (double)int_value;
-                    is_double = true;
-
-                    for (size_t i = digits_to_process; i < digit_run_length; i++) {
+                    mantissa_digits = (int)digit_run_length;
+                } else {
+                    for (size_t i = 0; i < 18; i++) {
+                        mantissa = mantissa * 10 + (parser->input[parser->index++] - '0');
+                    }
+                    mantissa_digits = 18;
+                
+                    for (size_t i = 18; i < digit_run_length; i++) {
                         uint8_t digit = parser->input[parser->index++] - '0';
-                        double_value = double_value * 10.0 + (double)digit;
+                        
+                        if (!integer_overflow) {
+                            if (mantissa > max_mantissa_before_overflow || 
+                                (mantissa == max_mantissa_before_overflow && digit > UINT64_MAX % 10)) {
+                                integer_overflow = true;
+                                is_double = true;
+                            }
+                        }
+                        
+                        if (!integer_overflow) {
+                            mantissa = mantissa * 10 + digit;
+                            mantissa_digits++;
+                        } else {
+                            decimal_exponent++;
+                        }
                     }
                 }
             }
 
             while (json_has_more(parser) && is_digit(json_peek(parser))) {
                 uint8_t digit = json_next(parser) - '0';
-
-                if (!integer_overflow) {
-                    // Check for overflow considering the sign
-                    int64_t limit = is_negative ? -(INT64_MIN / 10) : (INT64_MAX / 10);
-                    int64_t last_digit_limit = is_negative ? -(INT64_MIN % 10) : (INT64_MAX % 10);
-
-                    if (int_value > limit || (int_value == limit && digit > last_digit_limit)) {
+                
+                if (mantissa_digits >= 18 && !integer_overflow) {
+                    if (mantissa > max_mantissa_before_overflow || 
+                        (mantissa == max_mantissa_before_overflow && digit > UINT64_MAX % 10)) {
                         integer_overflow = true;
-                        double_value = (double)int_value;
                         is_double = true;
                     }
                 }
-
+                
                 if (!integer_overflow) {
-                    int_value = int_value * 10 + digit;
+                    mantissa = mantissa * 10 + digit;
+                    mantissa_digits++;
                 } else {
-                    double_value = double_value * 10.0 + (double)digit;
+                    decimal_exponent++;
                 }
             }
         } else {
             while (json_has_more(parser) && is_digit(json_peek(parser))) {
                 uint8_t digit = json_next(parser) - '0';
-
-                if (!integer_overflow) {
-                    // Check for overflow considering the sign
-                    int64_t limit = is_negative ? -(INT64_MIN / 10) : (INT64_MAX / 10);
-                    int64_t last_digit_limit = is_negative ? -(INT64_MIN % 10) : (INT64_MAX % 10);
-
-                    if (int_value > limit || (int_value == limit && digit > last_digit_limit)) {
+                
+                if (mantissa_digits >= 18 && !integer_overflow) {
+                    if (mantissa > max_mantissa_before_overflow || 
+                        (mantissa == max_mantissa_before_overflow && digit > UINT64_MAX % 10)) {
                         integer_overflow = true;
-                        double_value = (double)int_value;
                         is_double = true;
                     }
-                    if (!integer_overflow) {
-                        int_value = int_value * 10 + digit;
-                    } else {
-                        double_value = double_value * 10.0 + (double)digit;
-                    }
+                }
+                
+                if (!integer_overflow) {
+                    mantissa = mantissa * 10 + digit;
+                    mantissa_digits++;
                 } else {
-                    double_value = double_value * 10.0 + (double)digit;
+                    decimal_exponent++;
                 }
             }
         }
-    }
-
-    if (integer_overflow) {
-        is_double = true;
     }
 
     if (json_has_more(parser) && json_peek(parser) == '.') {
@@ -1158,21 +1145,26 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
             return JSON_INVALID_NUMBER;
         }
 
-        if (!integer_overflow) {
-            double_value = (double)int_value;
-        }
-
-        double fraction = 0.0;
-        double divisor = 1.0;
         while (json_has_more(parser) && is_digit(json_peek(parser))) {
             uint8_t digit = json_next(parser) - '0';
-            divisor *= 10.0;
-            fraction += (double)digit / divisor;
+            
+            if (mantissa_digits >= 18 && !integer_overflow) {
+                if (mantissa > max_mantissa_before_overflow || 
+                    (mantissa == max_mantissa_before_overflow && digit > UINT64_MAX % 10)) {
+                    integer_overflow = true;
+                }
+            }
+            
+            if (!integer_overflow) {
+                mantissa = mantissa * 10 + digit;
+                mantissa_digits++;
+                decimal_exponent--;
+            }
         }
-        double_value += fraction;
     }
 
     if (json_has_more(parser) && (json_peek(parser) == 'e' || json_peek(parser) == 'E')) {
+        is_double = true;
         json_next(parser);
 
         bool exp_negative = false;
@@ -1184,27 +1176,15 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
             return JSON_INVALID_NUMBER;
         }
 
-        if (!integer_overflow && !is_double) {
-            double_value = (double)int_value;
-        }
-        is_double = true;
-
-        int exp_value = 0;
+        int explicit_exp = 0;
         while (json_has_more(parser) && is_digit(json_peek(parser))) {
             uint8_t digit = json_next(parser) - '0';
-            if (exp_value <= 308) {
-                exp_value = exp_value * 10 + digit;
+            if (explicit_exp <= 308) {
+                explicit_exp = explicit_exp * 10 + digit;
             }
         }
 
-        if (exp_value > 0) {
-            double scale = (exp_value < POW10_TABLE_SIZE) ? pow10_table[exp_value] : pow(10.0, (double)exp_value);
-            if (exp_negative) {
-                double_value /= scale;
-            } else {
-                double_value *= scale;
-            }
-        }
+        decimal_exponent += exp_negative ? -explicit_exp : explicit_exp;
     }
 
     if (parser->index == start_index + (is_negative ? 1 : 0)) {
@@ -1212,9 +1192,30 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
     }
 
     if (is_double) {
-        *out_value = json_create_double(parser->arena, is_negative ? -double_value : double_value);
+        double result = (double)mantissa;
+
+        if (decimal_exponent > 0) {
+            double scale = (decimal_exponent < POW10_TABLE_SIZE) 
+                ? pow10_table[decimal_exponent] 
+                : pow(10.0, (double)decimal_exponent);
+            result *= scale;
+        } else if (decimal_exponent < 0) {
+            int abs_exp = -decimal_exponent;
+            double scale = (abs_exp < POW10_TABLE_SIZE) 
+                ? pow10_table[abs_exp] 
+                : pow(10.0, (double)abs_exp);
+            result /= scale;
+        }
+
+        *out_value = json_create_double(parser->arena, is_negative ? -result : result);
     } else {
-        *out_value = json_create_int(parser->arena, is_negative ? -int_value : int_value);
+        if (mantissa > (uint64_t)INT64_MAX + (is_negative ? 1 : 0)) {
+            double result = (double)mantissa;
+            *out_value = json_create_double(parser->arena, is_negative ? -result : result);
+        } else {
+            int64_t int_value = (int64_t)mantissa;
+            *out_value = json_create_int(parser->arena, is_negative ? -int_value : int_value);
+        }
     }
 
     return *out_value ? JSON_NO_ERROR : JSON_OUT_OF_MEMORY;
@@ -1715,3 +1716,5 @@ json_error_t json_parse(const uint8_t *data, size_t length, json_value_t **out_v
 
     return err;
 }
+
+
