@@ -137,7 +137,7 @@ struct ArrayEncoder: UnkeyedEncodingContainer {
 
     mutating func encode<T>(
         _ value: T
-    ) throws where T : Encodable {
+    ) throws where T: Encodable {
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
             codingPath: codingPath + [IndexKey(count)],
@@ -150,18 +150,17 @@ struct ArrayEncoder: UnkeyedEncodingContainer {
 
     mutating func nestedContainer<NestedKey>(
         keyedBy keyType: NestedKey.Type
-    ) -> KeyedEncodingContainer<NestedKey> where NestedKey : CodingKey {
+    ) -> KeyedEncodingContainer<NestedKey> where NestedKey: CodingKey {
         let index = append(.object(JSON.Object()))
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
             codingPath: codingPath + [IndexKey(index)],
-            userInfo: encoder.userInfo,
-            onValueChange: { [encoder, containerIndex] json in
-                var array = encoder.array(at: containerIndex)
-                array[index] = json
-                encoder.store(container: .array(array), at: containerIndex)
-            }
-        )
+            userInfo: encoder.userInfo
+        ) { [encoder, containerIndex] json in
+            var array = encoder.array(at: containerIndex)
+            array[index] = json
+            encoder.store(container: .array(array), at: containerIndex)
+        }
         let container = ObjectEncoder<NestedKey>(encoder: nestedEncoder)
         return KeyedEncodingContainer(container)
     }
@@ -171,13 +170,12 @@ struct ArrayEncoder: UnkeyedEncodingContainer {
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
             codingPath: codingPath + [IndexKey(index)],
-            userInfo: encoder.userInfo,
-            onValueChange: { [encoder, containerIndex] json in
-                var array = encoder.array(at: containerIndex)
-                array[index] = json
-                encoder.store(container: .array(array), at: containerIndex)
-            }
-        )
+            userInfo: encoder.userInfo
+        ) { [encoder, containerIndex] json in
+            var array = encoder.array(at: containerIndex)
+            array[index] = json
+            encoder.store(container: .array(array), at: containerIndex)
+        }
         return ArrayEncoder(encoder: nestedEncoder)
     }
 
@@ -186,13 +184,12 @@ struct ArrayEncoder: UnkeyedEncodingContainer {
         return InternalEncoder(
             storage: encoder.storage,
             codingPath: codingPath + [IndexKey(index)],
-            userInfo: encoder.userInfo,
-            onValueChange: { [encoder, containerIndex] json in
-                var array = encoder.array(at: containerIndex)
-                array[index] = json
-                encoder.store(container: .array(array), at: containerIndex)
-            }
-        )
+            userInfo: encoder.userInfo
+        ) { [encoder, containerIndex] json in
+            var array = encoder.array(at: containerIndex)
+            array[index] = json
+            encoder.store(container: .array(array), at: containerIndex)
+        }
     }
 
     // MARK: - Private

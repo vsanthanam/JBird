@@ -35,7 +35,7 @@ struct ArrayDecoderTests {
         let foo: String
     }
 
-    let someCodableData = try! JSONEncoder().encode(Values([SomeCodable(foo: "foo"), SomeCodable(foo: "bar"), SomeCodable(foo: "baz")]))
+    static let someCodableData = try! JSONEncoder().encode(Values([SomeCodable(foo: "foo"), SomeCodable(foo: "bar"), SomeCodable(foo: "baz")]))
 
     struct Values<Element>: Codable, Equatable, ExpressibleByArrayLiteral where Element: Equatable & Codable {
 
@@ -486,37 +486,7 @@ struct ArrayDecoderTests {
         #expect(throws: DecodingError.self) {
             try JSON.Decoder().decode(
                 Strings.self,
-                from: someCodableData
-            )
-        }
-    }
-
-    @Test("Decode Ints")
-    func decodeInts() throws {
-        let value: Ints = [24, -12]
-        let data = try JSONEncoder().encode(value)
-        let foundation = try JSONDecoder().decode(Ints.self, from: data)
-        let jbird = try JSON.Decoder().decode(Ints.self, from: data)
-        #expect(foundation == jbird)
-        #expect(throws: DecodingError.self) {
-            try JSON.Decoder().decode(
-                Ints.self,
-                from: someCodableData
-            )
-        }
-    }
-
-    @Test("Decode Int8s")
-    func decodeInt8s() throws {
-        let value: Int8s = [-1, 1]
-        let data = try JSONEncoder().encode(value)
-        let foundation = try JSONDecoder().decode(Int8s.self, from: data)
-        let jbird = try JSON.Decoder().decode(Int8s.self, from: data)
-        #expect(foundation == jbird)
-        #expect(throws: DecodingError.self) {
-            try JSON.Decoder().decode(
-                Int8s.self,
-                from: someCodableData
+                from: ArrayDecoderTests.someCodableData
             )
         }
     }
@@ -531,7 +501,7 @@ struct ArrayDecoderTests {
         #expect(throws: DecodingError.self) {
             try JSON.Decoder().decode(
                 Bools.self,
-                from: someCodableData
+                from: ArrayDecoderTests.someCodableData
             )
         }
     }
@@ -546,7 +516,7 @@ struct ArrayDecoderTests {
         #expect(throws: DecodingError.self) {
             try JSON.Decoder().decode(
                 Floats.self,
-                from: someCodableData
+                from: ArrayDecoderTests.someCodableData
             )
         }
     }
@@ -562,129 +532,169 @@ struct ArrayDecoderTests {
         #expect(throws: DecodingError.self) {
             try JSON.Decoder().decode(
                 Doubles.self,
-                from: someCodableData
+                from: ArrayDecoderTests.someCodableData
             )
         }
     }
 
-    @Test("Decode Int16s")
-    func decodeInt16s() throws {
-        let value: Int16s = [-3, 7]
-        let data = try JSONEncoder().encode(value)
-        let foundation = try JSONDecoder().decode(Int16s.self, from: data)
-        let jbird = try JSON.Decoder().decode(Int16s.self, from: data)
-        #expect(foundation == jbird)
-        #expect(throws: DecodingError.self) {
-            try JSON.Decoder().decode(
-                Int16s.self,
-                from: someCodableData
-            )
+    @Suite("Decode Signed Integer Arrays")
+    struct SignedIntegers {
+
+        @Test("Decode Ints")
+        func decodeInts() throws {
+            let value: Ints = [24, -12]
+            let data = try JSONEncoder().encode(value)
+            let foundation = try JSONDecoder().decode(Ints.self, from: data)
+            let jbird = try JSON.Decoder().decode(Ints.self, from: data)
+            #expect(foundation == jbird)
+            #expect(throws: DecodingError.self) {
+                try JSON.Decoder().decode(
+                    Ints.self,
+                    from: ArrayDecoderTests.someCodableData
+                )
+            }
         }
+
+        @Test("Decode Int8s")
+        func decodeInt8s() throws {
+            let value: Int8s = [-1, 1]
+            let data = try JSONEncoder().encode(value)
+            let foundation = try JSONDecoder().decode(Int8s.self, from: data)
+            let jbird = try JSON.Decoder().decode(Int8s.self, from: data)
+            #expect(foundation == jbird)
+            #expect(throws: DecodingError.self) {
+                try JSON.Decoder().decode(
+                    Int8s.self,
+                    from: ArrayDecoderTests.someCodableData
+                )
+            }
+        }
+
+        @Test("Decode Int16s")
+        func decodeInt16s() throws {
+            let value: Int16s = [-3, 7]
+            let data = try JSONEncoder().encode(value)
+            let foundation = try JSONDecoder().decode(Int16s.self, from: data)
+            let jbird = try JSON.Decoder().decode(Int16s.self, from: data)
+            #expect(foundation == jbird)
+            #expect(throws: DecodingError.self) {
+                try JSON.Decoder().decode(
+                    Int16s.self,
+                    from: ArrayDecoderTests.someCodableData
+                )
+            }
+        }
+
+        @Test("Decode Int32s")
+        func decodeInt32s() throws {
+            let value: Int32s = [-1000, 1000]
+            let data = try JSONEncoder().encode(value)
+            let foundation = try JSONDecoder().decode(Int32s.self, from: data)
+            let jbird = try JSON.Decoder().decode(Int32s.self, from: data)
+            #expect(foundation == jbird)
+            #expect(throws: DecodingError.self) {
+                try JSON.Decoder().decode(
+                    Int32s.self,
+                    from: ArrayDecoderTests.someCodableData
+                )
+            }
+        }
+
+        @Test("Decode Int64s")
+        func decodeInt64s() throws {
+            let value: Int64s = [-9000, 9000]
+            let data = try JSONEncoder().encode(value)
+            let foundation = try JSONDecoder().decode(Int64s.self, from: data)
+            let jbird = try JSON.Decoder().decode(Int64s.self, from: data)
+            #expect(foundation == jbird)
+            #expect(throws: DecodingError.self) {
+                try JSON.Decoder().decode(
+                    Int64s.self,
+                    from: ArrayDecoderTests.someCodableData
+                )
+            }
+        }
+
     }
 
-    @Test("Decode Int32s")
-    func decodeInt32s() throws {
-        let value: Int32s = [-1000, 1000]
-        let data = try JSONEncoder().encode(value)
-        let foundation = try JSONDecoder().decode(Int32s.self, from: data)
-        let jbird = try JSON.Decoder().decode(Int32s.self, from: data)
-        #expect(foundation == jbird)
-        #expect(throws: DecodingError.self) {
-            try JSON.Decoder().decode(
-                Int32s.self,
-                from: someCodableData
-            )
-        }
-    }
+    @Suite("Decode Unsigned Integer Arrays")
+    struct UnsignedIntegers {
 
-    @Test("Decode Int64s")
-    func decodeInt64s() throws {
-        let value: Int64s = [-9000, 9000]
-        let data = try JSONEncoder().encode(value)
-        let foundation = try JSONDecoder().decode(Int64s.self, from: data)
-        let jbird = try JSON.Decoder().decode(Int64s.self, from: data)
-        #expect(foundation == jbird)
-        #expect(throws: DecodingError.self) {
-            try JSON.Decoder().decode(
-                Int64s.self,
-                from: someCodableData
-            )
+        @Test("Decode UInts")
+        func decodeUInts() throws {
+            let value: UInts = [0, 42]
+            let data = try JSONEncoder().encode(value)
+            let foundation = try JSONDecoder().decode(UInts.self, from: data)
+            let jbird = try JSON.Decoder().decode(UInts.self, from: data)
+            #expect(foundation == jbird)
+            #expect(throws: DecodingError.self) {
+                try JSON.Decoder().decode(
+                    UInts.self,
+                    from: ArrayDecoderTests.someCodableData
+                )
+            }
         }
-    }
 
-    @Test("Decode UInts")
-    func decodeUInts() throws {
-        let value: UInts = [0, 42]
-        let data = try JSONEncoder().encode(value)
-        let foundation = try JSONDecoder().decode(UInts.self, from: data)
-        let jbird = try JSON.Decoder().decode(UInts.self, from: data)
-        #expect(foundation == jbird)
-        #expect(throws: DecodingError.self) {
-            try JSON.Decoder().decode(
-                UInts.self,
-                from: someCodableData
-            )
+        @Test("Decode UInt8s")
+        func decodeUInt8s() throws {
+            let value: UInt8s = [0, 200]
+            let data = try JSONEncoder().encode(value)
+            let foundation = try JSONDecoder().decode(UInt8s.self, from: data)
+            let jbird = try JSON.Decoder().decode(UInt8s.self, from: data)
+            #expect(foundation == jbird)
+            #expect(throws: DecodingError.self) {
+                try JSON.Decoder().decode(
+                    UInt8s.self,
+                    from: ArrayDecoderTests.someCodableData
+                )
+            }
         }
-    }
 
-    @Test("Decode UInt8s")
-    func decodeUInt8s() throws {
-        let value: UInt8s = [0, 200]
-        let data = try JSONEncoder().encode(value)
-        let foundation = try JSONDecoder().decode(UInt8s.self, from: data)
-        let jbird = try JSON.Decoder().decode(UInt8s.self, from: data)
-        #expect(foundation == jbird)
-        #expect(throws: DecodingError.self) {
-            try JSON.Decoder().decode(
-                UInt8s.self,
-                from: someCodableData
-            )
+        @Test("Decode UInt16s")
+        func decodeUInt16s() throws {
+            let value: UInt16s = [0, 65000]
+            let data = try JSONEncoder().encode(value)
+            let foundation = try JSONDecoder().decode(UInt16s.self, from: data)
+            let jbird = try JSON.Decoder().decode(UInt16s.self, from: data)
+            #expect(foundation == jbird)
+            #expect(throws: DecodingError.self) {
+                try JSON.Decoder().decode(
+                    UInt16s.self,
+                    from: ArrayDecoderTests.someCodableData
+                )
+            }
         }
-    }
 
-    @Test("Decode UInt16s")
-    func decodeUInt16s() throws {
-        let value: UInt16s = [0, 65000]
-        let data = try JSONEncoder().encode(value)
-        let foundation = try JSONDecoder().decode(UInt16s.self, from: data)
-        let jbird = try JSON.Decoder().decode(UInt16s.self, from: data)
-        #expect(foundation == jbird)
-        #expect(throws: DecodingError.self) {
-            try JSON.Decoder().decode(
-                UInt16s.self,
-                from: someCodableData
-            )
+        @Test("Decode UInt32s")
+        func decodeUInt32s() throws {
+            let value: UInt32s = [1, 1_000_000]
+            let data = try JSONEncoder().encode(value)
+            let foundation = try JSONDecoder().decode(UInt32s.self, from: data)
+            let jbird = try JSON.Decoder().decode(UInt32s.self, from: data)
+            #expect(foundation == jbird)
+            #expect(throws: DecodingError.self) {
+                try JSON.Decoder().decode(
+                    UInt32s.self,
+                    from: ArrayDecoderTests.someCodableData
+                )
+            }
         }
-    }
 
-    @Test("Decode UInt32s")
-    func decodeUInt32s() throws {
-        let value: UInt32s = [1, 1_000_000]
-        let data = try JSONEncoder().encode(value)
-        let foundation = try JSONDecoder().decode(UInt32s.self, from: data)
-        let jbird = try JSON.Decoder().decode(UInt32s.self, from: data)
-        #expect(foundation == jbird)
-        #expect(throws: DecodingError.self) {
-            try JSON.Decoder().decode(
-                UInt32s.self,
-                from: someCodableData
-            )
+        @Test("Decode UInt64s")
+        func decodeUInt64s() throws {
+            let value: UInt64s = [1, 1_000_000_000]
+            let data = try JSONEncoder().encode(value)
+            let foundation = try JSONDecoder().decode(UInt64s.self, from: data)
+            let jbird = try JSON.Decoder().decode(UInt64s.self, from: data)
+            #expect(foundation == jbird)
+            #expect(throws: DecodingError.self) {
+                try JSON.Decoder().decode(
+                    UInt64s.self,
+                    from: ArrayDecoderTests.someCodableData
+                )
+            }
         }
-    }
 
-    @Test("Decode UInt64s")
-    func decodeUInt64s() throws {
-        let value: UInt64s = [1, 1_000_000_000]
-        let data = try JSONEncoder().encode(value)
-        let foundation = try JSONDecoder().decode(UInt64s.self, from: data)
-        let jbird = try JSON.Decoder().decode(UInt64s.self, from: data)
-        #expect(foundation == jbird)
-        #expect(throws: DecodingError.self) {
-            try JSON.Decoder().decode(
-                UInt64s.self,
-                from: someCodableData
-            )
-        }
     }
 
     @Test("Decode Codables")
@@ -697,7 +707,7 @@ struct ArrayDecoderTests {
         #expect(throws: DecodingError.self) {
             try JSON.Decoder().decode(
                 Values<String>.self,
-                from: someCodableData
+                from: ArrayDecoderTests.someCodableData
             )
         }
     }
@@ -712,7 +722,7 @@ struct ArrayDecoderTests {
         #expect(throws: DecodingError.self) {
             try JSON.Decoder().decode(
                 [Int].self,
-                from: someCodableData
+                from: ArrayDecoderTests.someCodableData
             )
         }
     }

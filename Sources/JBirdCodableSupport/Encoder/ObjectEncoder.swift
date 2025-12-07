@@ -196,7 +196,7 @@ struct ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: CodingKey {
     mutating func superEncoder() -> any Encoder {
         InternalEncoder(
             storage: encoder.storage,
-            codingPath: codingPath,
+            codingPath: codingPath + [SuperKey()],
             userInfo: encoder.userInfo
         ) { [encoder, containerIndex] json in
             var object = encoder.object(at: containerIndex)

@@ -1094,11 +1094,13 @@ extension JSON {
 
 }
 
-private let floatNumberFormatter = {
+private let floatNumberFormatter: NumberFormatter = {
     let formatter = NumberFormatter()
     formatter.locale = Locale(identifier: "en_US_POSIX")
     formatter.numberStyle = .scientific
-    formatter.positiveFormat = "0.################E+0"
-    formatter.negativeFormat = "-0.################E+0"
+    formatter.positiveFormat = "0.################E+00"
+    formatter.negativeFormat = "-0.################E+00"
+    formatter.exponentSymbol = "e"
+
     return formatter
 }()

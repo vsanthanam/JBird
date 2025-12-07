@@ -36,7 +36,7 @@ extension JSON {
         public init() {}
 
         // MARK: - API
-        
+
         public var deserializationOptions: JSON.DeserializationOptions = .default
 
         public func decode<T>(
@@ -60,12 +60,12 @@ extension JSON {
     public struct Encoder {
 
         // MARK: - Initializers
-        
+
         public init() {}
-        
+
         // MARK: - API
-        
-        public var serializationOptions: JSON.SerializationOptions = .default
+
+        public var serializationOptions: JSON.SerializationOptions = [.fragmentsAllowed]
 
         public func encode(
             _ value: some Encodable

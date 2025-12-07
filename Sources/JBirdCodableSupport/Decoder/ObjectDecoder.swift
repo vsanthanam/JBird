@@ -385,10 +385,11 @@ struct ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: CodingKey {
     }
 
     func superDecoder() throws -> any Decoder {
-        InternalDecoder(
+        let value = object["super"] ?? .object(object)
+        return InternalDecoder(
             storage: decoder.storage,
-            value: .init(object),
-            codingPath: codingPath,
+            value: value,
+            codingPath: codingPath + [SuperKey()],
             userInfo: decoder.userInfo,
             parent: decoder
         )

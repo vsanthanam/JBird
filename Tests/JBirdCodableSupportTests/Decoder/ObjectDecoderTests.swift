@@ -35,7 +35,7 @@ struct ObjectDecoderTests {
         let foo: String
     }
 
-    let someCodableData = try! JSONEncoder().encode(KeyedValue(value: SomeCodable(foo: "bar")))
+    static let someCodableData = try! JSONEncoder().encode(KeyedValue(value: SomeCodable(foo: "bar")))
 
     struct KeyedValue<T>: Equatable, Codable where T: Codable & Equatable {
         let value: T
@@ -388,7 +388,6 @@ struct ObjectDecoderTests {
 
         private enum CodingKeys: String, CodingKey {
             case bar
-            case superPayload
             case qux
         }
 
@@ -396,10 +395,10 @@ struct ObjectDecoderTests {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             self.bar = try container.decode(String.self, forKey: .bar)
             let quxContainer = try container.nestedContainer(keyedBy: Qux.CodingKeys.self, forKey: .qux)
-            let quuux = try quxContainer.decode(Bool.self, forKey: .quux)
+            let quux = try quxContainer.decode(Bool.self, forKey: .quux)
             let grault = try quxContainer.decode(Double.self, forKey: .grault)
-            self.qux = .init(quux: quuux, grault: grault)
-            let superDecoder = try container.superDecoder(forKey: .superPayload)
+            self.qux = .init(quux: quux, grault: grault)
+            let superDecoder = try container.superDecoder()
             try super.init(from: superDecoder)
         }
 
@@ -407,7 +406,7 @@ struct ObjectDecoderTests {
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(bar, forKey: .bar)
             try container.encode(qux, forKey: .qux)
-            let superEncoder = container.superEncoder(forKey: .superPayload)
+            let superEncoder = container.superEncoder()
             try super.encode(to: superEncoder)
         }
 
@@ -426,7 +425,7 @@ struct ObjectDecoderTests {
         }
     }
 
-    @Test("Test Keyed String")
+    @Test("Keyed String")
     func keyedString() throws {
         let value = KeyedString(value: "foo")
         let data = try JSONEncoder().encode(value)
@@ -436,12 +435,12 @@ struct ObjectDecoderTests {
         #expect(throws: DecodingError.self) {
             try JSON.Decoder().decode(
                 KeyedString.self,
-                from: someCodableData
+                from: ObjectDecoderTests.someCodableData
             )
         }
     }
 
-    @Test("Test Keyed Bool")
+    @Test("Keyed Bool")
     func keyedBool() throws {
         let value = KeyedBool(value: false)
         let data = try JSONEncoder().encode(value)
@@ -451,162 +450,172 @@ struct ObjectDecoderTests {
         #expect(throws: DecodingError.self) {
             try JSON.Decoder().decode(
                 KeyedBool.self,
-                from: someCodableData
+                from: ObjectDecoderTests.someCodableData
             )
         }
     }
 
-    @Test("Test Keyed Int")
-    func keyedInt() throws {
-        let value = KeyedInt(value: 42)
-        let data = try JSONEncoder().encode(value)
-        let foundation = try JSONDecoder().decode(KeyedInt.self, from: data)
-        let jbird = try JSON.Decoder().decode(KeyedInt.self, from: data)
-        #expect(foundation == jbird)
-        #expect(throws: DecodingError.self) {
-            try JSON.Decoder().decode(
-                KeyedInt.self,
-                from: someCodableData
-            )
+    @Suite("Keyed Signed Integers")
+    struct SignedIntegers {
+
+        @Test("Keyed Int")
+        func keyedInt() throws {
+            let value = KeyedInt(value: 42)
+            let data = try JSONEncoder().encode(value)
+            let foundation = try JSONDecoder().decode(KeyedInt.self, from: data)
+            let jbird = try JSON.Decoder().decode(KeyedInt.self, from: data)
+            #expect(foundation == jbird)
+            #expect(throws: DecodingError.self) {
+                try JSON.Decoder().decode(
+                    KeyedInt.self,
+                    from: ObjectDecoderTests.someCodableData
+                )
+            }
         }
+
+        @Test("Keyed Int8")
+        func keyedInt8() throws {
+            let value = KeyedInt8(value: -1)
+            let data = try JSONEncoder().encode(value)
+            let foundation = try JSONDecoder().decode(KeyedInt8.self, from: data)
+            let jbird = try JSON.Decoder().decode(KeyedInt8.self, from: data)
+            #expect(foundation == jbird)
+            #expect(throws: DecodingError.self) {
+                try JSON.Decoder().decode(
+                    KeyedInt8.self,
+                    from: ObjectDecoderTests.someCodableData
+                )
+            }
+        }
+
+        @Test("Keyed Int16")
+        func keyedInt16() throws {
+            let value = KeyedInt16(value: -3)
+            let data = try JSONEncoder().encode(value)
+            let foundation = try JSONDecoder().decode(KeyedInt16.self, from: data)
+            let jbird = try JSON.Decoder().decode(KeyedInt16.self, from: data)
+            #expect(foundation == jbird)
+            #expect(throws: DecodingError.self) {
+                try JSON.Decoder().decode(
+                    KeyedInt16.self,
+                    from: ObjectDecoderTests.someCodableData
+                )
+            }
+        }
+
+        @Test("Keyed Int32")
+        func keyedInt32() throws {
+            let value = KeyedInt32(value: -1000)
+            let data = try JSONEncoder().encode(value)
+            let foundation = try JSONDecoder().decode(KeyedInt32.self, from: data)
+            let jbird = try JSON.Decoder().decode(KeyedInt32.self, from: data)
+            #expect(foundation == jbird)
+            #expect(throws: DecodingError.self) {
+                try JSON.Decoder().decode(
+                    KeyedInt32.self,
+                    from: ObjectDecoderTests.someCodableData
+                )
+            }
+        }
+
+        @Test("Keyed Int64")
+        func keyedInt64() throws {
+            let value = KeyedInt64(value: -9000)
+            let data = try JSONEncoder().encode(value)
+            let foundation = try JSONDecoder().decode(KeyedInt64.self, from: data)
+            let jbird = try JSON.Decoder().decode(KeyedInt64.self, from: data)
+            #expect(foundation == jbird)
+            #expect(throws: DecodingError.self) {
+                try JSON.Decoder().decode(
+                    KeyedInt64.self,
+                    from: ObjectDecoderTests.someCodableData
+                )
+            }
+        }
+
     }
 
-    @Test("Test Keyed Int8")
-    func keyedInt8() throws {
-        let value = KeyedInt8(value: -1)
-        let data = try JSONEncoder().encode(value)
-        let foundation = try JSONDecoder().decode(KeyedInt8.self, from: data)
-        let jbird = try JSON.Decoder().decode(KeyedInt8.self, from: data)
-        #expect(foundation == jbird)
-        #expect(throws: DecodingError.self) {
-            try JSON.Decoder().decode(
-                KeyedInt8.self,
-                from: someCodableData
-            )
+    @Suite("Keyed Unsigned Integers")
+    struct UnsignedIntegers {
+
+        @Test("Keyed UInt")
+        func keyedUInt() throws {
+            let value = KeyedUInt(value: 42)
+            let data = try JSONEncoder().encode(value)
+            let foundation = try JSONDecoder().decode(KeyedUInt.self, from: data)
+            let jbird = try JSON.Decoder().decode(KeyedUInt.self, from: data)
+            #expect(foundation == jbird)
+            #expect(throws: DecodingError.self) {
+                try JSON.Decoder().decode(
+                    KeyedUInt.self,
+                    from: ObjectDecoderTests.someCodableData
+                )
+            }
         }
+
+        @Test("Keyed UInt8")
+        func keyedUInt8() throws {
+            let value = KeyedUInt8(value: 200)
+            let data = try JSONEncoder().encode(value)
+            let foundation = try JSONDecoder().decode(KeyedUInt8.self, from: data)
+            let jbird = try JSON.Decoder().decode(KeyedUInt8.self, from: data)
+            #expect(foundation == jbird)
+            #expect(throws: DecodingError.self) {
+                try JSON.Decoder().decode(
+                    KeyedUInt8.self,
+                    from: ObjectDecoderTests.someCodableData
+                )
+            }
+        }
+
+        @Test("Keyed UInt16")
+        func keyedUInt16() throws {
+            let value = KeyedUInt16(value: 65000)
+            let data = try JSONEncoder().encode(value)
+            let foundation = try JSONDecoder().decode(KeyedUInt16.self, from: data)
+            let jbird = try JSON.Decoder().decode(KeyedUInt16.self, from: data)
+            #expect(foundation == jbird)
+            #expect(throws: DecodingError.self) {
+                try JSON.Decoder().decode(
+                    KeyedUInt16.self,
+                    from: ObjectDecoderTests.someCodableData
+                )
+            }
+        }
+
+        @Test("Keyed UInt32")
+        func keyedUInt32() throws {
+            let value = KeyedUInt32(value: 1_000_000)
+            let data = try JSONEncoder().encode(value)
+            let foundation = try JSONDecoder().decode(KeyedUInt32.self, from: data)
+            let jbird = try JSON.Decoder().decode(KeyedUInt32.self, from: data)
+            #expect(foundation == jbird)
+            #expect(throws: DecodingError.self) {
+                try JSON.Decoder().decode(
+                    KeyedUInt32.self,
+                    from: ObjectDecoderTests.someCodableData
+                )
+            }
+        }
+
+        @Test("Keyed UInt64")
+        func keyedUInt64() throws {
+            let value = KeyedUInt64(value: 1_000_000_000)
+            let data = try JSONEncoder().encode(value)
+            let foundation = try JSONDecoder().decode(KeyedUInt64.self, from: data)
+            let jbird = try JSON.Decoder().decode(KeyedUInt64.self, from: data)
+            #expect(foundation == jbird)
+            #expect(throws: DecodingError.self) {
+                try JSON.Decoder().decode(
+                    KeyedUInt64.self,
+                    from: ObjectDecoderTests.someCodableData
+                )
+            }
+        }
+
     }
 
-    @Test("Test Keyed Int16")
-    func keyedInt16() throws {
-        let value = KeyedInt16(value: -3)
-        let data = try JSONEncoder().encode(value)
-        let foundation = try JSONDecoder().decode(KeyedInt16.self, from: data)
-        let jbird = try JSON.Decoder().decode(KeyedInt16.self, from: data)
-        #expect(foundation == jbird)
-        #expect(throws: DecodingError.self) {
-            try JSON.Decoder().decode(
-                KeyedInt16.self,
-                from: someCodableData
-            )
-        }
-    }
-
-    @Test("Test Keyed Int32")
-    func keyedInt32() throws {
-        let value = KeyedInt32(value: -1000)
-        let data = try JSONEncoder().encode(value)
-        let foundation = try JSONDecoder().decode(KeyedInt32.self, from: data)
-        let jbird = try JSON.Decoder().decode(KeyedInt32.self, from: data)
-        #expect(foundation == jbird)
-        #expect(throws: DecodingError.self) {
-            try JSON.Decoder().decode(
-                KeyedInt32.self,
-                from: someCodableData
-            )
-        }
-    }
-
-    @Test("Test Keyed Int64")
-    func keyedInt64() throws {
-        let value = KeyedInt64(value: -9000)
-        let data = try JSONEncoder().encode(value)
-        let foundation = try JSONDecoder().decode(KeyedInt64.self, from: data)
-        let jbird = try JSON.Decoder().decode(KeyedInt64.self, from: data)
-        #expect(foundation == jbird)
-        #expect(throws: DecodingError.self) {
-            try JSON.Decoder().decode(
-                KeyedInt64.self,
-                from: someCodableData
-            )
-        }
-    }
-
-    @Test("Test Keyed UInt")
-    func keyedUInt() throws {
-        let value = KeyedUInt(value: 42)
-        let data = try JSONEncoder().encode(value)
-        let foundation = try JSONDecoder().decode(KeyedUInt.self, from: data)
-        let jbird = try JSON.Decoder().decode(KeyedUInt.self, from: data)
-        #expect(foundation == jbird)
-        #expect(throws: DecodingError.self) {
-            try JSON.Decoder().decode(
-                KeyedUInt.self,
-                from: someCodableData
-            )
-        }
-    }
-
-    @Test("Test Keyed UInt8")
-    func keyedUInt8() throws {
-        let value = KeyedUInt8(value: 200)
-        let data = try JSONEncoder().encode(value)
-        let foundation = try JSONDecoder().decode(KeyedUInt8.self, from: data)
-        let jbird = try JSON.Decoder().decode(KeyedUInt8.self, from: data)
-        #expect(foundation == jbird)
-        #expect(throws: DecodingError.self) {
-            try JSON.Decoder().decode(
-                KeyedUInt8.self,
-                from: someCodableData
-            )
-        }
-    }
-
-    @Test("Test Keyed UInt16")
-    func keyedUInt16() throws {
-        let value = KeyedUInt16(value: 65000)
-        let data = try JSONEncoder().encode(value)
-        let foundation = try JSONDecoder().decode(KeyedUInt16.self, from: data)
-        let jbird = try JSON.Decoder().decode(KeyedUInt16.self, from: data)
-        #expect(foundation == jbird)
-        #expect(throws: DecodingError.self) {
-            try JSON.Decoder().decode(
-                KeyedUInt16.self,
-                from: someCodableData
-            )
-        }
-    }
-
-    @Test("Test Keyed UInt32")
-    func keyedUInt32() throws {
-        let value = KeyedUInt32(value: 1_000_000)
-        let data = try JSONEncoder().encode(value)
-        let foundation = try JSONDecoder().decode(KeyedUInt32.self, from: data)
-        let jbird = try JSON.Decoder().decode(KeyedUInt32.self, from: data)
-        #expect(foundation == jbird)
-        #expect(throws: DecodingError.self) {
-            try JSON.Decoder().decode(
-                KeyedUInt32.self,
-                from: someCodableData
-            )
-        }
-    }
-
-    @Test("Test Keyed UInt64")
-    func keyedUInt64() throws {
-        let value = KeyedUInt64(value: 1_000_000_000)
-        let data = try JSONEncoder().encode(value)
-        let foundation = try JSONDecoder().decode(KeyedUInt64.self, from: data)
-        let jbird = try JSON.Decoder().decode(KeyedUInt64.self, from: data)
-        #expect(foundation == jbird)
-        #expect(throws: DecodingError.self) {
-            try JSON.Decoder().decode(
-                KeyedUInt64.self,
-                from: someCodableData
-            )
-        }
-    }
-
-    @Test("Test Keyed Float")
+    @Test("Keyed Float")
     func keyedFloat() throws {
         let value = KeyedFloat(value: 1.5)
         let data = try JSONEncoder().encode(value)
@@ -616,12 +625,12 @@ struct ObjectDecoderTests {
         #expect(throws: DecodingError.self) {
             try JSON.Decoder().decode(
                 KeyedFloat.self,
-                from: someCodableData
+                from: ObjectDecoderTests.someCodableData
             )
         }
     }
 
-    @Test("Test Keyed Double")
+    @Test("Keyed Double")
     func keyedDouble() throws {
         let value = KeyedDouble(value: 1.2)
         let data = try JSONEncoder().encode(value)
@@ -631,12 +640,12 @@ struct ObjectDecoderTests {
         #expect(throws: DecodingError.self) {
             try JSON.Decoder().decode(
                 KeyedDouble.self,
-                from: someCodableData
+                from: ObjectDecoderTests.someCodableData
             )
         }
     }
 
-    @Test("Test Keyed Codable")
+    @Test("Keyed Codable")
     func keyedCodable() throws {
         let value = KeyedValue<Int>(value: 12)
         let data = try JSONEncoder().encode(value)
@@ -646,12 +655,12 @@ struct ObjectDecoderTests {
         #expect(throws: DecodingError.self) {
             try JSON.Decoder().decode(
                 KeyedValue<Int>.self,
-                from: someCodableData
+                from: ObjectDecoderTests.someCodableData
             )
         }
     }
 
-    @Test("Test Keyed Subclass")
+    @Test("Keyed Subclass")
     func keyedSubClass() throws {
         let value = SomeSub(foo: "bar", bar: "foo", qux: .init(quux: false, grault: 1.2))
         let data = try JSONEncoder().encode(value)
@@ -659,4 +668,5 @@ struct ObjectDecoderTests {
         let jbird = try JSON.Decoder().decode(SomeSub.self, from: data)
         #expect(foundation == jbird)
     }
+
 }

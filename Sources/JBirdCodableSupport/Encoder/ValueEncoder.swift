@@ -133,7 +133,7 @@ struct ValueEncoder: SingleValueEncodingContainer {
 
     mutating func encode<T>(
         _ value: T
-    ) throws where T : Encodable {
+    ) throws where T: Encodable {
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
             codingPath: codingPath,
