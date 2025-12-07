@@ -29,25 +29,57 @@ import JBirdCore
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON {
 
-    public final class Decoder: Sendable {
+    public struct Decoder {
 
         // MARK: - Initializers
 
         public init() {}
 
         // MARK: - API
+        
+        public var deserializationOptions: JSON.DeserializationOptions = .default
 
         public func decode<T>(
             _ type: T.Type = T.self,
             from data: Data,
         ) throws -> T where T: Decodable {
-            let json = try JSON.value(for: data)
+            let json = try JSON.value(
+                for: data,
+                options: deserializationOptions
+            )
             let decoder = InternalDecoder(
                 value: json,
                 codingPath: [],
                 userInfo: [:]
             )
             return try T(from: decoder)
+        }
+
+    }
+
+    public struct Encoder {
+
+        // MARK: - Initializers
+        
+        public init() {}
+        
+        // MARK: - API
+        
+        public var serializationOptions: JSON.SerializationOptions = .default
+
+        public func encode(
+            _ value: some Encodable
+        ) throws -> Data {
+            let encoder = InternalEncoder(
+                codingPath: [],
+                userInfo: [:]
+            )
+            try value.encode(to: encoder)
+            let json = encoder.finalize()
+            return try JSON.data(
+                from: json,
+                options: serializationOptions
+            )
         }
 
     }

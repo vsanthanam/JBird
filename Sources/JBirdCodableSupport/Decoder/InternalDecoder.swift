@@ -31,7 +31,7 @@ final class InternalDecoder: Decoder {
     // MARK: - Initializers
 
     init(
-        storage: Storage,
+        storage: Storage = .init(),
         value: JSON,
         codingPath: [any CodingKey],
         userInfo: [CodingUserInfoKey: Any],
@@ -42,24 +42,6 @@ final class InternalDecoder: Decoder {
         self.userInfo = userInfo
         self.parent = parent
         self.storage.push(container: value)
-    }
-
-    convenience init(
-        value: JSON,
-        codingPath: [any CodingKey],
-        userInfo: [CodingUserInfoKey: Any]
-    ) {
-        self.init(
-            storage: Storage(),
-            value: value,
-            codingPath: codingPath,
-            userInfo: userInfo,
-            parent: nil
-        )
-    }
-
-    deinit {
-        storage.popContainer()
     }
 
     // MARK: - API
@@ -154,5 +136,11 @@ final class InternalDecoder: Decoder {
     // MARK: - Private
 
     private let parent: InternalDecoder?
+
+    // MARK: - Deinit
+
+    deinit {
+        storage.popContainer()
+    }
 
 }
