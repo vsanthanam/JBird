@@ -343,12 +343,14 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
         _ type: T.Type
     ) throws -> T where T: Decodable {
         let (value, index) = try next(type)
-        let decoder = InternalDecoder(
+        let nestedDecoder = InternalDecoder(
+            storage: decoder.storage,
             value: value,
             codingPath: codingPath + [IndexKey(index)],
-            userInfo: decoder.userInfo
+            userInfo: decoder.userInfo,
+            parent: decoder
         )
-        return try T(from: decoder)
+        return try T(from: nestedDecoder)
     }
 
     mutating func nestedContainer<NestedKey>(
@@ -356,9 +358,11 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
     ) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
         let (value, index) = try next(JSON.self)
         let nestedDecoder = InternalDecoder(
+            storage: decoder.storage,
             value: value,
             codingPath: codingPath + [IndexKey(index)],
-            userInfo: decoder.userInfo
+            userInfo: decoder.userInfo,
+            parent: decoder
         )
         return try nestedDecoder.container(keyedBy: type)
     }
@@ -367,9 +371,11 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
         let (value, index) = try next(JSON.self)
 
         let nestedDecoder = InternalDecoder(
+            storage: decoder.storage,
             value: value,
             codingPath: codingPath + [IndexKey(index)],
-            userInfo: decoder.userInfo
+            userInfo: decoder.userInfo,
+            parent: decoder
         )
 
         return try nestedDecoder.unkeyedContainer()
@@ -378,9 +384,11 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
     mutating func superDecoder() throws -> any Decoder {
         let (value, index) = try next(JSON.self)
         return InternalDecoder(
+            storage: decoder.storage,
             value: value,
             codingPath: codingPath + [IndexKey(index)],
-            userInfo: decoder.userInfo
+            userInfo: decoder.userInfo,
+            parent: decoder
         )
     }
 

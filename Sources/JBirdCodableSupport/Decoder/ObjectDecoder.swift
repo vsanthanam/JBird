@@ -345,12 +345,14 @@ struct ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: CodingKey {
         forKey key: Key
     ) throws -> T where T : Decodable {
         let value = try value(forKey: key)
-        let decoder = InternalDecoder(
+        let nestedDecoder = InternalDecoder(
+            storage: decoder.storage,
             value: value,
             codingPath: codingPath + [key],
-            userInfo: decoder.userInfo
+            userInfo: decoder.userInfo,
+            parent: decoder
         )
-        return try T(from: decoder)
+        return try T(from: nestedDecoder)
     }
 
     func nestedContainer<NestedKey>(
@@ -358,31 +360,37 @@ struct ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: CodingKey {
         forKey key: Key
     ) throws -> KeyedDecodingContainer<NestedKey> where NestedKey: CodingKey {
         let value = try value(forKey: key)
-        let decoder = InternalDecoder(
+        let nestedDecoder = InternalDecoder(
+            storage: decoder.storage,
             value: value,
             codingPath: codingPath + [key],
-            userInfo: decoder.userInfo
+            userInfo: decoder.userInfo,
+            parent: decoder
         )
-        return try decoder.container(keyedBy: type)
+        return try nestedDecoder.container(keyedBy: type)
     }
 
     func nestedUnkeyedContainer(
         forKey key: Key
     ) throws -> any UnkeyedDecodingContainer {
         let value = try value(forKey: key)
-        let decoder = InternalDecoder(
+        let nestedDecoder = InternalDecoder(
+            storage: decoder.storage,
             value: value,
             codingPath: codingPath + [key],
-            userInfo: decoder.userInfo
+            userInfo: decoder.userInfo,
+            parent: decoder
         )
-        return try decoder.unkeyedContainer()
+        return try nestedDecoder.unkeyedContainer()
     }
 
     func superDecoder() throws -> any Decoder {
         InternalDecoder(
+            storage: decoder.storage,
             value: .init(object),
             codingPath: codingPath,
-            userInfo: decoder.userInfo
+            userInfo: decoder.userInfo,
+            parent: decoder
         )
     }
 
@@ -391,9 +399,11 @@ struct ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: CodingKey {
     ) throws -> any Decoder {
         let value = try value(forKey: key)
         return InternalDecoder(
+            storage: decoder.storage,
             value: value,
             codingPath: codingPath + [key],
-            userInfo: decoder.userInfo
+            userInfo: decoder.userInfo,
+            parent: decoder
         )
     }
 

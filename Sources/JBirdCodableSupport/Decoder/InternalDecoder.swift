@@ -31,18 +31,72 @@ final class InternalDecoder: Decoder {
     // MARK: - Initializers
 
     init(
+        storage: Storage,
+        value: JSON,
+        codingPath: [any CodingKey],
+        userInfo: [CodingUserInfoKey: Any],
+        parent: InternalDecoder? = nil
+    ) {
+        self.storage = storage
+        self.codingPath = codingPath
+        self.userInfo = userInfo
+        self.parent = parent
+        self.storage.push(container: value)
+    }
+
+    convenience init(
         value: JSON,
         codingPath: [any CodingKey],
         userInfo: [CodingUserInfoKey: Any]
     ) {
-        self.value = value
-        self.codingPath = codingPath
-        self.userInfo = userInfo
+        self.init(
+            storage: Storage(),
+            value: value,
+            codingPath: codingPath,
+            userInfo: userInfo,
+            parent: nil
+        )
+    }
+
+    deinit {
+        storage.popContainer()
     }
 
     // MARK: - API
 
-    let value: JSON
+    var value: JSON {
+        storage.topContainer
+    }
+
+    final class Storage {
+
+        init(containers: [JSON] = []) {
+            self.containers = containers
+        }
+
+        var topContainer: JSON {
+            guard let container = containers.last else {
+                preconditionFailure("Attempted to read from an empty container stack.")
+            }
+            return container
+        }
+
+        func push(
+            container: JSON
+        ) {
+            containers.append(container)
+        }
+
+        func popContainer() {
+            precondition(!containers.isEmpty, "Attempted to pop from an empty container stack.")
+            containers.removeLast()
+        }
+
+        private var containers: [JSON] = []
+
+    }
+
+    let storage: Storage
 
     // MARK: - Decoder
 
@@ -96,5 +150,9 @@ final class InternalDecoder: Decoder {
             value: value
         )
     }
+
+    // MARK: - Private
+
+    private let parent: InternalDecoder?
 
 }
