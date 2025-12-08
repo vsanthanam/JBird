@@ -415,29 +415,3 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
     private let array: JSON.Array
 
 }
-
-private struct IndexKey: CodingKey {
-
-    init(_ index: Int) {
-        self.index = index
-    }
-
-    var stringValue: String {
-        index.description
-    }
-
-    init?(stringValue: String) {
-        fatalError()
-    }
-
-    var intValue: Int? {
-        index
-    }
-
-    init?(intValue: Int) {
-        self.init(intValue)
-    }
-
-    let index: Int
-
-}
