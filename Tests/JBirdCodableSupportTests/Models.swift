@@ -494,7 +494,7 @@ struct UInt64s: Codable, Equatable, ExpressibleByArrayLiteral {
 
 }
 
-struct Optionals<T>: Codable, ExpressibleByArrayLiteral where T: Codable {
+struct Optionals<T>: Codable, Equatable, ExpressibleByArrayLiteral where T: Codable & Equatable {
 
     init(arrayLiteral elements: T?...) {
         value = elements
@@ -915,4 +915,29 @@ struct Qux: Codable {
         case quux
         case grault
     }
+}
+
+struct AllScalars: Codable {
+
+    struct Nested: Codable {
+        let foo: Double
+        let bar: Bool
+    }
+
+    let foo: String
+    let bar: Float
+    let baz: Double
+    let int: Int
+    let int8: Int8
+    let int16: Int16
+    let int32: Int32
+    let int64: Int64
+    let uint: UInt
+    let uint8: UInt8
+    let uint16: UInt16
+    let uint32: UInt32
+    let uint64: UInt64
+    let bool: Bool
+    let optional: String?
+    let nested: Nested
 }

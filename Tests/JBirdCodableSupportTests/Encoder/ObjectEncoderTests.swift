@@ -31,24 +31,6 @@ import Testing
 @Suite("Object Encoder Tests")
 struct ObjectEncoderTests {
 
-    struct AllScalars: Codable {
-        let foo: String
-        let bar: Float
-        let baz: Double
-        let int: Int
-        let int8: Int8
-        let int16: Int16
-        let int32: Int32
-        let int64: Int64
-        let uint: UInt
-        let uint8: UInt8
-        let uint16: UInt16
-        let uint32: UInt32
-        let uint64: UInt64
-        let bool: Bool
-        let optional: String?
-    }
-
     @Test("Encode Keyed Scalars")
     func encodeAllScalars() throws {
         let val = AllScalars(
@@ -66,7 +48,8 @@ struct ObjectEncoderTests {
             uint32: 9,
             uint64: 10,
             bool: true,
-            optional: nil
+            optional: nil,
+            nested: .init(foo: 1.2, bar: false)
         )
         let foundationEncoder = JSONEncoder()
         foundationEncoder.outputFormatting = [.sortedKeys]

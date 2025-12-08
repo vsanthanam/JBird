@@ -258,6 +258,21 @@ struct ArrayDecoderTests {
 
     }
 
+    @Test("Decode Optionals")
+    func decodeOptionals() throws {
+        let value: Optionals<String> = ["foo", nil, "bar"]
+        let data = try JSONEncoder().encode(value)
+        let foundation = try JSONDecoder().decode(Optionals<String>.self, from: data)
+        let jbird = try JSON.Decoder().decode(Optionals<String>.self, from: data)
+        #expect(foundation == jbird)
+        #expect(throws: DecodingError.self) {
+            try JSON.Decoder().decode(
+                Optionals<String>.self,
+                from: ArrayDecoderTests.someCodableData
+            )
+        }
+    }
+
     @Test("Decode Codables")
     func decodeCodables() throws {
         let value: Values<SomeCodable> = [.init(foo: "foo"), .init(foo: "bar"), .init(foo: "baz")]
