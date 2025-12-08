@@ -907,6 +907,46 @@ final class SomeSub: SomeInheritable, Equatable {
     }
 }
 
+final class SomeSubWitihKey: SomeInheritable, Equatable {
+    let bar: String
+    let qux: Qux
+
+    init(foo: String, bar: String, qux: Qux) {
+        self.bar = bar
+        self.qux = qux
+        super.init(foo: foo)
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case bar
+        case qux
+        case temp
+    }
+
+    required init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.bar = try container.decode(String.self, forKey: .bar)
+        let quxContainer = try container.nestedContainer(keyedBy: Qux.CodingKeys.self, forKey: .qux)
+        let quux = try quxContainer.decode(Bool.self, forKey: .quux)
+        let grault = try quxContainer.decode(Double.self, forKey: .grault)
+        self.qux = .init(quux: quux, grault: grault)
+        let superDecoder = try container.superDecoder(forKey: .temp)
+        try super.init(from: superDecoder)
+    }
+
+    override func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(bar, forKey: .bar)
+        try container.encode(qux, forKey: .qux)
+        let superEncoder = container.superEncoder(forKey: .temp)
+        try super.encode(to: superEncoder)
+    }
+
+    static func == (lhs: SomeSubWitihKey, rhs: SomeSubWitihKey) -> Bool {
+        lhs.foo == rhs.foo && lhs.bar == rhs.bar
+    }
+}
+
 struct Qux: Codable {
     let quux: Bool
     let grault: Double

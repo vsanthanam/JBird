@@ -32,11 +32,11 @@ final class ArrayEncoder: UnkeyedEncodingContainer {
 
     init(
         encoder: InternalEncoder,
-        isNested: Bool,
+        autoPopContainers: Bool,
     ) {
         self.encoder = encoder
         containerIndex = encoder.pushContainer(.array(JSON.Array()))
-        self.isNested = isNested
+        self.autoPopContainers = autoPopContainers
     }
 
     // MARK: - UnkeyedEncodingContainer
@@ -143,7 +143,8 @@ final class ArrayEncoder: UnkeyedEncodingContainer {
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
             codingPath: codingPath + [IndexKey(count)],
-            userInfo: encoder.userInfo
+            userInfo: encoder.userInfo,
+            autoPopContainers: false
         )
         try value.encode(to: nestedEncoder)
         let encoded = nestedEncoder.popContainer()
@@ -157,13 +158,14 @@ final class ArrayEncoder: UnkeyedEncodingContainer {
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
             codingPath: codingPath + [IndexKey(index)],
-            userInfo: encoder.userInfo
+            userInfo: encoder.userInfo,
+            autoPopContainers: true
         ) { [encoder, containerIndex] json in
             var array = encoder.array(at: containerIndex)
             array[index] = json
             encoder.store(container: .array(array), at: containerIndex)
         }
-        let container = ObjectEncoder<NestedKey>(encoder: nestedEncoder, isNested: true)
+        let container = ObjectEncoder<NestedKey>(encoder: nestedEncoder, autoPopContainers: true)
         return KeyedEncodingContainer(container)
     }
 
@@ -172,13 +174,14 @@ final class ArrayEncoder: UnkeyedEncodingContainer {
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
             codingPath: codingPath + [IndexKey(index)],
-            userInfo: encoder.userInfo
+            userInfo: encoder.userInfo,
+            autoPopContainers: true
         ) { [encoder, containerIndex] json in
             var array = encoder.array(at: containerIndex)
             array[index] = json
             encoder.store(container: .array(array), at: containerIndex)
         }
-        return ArrayEncoder(encoder: nestedEncoder, isNested: true)
+        return ArrayEncoder(encoder: nestedEncoder, autoPopContainers: true)
     }
 
     func superEncoder() -> any Encoder {
@@ -186,7 +189,8 @@ final class ArrayEncoder: UnkeyedEncodingContainer {
         return InternalEncoder(
             storage: encoder.storage,
             codingPath: codingPath + [IndexKey(index)],
-            userInfo: encoder.userInfo
+            userInfo: encoder.userInfo,
+            autoPopContainers: true
         ) { [encoder, containerIndex] json in
             var array = encoder.array(at: containerIndex)
             array[index] = json
@@ -208,12 +212,12 @@ final class ArrayEncoder: UnkeyedEncodingContainer {
 
     private let encoder: InternalEncoder
     private let containerIndex: Int
-    private let isNested: Bool
+    private let autoPopContainers: Bool
 
     // MARK: - Deinit
 
     deinit {
-        if isNested {
+        if autoPopContainers {
             _ = encoder.popContainer()
         }
     }

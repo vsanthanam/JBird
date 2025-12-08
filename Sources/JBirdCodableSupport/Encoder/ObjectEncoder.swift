@@ -32,11 +32,11 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
 
     init(
         encoder: InternalEncoder,
-        isNested: Bool
+        autoPopContainers: Bool
     ) {
         self.encoder = encoder
         containerIndex = encoder.pushContainer(.object(JSON.Object()))
-        self.isNested = isNested
+        self.autoPopContainers = autoPopContainers
     }
 
     // MARK: - KeyedEncodingContainerProtocol
@@ -156,7 +156,8 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
             codingPath: codingPath + [key],
-            userInfo: encoder.userInfo
+            userInfo: encoder.userInfo,
+            autoPopContainers: false
         )
         try value.encode(to: nestedEncoder)
         let encoded = nestedEncoder.popContainer()
@@ -170,13 +171,14 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
             codingPath: codingPath + [key],
-            userInfo: encoder.userInfo
+            userInfo: encoder.userInfo,
+            autoPopContainers: true
         ) { [encoder, containerIndex] json in
             var object = encoder.object(at: containerIndex)
             object[key.stringValue] = json
             encoder.store(container: .object(object), at: containerIndex)
         }
-        let container = ObjectEncoder<NestedKey>(encoder: nestedEncoder, isNested: true)
+        let container = ObjectEncoder<NestedKey>(encoder: nestedEncoder, autoPopContainers: true)
         return KeyedEncodingContainer(container)
     }
 
@@ -186,20 +188,22 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
             codingPath: codingPath + [key],
-            userInfo: encoder.userInfo
+            userInfo: encoder.userInfo,
+            autoPopContainers: true
         ) { [encoder, containerIndex] json in
             var object = encoder.object(at: containerIndex)
             object[key.stringValue] = json
             encoder.store(container: .object(object), at: containerIndex)
         }
-        return ArrayEncoder(encoder: nestedEncoder, isNested: true)
+        return ArrayEncoder(encoder: nestedEncoder, autoPopContainers: true)
     }
 
     func superEncoder() -> any Encoder {
         InternalEncoder(
             storage: encoder.storage,
             codingPath: codingPath + [SuperKey()],
-            userInfo: encoder.userInfo
+            userInfo: encoder.userInfo,
+            autoPopContainers: true
         ) { [encoder, containerIndex] json in
             var object = encoder.object(at: containerIndex)
             object[JSON.Key("super")] = json
@@ -213,7 +217,8 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
         InternalEncoder(
             storage: encoder.storage,
             codingPath: codingPath + [key],
-            userInfo: encoder.userInfo
+            userInfo: encoder.userInfo,
+            autoPopContainers: true
         ) { [encoder, containerIndex] json in
             var object = encoder.object(at: containerIndex)
             object[key.stringValue] = json
@@ -234,12 +239,12 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
 
     private let encoder: InternalEncoder
     private let containerIndex: Int
-    private let isNested: Bool
+    private let autoPopContainers: Bool
 
     // MARK: - Deinit
 
     deinit {
-        if isNested {
+        if autoPopContainers {
             _ = encoder.popContainer()
         }
     }

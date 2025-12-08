@@ -32,11 +32,13 @@ final class InternalEncoder: Encoder {
         storage: Storage = Storage(),
         codingPath: [any CodingKey],
         userInfo: [CodingUserInfoKey: Any],
+        autoPopContainers: Bool = false,
         onValueChange: ((JSON) -> Void)? = nil
     ) {
         self.storage = storage
         self.codingPath = codingPath
         self.userInfo = userInfo
+        self.autoPopContainers = autoPopContainers
         self.onValueChange = onValueChange
         self.depth = storage.count
     }
@@ -152,14 +154,14 @@ final class InternalEncoder: Encoder {
     func container<Key>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> where Key : CodingKey {
         precondition(containerType == nil, "Attempted to create multiple containers at coding path \(codingPath)")
         containerType = .keyed
-        let container = ObjectEncoder<Key>(encoder: self, isNested: false)
+        let container = ObjectEncoder<Key>(encoder: self, autoPopContainers: autoPopContainers)
         return KeyedEncodingContainer(container)
     }
 
     func unkeyedContainer() -> any UnkeyedEncodingContainer {
         precondition(containerType == nil, "Attempted to create multiple containers at coding path \(codingPath)")
         containerType = .unkeyed
-        return ArrayEncoder(encoder: self, isNested: false)
+        return ArrayEncoder(encoder: self, autoPopContainers: autoPopContainers)
     }
 
     func singleValueContainer() -> any SingleValueEncodingContainer {
@@ -176,6 +178,7 @@ final class InternalEncoder: Encoder {
         case singleValue
     }
 
+    private let autoPopContainers: Bool
     private let depth: Int
     private let onValueChange: ((JSON) -> Void)?
     private var containerType: ContainerType?

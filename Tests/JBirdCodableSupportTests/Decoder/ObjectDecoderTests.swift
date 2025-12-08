@@ -281,4 +281,13 @@ struct ObjectDecoderTests {
         #expect(foundation == jbird)
     }
 
+    @Test("Keyed Subclass With Key")
+    func keyedSubClassWithKey() throws {
+        let value = SomeSubWitihKey(foo: "bar", bar: "foo", qux: .init(quux: false, grault: 1.2))
+        let data = try JSONEncoder().encode(value)
+        let foundation = try JSONDecoder().decode(SomeSubWitihKey.self, from: data)
+        let jbird = try JSON.Decoder().decode(SomeSubWitihKey.self, from: data)
+        #expect(foundation == jbird)
+    }
+
 }

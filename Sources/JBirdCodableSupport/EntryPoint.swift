@@ -72,7 +72,8 @@ extension JSON {
         ) throws -> Data {
             let encoder = InternalEncoder(
                 codingPath: [],
-                userInfo: [:]
+                userInfo: [:],
+
             )
             try value.encode(to: encoder)
             let json = encoder.finalize()
