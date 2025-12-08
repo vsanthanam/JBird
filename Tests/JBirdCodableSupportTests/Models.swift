@@ -981,3 +981,41 @@ struct AllScalars: Codable {
     let optional: String?
     let nested: Nested
 }
+
+struct UnkeyedWithNestedKeyedModel: Codable, Equatable {
+
+    init(qux: String, foo: String, bar: String) {
+        self.qux = qux
+        self.member = Member(foo: foo, bar: bar)
+    }
+
+    let qux: String
+    let member: Member
+
+    struct Member: Equatable {
+        let foo: String
+        let bar: String
+
+        enum CodingKeys: CodingKey {
+            case foo
+            case bar
+        }
+    }
+
+    init(from decoder: any Decoder) throws {
+        var container = try decoder.unkeyedContainer()
+        self.qux = try container.decode(String.self)
+        let nested = try container.nestedContainer(keyedBy: Member.CodingKeys.self)
+        let foo = try nested.decode(String.self, forKey: .foo)
+        let bar = try nested.decode(String.self, forKey: .bar)
+        self.member = Member(foo: foo, bar: bar)
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.unkeyedContainer()
+        try container.encode(qux)
+        var nested = container.nestedContainer(keyedBy: Member.CodingKeys.self)
+        try nested.encode(member.foo, forKey: .foo)
+        try nested.encode(member.bar, forKey: .bar)
+    }
+}
