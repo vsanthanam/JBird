@@ -7,6 +7,7 @@ swift package --allow-writing-to-directory docs \
     --product JBirdCore \
     --product JBirdBuilders \
     --product JBirdMacros \
+    --product JBirdCodableSupport \
     --disable-indexing \
     --transform-for-static-hosting \
     --hosting-base-path docs \
