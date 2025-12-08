@@ -8,7 +8,7 @@ jobs:
   build-xcframework:
     strategy:
       matrix:
-        target: [JBird, JBirdCore, JBirdBuilders]
+        target: [JBird, JBirdCore, JBirdBuilders, JBirdCodableSupport]
     name: Build XCFramework (${{ matrix.target }})
     runs-on: macos-26
     outputs:
