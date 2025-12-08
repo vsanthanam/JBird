@@ -37,7 +37,7 @@ struct ObjectDecoderTests {
 
     static let someCodableData = try! JSONEncoder().encode(KeyedValue(value: SomeCodable(foo: "bar")))
 
-    @Test("Keyed String")
+    @Test("Decode Keyed String")
     func keyedString() throws {
         let value = KeyedString(value: "foo")
         let data = try JSONEncoder().encode(value)
@@ -52,7 +52,7 @@ struct ObjectDecoderTests {
         }
     }
 
-    @Test("Keyed Bool")
+    @Test("Decode Keyed Bool")
     func keyedBool() throws {
         let value = KeyedBool(value: false)
         let data = try JSONEncoder().encode(value)
@@ -67,7 +67,7 @@ struct ObjectDecoderTests {
         }
     }
 
-    @Suite("Keyed Signed Integers")
+    @Suite("Decode Keyed Signed Integers")
     struct SignedIntegers {
 
         @Test("Keyed Int")
@@ -147,7 +147,7 @@ struct ObjectDecoderTests {
 
     }
 
-    @Suite("Keyed Unsigned Integers")
+    @Suite("Decode Keyed Unsigned Integers")
     struct UnsignedIntegers {
 
         @Test("Keyed UInt")
@@ -227,7 +227,7 @@ struct ObjectDecoderTests {
 
     }
 
-    @Test("Keyed Float")
+    @Test("Decode Keyed Float")
     func keyedFloat() throws {
         let value = KeyedFloat(value: 1.5)
         let data = try JSONEncoder().encode(value)
@@ -242,7 +242,7 @@ struct ObjectDecoderTests {
         }
     }
 
-    @Test("Keyed Double")
+    @Test("Decode Keyed Double")
     func keyedDouble() throws {
         let value = KeyedDouble(value: 1.2)
         let data = try JSONEncoder().encode(value)
@@ -257,7 +257,7 @@ struct ObjectDecoderTests {
         }
     }
 
-    @Test("Keyed Codable")
+    @Test("Decode Keyed Codable")
     func keyedCodable() throws {
         let value = KeyedValue<Int>(value: 12)
         let data = try JSONEncoder().encode(value)
@@ -272,7 +272,7 @@ struct ObjectDecoderTests {
         }
     }
 
-    @Test("Keyed Subclass")
+    @Test("Decode Keyed Subclass")
     func keyedSubClass() throws {
         let value = SomeSub(foo: "bar", bar: "foo", qux: .init(quux: false, grault: 1.2))
         let data = try JSONEncoder().encode(value)
@@ -281,12 +281,21 @@ struct ObjectDecoderTests {
         #expect(foundation == jbird)
     }
 
-    @Test("Keyed Subclass With Key")
+    @Test("Decode Keyed Subclass With Key")
     func keyedSubClassWithKey() throws {
         let value = SomeSubWitihKey(foo: "bar", bar: "foo", qux: .init(quux: false, grault: 1.2))
         let data = try JSONEncoder().encode(value)
         let foundation = try JSONDecoder().decode(SomeSubWitihKey.self, from: data)
         let jbird = try JSON.Decoder().decode(SomeSubWitihKey.self, from: data)
+        #expect(foundation == jbird)
+    }
+
+    @Test("Decode Keyed with nested keys")
+    func decodeKeyedWithNestedKeyed() throws {
+        let value = KeyedWithNestedKeyed(foo: "foo", baz: "baz", qux: "qux")
+        let data = try JSONEncoder().encode(value)
+        let foundation = try JSONDecoder().decode(KeyedWithNestedKeyed.self, from: data)
+        let jbird = try JSON.Decoder().decode(KeyedWithNestedKeyed.self, from: data)
         #expect(foundation == jbird)
     }
 

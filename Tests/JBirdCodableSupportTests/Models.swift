@@ -1064,3 +1064,81 @@ final class UnkeyedSub: UnkeyedInheritable, Equatable {
     }
 
 }
+
+struct Transparent: Codable, Equatable {
+
+    init(foo: Bar) {
+        self.foo = foo
+    }
+
+    let foo: Bar
+
+    struct Bar: Codable, Equatable {
+        let baz: String
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        self.foo = try container.decode(Bar.self)
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(foo)
+    }
+
+}
+
+struct KeyedWithNestedKeyed: Codable, Equatable {
+
+    init(foo: String, baz: String, qux: String) {
+        self.foo = foo
+        self.bar = .init(baz: baz, qux: qux)
+    }
+
+    enum CodingKeys: CodingKey {
+        case foo
+        case bar
+        case baz
+        case qux
+    }
+
+    let foo: String
+    let bar: Bar
+
+    struct Bar: Equatable {
+        let baz: String
+        let qux: String
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(
+            keyedBy: CodingKeys.self
+        )
+        let foo = try container.decode(
+            String.self,
+            forKey: .foo
+        )
+        let barContainer = try container.nestedContainer(
+            keyedBy: CodingKeys.self,
+            forKey: .bar
+        )
+        let baz = try barContainer.decode(
+            String.self,
+            forKey: .baz
+        )
+        let qux = try barContainer.decode(
+            String.self,
+            forKey: .qux
+        )
+        self.init(foo: foo, baz: baz, qux: qux)
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(foo, forKey: .foo)
+        var barContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .bar)
+        try barContainer.encode(bar.baz, forKey: .baz)
+        try barContainer.encode(bar.qux, forKey: .qux)
+    }
+}

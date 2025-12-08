@@ -272,4 +272,19 @@ struct ValueDecoderTests {
 
     }
 
+    @Test("Decode Single Value")
+    func decodeSingleValue() throws {
+        let value = Transparent(foo: Transparent.Bar(baz: "qux"))
+        let data = try JSONEncoder().encode(value)
+        let foundation = try JSONDecoder().decode(Transparent.self, from: data)
+        let jbird = try JSON.Decoder().decode(Transparent.self, from: data)
+        #expect(foundation == jbird)
+        #expect(throws: DecodingError.self) {
+            try JSON.Decoder().decode(
+                Transparent.self,
+                from: ValueDecoderTests.someCodableData
+            )
+        }
+    }
+
 }

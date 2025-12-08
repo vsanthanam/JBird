@@ -144,7 +144,8 @@ final class ArrayEncoder: UnkeyedEncodingContainer {
             storage: encoder.storage,
             codingPath: codingPath + [IndexKey(count)],
             userInfo: encoder.userInfo,
-            autoPopContainers: false
+            autoPopContainers: false,
+            onValueChange: nil
         )
         try value.encode(to: nestedEncoder)
         let encoded = nestedEncoder.popContainer()

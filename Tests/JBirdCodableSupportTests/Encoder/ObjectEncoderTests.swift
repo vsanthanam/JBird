@@ -83,4 +83,16 @@ struct ObjectEncoderTests {
         let jbird = try jbirdEncoder.encode(value)
         #expect(foundation == jbird)
     }
+
+    @Test("Keyed with nested keys")
+    func decodeKeyedWithNestedKeyed() throws {
+        let value = KeyedWithNestedKeyed(foo: "foo", baz: "baz", qux: "qux")
+        let foundationEncoder = JSONEncoder()
+        foundationEncoder.outputFormatting = [.sortedKeys]
+        let foundation = try foundationEncoder.encode(value)
+        var jbirdEncoder = JSON.Encoder()
+        jbirdEncoder.serializationOptions = [.sortedKeys]
+        let jbird = try jbirdEncoder.encode(value)
+        #expect(foundation == jbird)
+    }
 }
