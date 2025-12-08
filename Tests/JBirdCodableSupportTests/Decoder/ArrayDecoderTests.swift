@@ -333,4 +333,19 @@ struct ArrayDecoderTests {
         }
     }
 
+    @Test("Unkeyed Super Decoder")
+    func decodedUnkeyedSuper() throws {
+        let value = UnkeyedSub(foo: "bar", bar: "foo")
+        let data = try JSONEncoder().encode(value)
+        let foundation = try JSONDecoder().decode(UnkeyedSub.self, from: data)
+        let jbird = try JSON.Decoder().decode(UnkeyedSub.self, from: data)
+        #expect(foundation == jbird)
+        #expect(throws: DecodingError.self) {
+            try JSON.Decoder().decode(
+                UnkeyedSub.self,
+                from: ArrayDecoderTests.someCodableData
+            )
+        }
+    }
+
 }

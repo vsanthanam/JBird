@@ -81,9 +81,7 @@ struct Values<Element>: Codable, Equatable, ExpressibleByArrayLiteral where Elem
 
     func encode(to encoder: any Encoder) throws {
         var container = encoder.unkeyedContainer()
-        for value in values {
-            try container.encode(value)
-        }
+        try container.encode(contentsOf: values)
     }
 
 }
@@ -1018,4 +1016,51 @@ struct UnkeyedWithNestedKeyedModel: Codable, Equatable {
         try nested.encode(member.foo, forKey: .foo)
         try nested.encode(member.bar, forKey: .bar)
     }
+}
+
+class UnkeyedInheritable: Codable {
+
+    init(foo: String) {
+        self.foo = foo
+    }
+
+    let foo: String
+
+    required init(from decoder: any Decoder) throws {
+        var container = try decoder.unkeyedContainer()
+        self.foo = try container.decode(String.self)
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.unkeyedContainer()
+        try container.encode(foo)
+    }
+
+}
+
+final class UnkeyedSub: UnkeyedInheritable, Equatable {
+
+    init(foo: String, bar: String) {
+        self.bar = bar
+        super.init(foo: foo)
+    }
+
+    let bar: String
+
+    required init(from decoder: any Decoder) throws {
+        var container = try decoder.unkeyedContainer()
+        self.bar = try container.decode(String.self)
+        try super.init(from: container.superDecoder())
+    }
+
+    override func encode(to encoder: any Encoder) throws {
+        var container = encoder.unkeyedContainer()
+        try container.encode(bar)
+        try super.encode(to: container.superEncoder())
+    }
+
+    static func == (lhs: UnkeyedSub, rhs: UnkeyedSub) -> Bool {
+        lhs.foo == rhs.foo && lhs.bar == rhs.bar
+    }
+
 }

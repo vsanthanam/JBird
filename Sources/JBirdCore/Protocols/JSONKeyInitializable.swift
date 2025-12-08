@@ -37,10 +37,10 @@ extension JSONKeyInitializable where Self: RawRepresentable, RawValue: JSONKeyIn
 
     public init(jsonKey: JSON.Key) throws {
         let rawValue = try RawValue(jsonKey: jsonKey)
-        guard let val = Self(rawValue: rawValue) else {
+        guard let value = Self(rawValue: rawValue) else {
             throw JSONError.invalidRawRepresentable
         }
-        self = val
+        self = value
     }
 
 }

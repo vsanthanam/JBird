@@ -33,7 +33,7 @@ struct ObjectEncoderTests {
 
     @Test("Encode Keyed Scalars")
     func encodeAllScalars() throws {
-        let val = AllScalars(
+        let value = AllScalars(
             foo: "foo",
             bar: 1.2,
             baz: 2.3,
@@ -53,10 +53,10 @@ struct ObjectEncoderTests {
         )
         let foundationEncoder = JSONEncoder()
         foundationEncoder.outputFormatting = [.sortedKeys]
-        let foundation = try foundationEncoder.encode(val)
+        let foundation = try foundationEncoder.encode(value)
         var jbirdEncoder = JSON.Encoder()
         jbirdEncoder.serializationOptions = [.sortedKeys]
-        let jbird = try jbirdEncoder.encode(val)
+        let jbird = try jbirdEncoder.encode(value)
         #expect(foundation == jbird)
     }
 
