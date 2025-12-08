@@ -213,4 +213,11 @@ struct ValueEncoderTests {
         #expect(foundation == jbird)
     }
 
+    @Test("Encode Single Value")
+    func encodeSingleValue() throws {
+        let value = Transparent(foo: Transparent.Bar(baz: "qux"))
+        let foundation = try JSONEncoder().encode(value)
+        let jbird = try JSON.Encoder().encode(value)
+        #expect(foundation == jbird)
+    }
 }

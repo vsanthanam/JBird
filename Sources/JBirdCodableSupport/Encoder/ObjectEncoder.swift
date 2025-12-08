@@ -157,7 +157,8 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
             storage: encoder.storage,
             codingPath: codingPath + [key],
             userInfo: encoder.userInfo,
-            autoPopContainers: false
+            autoPopContainers: false,
+            onValueChange: nil
         )
         try value.encode(to: nestedEncoder)
         let encoded = nestedEncoder.popContainer()

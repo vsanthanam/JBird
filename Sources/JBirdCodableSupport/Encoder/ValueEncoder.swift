@@ -137,7 +137,9 @@ struct ValueEncoder: SingleValueEncodingContainer {
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
             codingPath: codingPath,
-            userInfo: encoder.userInfo
+            userInfo: encoder.userInfo,
+            autoPopContainers: false,
+            onValueChange: nil
         )
         try value.encode(to: nestedEncoder)
         let encoded = nestedEncoder.popContainer()

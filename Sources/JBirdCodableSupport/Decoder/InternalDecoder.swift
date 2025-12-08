@@ -31,11 +31,11 @@ final class InternalDecoder: Decoder {
     // MARK: - Initializers
 
     init(
-        storage: Storage = .init(),
+        storage: Storage,
         value: JSON,
         codingPath: [any CodingKey],
         userInfo: [CodingUserInfoKey: Any],
-        parent: InternalDecoder? = nil
+        parent: InternalDecoder?
     ) {
         self.storage = storage
         self.codingPath = codingPath
@@ -45,6 +45,16 @@ final class InternalDecoder: Decoder {
     }
 
     // MARK: - API
+
+    static func root(for json: JSON) -> InternalDecoder {
+        .init(
+            storage: Storage(),
+            value: json,
+            codingPath: [],
+            userInfo: [:],
+            parent: nil
+        )
+    }
 
     var value: JSON {
         storage.topContainer

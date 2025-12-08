@@ -29,11 +29,11 @@ import JBirdCore
 final class InternalEncoder: Encoder {
 
     init(
-        storage: Storage = Storage(),
+        storage: Storage,
         codingPath: [any CodingKey],
         userInfo: [CodingUserInfoKey: Any],
-        autoPopContainers: Bool = false,
-        onValueChange: ((JSON) -> Void)? = nil
+        autoPopContainers: Bool,
+        onValueChange: ((JSON) -> Void)?
     ) {
         self.storage = storage
         self.codingPath = codingPath
@@ -44,6 +44,16 @@ final class InternalEncoder: Encoder {
     }
 
     // MARK: - API
+
+    static var root: InternalEncoder {
+        .init(
+            storage: Storage(),
+            codingPath: [],
+            userInfo: [:],
+            autoPopContainers: false,
+            onValueChange: nil
+        )
+    }
 
     let storage: Storage
 

@@ -29,16 +29,24 @@ import JBirdCore
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON {
 
+    /// A JSON decoder
     public struct Decoder {
 
         // MARK: - Initializers
 
+        /// Create a JSON decoder
         public init() {}
 
         // MARK: - API
 
+        /// Options used to deserialize the payload
         public var deserializationOptions: JSON.DeserializationOptions = .default
 
+        /// Decode a JSON payload into a `Decodable` type
+        /// - Parameters:
+        ///   - type: The type to decode into
+        ///   - data: The payload to decode
+        /// - Returns: An instance of the decoded type, based on the provided payload
         public func decode<T>(
             _ type: T.Type = T.self,
             from data: Data,
@@ -47,34 +55,32 @@ extension JSON {
                 for: data,
                 options: deserializationOptions
             )
-            let decoder = InternalDecoder(
-                value: json,
-                codingPath: [],
-                userInfo: [:]
-            )
+            let decoder = InternalDecoder.root(for: json)
             return try T(from: decoder)
         }
 
     }
 
+    /// A JSON encoder
     public struct Encoder {
 
         // MARK: - Initializers
 
+        /// Create a JSON encoder
         public init() {}
 
         // MARK: - API
 
+        /// Options used to create the serialized payload
         public var serializationOptions: JSON.SerializationOptions = [.fragmentsAllowed]
 
+        /// Create a JSON payload based on an `Encodable` type
+        /// - Parameter value: The type to encode
+        /// - Returns: A serialized JSON payload, based on the provided `Encodable` type.
         public func encode(
             _ value: some Encodable
         ) throws -> Data {
-            let encoder = InternalEncoder(
-                codingPath: [],
-                userInfo: [:],
-
-            )
+            let encoder = InternalEncoder.root
             try value.encode(to: encoder)
             let json = encoder.finalize()
             return try JSON.data(
