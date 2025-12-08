@@ -36,7 +36,7 @@ struct BuilderTests {
         #expect(json == [:])
     }
 
-    @Suite
+    @Suite("Array Builder")
     struct ArrayBuilder {
 
         @Test("JSON Expression")
@@ -65,7 +65,7 @@ struct BuilderTests {
             #expect(json == ["foo", true])
         }
 
-        @Test
+        @Test("Array Expression")
         func arrayExpression() {
             let json = JSON {
                 ["foo", true]
@@ -121,7 +121,7 @@ struct BuilderTests {
 
     }
 
-    @Suite
+    @Suite("Object Builders")
     struct ObjectBuilder {
 
         @Test("Tuple Expression")

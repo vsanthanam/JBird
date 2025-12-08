@@ -14,6 +14,7 @@ output=$(swift package \
     --product JBirdCore \
     --product JBirdBuilders \
     --product JBirdMacros \
+    --product JBirdCodableSupport \
     --output-path "$temp_dir" \
     --transform-for-static-hosting \
     --hosting-base-path temp-docs 2>&1)

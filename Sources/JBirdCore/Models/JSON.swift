@@ -31,6 +31,11 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
 
     // MARK: - Initializers
 
+    /// Create an empty JSON object
+    public init() {
+        self = .object([:])
+    }
+
     /// Create a `JSON` value from a ``JSONConvertible`` type
     ///
     /// - Parameter convertible: An instance of the type to convert to JSON
@@ -95,7 +100,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
 
     /// A zero JSON value
     ///
-    /// This is sufar for `JSON.number(.int(0))`
+    /// This is sugar for `JSON.number(.int(0))`
     public static let zero: JSON = 0
 
     /// The number of objects in the JSON array or JSON dictionary.
@@ -1125,7 +1130,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             @discardableResult
             @concurrent
             public func write(
-                fileURL: URL,
+                to fileURL: URL,
                 options: JSON.SerializationOptions = .default,
                 shouldOverwrite: Bool = false
             ) async throws -> Data {
@@ -1157,7 +1162,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             ///   - shouldOverwrite: Whether or not existing content should be overwritten
             @discardableResult
             public func write(
-                fileURL: URL,
+                to fileURL: URL,
                 options: JSON.SerializationOptions = .default,
                 shouldOverwrite: Bool = false
             ) async throws -> Data {
@@ -1188,7 +1193,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         /// This method is unavailable on non-Apple platforms
         @available(*, unavailable, message: "File writing is only available on Apple platforms")
         public func write(
-            fileURL: URL,
+            to fileURL: URL,
             options: JSON.SerializationOptions = .default,
             shouldOverwrite: Bool = false
         ) async throws -> Data {

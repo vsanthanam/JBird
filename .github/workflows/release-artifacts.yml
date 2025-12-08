@@ -30,7 +30,7 @@ jobs:
     needs: build-xcframework
     strategy:
       matrix:
-        target: [JBird, JBirdCore, JBirdBuilders]
+        target: [JBird, JBirdCore, JBirdBuilders, JBirdCodableSupport]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

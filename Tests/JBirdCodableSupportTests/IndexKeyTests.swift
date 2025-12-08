@@ -1,5 +1,5 @@
 // JBird
-// ExportedImportTests.swift
+// IndexKeyTests.swift
 //
 // MIT License
 //
@@ -23,42 +23,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import JBird
+@testable import JBirdCodableSupport
 import Testing
 
-@JSONRepresentable
-struct User: Equatable {
+@Suite("Index Key Tests")
+struct IndexKeyTests {
 
-    init(
-        username: String,
-        age: Int,
-        tags: [String]
-    ) {
-        self.username = username
-        self.age = age
-        self.tags = tags
-    }
-
-    let username: String
-    let age: Int
-    let tags: [String]
-
-}
-
-// Ensures the API surface of `JBirdCore`, `JBirdBuilders` and `JBirdMacros` is available through the single `JBird` import
-@Test("Test user convert")
-func userEncode() throws {
-    let json = JSON {
-        "username" => "sjobs"
-        "age" => 50
-        "tags" => {
-            "ios"
-            "swift"
+    #if compiler(>=6.2)
+        @Test("String Init")
+        func stringInit() async {
+            await #expect(processExitsWith: .failure) {
+                _ = IndexKey(stringValue: "foo")
+            }
         }
+    #endif
+
+    @Test("Int Init")
+    func intInit() async throws {
+        let key = try #require(IndexKey(intValue: 12))
+        #expect(key.intValue == 12)
+        #expect(key.stringValue == "12")
+        #expect(key.index == 12)
     }
-    let user = try User(json: json)
-    let expected = User(username: "sjobs", age: 50, tags: ["ios", "swift"])
-    #expect(user == expected)
-    let converted = user.jsonValue
-    #expect(converted == json)
+
 }

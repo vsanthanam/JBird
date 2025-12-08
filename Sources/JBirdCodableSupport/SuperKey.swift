@@ -1,5 +1,5 @@
 // JBird
-// ExportedImportTests.swift
+// SuperKey.swift
 //
 // MIT License
 //
@@ -23,42 +23,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import JBird
-import Testing
+struct SuperKey: CodingKey {
 
-@JSONRepresentable
-struct User: Equatable {
+    // MARK: - Initializers
 
-    init(
-        username: String,
-        age: Int,
-        tags: [String]
-    ) {
-        self.username = username
-        self.age = age
-        self.tags = tags
-    }
+    init() {}
 
-    let username: String
-    let age: Int
-    let tags: [String]
+    // MARK: - CodingKey
 
-}
+    let stringValue = "super"
 
-// Ensures the API surface of `JBirdCore`, `JBirdBuilders` and `JBirdMacros` is available through the single `JBird` import
-@Test("Test user convert")
-func userEncode() throws {
-    let json = JSON {
-        "username" => "sjobs"
-        "age" => 50
-        "tags" => {
-            "ios"
-            "swift"
+    init?(stringValue: String) {
+        guard stringValue == "super" else {
+            return nil
         }
     }
-    let user = try User(json: json)
-    let expected = User(username: "sjobs", age: 50, tags: ["ios", "swift"])
-    #expect(user == expected)
-    let converted = user.jsonValue
-    #expect(converted == json)
+
+    var intValue: Int? {
+        nil
+    }
+
+    init?(intValue: Int) {
+        nil
+    }
+
 }

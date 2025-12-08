@@ -1,5 +1,5 @@
 // JBird
-// ExportedImportTests.swift
+// InternalDecoderTests.swift
 //
 // MIT License
 //
@@ -23,42 +23,31 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import JBird
+import Foundation
+import JBirdCodableSupport
+import JBirdCore
 import Testing
 
-@JSONRepresentable
-struct User: Equatable {
+@Suite("Internal Decoder Tests")
+struct InternalDecoderTests {
 
-    init(
-        username: String,
-        age: Int,
-        tags: [String]
-    ) {
-        self.username = username
-        self.age = age
-        self.tags = tags
-    }
-
-    let username: String
-    let age: Int
-    let tags: [String]
-
-}
-
-// Ensures the API surface of `JBirdCore`, `JBirdBuilders` and `JBirdMacros` is available through the single `JBird` import
-@Test("Test user convert")
-func userEncode() throws {
-    let json = JSON {
-        "username" => "sjobs"
-        "age" => 50
-        "tags" => {
-            "ios"
-            "swift"
+    @Test("Unavailable Keyed Decoder")
+    func unavailableKeyedDecoder() throws {
+        struct Keyed: Codable {
+            let foo: String
+        }
+        let data = try JSONEncoder().encode(3)
+        #expect(throws: DecodingError.self) {
+            _ = try JSON.Decoder().decode(Keyed.self, from: data)
         }
     }
-    let user = try User(json: json)
-    let expected = User(username: "sjobs", age: 50, tags: ["ios", "swift"])
-    #expect(user == expected)
-    let converted = user.jsonValue
-    #expect(converted == json)
+
+    @Test("Unavailable Unkeyed Decoder")
+    func unavailableUnkeyedDecoder() throws {
+        let data = try JSONEncoder().encode(12)
+        #expect(throws: DecodingError.self) {
+            _ = try JSON.Decoder().decode([Int].self, from: data)
+        }
+    }
+
 }

@@ -30,6 +30,12 @@ import Testing
 @Suite("JSON Tests")
 struct JSONTests {
 
+    @Test("Empty Init")
+    func emptyInit() {
+        let json = JSON()
+        #expect(json == .object([:]))
+    }
+
     @Test("JSON Count")
     func jsonCount() throws {
         let jsonObject = JSON.object(["foo": "bar"])
@@ -673,7 +679,7 @@ struct JSONTests {
                     "baz": nil
                 ]
 
-                try await json.write(fileURL: testURL, options: .sortedKeys)
+                try await json.write(to: testURL, options: .sortedKeys)
                 let diskContent = try String(contentsOf: testURL, encoding: .utf8)
                 let expected = #"""
                 {"bar":false,"baz":null,"foo":true}
@@ -693,7 +699,7 @@ struct JSONTests {
                 ]
 
                 await #expect(throws: JSONError.fileExists(testURL)) {
-                    try await json.write(fileURL: testURL)
+                    try await json.write(to: testURL)
                 }
             }
 
@@ -707,7 +713,7 @@ struct JSONTests {
                     "baz": nil
                 ]
 
-                try await json.write(fileURL: testURL, options: .sortedKeys, shouldOverwrite: true)
+                try await json.write(to: testURL, options: .sortedKeys, shouldOverwrite: true)
                 let diskContent = try String(contentsOf: testURL, encoding: .utf8)
                 let expected = #"""
                 {"bar":false,"baz":null,"foo":true}

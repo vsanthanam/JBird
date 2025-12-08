@@ -23,7 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#if SWIFT_PACKAGE && swift(>=6.1)
+#if SWIFT_PACKAGE
     @_exported import JBirdCore
 
     #if DeclarativeAPI
@@ -34,8 +34,12 @@
         #if DeclarativeAPI
             @_exported import JBirdMacros
         #else
-            #error("You cannot use the ConformanceMacro trait without the DeclarativeAPI trait.")
+            #error("You cannot use the `ConformanceMacros` trait without the `DeclarativeAPI` trait.")
         #endif
+    #endif
+
+    #if CodableSupport
+        @_exported import JBirdCodableSupport
     #endif
 #else
     #if canImport(JBirdCore)
@@ -51,10 +55,14 @@
                 #error("You cannot use JBirdMacros without JBirdBuilders.")
             #endif
         #endif
+
+        #if canImport(JBirdCodableSupport)
+            @_exported import JBirdCodableSupport
+        #endif
     #else
         #error("The umbrella module JBird requires JBirdCore.")
     #endif
 #endif
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-enum JBirdEnum {}
+enum JBirdUmbrellaModule {}

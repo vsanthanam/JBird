@@ -1,5 +1,5 @@
 // JBird
-// ExportedImportTests.swift
+// SuperKeyTests.swift
 //
 // MIT License
 //
@@ -23,42 +23,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import JBird
+@testable import JBirdCodableSupport
 import Testing
 
-@JSONRepresentable
-struct User: Equatable {
-
-    init(
-        username: String,
-        age: Int,
-        tags: [String]
-    ) {
-        self.username = username
-        self.age = age
-        self.tags = tags
-    }
-
-    let username: String
-    let age: Int
-    let tags: [String]
-
-}
-
-// Ensures the API surface of `JBirdCore`, `JBirdBuilders` and `JBirdMacros` is available through the single `JBird` import
-@Test("Test user convert")
-func userEncode() throws {
-    let json = JSON {
-        "username" => "sjobs"
-        "age" => 50
-        "tags" => {
-            "ios"
-            "swift"
-        }
-    }
-    let user = try User(json: json)
-    let expected = User(username: "sjobs", age: 50, tags: ["ios", "swift"])
-    #expect(user == expected)
-    let converted = user.jsonValue
-    #expect(converted == json)
+@Test("Test Super Key")
+func superKey() throws {
+    let key = SuperKey()
+    #expect(key.stringValue == "super")
+    #expect(key.intValue == nil)
+    let stringInitKey = try #require(SuperKey(stringValue: "super"))
+    #expect(stringInitKey.stringValue == "super")
+    #expect(stringInitKey.intValue == nil)
+    let invalidStringKey = SuperKey(stringValue: "plop")
+    #expect(invalidStringKey == nil)
+    let invalidIntKey = SuperKey(intValue: 12)
+    #expect(invalidIntKey == nil)
 }

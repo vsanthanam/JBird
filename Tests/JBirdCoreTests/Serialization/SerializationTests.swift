@@ -239,7 +239,7 @@ struct SerializationTests {
                 let data = try json.serialize()
                 let str = try #require(String(data: data, encoding: .utf8))
                 let expected = #"""
-                1.23E-9
+                1.23e-09
                 """#
                 #expect(str == expected)
                 let stringified = try json.stringify()

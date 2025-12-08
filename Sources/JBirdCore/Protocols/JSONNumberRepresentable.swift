@@ -68,7 +68,10 @@ extension Int: JSONNumberRepresentable {
 extension Double: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {
-        .double(self)
+        if !isFinite {
+            assertionFailure("Infinite floating point values cannot be represented in JSON")
+        }
+        return .double(self)
     }
 
     public init(jsonNumber: JSON.Number) throws {
@@ -212,7 +215,14 @@ extension Int64: JSONNumberRepresentable {
 extension Float: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {
-        .double(Double(self))
+        if isFinite {
+            let double = Double(String(self))
+            return .double(double.unsafelyUnwrapped)
+        } else {
+            assertionFailure("Infinite floating point values cannot be represented in JSON")
+            return .double(Double(self))
+        }
+
     }
 
     public init(jsonNumber: JSON.Number) throws {
