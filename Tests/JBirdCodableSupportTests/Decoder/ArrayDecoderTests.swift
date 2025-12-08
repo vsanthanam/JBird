@@ -318,4 +318,19 @@ struct ArrayDecoderTests {
         }
     }
 
+    @Test("Nested Keyed")
+    func decodeUnkeyedWithNestedKeyed() throws {
+        let value = UnkeyedWithNestedKeyedModel(qux: "qux", foo: "foo", bar: "bar")
+        let data = try JSONEncoder().encode(value)
+        let foundation = try JSONDecoder().decode(UnkeyedWithNestedKeyedModel.self, from: data)
+        let jbird = try JSON.Decoder().decode(UnkeyedWithNestedKeyedModel.self, from: data)
+        #expect(foundation == jbird)
+        #expect(throws: DecodingError.self) {
+            try JSON.Decoder().decode(
+                [Int].self,
+                from: ArrayDecoderTests.someCodableData
+            )
+        }
+    }
+
 }

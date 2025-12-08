@@ -170,11 +170,23 @@ struct ArrayEncoderTests {
         #expect(foundation == jbird)
     }
 
-    @Test("Nested Unkeyed Array")
+    @Test("Nested Unkeyed")
     func nestedUnkeyed() throws {
         let val = NestedUnkeyedModel(foo: "foo", int: [1, 2, 3])
         let foundation = try JSONEncoder().encode(val)
         let jbird = try JSON.Encoder().encode(val)
+        #expect(foundation == jbird)
+    }
+
+    @Test("Nested Keyed")
+    func decodeUnkeyedWithNestedKeyed() throws {
+        let value = UnkeyedWithNestedKeyedModel(qux: "qux", foo: "foo", bar: "bar")
+        let foundationEncoder = JSONEncoder()
+        foundationEncoder.outputFormatting = [.sortedKeys]
+        let foundation = try foundationEncoder.encode(value)
+        var jbirdEncoder = JSON.Encoder()
+        jbirdEncoder.serializationOptions = [.sortedKeys]
+        let jbird = try jbirdEncoder.encode(value)
         #expect(foundation == jbird)
     }
 
