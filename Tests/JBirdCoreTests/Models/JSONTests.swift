@@ -30,6 +30,12 @@ import Testing
 @Suite("JSON Tests")
 struct JSONTests {
 
+    @Test("Empty Init")
+    func emptyInit() {
+        let json = JSON()
+        #expect(json == .object([:]))
+    }
+
     @Test("JSON Count")
     func jsonCount() throws {
         let jsonObject = JSON.object(["foo": "bar"])
