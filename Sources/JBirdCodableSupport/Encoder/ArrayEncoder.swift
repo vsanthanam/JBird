@@ -219,19 +219,3 @@ final class ArrayEncoder: UnkeyedEncodingContainer {
     }
 
 }
-
-// private final class AutoPop {
-//
-//    init(
-//        _ pop: @escaping () -> Void
-//    ) {
-//        self.pop = pop
-//    }
-//
-//    deinit {
-//        pop()
-//    }
-//
-//    private let pop: () -> Void
-//
-// }
