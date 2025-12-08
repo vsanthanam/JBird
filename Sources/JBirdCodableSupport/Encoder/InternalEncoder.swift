@@ -152,14 +152,14 @@ final class InternalEncoder: Encoder {
     func container<Key>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> where Key : CodingKey {
         precondition(containerType == nil, "Attempted to create multiple containers at coding path \(codingPath)")
         containerType = .keyed
-        let container = ObjectEncoder<Key>(encoder: self)
+        let container = ObjectEncoder<Key>(encoder: self, isNested: false)
         return KeyedEncodingContainer(container)
     }
 
     func unkeyedContainer() -> any UnkeyedEncodingContainer {
         precondition(containerType == nil, "Attempted to create multiple containers at coding path \(codingPath)")
         containerType = .unkeyed
-        return ArrayEncoder(encoder: self)
+        return ArrayEncoder(encoder: self, isNested: false)
     }
 
     func singleValueContainer() -> any SingleValueEncodingContainer {

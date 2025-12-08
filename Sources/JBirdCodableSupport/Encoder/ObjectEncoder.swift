@@ -26,15 +26,17 @@
 import JBirdCore
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-struct ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: CodingKey {
+final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: CodingKey {
 
     // MARK: - Initializer
 
     init(
-        encoder: InternalEncoder
+        encoder: InternalEncoder,
+        isNested: Bool
     ) {
         self.encoder = encoder
         containerIndex = encoder.pushContainer(.object(JSON.Object()))
+        self.isNested = isNested
     }
 
     // MARK: - KeyedEncodingContainerProtocol
@@ -43,111 +45,111 @@ struct ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: CodingKey {
         encoder.codingPath
     }
 
-    mutating func encodeNil(
+    func encodeNil(
         forKey key: Key
     ) throws {
         set(.null, forKey: key)
     }
 
-    mutating func encode(
+    func encode(
         _ value: Bool,
         forKey key: Key
     ) throws {
         set(JSON(value), forKey: key)
     }
 
-    mutating func encode(
+    func encode(
         _ value: String,
         forKey key: Key
     ) throws {
         set(JSON(value), forKey: key)
     }
 
-    mutating func encode(
+    func encode(
         _ value: Double,
         forKey key: Key
     ) throws {
         set(JSON(value), forKey: key)
     }
 
-    mutating func encode(
+    func encode(
         _ value: Float,
         forKey key: Key
     ) throws {
         set(JSON(value), forKey: key)
     }
 
-    mutating func encode(
+    func encode(
         _ value: Int,
         forKey key: Key
     ) throws {
         set(JSON(value), forKey: key)
     }
 
-    mutating func encode(
+    func encode(
         _ value: Int8,
         forKey key: Key
     ) throws {
         set(JSON(value), forKey: key)
     }
 
-    mutating func encode(
+    func encode(
         _ value: Int16,
         forKey key: Key
     ) throws {
         set(JSON(value), forKey: key)
     }
 
-    mutating func encode(
+    func encode(
         _ value: Int32,
         forKey key: Key
     ) throws {
         set(JSON(value), forKey: key)
     }
 
-    mutating func encode(
+    func encode(
         _ value: Int64,
         forKey key: Key
     ) throws {
         set(JSON(value), forKey: key)
     }
 
-    mutating func encode(
+    func encode(
         _ value: UInt,
         forKey key: Key
     ) throws {
         set(JSON(value), forKey: key)
     }
 
-    mutating func encode(
+    func encode(
         _ value: UInt8,
         forKey key: Key
     ) throws {
         set(JSON(value), forKey: key)
     }
 
-    mutating func encode(
+    func encode(
         _ value: UInt16,
         forKey key: Key
     ) throws {
         set(JSON(value), forKey: key)
     }
 
-    mutating func encode(
+    func encode(
         _ value: UInt32,
         forKey key: Key
     ) throws {
         set(JSON(value), forKey: key)
     }
 
-    mutating func encode(
+    func encode(
         _ value: UInt64,
         forKey key: Key
     ) throws {
         set(JSON(value), forKey: key)
     }
 
-    mutating func encode<T>(
+    func encode<T>(
         _ value: T,
         forKey key: Key
     ) throws where T : Encodable {
@@ -161,7 +163,7 @@ struct ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: CodingKey {
         set(encoded, forKey: key)
     }
 
-    mutating func nestedContainer<NestedKey>(
+    func nestedContainer<NestedKey>(
         keyedBy keyType: NestedKey.Type,
         forKey key: Key
     ) -> KeyedEncodingContainer<NestedKey> where NestedKey : CodingKey {
@@ -174,11 +176,11 @@ struct ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: CodingKey {
             object[key.stringValue] = json
             encoder.store(container: .object(object), at: containerIndex)
         }
-        let container = ObjectEncoder<NestedKey>(encoder: nestedEncoder)
+        let container = ObjectEncoder<NestedKey>(encoder: nestedEncoder, isNested: true)
         return KeyedEncodingContainer(container)
     }
 
-    mutating func nestedUnkeyedContainer(
+    func nestedUnkeyedContainer(
         forKey key: Key
     ) -> any UnkeyedEncodingContainer {
         let nestedEncoder = InternalEncoder(
@@ -190,10 +192,10 @@ struct ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: CodingKey {
             object[key.stringValue] = json
             encoder.store(container: .object(object), at: containerIndex)
         }
-        return ArrayEncoder(encoder: nestedEncoder)
+        return ArrayEncoder(encoder: nestedEncoder, isNested: true)
     }
 
-    mutating func superEncoder() -> any Encoder {
+    func superEncoder() -> any Encoder {
         InternalEncoder(
             storage: encoder.storage,
             codingPath: codingPath + [SuperKey()],
@@ -205,7 +207,7 @@ struct ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: CodingKey {
         }
     }
 
-    mutating func superEncoder(
+    func superEncoder(
         forKey key: Key
     ) -> any Encoder {
         InternalEncoder(
@@ -232,5 +234,14 @@ struct ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: CodingKey {
 
     private let encoder: InternalEncoder
     private let containerIndex: Int
+    private let isNested: Bool
+
+    // MARK: - Deinit
+
+    deinit {
+        if isNested {
+            _ = encoder.popContainer()
+        }
+    }
 
 }

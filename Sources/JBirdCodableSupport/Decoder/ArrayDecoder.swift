@@ -26,7 +26,7 @@
 import JBirdCore
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-struct ArrayDecoder: UnkeyedDecodingContainer {
+final class ArrayDecoder: UnkeyedDecodingContainer {
 
     // MARK: - Initializers
 
@@ -54,7 +54,7 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
         decoder.codingPath
     }
 
-    mutating func decodeNil() throws -> Bool {
+    func decodeNil() throws -> Bool {
         guard currentIndex < (count ?? 0) else {
             let context = DecodingError.Context(
                 codingPath: codingPath + [IndexKey(currentIndex)],
@@ -73,7 +73,7 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
         }
     }
 
-    mutating func decode(
+    func decode(
         _ type: Bool.Type
     ) throws -> Bool {
         let (value, index) = try next(type)
@@ -92,7 +92,7 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
         }
     }
 
-    mutating func decode(
+    func decode(
         _ type: Float.Type
     ) throws -> Float {
         let (value, index) = try next(type)
@@ -111,7 +111,7 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
         }
     }
 
-    mutating func decode(
+    func decode(
         _ type: Double.Type
     ) throws -> Double {
         let (value, index) = try next(type)
@@ -130,7 +130,7 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
         }
     }
 
-    mutating func decode(
+    func decode(
         _ type: Int.Type
     ) throws -> Int {
         let (value, index) = try next(type)
@@ -149,7 +149,7 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
         }
     }
 
-    mutating func decode(
+    func decode(
         _ type: Int8.Type
     ) throws -> Int8 {
         let (value, index) = try next(type)
@@ -168,7 +168,7 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
         }
     }
 
-    mutating func decode(
+    func decode(
         _ type: Int16.Type
     ) throws -> Int16 {
         let (value, index) = try next(type)
@@ -187,7 +187,7 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
         }
     }
 
-    mutating func decode(
+    func decode(
         _ type: Int32.Type
     ) throws -> Int32 {
         let (value, index) = try next(type)
@@ -206,7 +206,7 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
         }
     }
 
-    mutating func decode(
+    func decode(
         _ type: Int64.Type
     ) throws -> Int64 {
         let (value, index) = try next(type)
@@ -225,7 +225,7 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
         }
     }
 
-    mutating func decode(
+    func decode(
         _ type: UInt.Type
     ) throws -> UInt {
         let (value, index) = try next(type)
@@ -244,7 +244,7 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
         }
     }
 
-    mutating func decode(
+    func decode(
         _ type: UInt8.Type
     ) throws -> UInt8 {
         let (value, index) = try next(type)
@@ -263,7 +263,7 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
         }
     }
 
-    mutating func decode(
+    func decode(
         _ type: UInt16.Type
     ) throws -> UInt16 {
         let (value, index) = try next(type)
@@ -282,7 +282,7 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
         }
     }
 
-    mutating func decode(
+    func decode(
         _ type: UInt32.Type
     ) throws -> UInt32 {
         let (value, index) = try next(type)
@@ -301,7 +301,7 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
         }
     }
 
-    mutating func decode(
+    func decode(
         _ type: UInt64.Type
     ) throws -> UInt64 {
         let (value, index) = try next(type)
@@ -320,7 +320,7 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
         }
     }
 
-    mutating func decode(
+    func decode(
         _ type: String.Type
     ) throws -> String {
         let (value, index) = try next(type)
@@ -339,7 +339,7 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
         }
     }
 
-    mutating func decode<T>(
+    func decode<T>(
         _ type: T.Type
     ) throws -> T where T: Decodable {
         let (value, index) = try next(type)
@@ -353,7 +353,7 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
         return try T(from: nestedDecoder)
     }
 
-    mutating func nestedContainer<NestedKey>(
+    func nestedContainer<NestedKey>(
         keyedBy type: NestedKey.Type
     ) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
         let (value, index) = try next(JSON.self)
@@ -367,7 +367,7 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
         return try nestedDecoder.container(keyedBy: type)
     }
 
-    mutating func nestedUnkeyedContainer() throws -> any UnkeyedDecodingContainer {
+    func nestedUnkeyedContainer() throws -> any UnkeyedDecodingContainer {
         let (value, index) = try next(JSON.self)
 
         let nestedDecoder = InternalDecoder(
@@ -381,7 +381,7 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
         return try nestedDecoder.unkeyedContainer()
     }
 
-    mutating func superDecoder() throws -> any Decoder {
+    func superDecoder() throws -> any Decoder {
         let (value, index) = try next(JSON.self)
         return InternalDecoder(
             storage: decoder.storage,
@@ -394,7 +394,7 @@ struct ArrayDecoder: UnkeyedDecodingContainer {
 
     // MARK: - Private
 
-    private mutating func next<T>(
+    private func next<T>(
         _ type: T.Type = T.self
     ) throws -> (JSON, Int) {
         guard !isAtEnd else {

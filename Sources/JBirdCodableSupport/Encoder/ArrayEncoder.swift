@@ -26,15 +26,17 @@
 import JBirdCore
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-struct ArrayEncoder: UnkeyedEncodingContainer {
+final class ArrayEncoder: UnkeyedEncodingContainer {
 
     // MARK: - Initializer
 
     init(
-        encoder: InternalEncoder
+        encoder: InternalEncoder,
+        isNested: Bool,
     ) {
         self.encoder = encoder
         containerIndex = encoder.pushContainer(.array(JSON.Array()))
+        self.isNested = isNested
     }
 
     // MARK: - UnkeyedEncodingContainer
@@ -47,95 +49,95 @@ struct ArrayEncoder: UnkeyedEncodingContainer {
         encoder.array(at: containerIndex).count
     }
 
-    mutating func encodeNil() throws {
+    func encodeNil() throws {
         append(.null)
     }
 
-    mutating func encode(
+    func encode(
         _ value: Bool
     ) throws {
         append(JSON(value))
     }
 
-    mutating func encode(
+    func encode(
         _ value: String
     ) throws {
         append(JSON(value))
     }
 
-    mutating func encode(
+    func encode(
         _ value: Double
     ) throws {
         append(JSON(value))
     }
 
-    mutating func encode(
+    func encode(
         _ value: Float
     ) throws {
         append(JSON(value))
     }
 
-    mutating func encode(
+    func encode(
         _ value: Int
     ) throws {
         append(JSON(value))
     }
 
-    mutating func encode(
+    func encode(
         _ value: Int8
     ) throws {
         append(JSON(value))
     }
 
-    mutating func encode(
+    func encode(
         _ value: Int16
     ) throws {
         append(JSON(value))
     }
 
-    mutating func encode(
+    func encode(
         _ value: Int32
     ) throws {
         append(JSON(value))
     }
 
-    mutating func encode(
+    func encode(
         _ value: Int64
     ) throws {
         append(JSON(value))
     }
 
-    mutating func encode(
+    func encode(
         _ value: UInt
     ) throws {
         append(JSON(value))
     }
 
-    mutating func encode(
+    func encode(
         _ value: UInt8
     ) throws {
         append(JSON(value))
     }
 
-    mutating func encode(
+    func encode(
         _ value: UInt16
     ) throws {
         append(JSON(value))
     }
 
-    mutating func encode(
+    func encode(
         _ value: UInt32
     ) throws {
         append(JSON(value))
     }
 
-    mutating func encode(
+    func encode(
         _ value: UInt64
     ) throws {
         append(JSON(value))
     }
 
-    mutating func encode<T>(
+    func encode<T>(
         _ value: T
     ) throws where T: Encodable {
         let nestedEncoder = InternalEncoder(
@@ -148,7 +150,7 @@ struct ArrayEncoder: UnkeyedEncodingContainer {
         append(encoded)
     }
 
-    mutating func nestedContainer<NestedKey>(
+    func nestedContainer<NestedKey>(
         keyedBy keyType: NestedKey.Type
     ) -> KeyedEncodingContainer<NestedKey> where NestedKey: CodingKey {
         let index = append(.object(JSON.Object()))
@@ -161,11 +163,11 @@ struct ArrayEncoder: UnkeyedEncodingContainer {
             array[index] = json
             encoder.store(container: .array(array), at: containerIndex)
         }
-        let container = ObjectEncoder<NestedKey>(encoder: nestedEncoder)
+        let container = ObjectEncoder<NestedKey>(encoder: nestedEncoder, isNested: true)
         return KeyedEncodingContainer(container)
     }
 
-    mutating func nestedUnkeyedContainer() -> any UnkeyedEncodingContainer {
+    func nestedUnkeyedContainer() -> any UnkeyedEncodingContainer {
         let index = append(.array(JSON.Array()))
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
@@ -176,10 +178,10 @@ struct ArrayEncoder: UnkeyedEncodingContainer {
             array[index] = json
             encoder.store(container: .array(array), at: containerIndex)
         }
-        return ArrayEncoder(encoder: nestedEncoder)
+        return ArrayEncoder(encoder: nestedEncoder, isNested: true)
     }
 
-    mutating func superEncoder() -> any Encoder {
+    func superEncoder() -> any Encoder {
         let index = append(.null)
         return InternalEncoder(
             storage: encoder.storage,
@@ -195,7 +197,7 @@ struct ArrayEncoder: UnkeyedEncodingContainer {
     // MARK: - Private
 
     @discardableResult
-    private mutating func append(
+    private func append(
         _ json: JSON
     ) -> Int {
         var array = encoder.array(at: containerIndex)
@@ -206,5 +208,30 @@ struct ArrayEncoder: UnkeyedEncodingContainer {
 
     private let encoder: InternalEncoder
     private let containerIndex: Int
+    private let isNested: Bool
+
+    // MARK: - Deinit
+
+    deinit {
+        if isNested {
+            _ = encoder.popContainer()
+        }
+    }
 
 }
+
+// private final class AutoPop {
+//
+//    init(
+//        _ pop: @escaping () -> Void
+//    ) {
+//        self.pop = pop
+//    }
+//
+//    deinit {
+//        pop()
+//    }
+//
+//    private let pop: () -> Void
+//
+// }
