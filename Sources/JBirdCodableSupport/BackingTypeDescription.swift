@@ -40,9 +40,9 @@ extension JSON {
 
     var backingTypeDescription: BackingTypeDescription {
         switch self {
-        case .literal(.null):
+        case .null:
             .null
-        case .literal(.true), .literal(.false):
+        case .bool:
             .bool
         case .object:
             .object

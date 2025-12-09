@@ -49,9 +49,6 @@ public enum JSONError: Error, Equatable, Sendable, CustomStringConvertible {
     /// Thrown when a JSON object cannot be converted into an object
     case illegalObjectConversion
 
-    /// Thrown when a JSON object cannot be converted into a literal
-    case illegalLiteralConversion
-
     /// Thrown when a JSON object cannot be converted into a number value
     case illegalNumberConversion
 
@@ -95,8 +92,6 @@ public enum JSONError: Error, Equatable, Sendable, CustomStringConvertible {
             "JSON cannot be represented as an array"
         case .illegalObjectConversion:
             "JSON cannot be represented as an object"
-        case .illegalLiteralConversion:
-            "JSON cannot be represented as a literal value"
         case .illegalNumberConversion:
             "JSON cannot be represented as a number value"
         case .illegalStringConversion:

@@ -32,19 +32,19 @@ struct BackingTypeDescriptionTests {
 
     @Test("Null Type Description")
     func testNull() {
-        let json = JSON.literal(.null)
+        let json = JSON.null
         #expect(json.backingTypeDescription == .null)
     }
 
     @Test("True Type Description")
     func testTrue() {
-        let json = JSON.literal(.true)
+        let json = JSON.bool(true)
         #expect(json.backingTypeDescription == .bool)
     }
 
     @Test("False Type Description")
     func testFalse() {
-        let json = JSON.literal(.false)
+        let json = JSON.bool(false)
         #expect(json.backingTypeDescription == .bool)
     }
 

@@ -31,16 +31,6 @@ public protocol JSONInitializable {
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension JSONInitializable where Self: JSONLiteralInitializable {
-
-    public init(json: JSON) throws {
-        let literal = try json.literalValue
-        self = try literal.convert()
-    }
-
-}
-
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSONInitializable where Self: JSONNumberInitializable {
 
     public init(json: JSON) throws {

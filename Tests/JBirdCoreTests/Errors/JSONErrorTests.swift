@@ -50,9 +50,6 @@ func jsonErrorDescriptionTests() {
     let illegalObjectConversion = JSONError.illegalObjectConversion
     #expect(illegalObjectConversion.description == "JSON cannot be represented as an object")
 
-    let illegalLiteralConversion = JSONError.illegalLiteralConversion
-    #expect(illegalLiteralConversion.description == "JSON cannot be represented as a literal value")
-
     let illegalNumberConversion = JSONError.illegalNumberConversion
     #expect(illegalNumberConversion.description == "JSON cannot be represented as a number value")
 

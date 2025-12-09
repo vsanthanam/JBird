@@ -56,12 +56,12 @@ struct JSONRepresentableTests {
         func trueJSONValue() {
             let bool = true
             let json = bool.jsonValue
-            #expect(json == .literal(.true))
+            #expect(json == .bool(true))
         }
 
         @Test("True Bool Convert")
         func trueConvert() throws {
-            let json = JSON.literal(.true)
+            let json = JSON.bool(true)
             let bool = try json.convert(into: Bool.self)
             #expect(bool == true)
         }
@@ -70,64 +70,64 @@ struct JSONRepresentableTests {
         func falseJSONValue() {
             let bool = false
             let json = bool.jsonValue
-            #expect(json == .literal(.false))
+            #expect(json == .bool(false))
         }
 
         @Test("False Bool Convert")
         func falseConvert() throws {
-            let json = JSON.literal(.false)
+            let json = JSON.bool(false)
             let bool = try json.convert(into: Bool.self)
             #expect(bool == false)
         }
 
     }
 
-    @Suite("Literal Conformance Tests")
-    struct LiteralTests {
-
-        @Test("True Literal JSON Value")
-        func trueJSONValue() {
-            let literal = JSON.Literal.true
-            let json = literal.jsonValue
-            #expect(json == .literal(.true))
-        }
-
-        @Test("True Literal Convert")
-        func trueConvert() throws {
-            let json = JSON.literal(.true)
-            let literal = try json.convert(into: JSON.Literal.self)
-            #expect(literal == .true)
-        }
-
-        @Test("False Literal JSON Value")
-        func falseJSONValue() {
-            let literal = JSON.Literal.false
-            let json = literal.jsonValue
-            #expect(json == .literal(.false))
-        }
-
-        @Test("False Literal Convert")
-        func falseConvert() throws {
-            let json = JSON.literal(.false)
-            let literal = try json.convert(into: JSON.Literal.self)
-            #expect(literal == .false)
-        }
-
-        @Test("Null Literal JSON Value")
-        func nullJSONValue() {
-            let literal = JSON.Literal.null
-            let json = literal.jsonValue
-            #expect(json == .literal(.null))
-        }
-
-        @Test("Null Literal Convert")
-        func nullConvert() throws {
-            let json = JSON.literal(.null)
-            let literal = try json.convert(into: JSON.Literal.self)
-            #expect(literal == .null)
-        }
-
-    }
+//    @Suite("Literal Conformance Tests")
+//    struct LiteralTests {
+//
+//        @Test("True Literal JSON Value")
+//        func trueJSONValue() {
+//            let literal = JSON.Literal.true
+//            let json = literal.jsonValue
+//            #expect(json == .bool(true))
+//        }
+//
+//        @Test("True Literal Convert")
+//        func trueConvert() throws {
+//            let json = JSON.bool(true)
+//            let literal = try json.convert(into: JSON.Literal.self)
+//            #expect(literal == .true)
+//        }
+//
+//        @Test("False Literal JSON Value")
+//        func falseJSONValue() {
+//            let literal = JSON.Literal.false
+//            let json = literal.jsonValue
+//            #expect(json == .bool(.false))
+//        }
+//
+//        @Test("False Literal Convert")
+//        func falseConvert() throws {
+//            let json = JSON.bool(.false)
+//            let literal = try json.convert(into: JSON.Literal.self)
+//            #expect(literal == .false)
+//        }
+//
+//        @Test("Null Literal JSON Value")
+//        func nullJSONValue() {
+//            let literal = JSON.Literal.null
+//            let json = literal.jsonValue
+//            #expect(json == .literal(.null))
+//        }
+//
+//        @Test("Null Literal Convert")
+//        func nullConvert() throws {
+//            let json = JSON.literal(.null)
+//            let literal = try json.convert(into: JSON.Literal.self)
+//            #expect(literal == .null)
+//        }
+//
+//    }
 
     @Suite("Int Conformance Tests")
     struct IntTests {
@@ -272,12 +272,12 @@ struct JSONRepresentableTests {
         func dictionaryJSONValue() {
             let dictionary = [CustomKey.foo: true, CustomKey.bar: false]
             let json = dictionary.jsonValue
-            #expect(json == .object(["foo": .literal(.true), "bar": .literal(.false)]))
+            #expect(json == .object(["foo": .bool(true), "bar": .bool(false)]))
         }
 
         @Test("Dictionary Convert")
         func dictionaryConvert() throws {
-            let json = JSON.object(["foo": .literal(.true), "bar": .literal(.false)])
+            let json = JSON.object(["foo": .bool(true), "bar": .bool(false)])
             let dictionary = try json.convert(into: [CustomKey: Bool].self)
             #expect(dictionary == [.foo: true, .bar: false])
         }

@@ -102,7 +102,6 @@ struct JSONTests {
         func nullValue() {
             let nullValue: JSON = .null
             #expect(nullValue.isNull)
-            #expect(nullValue.isLiteral)
             #expect(!nullValue.isBool)
             #expect(!nullValue.isNumber)
             #expect(!nullValue.isInt)
@@ -117,7 +116,6 @@ struct JSONTests {
             let trueValue: JSON = true
             let falseValue: JSON = false
             #expect(!trueValue.isNull)
-            #expect(trueValue.isLiteral)
             #expect(trueValue.isBool)
             #expect(!trueValue.isNumber)
             #expect(!trueValue.isInt)
@@ -126,7 +124,6 @@ struct JSONTests {
             #expect(!trueValue.isObject)
             #expect(!trueValue.isArray)
             #expect(!falseValue.isNull)
-            #expect(falseValue.isLiteral)
             #expect(falseValue.isBool)
             #expect(!falseValue.isNumber)
             #expect(!falseValue.isInt)
@@ -140,7 +137,6 @@ struct JSONTests {
         func intValue() {
             let intValue: JSON = 42
             #expect(!intValue.isNull)
-            #expect(!intValue.isLiteral)
             #expect(!intValue.isBool)
             #expect(intValue.isNumber)
             #expect(intValue.isInt)
@@ -154,7 +150,6 @@ struct JSONTests {
         func doubleValue() {
             let doubleValue: JSON = 4.2
             #expect(!doubleValue.isNull)
-            #expect(!doubleValue.isLiteral)
             #expect(!doubleValue.isBool)
             #expect(doubleValue.isNumber)
             #expect(!doubleValue.isInt)
@@ -168,7 +163,6 @@ struct JSONTests {
         func stringValue() {
             let stringValue: JSON = "Hello, World!"
             #expect(!stringValue.isNull)
-            #expect(!stringValue.isLiteral)
             #expect(!stringValue.isBool)
             #expect(!stringValue.isNumber)
             #expect(!stringValue.isInt)
@@ -182,7 +176,6 @@ struct JSONTests {
         func arrayValue() {
             let arrayValue: JSON = [1, 2, 3]
             #expect(!arrayValue.isNull)
-            #expect(!arrayValue.isLiteral)
             #expect(!arrayValue.isBool)
             #expect(!arrayValue.isNumber)
             #expect(!arrayValue.isInt)
@@ -196,7 +189,6 @@ struct JSONTests {
         func objectValue() {
             let objectValue: JSON = ["key": "value"]
             #expect(!objectValue.isNull)
-            #expect(!objectValue.isLiteral)
             #expect(!objectValue.isBool)
             #expect(!objectValue.isNumber)
             #expect(!objectValue.isInt)
@@ -254,16 +246,6 @@ struct JSONTests {
             }
         }
 
-        @Test("Literal value access")
-        func literalValue() throws {
-            let jsonLiteral = JSON.literal(.true)
-            let nonLiteralJson = JSON.string("foo")
-            let literal = try jsonLiteral.literalValue
-            #expect(literal == .true)
-            #expect(throws: JSONError.illegalLiteralConversion) {
-                _ = try nonLiteralJson.literalValue
-            }
-        }
     }
 
     @Suite("Subtype Helper Tests")
@@ -271,12 +253,12 @@ struct JSONTests {
 
         @Test("Bool access tests")
         func boolValue() throws {
-            let jsonBool = JSON.literal(.true)
+            let jsonBool = JSON.bool(true)
             let nonBoolJson = JSON.string("foo")
-            let nonBoolButLiteralJSON = JSON.literal(.null)
+            let nonBoolButLiteralJSON = JSON.null
             let bool = try jsonBool.boolValue
             #expect(bool == true)
-            #expect(throws: JSONError.illegalLiteralConversion) {
+            #expect(throws: JSONError.illegalBoolConversion) {
                 _ = try nonBoolJson.boolValue
             }
             #expect(throws: JSONError.illegalBoolConversion) {
@@ -322,21 +304,21 @@ struct JSONTests {
         @Test("Literal null")
         func literalNil() {
             let literal: JSON = nil
-            let standard = JSON.literal(.null)
+            let standard = JSON.null
             #expect(literal == standard)
         }
 
         @Test("Literal true")
         func literalTrue() {
             let literal: JSON = true
-            let standard = JSON.literal(.true)
+            let standard = JSON.bool(true)
             #expect(literal == standard)
         }
 
         @Test("Literal false")
         func literalFalse() {
             let literal: JSON = false
-            let standard = JSON.literal(.false)
+            let standard = JSON.bool(false)
             #expect(literal == standard)
         }
 
