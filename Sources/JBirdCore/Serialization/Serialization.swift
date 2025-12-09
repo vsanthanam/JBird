@@ -449,7 +449,7 @@ extension JSON {
         number: Number,
         into bytes: inout [UInt8]
     ) throws {
-        switch number {
+        switch number.storage {
         case let .int(value):
             serialize(integer: value, into: &bytes)
         case let .double(value):
@@ -722,9 +722,9 @@ extension JSON {
             case JSON_BOOLEAN:
                 return .bool(json_get_boolean(value))
             case JSON_NUMBER_INT:
-                return .number(.int(Int(json_get_int(value))))
+                return .number(JSON.Number(json_get_int(value)))
             case JSON_NUMBER_DOUBLE:
-                return .number(.double(json_get_double(value)))
+                return .number(JSON.Number(json_get_double(value)))
             case JSON_STRING:
                 let str = String(cString: json_get_string(value))
                 return .string(str)
@@ -823,9 +823,9 @@ extension JSON {
                 case JSON_BOOLEAN:
                     return .bool(json_get_boolean(value))
                 case JSON_NUMBER_INT:
-                    return .number(.int(Int(json_get_int(value))))
+                    return .number(JSON.Number(json_get_int(value)))
                 case JSON_NUMBER_DOUBLE:
-                    return .number(.double(json_get_double(value)))
+                    return .number(JSON.Number(json_get_double(value)))
                 case JSON_STRING:
                     let str = String(cString: json_get_string(value))
                     return .string(str)
@@ -954,9 +954,9 @@ extension JSON {
                 case JSON_BOOLEAN:
                     return .bool(json_get_boolean(value))
                 case JSON_NUMBER_INT:
-                    return .number(.int(Int(json_get_int(value))))
+                    return .number(JSON.Number(json_get_int(value)))
                 case JSON_NUMBER_DOUBLE:
-                    return .number(.double(json_get_double(value)))
+                    return .number(JSON.Number(json_get_double(value)))
                 case JSON_STRING:
                     let str = String(cString: json_get_string(value))
                     return .string(str)

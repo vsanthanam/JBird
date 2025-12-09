@@ -29,7 +29,7 @@ import Foundation
 extension JSON {
 
     /// A JSON number
-    public enum Number: Equatable, Hashable, Sendable, ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral, CustomStringConvertible {
+    public struct Number: Equatable, Hashable, Sendable, ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral, CustomStringConvertible {
 
         // MARK: - Initializers
 
@@ -37,39 +37,9 @@ extension JSON {
             self = convertible.jsonNumber
         }
 
-        // MARK: - API
-
-        case int(Int)
-
-        case double(Double)
-
-        /// The number value as a Swift integer
-        public var intValue: Int {
-            get throws {
-                switch self {
-                case let .int(int):
-                    int
-                case .double:
-                    throw JSONError.illegalIntConversion
-                }
-            }
-        }
-
-        /// The number value as a Swift double
-        public var doubleValue: Double {
-            get throws {
-                switch self {
-                case let .double(double):
-                    double
-                case .int:
-                    throw JSONError.illegalDoubleConversion
-                }
-            }
-        }
-
         /// Whether or not the number value is an integer
-        public var isInt: Bool {
-            switch self {
+        public var isInteger: Bool {
+            switch storage {
             case .int:
                 true
             case .double:
@@ -78,8 +48,8 @@ extension JSON {
         }
 
         /// Whether or not the number value is a double
-        public var isDouble: Bool {
-            switch self {
+        public var isFloatingPoint: Bool {
+            switch storage {
             case .int:
                 false
             case .double:
@@ -90,7 +60,7 @@ extension JSON {
         /// The untyped representation of the JSON literal
         /// - Returns: An `AnyHashable` containing an `Int` or a `Double` representing the JSON number.
         public func unboxed() -> AnyHashable {
-            switch self {
+            switch storage {
             case let .int(int):
                 int
             case let .double(double):
@@ -111,7 +81,7 @@ extension JSON {
         public init(
             integerLiteral value: IntegerLiteralType
         ) {
-            self = .int(value)
+            self.init(.int(value))
         }
 
         // MARK: - ExpressibleByFloatLiteral
@@ -121,13 +91,13 @@ extension JSON {
         public init(
             floatLiteral value: FloatLiteralType
         ) {
-            self = .double(value)
+            self.init(.double(value))
         }
 
         // MARK: - Equatable
 
         public static func == (lhs: Number, rhs: Number) -> Bool {
-            switch (lhs, rhs) {
+            switch (lhs.storage, rhs.storage) {
             case let (.int(lhs), .int(rhs)):
                 lhs == rhs
             case let (.double(lhs), .double(rhs)):
@@ -150,13 +120,26 @@ extension JSON {
         // MARK: - CustomStringConvertible
 
         public var description: String {
-            switch self {
+            switch storage {
             case let .int(int):
                 int.description
             case let .double(double):
                 double.description
             }
         }
+
+        // MARK: - Private
+
+        init(_ storage: Storage) {
+            self.storage = storage
+        }
+
+        enum Storage: Hashable {
+            case int(Int)
+            case double(Double)
+        }
+
+        let storage: Storage
 
     }
 

@@ -56,11 +56,11 @@ func jsonErrorDescriptionTests() {
     let illegalStringConversion = JSONError.illegalStringConversion
     #expect(illegalStringConversion.description == "JSON cannot be represented as a string")
 
-    let illegalIntConversion = JSONError.illegalIntConversion
-    #expect(illegalIntConversion.description == "JSON cannot be represented as an integer")
+    let illegalIntegerConversion = JSONError.illegalIntegerConversion
+    #expect(illegalIntegerConversion.description == "JSON cannot be represented as an integer")
 
-    let illegalDoubleConversion = JSONError.illegalDoubleConversion
-    #expect(illegalDoubleConversion.description == "JSON cannot be represented as a double")
+    let illegalFloatConversion = JSONError.illegalFloatConversion
+    #expect(illegalFloatConversion.description == "JSON cannot be represented as a double")
 
     let illegalCollectionConversion = JSONError.illegalCollectionConversion
     #expect(illegalCollectionConversion.description == "JSON cannot be represented as a collection")

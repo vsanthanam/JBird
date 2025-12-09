@@ -45,11 +45,11 @@ extension JSON.Number: JSONNumberRepresentable {
 extension Int: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {
-        .int(self)
+        .init(.int(self))
     }
 
     public init(jsonNumber: JSON.Number) throws {
-        switch jsonNumber {
+        switch jsonNumber.storage {
         case let .int(value):
             self = value
         case let .double(value):
@@ -57,7 +57,7 @@ extension Int: JSONNumberRepresentable {
                let int = Int(exactly: value) {
                 self = int
             } else {
-                throw JSONError.illegalNumberConversion
+                throw JSONError.illegalIntegerConversion
             }
         }
     }
@@ -71,11 +71,11 @@ extension Double: JSONNumberRepresentable {
         if !isFinite {
             assertionFailure("Infinite floating point values cannot be represented in JSON")
         }
-        return .double(self)
+        return .init(.double(self))
     }
 
     public init(jsonNumber: JSON.Number) throws {
-        switch jsonNumber {
+        switch jsonNumber.storage {
         case let .int(value):
             self = Double(value)
         case let .double(value):
@@ -89,7 +89,7 @@ extension Double: JSONNumberRepresentable {
 extension UInt: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {
-        .int(Int(self))
+        .init(.int(Int(self)))
     }
 
     public init(jsonNumber: JSON.Number) throws {
@@ -103,7 +103,7 @@ extension UInt: JSONNumberRepresentable {
 extension UInt8: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {
-        .int(Int(self))
+        .init(.int(Int(self)))
     }
 
     public init(jsonNumber: JSON.Number) throws {
@@ -117,7 +117,7 @@ extension UInt8: JSONNumberRepresentable {
 extension UInt16: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {
-        .int(Int(self))
+        .init(.int(Int(self)))
     }
 
     public init(jsonNumber: JSON.Number) throws {
@@ -131,7 +131,7 @@ extension UInt16: JSONNumberRepresentable {
 extension UInt32: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {
-        .int(Int(self))
+        .init(.int(Int(self)))
     }
 
     public init(jsonNumber: JSON.Number) throws {
@@ -145,7 +145,7 @@ extension UInt32: JSONNumberRepresentable {
 extension UInt64: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {
-        .int(Int(self))
+        .init(.int(Int(self)))
     }
 
     public init(jsonNumber: JSON.Number) throws {
@@ -159,7 +159,7 @@ extension UInt64: JSONNumberRepresentable {
 extension Int8: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {
-        .int(Int(self))
+        .init(.int(Int(self)))
     }
 
     public init(jsonNumber: JSON.Number) throws {
@@ -173,7 +173,7 @@ extension Int8: JSONNumberRepresentable {
 extension Int16: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {
-        .int(Int(self))
+        .init(.int(Int(self)))
     }
 
     public init(jsonNumber: JSON.Number) throws {
@@ -187,7 +187,7 @@ extension Int16: JSONNumberRepresentable {
 extension Int32: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {
-        .int(Int(self))
+        .init(.int(Int(self)))
     }
 
     public init(jsonNumber: JSON.Number) throws {
@@ -201,7 +201,7 @@ extension Int32: JSONNumberRepresentable {
 extension Int64: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {
-        .int(Int(self))
+        .init(.int(Int(self)))
     }
 
     public init(jsonNumber: JSON.Number) throws {
@@ -217,10 +217,10 @@ extension Float: JSONNumberRepresentable {
     public var jsonNumber: JSON.Number {
         if isFinite {
             let double = Double(String(self))
-            return .double(double.unsafelyUnwrapped)
+            return .init(.double(double.unsafelyUnwrapped))
         } else {
             assertionFailure("Infinite floating point values cannot be represented in JSON")
-            return .double(Double(self))
+            return .init(.double(Double(self)))
         }
 
     }
@@ -246,14 +246,14 @@ extension Decimal: JSONNumberRepresentable {
             let i64 = ns.int64Value
             if Decimal(i64) == self,
                i64 >= Int64(Int.min), i64 <= Int64(Int.max) {
-                return .int(Int(i64))
+                return .init(.int(Int(i64)))
             }
         }
-        return .double(NSDecimalNumber(decimal: self).doubleValue)
+        return .init(.double(NSDecimalNumber(decimal: self).doubleValue))
     }
 
     public init(jsonNumber: JSON.Number) throws {
-        switch jsonNumber {
+        switch jsonNumber.storage {
         case let .int(number):
             self = Decimal(number)
         case let .double(number):

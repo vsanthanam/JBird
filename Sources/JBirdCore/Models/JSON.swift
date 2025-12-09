@@ -215,32 +215,6 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         }
     }
 
-    /// The JSON value as a Swift integer.
-    ///
-    /// This property will throw an error if the JSON value is anything other than a JSON integer, even if the JSON contains a double value that could be legally represented an integer, such as `4.0`.
-    ///
-    /// To coerce such doubles into integers, use the ``convert(into:)`` method instead.
-    ///
-    /// - Throws: An error, if the JSON value is not an integer
-    public var intValue: Int {
-        get throws {
-            try numberValue.intValue
-        }
-    }
-
-    /// The JSON value as a Swift double.
-    ///
-    /// Thie property will throw an error if the JSON value is anything other than a JSON double, even if the JSON contains an integer value that can be represented as a double.
-    ///
-    /// To coerce integers into doubles, use the ``convert(into:)`` method instead
-    ///
-    /// - Throws: An error, if the JSON value is not a double
-    public var doubleValue: Double {
-        get throws {
-            try numberValue.doubleValue
-        }
-    }
-
     /// The JSON value as a Swift string.
     ///
     /// This property will throw an error if the JSON value is anything other than a JSON string.
@@ -310,30 +284,6 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         switch self {
         case .number:
             true
-        case .bool, .null, .object, .array, .string:
-            false
-        }
-    }
-
-    /// Whether or not the JSON value is an int
-    ///
-    /// This property returns `true` if the JSON value is an integer. Otherwise, it returns `false`.
-    public var isInt: Bool {
-        switch self {
-        case let .number(number):
-            number.isInt
-        case .bool, .null, .object, .array, .string:
-            false
-        }
-    }
-
-    /// Whether or not the JSON value is a double
-    ///
-    /// This property returns `true` if the JSON value is a double. Otherwise, it returns `false`.
-    public var isDouble: Bool {
-        switch self {
-        case let .number(number):
-            number.isDouble
         case .bool, .null, .object, .array, .string:
             false
         }

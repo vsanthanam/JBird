@@ -48,15 +48,9 @@ struct BackingTypeDescriptionTests {
         #expect(json.backingTypeDescription == .bool)
     }
 
-    @Test("Int Type Description")
-    func testInt() {
-        let json = JSON.number(.int(12))
-        #expect(json.backingTypeDescription == .number)
-    }
-
-    @Test("Double Type Description")
-    func testDouble() {
-        let json = JSON.number(.double(1.2))
+    @Test("Number Type Description")
+    func int() {
+        let json = JSON.number(12)
         #expect(json.backingTypeDescription == .number)
     }
 
