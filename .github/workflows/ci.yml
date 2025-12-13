@@ -24,7 +24,7 @@ jobs:
     runs-on: macos-26
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - name: Select Xcode Version
       run: ./.scripts/xcode-select 26.1
     - name: Build JBird for iOS ${{ matrix.version }}
@@ -38,7 +38,7 @@ jobs:
     runs-on: macos-26
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - name: Select Xcode Version
       run: ./.scripts/xcode-select 26.1
     - name: Build JBird for tvOS ${{ matrix.version }}
@@ -52,7 +52,7 @@ jobs:
     runs-on: macos-26
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - name: Select Xcode Version
       run: ./.scripts/xcode-select 26.1
     - name: Build JBird for watchOS ${{ matrix.version }}
@@ -73,7 +73,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - name: Select Xcode Version
       run: ./.scripts/xcode-select ${{ matrix.xcode }}
     - name: List SDKs
@@ -96,7 +96,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - name: Select Xcode Version
       run: ./.scripts/xcode-select ${{ matrix.xcode }}
     - name: List SDKs
@@ -112,7 +112,7 @@ jobs:
     runs-on: macos-26
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - name: Select Xcode Version
       run: ./.scripts/xcode-select 26.1
     - name: Build JBird for visionOS ${{ matrix.version }}
@@ -122,7 +122,7 @@ jobs:
     runs-on: macos-26
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - name: Select Xcode Version
       run: ./.scripts/xcode-select
     - name: Lint with SwiftFormat
@@ -145,7 +145,7 @@ jobs:
       artifact-name: macos-build
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - name: Select Xcode Version
       run: ./.scripts/xcode-select ${{ matrix.xcode }}
     - name: Build JBird
@@ -174,7 +174,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Xcode Version
         run: ./.scripts/xcode-select ${{ matrix.xcode }}
       - name: Download Build
@@ -199,7 +199,7 @@ jobs:
       image: swift:${{ matrix.swift }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Build JBird
         run: swift build -v --build-tests --build-path .build
       - name: Install `zip`
@@ -223,7 +223,7 @@ jobs:
       image: swift:${{ matrix.swift }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Download Build
         uses: actions/download-artifact@v4
         with:
@@ -244,7 +244,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Swift
         uses: compnerd/gha-setup-swift@main
         with:
@@ -271,7 +271,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Swift
         uses: compnerd/gha-setup-swift@main
         with:
@@ -299,7 +299,7 @@ jobs:
       image: swift:${{ matrix.swift }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - if: ${{ matrix.swift == '6.2' }}
         name: Setup Swift WASM (6.2)
         run: |
@@ -343,7 +343,7 @@ jobs:
       artifact-name: android-build-${{ matrix.swift }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Build JBird
         uses: skiptools/swift-android-action@v2
         with:
@@ -365,7 +365,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
       - name: Install clang-format
         run: |
           sudo apt-get update
@@ -377,7 +377,7 @@ jobs:
     runs-on: macos-26
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - name: Select Xcode Version
       run: ./.scripts/xcode-select
     - name: Validate Documentation
@@ -391,7 +391,7 @@ jobs:
     runs-on: macos-26
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - name: Select Xcode Version
       run: ./.scripts/xcode-select
     - name: Build XCFramework
@@ -401,7 +401,7 @@ jobs:
     runs-on: macos-26
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Select Xcode Version
         run: ./.scripts/xcode-select
       - name: Run llvm-cov
@@ -434,7 +434,7 @@ jobs:
     runs-on: macos-26
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Select Xcode Version
         run: ./.scripts/xcode-select
       - name: Analyze C parsing core
