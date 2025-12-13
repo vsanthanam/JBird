@@ -389,7 +389,7 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
         return InternalDecoder(
             storage: decoder.storage,
             value: value,
-            codingPath: codingPath + [SuperKey()],
+            codingPath: codingPath + [SuperCodingKey()],
             userInfo: decoder.userInfo,
             parent: decoder
         )

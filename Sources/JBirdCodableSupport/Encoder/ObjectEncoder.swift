@@ -202,7 +202,7 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
     func superEncoder() -> any Encoder {
         InternalEncoder(
             storage: encoder.storage,
-            codingPath: codingPath + [SuperKey()],
+            codingPath: codingPath + [SuperCodingKey()],
             userInfo: encoder.userInfo,
             autoPopContainers: true
         ) { [encoder, containerIndex] json in
