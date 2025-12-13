@@ -42,8 +42,6 @@ jobs:
           key: xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.1-sdk-${{ matrix.version }}-${{ hashFiles('**/*.xcodeproj/project.pbxproj', '**/*.xcworkspace/contents.xcworkspacedata', '**/Package.resolved') }}
           restore-keys: |
             xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.1-sdk-${{ matrix.version }}-
-            xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.1-
-            xcode-deriveddata-${{ runner.os }}-
       - name: Build JBird for iOS ${{ matrix.version }}
         run: ./.scripts/build-ios-xcode JBird ${{ matrix.version }}
 
@@ -71,8 +69,6 @@ jobs:
           key: xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.1-sdk-${{ matrix.version }}-${{ hashFiles('**/*.xcodeproj/project.pbxproj', '**/*.xcworkspace/contents.xcworkspacedata', '**/Package.resolved') }}
           restore-keys: |
             xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.1-sdk-${{ matrix.version }}-
-            xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.1-
-            xcode-deriveddata-${{ runner.os }}-
       - name: Build JBird for tvOS ${{ matrix.version }}
         run: ./.scripts/build-tvos-xcode JBird ${{ matrix.version }}
 
@@ -100,8 +96,6 @@ jobs:
           key: xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.1-sdk-${{ matrix.version }}-${{ hashFiles('**/*.xcodeproj/project.pbxproj', '**/*.xcworkspace/contents.xcworkspacedata', '**/Package.resolved') }}
           restore-keys: |
             xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.1-sdk-${{ matrix.version }}-
-            xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.1-
-            xcode-deriveddata-${{ runner.os }}-
       - name: Build JBird for watchOS ${{ matrix.version }}
         run: ./.scripts/build-watchos-xcode JBird ${{ matrix.version }}
 
@@ -136,8 +130,6 @@ jobs:
           key: xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-${{ matrix.xcode }}-sdk-${{ matrix.version }}-${{ hashFiles('**/*.xcodeproj/project.pbxproj', '**/*.xcworkspace/contents.xcworkspacedata', '**/Package.resolved') }}
           restore-keys: |
             xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-${{ matrix.xcode }}-sdk-${{ matrix.version }}-
-            xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-${{ matrix.xcode }}-
-            xcode-deriveddata-${{ runner.os }}-
       - name: List SDKs
         run: xcodebuild -showsdks | grep macosx
       - name: Build JBird for macOS ${{ matrix.version }}
@@ -174,8 +166,6 @@ jobs:
           key: xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-${{ matrix.xcode }}-sdk-${{ matrix.version }}-${{ hashFiles('**/*.xcodeproj/project.pbxproj', '**/*.xcworkspace/contents.xcworkspacedata', '**/Package.resolved') }}
           restore-keys: |
             xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-${{ matrix.xcode }}-sdk-${{ matrix.version }}-
-            xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-${{ matrix.xcode }}-
-            xcode-deriveddata-${{ runner.os }}-
       - name: List SDKs
         run: xcodebuild -showsdks | grep macosx
       - name: Build JBird for Mac Catalyst ${{ matrix.version }}
@@ -205,8 +195,6 @@ jobs:
           key: xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.1-sdk-${{ matrix.version }}-${{ hashFiles('**/*.xcodeproj/project.pbxproj', '**/*.xcworkspace/contents.xcworkspacedata', '**/Package.resolved') }}
           restore-keys: |
             xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.1-sdk-${{ matrix.version }}-
-            xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.1-
-            xcode-deriveddata-${{ runner.os }}-
       - name: Build JBird for visionOS ${{ matrix.version }}
         run: ./.scripts/build-visionos-xcode JBird ${{ matrix.version }}
 
@@ -253,8 +241,6 @@ jobs:
           key: spm-macos-${{ matrix.swift }}-debug-${{ hashFiles('**/Package.resolved') }}
           restore-keys: |
             spm-macos-${{ matrix.swift }}-debug-
-            spm-macos-${{ matrix.swift }}-
-            spm-macos-
       - name: Build JBird
         run: swift build -v --build-tests --build-path .build
       - name: Compress Build
@@ -327,8 +313,6 @@ jobs:
           key: spm-ubuntu-${{ matrix.swift }}-debug-${{ env.PACKAGE_RESOLVED_HASH }}
           restore-keys: |
             spm-ubuntu-${{ matrix.swift }}-debug-
-            spm-ubuntu-${{ matrix.swift }}-
-            spm-ubuntu-
       - name: Build JBird
         run: swift build -v --build-tests --build-path .build
       - name: Install `zip`
@@ -381,6 +365,19 @@ jobs:
         with:
           swift-version: swift-${{ matrix.swift }}-release
           swift-build: ${{ matrix.swift }}-RELEASE
+      - name: Load Build Cache
+        uses: actions/cache@v5
+        with:
+          path: |
+            .build/checkouts
+            .build/repositories
+            .build/artifacts
+            ~/.swiftpm
+            ${{ env.LOCALAPPDATA }}\org.swift.swiftpm
+            ${{ env.LOCALAPPDATA }}\SwiftPM
+          key: spm-windows-${{ matrix.swift }}-deps-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: |
+            spm-windows-${{ matrix.swift }}-deps-
       - name: Build JBird
         run: swift build -v --build-tests --disable-xctest --build-path .build -c debug -Xlinker /INCREMENTAL:NO
       - name: Compress Build
@@ -453,9 +450,6 @@ jobs:
           key: spm-wasm-${{ matrix.swift }}-debug-swift-6.2.3-RELEASE_wasm-${{ env.PACKAGE_RESOLVED_HASH }}
           restore-keys: |
             spm-wasm-${{ matrix.swift }}-debug-swift-6.2.3-RELEASE_wasm-
-            spm-wasm-${{ matrix.swift }}-debug-
-            spm-wasm-${{ matrix.swift }}-
-            spm-wasm-
 
       - if: ${{ matrix.swift != '6.2' }}
         name: Load Build Cache (WASM SwiftWasm SDK)
@@ -468,9 +462,6 @@ jobs:
           key: spm-wasm-${{ matrix.swift }}-debug-swiftwasm-${{ env.PACKAGE_RESOLVED_HASH }}
           restore-keys: |
             spm-wasm-${{ matrix.swift }}-debug-swiftwasm-
-            spm-wasm-${{ matrix.swift }}-debug-
-            spm-wasm-${{ matrix.swift }}-
-            spm-wasm-
 
       - if: ${{ matrix.swift == '6.2' }}
         name: Setup Swift WASM (6.2)
@@ -524,8 +515,6 @@ jobs:
           key: spm-android-${{ matrix.swift }}-debug-${{ hashFiles('**/Package.resolved') }}
           restore-keys: |
             spm-android-${{ matrix.swift }}-debug-
-            spm-android-${{ matrix.swift }}-
-            spm-android-
       - name: Build JBird
         uses: skiptools/swift-android-action@v2
         with:
