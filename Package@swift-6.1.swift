@@ -218,8 +218,8 @@ let package = Package(
                 .process("PrivacyInfo.xcprivacy")
             ],
             swiftSettings: [
-                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
-                .enableUpcomingFeature("ExistentialAny")
+                .enableUpcomingFeature("ExistentialAny"),
+                .enableUpcomingFeature("MemberImportVisibility")
             ]
         ),
         .testTarget(
@@ -229,8 +229,8 @@ let package = Package(
                 "JBirdCore"
             ],
             swiftSettings: [
-                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
-                .enableUpcomingFeature("ExistentialAny")
+                .enableUpcomingFeature("ExistentialAny"),
+                .enableUpcomingFeature("MemberImportVisibility")
             ]
         )
     ],
