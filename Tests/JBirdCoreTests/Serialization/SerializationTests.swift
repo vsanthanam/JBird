@@ -24,7 +24,7 @@
 // SOFTWARE.
 
 import Foundation
-import JBirdCore
+@testable import JBirdCore
 import Testing
 
 @Suite("Serialization Tests")
@@ -55,7 +55,7 @@ struct SerializationTests {
 
     @Test("Invalid Float Serialization")
     func invalidFloatSerialization() {
-        let json: JSON = .number(.double(.infinity))
+        let json: JSON = .number(.init(.double(.infinity)))
         #expect(throws: JSONSerializationError.invalidFloat) {
             try json.serialize()
         }

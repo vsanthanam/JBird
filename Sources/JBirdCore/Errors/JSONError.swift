@@ -49,9 +49,6 @@ public enum JSONError: Error, Equatable, Sendable, CustomStringConvertible {
     /// Thrown when a JSON object cannot be converted into an object
     case illegalObjectConversion
 
-    /// Thrown when a JSON object cannot be converted into a literal
-    case illegalLiteralConversion
-
     /// Thrown when a JSON object cannot be converted into a number value
     case illegalNumberConversion
 
@@ -59,10 +56,10 @@ public enum JSONError: Error, Equatable, Sendable, CustomStringConvertible {
     case illegalStringConversion
 
     /// Thrown when a JSON object cannot be converted into an integer
-    case illegalIntConversion
+    case illegalIntegerConversion
 
-    /// Thrown when a JSON object cannot be converted into a double
-    case illegalDoubleConversion
+    /// Thrown when a JSON object cannot be converted into a floating point value
+    case illegalFloatConversion
 
     /// Thrown when a JSON object cannot be converted into a collection
     case illegalCollectionConversion
@@ -95,15 +92,13 @@ public enum JSONError: Error, Equatable, Sendable, CustomStringConvertible {
             "JSON cannot be represented as an array"
         case .illegalObjectConversion:
             "JSON cannot be represented as an object"
-        case .illegalLiteralConversion:
-            "JSON cannot be represented as a literal value"
         case .illegalNumberConversion:
             "JSON cannot be represented as a number value"
         case .illegalStringConversion:
             "JSON cannot be represented as a string"
-        case .illegalIntConversion:
+        case .illegalIntegerConversion:
             "JSON cannot be represented as an integer"
-        case .illegalDoubleConversion:
+        case .illegalFloatConversion:
             "JSON cannot be represented as a double"
         case .illegalCollectionConversion:
             "JSON cannot be represented as a collection"

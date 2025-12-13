@@ -16,11 +16,12 @@ Because of these rules, an enumeration with associated types is an ideal way to 
 
 ```swift
 enum JSON {
-    case literal(Literal)
+    case bool(Bool)
     case object([String: JSON])
     case array([JSON])
     case number(Number)
     case string(String)
+    case null
 }
 ```
 
@@ -44,7 +45,7 @@ let steve = JSON.object(
     [
         "first_name": .string("Steve"),
         "last_name": .string("Jobs"),
-        "founded_apple": .literal(.true),
+        "founded_apple": .bool(true),
         "patent_count": .number(.int(317))
     ]
 )
@@ -75,7 +76,6 @@ let steve: JSON = [
 
 ### Subtypes
 
-- ``Literal``
 - ``Number``
 - ``Object``
 - ``Array``
@@ -87,16 +87,10 @@ let steve: JSON = [
 
 ### Inspecting JSON values
 
-- ``literalValue``
-- ``isLiteral``
 - ``boolValue``
 - ``isBool``
 - ``numberValue``
 - ``isNumber``
-- ``intValue``
-- ``isInt``
-- ``doubleValue``
-- ``isDouble``
 - ``stringValue``
 - ``isString``
 - ``arrayValue``

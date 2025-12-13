@@ -306,7 +306,7 @@ extension JSON {
     ) throws -> Data {
         if !options.contains(.fragmentsAllowed) {
             switch json {
-            case .literal, .number, .string:
+            case .bool, .null, .number, .string:
                 throw JSONSerializationError.illegalFragment
             case .array, .object:
                 break
@@ -337,7 +337,7 @@ extension JSON {
         ) async throws -> Data {
             if !options.contains(.fragmentsAllowed) {
                 switch json {
-                case .literal, .number, .string:
+                case .bool, .null, .number, .string:
                     throw JSONSerializationError.illegalFragment
                 case .array, .object:
                     break
@@ -366,7 +366,7 @@ extension JSON {
         ) async throws -> Data {
             if !options.contains(.fragmentsAllowed) {
                 switch json {
-                case .literal, .number, .string:
+                case .bool, .null, .number, .string:
                     throw JSONSerializationError.illegalFragment
                 case .array, .object:
                     break
@@ -409,8 +409,8 @@ extension JSON {
             try Task.checkCancellation()
         }
         switch json {
-        case let .literal(literal):
-            serialize(literal: literal, into: &bytes)
+        case let .bool(bool):
+            serialize(bool: bool, into: &bytes)
         case let .object(object):
             try serialize(object: object, into: &bytes, level: level, options: options, isAsync: isCancellable)
         case let .array(array):
@@ -419,22 +419,29 @@ extension JSON {
             try serialize(number: number, into: &bytes)
         case let .string(string):
             serialize(string: string, options: options, into: &bytes)
+        case .null:
+            serializeNull(into: &bytes)
         }
     }
 
     @inline(__always)
     private static func serialize(
-        literal: Literal,
+        bool: Bool,
         into bytes: inout [UInt8]
     ) {
-        switch literal {
-        case .true:
+        switch bool {
+        case true:
             bytes += [0x74, 0x72, 0x75, 0x65]
-        case .false:
+        case false:
             bytes += [0x66, 0x61, 0x6C, 0x73, 0x65]
-        case .null:
-            bytes += [0x6E, 0x75, 0x6C, 0x6C]
         }
+    }
+
+    @inline(__always)
+    private static func serializeNull(
+        into bytes: inout [UInt8]
+    ) {
+        bytes += [0x6E, 0x75, 0x6C, 0x6C]
     }
 
     @inline(__always)
@@ -442,7 +449,7 @@ extension JSON {
         number: Number,
         into bytes: inout [UInt8]
     ) throws {
-        switch number {
+        switch number.storage {
         case let .int(value):
             serialize(integer: value, into: &bytes)
         case let .double(value):
@@ -711,13 +718,13 @@ extension JSON {
             let type = json_get_type(value)
             switch type {
             case JSON_NULL:
-                return .literal(.null)
+                return .null
             case JSON_BOOLEAN:
-                return .literal(json_get_boolean(value) ? .true : .false)
+                return .bool(json_get_boolean(value))
             case JSON_NUMBER_INT:
-                return .number(.int(Int(json_get_int(value))))
+                return .number(JSON.Number(json_get_int(value)))
             case JSON_NUMBER_DOUBLE:
-                return .number(.double(json_get_double(value)))
+                return .number(JSON.Number(json_get_double(value)))
             case JSON_STRING:
                 let str = String(cString: json_get_string(value))
                 return .string(str)
@@ -759,7 +766,7 @@ extension JSON {
             switch json {
             case .array, .object:
                 return json
-            case .literal, .number, .string:
+            case .bool, .null, .number, .string:
                 throw JSONDeserializationError.illegalFragment
             }
         }
@@ -812,13 +819,13 @@ extension JSON {
                 let type = json_get_type(value)
                 switch type {
                 case JSON_NULL:
-                    return .literal(.null)
+                    return .null
                 case JSON_BOOLEAN:
-                    return .literal(json_get_boolean(value) ? .true : .false)
+                    return .bool(json_get_boolean(value))
                 case JSON_NUMBER_INT:
-                    return .number(.int(Int(json_get_int(value))))
+                    return .number(JSON.Number(json_get_int(value)))
                 case JSON_NUMBER_DOUBLE:
-                    return .number(.double(json_get_double(value)))
+                    return .number(JSON.Number(json_get_double(value)))
                 case JSON_STRING:
                     let str = String(cString: json_get_string(value))
                     return .string(str)
@@ -892,7 +899,7 @@ extension JSON {
                 switch json {
                 case .array, .object:
                     return json
-                case .literal, .number, .string:
+                case .bool, .null, .number, .string:
                     throw JSONDeserializationError.illegalFragment
                 }
             }
@@ -943,13 +950,13 @@ extension JSON {
                 let type = json_get_type(value)
                 switch type {
                 case JSON_NULL:
-                    return .literal(.null)
+                    return .null
                 case JSON_BOOLEAN:
-                    return .literal(json_get_boolean(value) ? .true : .false)
+                    return .bool(json_get_boolean(value))
                 case JSON_NUMBER_INT:
-                    return .number(.int(Int(json_get_int(value))))
+                    return .number(JSON.Number(json_get_int(value)))
                 case JSON_NUMBER_DOUBLE:
-                    return .number(.double(json_get_double(value)))
+                    return .number(JSON.Number(json_get_double(value)))
                 case JSON_STRING:
                     let str = String(cString: json_get_string(value))
                     return .string(str)
@@ -1023,7 +1030,7 @@ extension JSON {
                 switch json {
                 case .array, .object:
                     return json
-                case .literal, .number, .string:
+                case .bool, .null, .number, .string:
                     throw JSONDeserializationError.illegalFragment
                 }
             }

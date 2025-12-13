@@ -23,7 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import JBirdCore
+@testable import JBirdCore
 import Testing
 
 @Suite("Number Tests")
@@ -33,33 +33,33 @@ struct NumberTests {
     func convertibleInitializers() {
         let rawInt = 42
         let int = JSON.Number(rawInt)
-        #expect(int == .int(42))
+        #expect(int == .init(.int(42)))
 
         let rawDouble = 4.2
         let double = JSON.Number(rawDouble)
-        #expect(double == .double(4.2))
+        #expect(double == .init(.double(4.2)))
     }
 
     @Test("Mismatched Equivalence")
     func mismatchedEquivalence() {
-        #expect(JSON.Number.int(42) == JSON.Number.double(42.0))
-        #expect(JSON.Number.double(42.0) == JSON.Number.int(42))
-        #expect(JSON.Number.int(42) != JSON.Number.double(42.1))
-        #expect(JSON.Number.double(42.1) != JSON.Number.int(42))
-        #expect(JSON.Number.int(42) == JSON.Number.int(42))
-        #expect(JSON.Number.int(42) != JSON.Number.int(43))
-        #expect(JSON.Number.double(42.1) == JSON.Number.double(42.1))
-        #expect(JSON.Number.double(42.1) != JSON.Number.double(42.2))
+        #expect(JSON.Number(42) == JSON.Number(42.0))
+        #expect(JSON.Number(42.0) == JSON.Number(42))
+        #expect(JSON.Number(42) != JSON.Number(42.1))
+        #expect(JSON.Number(42.1) != JSON.Number(42))
+        #expect(JSON.Number(42) == JSON.Number(42))
+        #expect(JSON.Number(42) != JSON.Number(43))
+        #expect(JSON.Number(42.1) == JSON.Number(42.1))
+        #expect(JSON.Number(42.1) != JSON.Number(42.2))
 
     }
 
     @Test("Literal Expressions")
     func literalExpressions() {
         let int: JSON.Number = 42
-        #expect(int == .int(42))
+        #expect(int == .init(.int(42)))
 
         let double: JSON.Number = 4.2
-        #expect(double == .double(4.2))
+        #expect(double == .init(.double(4.2)))
     }
 
     @Test("Unboxed Number")
@@ -84,22 +84,22 @@ struct NumberTests {
         #expect(double.description == doubledescription)
     }
 
-    @Test("Number isInt")
-    func isInt() {
+    @Test("Number isInteger")
+    func isInteger() {
         let int: JSON.Number = 12
-        #expect(int.isInt)
+        #expect(int.isInteger)
 
         let double: JSON.Number = 12.34
-        #expect(!double.isInt)
+        #expect(!double.isInteger)
     }
 
-    @Test("Number isDouble")
-    func isDouble() {
+    @Test("Number isFloatingPoint")
+    func isFloatingPoint() {
         let int: JSON.Number = 12
-        #expect(!int.isDouble)
+        #expect(!int.isFloatingPoint)
 
         let double: JSON.Number = 12.34
-        #expect(double.isDouble)
+        #expect(double.isFloatingPoint)
     }
 
 }

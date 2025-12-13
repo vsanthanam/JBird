@@ -51,7 +51,7 @@ struct BuilderTests {
         func multipleJSONElementsExpression() {
             let json = JSON {
                 JSON.string("foo")
-                JSON.literal(.null)
+                JSON.null
             }
             #expect(json == ["foo", nil])
         }
@@ -136,8 +136,8 @@ struct BuilderTests {
         func dictionaryExpression() {
             let json = JSON {
                 [
-                    "foo": JSON.literal(.true),
-                    "bar": JSON.literal(.false)
+                    "foo": JSON.bool(true),
+                    "bar": JSON.bool(false)
                 ]
             }
             #expect(json == ["foo": true, "bar": false])

@@ -40,11 +40,12 @@ struct JSONTests {
     func jsonCount() throws {
         let jsonObject = JSON.object(["foo": "bar"])
         let jsonArray = JSON.array(["foo", "bar"])
-        let emptyArray: JSON = []
-        let emptyObject: JSON = [:]
-        let number: JSON = 1
-        let string: JSON = "foo"
-        let literal: JSON = false
+        let emptyArray = JSON.array([])
+        let emptyObject = JSON.object([:])
+        let number = JSON.number(0)
+        let string = JSON.string("foo")
+        let bool = JSON.bool(false)
+        let null = JSON.null
 
         try #expect(jsonObject.count == 1)
         try #expect(jsonArray.count == 2)
@@ -68,10 +69,17 @@ struct JSONTests {
         }
 
         #expect(throws: JSONError.illegalCollectionConversion) {
-            _ = try literal.count
+            _ = try bool.count
         }
         #expect(throws: JSONError.illegalCollectionConversion) {
-            _ = try literal.isEmpty
+            _ = try bool.isEmpty
+        }
+
+        #expect(throws: JSONError.illegalCollectionConversion) {
+            _ = try null.count
+        }
+        #expect(throws: JSONError.illegalCollectionConversion) {
+            _ = try null.isEmpty
         }
     }
 
@@ -85,8 +93,8 @@ struct JSONTests {
         let double: JSON = 3.14
         let array: JSON = ["apple", "banana", "cherry"]
         let object: JSON = ["name": "John", "age": 30]
-        #expect(`true` == true)
-        #expect(`false` == false)
+        #expect(`true`.unboxed().base is Bool)
+        #expect(`false`.unboxed().base is Bool)
         #expect(null.unboxed().base is NSNull)
         #expect(string.unboxed().base is String)
         #expect(int.unboxed().base is Int)
@@ -102,11 +110,8 @@ struct JSONTests {
         func nullValue() {
             let nullValue: JSON = .null
             #expect(nullValue.isNull)
-            #expect(nullValue.isLiteral)
             #expect(!nullValue.isBool)
             #expect(!nullValue.isNumber)
-            #expect(!nullValue.isInt)
-            #expect(!nullValue.isDouble)
             #expect(!nullValue.isString)
             #expect(!nullValue.isObject)
             #expect(!nullValue.isArray)
@@ -117,62 +122,43 @@ struct JSONTests {
             let trueValue: JSON = true
             let falseValue: JSON = false
             #expect(!trueValue.isNull)
-            #expect(trueValue.isLiteral)
             #expect(trueValue.isBool)
             #expect(!trueValue.isNumber)
-            #expect(!trueValue.isInt)
-            #expect(!trueValue.isDouble)
             #expect(!trueValue.isString)
             #expect(!trueValue.isObject)
             #expect(!trueValue.isArray)
             #expect(!falseValue.isNull)
-            #expect(falseValue.isLiteral)
             #expect(falseValue.isBool)
             #expect(!falseValue.isNumber)
-            #expect(!falseValue.isInt)
-            #expect(!falseValue.isDouble)
             #expect(!falseValue.isString)
             #expect(!falseValue.isObject)
             #expect(!falseValue.isArray)
         }
 
-        @Test("Int Value Check")
-        func intValue() {
+        @Test("Number Value Check")
+        func numberValue() {
             let intValue: JSON = 42
+            let floatValue: JSON = 4.2
             #expect(!intValue.isNull)
-            #expect(!intValue.isLiteral)
             #expect(!intValue.isBool)
             #expect(intValue.isNumber)
-            #expect(intValue.isInt)
-            #expect(!intValue.isDouble)
             #expect(!intValue.isString)
             #expect(!intValue.isObject)
             #expect(!intValue.isArray)
-        }
-
-        @Test("Double Value Check")
-        func doubleValue() {
-            let doubleValue: JSON = 4.2
-            #expect(!doubleValue.isNull)
-            #expect(!doubleValue.isLiteral)
-            #expect(!doubleValue.isBool)
-            #expect(doubleValue.isNumber)
-            #expect(!doubleValue.isInt)
-            #expect(doubleValue.isDouble)
-            #expect(!doubleValue.isString)
-            #expect(!doubleValue.isObject)
-            #expect(!doubleValue.isArray)
+            #expect(!floatValue.isNull)
+            #expect(!floatValue.isBool)
+            #expect(floatValue.isNumber)
+            #expect(!floatValue.isString)
+            #expect(!floatValue.isObject)
+            #expect(!floatValue.isArray)
         }
 
         @Test("String Value Check")
         func stringValue() {
             let stringValue: JSON = "Hello, World!"
             #expect(!stringValue.isNull)
-            #expect(!stringValue.isLiteral)
             #expect(!stringValue.isBool)
             #expect(!stringValue.isNumber)
-            #expect(!stringValue.isInt)
-            #expect(!stringValue.isDouble)
             #expect(stringValue.isString)
             #expect(!stringValue.isObject)
             #expect(!stringValue.isArray)
@@ -182,11 +168,8 @@ struct JSONTests {
         func arrayValue() {
             let arrayValue: JSON = [1, 2, 3]
             #expect(!arrayValue.isNull)
-            #expect(!arrayValue.isLiteral)
             #expect(!arrayValue.isBool)
             #expect(!arrayValue.isNumber)
-            #expect(!arrayValue.isInt)
-            #expect(!arrayValue.isDouble)
             #expect(!arrayValue.isString)
             #expect(!arrayValue.isObject)
             #expect(arrayValue.isArray)
@@ -196,11 +179,8 @@ struct JSONTests {
         func objectValue() {
             let objectValue: JSON = ["key": "value"]
             #expect(!objectValue.isNull)
-            #expect(!objectValue.isLiteral)
             #expect(!objectValue.isBool)
             #expect(!objectValue.isNumber)
-            #expect(!objectValue.isInt)
-            #expect(!objectValue.isDouble)
             #expect(!objectValue.isString)
             #expect(objectValue.isObject)
             #expect(!objectValue.isArray)
@@ -245,25 +225,26 @@ struct JSONTests {
 
         @Test("Number value access")
         func numberValue() throws {
-            let jsonNumber = JSON.number(.int(123))
+            let jsonNumber = JSON.number(123)
             let nonNumberJson = JSON.string("foo")
             let number = try jsonNumber.numberValue
-            #expect(number == .int(123))
+            #expect(number == .init(123))
             #expect(throws: JSONError.illegalNumberConversion) {
                 _ = try nonNumberJson.numberValue
             }
         }
 
-        @Test("Literal value access")
-        func literalValue() throws {
-            let jsonLiteral = JSON.literal(.true)
-            let nonLiteralJson = JSON.string("foo")
-            let literal = try jsonLiteral.literalValue
-            #expect(literal == .true)
-            #expect(throws: JSONError.illegalLiteralConversion) {
-                _ = try nonLiteralJson.literalValue
+        @Test("Bool value access")
+        func boolValue() throws {
+            let jsonBool = JSON.bool(false)
+            let nonBoolJson = JSON.string("foo")
+            let bool = try jsonBool.boolValue
+            #expect(bool == false)
+            #expect(throws: JSONError.illegalBoolConversion) {
+                _ = try nonBoolJson.boolValue
             }
         }
+
     }
 
     @Suite("Subtype Helper Tests")
@@ -271,12 +252,12 @@ struct JSONTests {
 
         @Test("Bool access tests")
         func boolValue() throws {
-            let jsonBool = JSON.literal(.true)
+            let jsonBool = JSON.bool(true)
             let nonBoolJson = JSON.string("foo")
-            let nonBoolButLiteralJSON = JSON.literal(.null)
+            let nonBoolButLiteralJSON = JSON.null
             let bool = try jsonBool.boolValue
             #expect(bool == true)
-            #expect(throws: JSONError.illegalLiteralConversion) {
+            #expect(throws: JSONError.illegalBoolConversion) {
                 _ = try nonBoolJson.boolValue
             }
             #expect(throws: JSONError.illegalBoolConversion) {
@@ -284,33 +265,25 @@ struct JSONTests {
             }
         }
 
-        @Test("Int access tests")
+        @Test("Integer access tests")
         func intValue() throws {
-            let jsonInt = JSON.number(.int(123))
+            let jsonInt = JSON.number(123)
             let nonIntJson = JSON.string("foo")
-            let nonIntButNumberJSON = JSON.number(.double(123.456))
-            let int = try jsonInt.intValue
+            let int = try jsonInt.numberValue.convert(into: Int.self)
             #expect(int == 123)
             #expect(throws: JSONError.illegalNumberConversion) {
-                _ = try nonIntJson.intValue
-            }
-            #expect(throws: JSONError.illegalIntConversion) {
-                _ = try nonIntButNumberJSON.intValue
+                _ = try nonIntJson.numberValue
             }
         }
 
-        @Test("Double access tests")
+        @Test("Floating point access tests")
         func doubleValue() throws {
-            let jsonDouble = JSON.number(.double(123.456))
+            let jsonDouble = JSON.number(123.456)
             let nonDoubleJson = JSON.string("foo")
-            let nonDoubleButNumberJSON = JSON.number(.int(123))
-            let double = try jsonDouble.doubleValue
+            let double = try jsonDouble.numberValue.convert(into: Double.self)
             #expect(double == 123.456)
             #expect(throws: JSONError.illegalNumberConversion) {
-                _ = try nonDoubleJson.doubleValue
-            }
-            #expect(throws: JSONError.illegalDoubleConversion) {
-                _ = try nonDoubleButNumberJSON.doubleValue
+                _ = try nonDoubleJson.numberValue
             }
         }
 
@@ -322,35 +295,35 @@ struct JSONTests {
         @Test("Literal null")
         func literalNil() {
             let literal: JSON = nil
-            let standard = JSON.literal(.null)
+            let standard = JSON.null
             #expect(literal == standard)
         }
 
         @Test("Literal true")
         func literalTrue() {
             let literal: JSON = true
-            let standard = JSON.literal(.true)
+            let standard = JSON.bool(true)
             #expect(literal == standard)
         }
 
         @Test("Literal false")
         func literalFalse() {
             let literal: JSON = false
-            let standard = JSON.literal(.false)
+            let standard = JSON.bool(false)
             #expect(literal == standard)
         }
 
         @Test("Literal int")
         func literalInt() {
             let literal: JSON = 123
-            let standard = JSON.number(.int(123))
+            let standard = JSON.number(123)
             #expect(literal == standard)
         }
 
         @Test("Literal double")
         func literalDouble() {
             let literal: JSON = 123.456
-            let standard = JSON.number(.double(123.456))
+            let standard = JSON.number(123.456)
             #expect(literal == standard)
         }
 
@@ -842,7 +815,7 @@ struct JSONTests {
             let array: JSON = ["a", "b", "c", "d"]
             let object: JSON = ["foo": "bar"]
             try #expect(array.allSatisfy { (element: JSON) in element.isString } == true)
-            try #expect(array.allSatisfy { (element: JSON) in element.isInt } == false)
+            try #expect(array.allSatisfy { (element: JSON) in element.isNumber } == false)
             #expect(throws: JSONError.illegalArrayConversion) {
                 try object.allSatisfy { (element: JSON) in true }
             }
@@ -906,10 +879,10 @@ struct JSONTests {
         func mapValuesTests() throws {
             let object: JSON = ["foo": "bar", "baz": 42]
             let array: JSON = ["a", "b", "c", "d"]
-            let mapped = try object.mapValues(\.isInt)
+            let mapped = try object.mapValues(\.isNumber)
             #expect(mapped == ["foo": false, "baz": true])
             #expect(throws: JSONError.illegalObjectConversion) {
-                _ = try array.mapValues(\.isInt)
+                _ = try array.mapValues(\.isNumber)
             }
         }
 
@@ -922,7 +895,7 @@ struct JSONTests {
             }
             #expect(mapped == ["foo": nil, "baz": nil])
             #expect(throws: JSONError.illegalObjectConversion) {
-                _ = try array.mapValues(\.isInt)
+                _ = try array.mapValues(\.isNumber)
             }
         }
 
@@ -963,12 +936,12 @@ struct JSONTests {
             let object: JSON = ["foo": "bar", "baz": 42]
             let array: JSON = ["a", "b", "c", "d"]
             let mapped = try object.compactMap { key, value in
-                value.isInt ? key.uppercased() : nil
+                value.isNumber ? key.uppercased() : nil
             }
             #expect(mapped == ["BAZ"])
             #expect(throws: JSONError.illegalObjectConversion) {
                 _ = try array.compactMap { key, value in
-                    value.isInt ? key.uppercased() : nil
+                    value.isNumber ? key.uppercased() : nil
                 }
             }
         }
@@ -978,12 +951,12 @@ struct JSONTests {
             let object: JSON = ["foo": "bar", "baz": 42]
             let array: JSON = ["a", "b", "c", "d"]
             let mapped = try object.compactMapValues { value in
-                try? value.intValue
+                try? value.convert(into: Int.self)
             }
             #expect(mapped == ["baz": 42])
             #expect(throws: JSONError.illegalObjectConversion) {
                 _ = try array.compactMapValues { value in
-                    try? value.intValue
+                    try? value.convert(into: Int.self)
                 }
             }
         }
@@ -998,12 +971,12 @@ struct JSONTests {
             let array: JSON = [1, 2, 3, 4, 5]
             let object: JSON = ["foo": "bar"]
             let total = try array.reduce(0) { total, json in
-                try (total + json.intValue)
+                try (total + json.convert())
             }
             #expect(total == 15)
             #expect(throws: JSONError.illegalArrayConversion) {
                 try object.reduce(0) { total, json in
-                    try (total + json.intValue)
+                    try (total + json.convert())
                 }
             }
         }
@@ -1013,12 +986,12 @@ struct JSONTests {
             let array: JSON = [1, 2, 3, 4, 5]
             let object: JSON = ["foo": "bar"]
             let total = try array.reduce(into: 0) { total, json in
-                total += try json.intValue
+                total += try json.convert()
             }
             #expect(total == 15)
             #expect(throws: JSONError.illegalArrayConversion) {
                 try object.reduce(into: 0) { total, json in
-                    total += try json.intValue
+                    total += try json.convert()
                 }
             }
         }
@@ -1068,13 +1041,13 @@ struct JSONTests {
             let array: JSON = [1, 2, 3, 4, 5]
             let object: JSON = ["foo": "bar", "baz": "qux"]
             try array.forEach { element in
-                let value = try element.intValue + 1
+                let value = try element.convert() + 1
                 result.append(value)
             }
             #expect(result == [2, 3, 4, 5, 6])
             #expect(throws: JSONError.illegalArrayConversion) {
                 try object.forEach { element in
-                    let value = try element.intValue + 1
+                    let value = try element.convert() + 1
                     result.append(value)
                 }
             }
@@ -1188,4 +1161,11 @@ struct JSONTests {
             }
         }
     }
+
+    @Test("Null JSON Description")
+    func nullDescription() {
+        let json = JSON.null
+        #expect(json.description == "null")
+    }
+
 }

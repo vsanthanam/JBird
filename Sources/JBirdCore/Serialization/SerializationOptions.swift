@@ -76,7 +76,7 @@ extension JSON {
         /// Whether or not to escape the forward slash character
         ///
         /// When this option is enabled, the forward slash character (`/`) will be escaped as `\/` in the serialized JSON.
-        /// This can be useful for preventing issues with certain parsers that may misinterpret the forward slash.
+        /// This can be useful for preventing issues with certain parsers that may misIntegererpret the forward slash.
         public static let escapeForwardSlash = SerializationOptions(rawValue: 1 << 8)
 
         /// The default set of options

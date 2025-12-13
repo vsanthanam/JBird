@@ -42,10 +42,17 @@ extension JSON: JSONRepresentable {
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension JSON.Literal: JSONRepresentable {}
+extension Bool: JSONRepresentable {
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension Bool: JSONRepresentable {}
+    public var jsonValue: JSON {
+        .bool(self)
+    }
+
+    public init(json: JSON) throws {
+        self = try json.boolValue
+    }
+
+}
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON.Number: JSONRepresentable {}
