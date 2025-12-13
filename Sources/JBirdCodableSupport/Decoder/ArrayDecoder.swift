@@ -57,7 +57,7 @@ final class ArrayDecoder: UnkeyedDecodingContainer {
     func decodeNil() throws -> Bool {
         guard currentIndex < (count ?? 0) else {
             let context = DecodingError.Context(
-                codingPath: codingPath + [IndexKey(currentIndex)],
+                codingPath: codingPath + [IndexCodingKey(currentIndex)],
                 debugDescription: "Unkeyed container is at end."
             )
             throw DecodingError.valueNotFound(Any?.self, context)
@@ -81,7 +81,7 @@ final class ArrayDecoder: UnkeyedDecodingContainer {
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + [IndexKey(index)],
+                codingPath: codingPath + [IndexCodingKey(index)],
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -100,7 +100,7 @@ final class ArrayDecoder: UnkeyedDecodingContainer {
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + [IndexKey(index)],
+                codingPath: codingPath + [IndexCodingKey(index)],
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -119,7 +119,7 @@ final class ArrayDecoder: UnkeyedDecodingContainer {
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + [IndexKey(index)],
+                codingPath: codingPath + [IndexCodingKey(index)],
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -138,7 +138,7 @@ final class ArrayDecoder: UnkeyedDecodingContainer {
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + [IndexKey(index)],
+                codingPath: codingPath + [IndexCodingKey(index)],
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -157,7 +157,7 @@ final class ArrayDecoder: UnkeyedDecodingContainer {
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + [IndexKey(index)],
+                codingPath: codingPath + [IndexCodingKey(index)],
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -176,7 +176,7 @@ final class ArrayDecoder: UnkeyedDecodingContainer {
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + [IndexKey(index)],
+                codingPath: codingPath + [IndexCodingKey(index)],
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -195,7 +195,7 @@ final class ArrayDecoder: UnkeyedDecodingContainer {
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + [IndexKey(index)],
+                codingPath: codingPath + [IndexCodingKey(index)],
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -214,7 +214,7 @@ final class ArrayDecoder: UnkeyedDecodingContainer {
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + [IndexKey(index)],
+                codingPath: codingPath + [IndexCodingKey(index)],
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -233,7 +233,7 @@ final class ArrayDecoder: UnkeyedDecodingContainer {
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + [IndexKey(index)],
+                codingPath: codingPath + [IndexCodingKey(index)],
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -252,7 +252,7 @@ final class ArrayDecoder: UnkeyedDecodingContainer {
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + [IndexKey(index)],
+                codingPath: codingPath + [IndexCodingKey(index)],
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -271,7 +271,7 @@ final class ArrayDecoder: UnkeyedDecodingContainer {
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + [IndexKey(index)],
+                codingPath: codingPath + [IndexCodingKey(index)],
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -290,7 +290,7 @@ final class ArrayDecoder: UnkeyedDecodingContainer {
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + [IndexKey(index)],
+                codingPath: codingPath + [IndexCodingKey(index)],
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -309,7 +309,7 @@ final class ArrayDecoder: UnkeyedDecodingContainer {
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + [IndexKey(index)],
+                codingPath: codingPath + [IndexCodingKey(index)],
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -328,7 +328,7 @@ final class ArrayDecoder: UnkeyedDecodingContainer {
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + [IndexKey(index)],
+                codingPath: codingPath + [IndexCodingKey(index)],
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -346,7 +346,7 @@ final class ArrayDecoder: UnkeyedDecodingContainer {
         let nestedDecoder = InternalDecoder(
             storage: decoder.storage,
             value: value,
-            codingPath: codingPath + [IndexKey(index)],
+            codingPath: codingPath + [IndexCodingKey(index)],
             userInfo: decoder.userInfo,
             parent: decoder
         )
@@ -360,7 +360,7 @@ final class ArrayDecoder: UnkeyedDecodingContainer {
         let nestedDecoder = InternalDecoder(
             storage: decoder.storage,
             value: value,
-            codingPath: codingPath + [IndexKey(index)],
+            codingPath: codingPath + [IndexCodingKey(index)],
             userInfo: decoder.userInfo,
             parent: decoder
         )
@@ -373,7 +373,7 @@ final class ArrayDecoder: UnkeyedDecodingContainer {
         let nestedDecoder = InternalDecoder(
             storage: decoder.storage,
             value: value,
-            codingPath: codingPath + [IndexKey(index)],
+            codingPath: codingPath + [IndexCodingKey(index)],
             userInfo: decoder.userInfo,
             parent: decoder
         )
@@ -386,7 +386,7 @@ final class ArrayDecoder: UnkeyedDecodingContainer {
         return InternalDecoder(
             storage: decoder.storage,
             value: value,
-            codingPath: codingPath + [IndexKey(index)],
+            codingPath: codingPath + [IndexCodingKey(index)],
             userInfo: decoder.userInfo,
             parent: decoder
         )
@@ -399,7 +399,7 @@ final class ArrayDecoder: UnkeyedDecodingContainer {
     ) throws -> (JSON, Int) {
         guard !isAtEnd else {
             let context = DecodingError.Context(
-                codingPath: codingPath + [IndexKey(currentIndex)],
+                codingPath: codingPath + [IndexCodingKey(currentIndex)],
                 debugDescription: "Couldn't find value"
             )
             throw DecodingError.valueNotFound(type, context)

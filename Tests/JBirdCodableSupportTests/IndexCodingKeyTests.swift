@@ -1,5 +1,5 @@
 // JBird
-// SuperKey.swift
+// IndexCodingKeyTests.swift
 //
 // MIT License
 //
@@ -23,28 +23,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-struct SuperKey: CodingKey {
+@testable import JBirdCodableSupport
+import Testing
 
-    // MARK: - Initializers
+@Suite("Index CodingKey Tests")
+struct IndexCodingKeyTests {
 
-    init() {}
-
-    // MARK: - CodingKey
-
-    let stringValue = "super"
-
-    init?(stringValue: String) {
-        guard stringValue == "super" else {
-            return nil
+    #if compiler(>=6.2)
+        @Test("String Init")
+        func stringInit() async {
+            await #expect(processExitsWith: .failure) {
+                _ = IndexCodingKey(stringValue: "foo")
+            }
         }
-    }
+    #endif
 
-    var intValue: Int? {
-        nil
-    }
-
-    init?(intValue: Int) {
-        nil
+    @Test("Int Init")
+    func intInit() async throws {
+        let key = try #require(IndexCodingKey(intValue: 12))
+        #expect(key.intValue == 12)
+        #expect(key.stringValue == "12")
     }
 
 }

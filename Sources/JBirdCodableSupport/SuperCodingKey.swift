@@ -1,5 +1,5 @@
 // JBird
-// SuperKeyTests.swift
+// SuperCodingKey.swift
 //
 // MIT License
 //
@@ -23,19 +23,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-@testable import JBirdCodableSupport
-import Testing
+struct SuperCodingKey: CodingKey {
 
-@Test("Test Super Key")
-func superKey() throws {
-    let key = SuperKey()
-    #expect(key.stringValue == "super")
-    #expect(key.intValue == nil)
-    let stringInitKey = try #require(SuperKey(stringValue: "super"))
-    #expect(stringInitKey.stringValue == "super")
-    #expect(stringInitKey.intValue == nil)
-    let invalidStringKey = SuperKey(stringValue: "plop")
-    #expect(invalidStringKey == nil)
-    let invalidIntKey = SuperKey(intValue: 12)
-    #expect(invalidIntKey == nil)
+    // MARK: - Initializers
+
+    init() {}
+
+    // MARK: - CodingKey
+
+    let stringValue = "super"
+
+    init?(stringValue: String) {
+        guard stringValue == "super" else {
+            return nil
+        }
+    }
+
+    var intValue: Int? {
+        nil
+    }
+
+    init?(intValue: Int) {
+        nil
+    }
+
 }

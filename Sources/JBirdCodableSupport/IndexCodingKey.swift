@@ -1,5 +1,5 @@
 // JBird
-// IndexKeyTests.swift
+// IndexCodingKey.swift
 //
 // MIT License
 //
@@ -23,27 +23,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-@testable import JBirdCodableSupport
-import Testing
+struct IndexCodingKey: CodingKey {
 
-@Suite("Index Key Tests")
-struct IndexKeyTests {
+    // MARK: - Initializers
 
-    #if compiler(>=6.2)
-        @Test("String Init")
-        func stringInit() async {
-            await #expect(processExitsWith: .failure) {
-                _ = IndexKey(stringValue: "foo")
-            }
-        }
-    #endif
-
-    @Test("Int Init")
-    func intInit() async throws {
-        let key = try #require(IndexKey(intValue: 12))
-        #expect(key.intValue == 12)
-        #expect(key.stringValue == "12")
-        #expect(key.index == 12)
+    init(_ index: Int) {
+        self.index = index
     }
+
+    // MARK: - CodingKey
+
+    var stringValue: String {
+        index.description
+    }
+
+    init?(stringValue: String) {
+        fatalError()
+    }
+
+    var intValue: Int? {
+        index
+    }
+
+    init?(intValue: Int) {
+        self.init(intValue)
+    }
+
+    // MARK: - Private
+
+    private let index: Int
 
 }
