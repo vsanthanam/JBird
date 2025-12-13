@@ -2,6 +2,7 @@ name: JBird CI
 permissions:
   contents: read
   pull-requests: write
+
 on:
   push:
     branches:
@@ -11,9 +12,11 @@ on:
     branches:
       - "main"
       - "*release*"
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
 jobs:
   build-ios-xcode:
     name: Build JBird (iOS)
@@ -23,12 +26,13 @@ jobs:
         version: ["26.1", "18.6", "17.7", "16.6"]
     runs-on: macos-26
     steps:
-    - name: Checkout
-      uses: actions/checkout@v6
-    - name: Select Xcode Version
-      run: ./.scripts/xcode-select 26.1
-    - name: Build JBird for iOS ${{ matrix.version }}
-      run: ./.scripts/build-ios-xcode JBird ${{ matrix.version }}
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Select Xcode Version
+        run: ./.scripts/xcode-select 26.1
+      - name: Build JBird for iOS ${{ matrix.version }}
+        run: ./.scripts/build-ios-xcode JBird ${{ matrix.version }}
+
   build-tvos-xcode:
     name: Build JBird (tvOS)
     strategy:
@@ -37,12 +41,13 @@ jobs:
         version: ["26.1", "18.6", "17.7", "16.6"]
     runs-on: macos-26
     steps:
-    - name: Checkout
-      uses: actions/checkout@v6
-    - name: Select Xcode Version
-      run: ./.scripts/xcode-select 26.1
-    - name: Build JBird for tvOS ${{ matrix.version }}
-      run: ./.scripts/build-tvos-xcode JBird ${{ matrix.version }}
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Select Xcode Version
+        run: ./.scripts/xcode-select 26.1
+      - name: Build JBird for tvOS ${{ matrix.version }}
+        run: ./.scripts/build-tvos-xcode JBird ${{ matrix.version }}
+
   build-watchos-xcode:
     name: Build JBird (watchOS)
     strategy:
@@ -51,12 +56,13 @@ jobs:
         version: ["26.1", "11.6", "10.7", "9.6"]
     runs-on: macos-26
     steps:
-    - name: Checkout
-      uses: actions/checkout@v6
-    - name: Select Xcode Version
-      run: ./.scripts/xcode-select 26.1
-    - name: Build JBird for watchOS ${{ matrix.version }}
-      run: ./.scripts/build-watchos-xcode JBird ${{ matrix.version }}
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Select Xcode Version
+        run: ./.scripts/xcode-select 26.1
+      - name: Build JBird for watchOS ${{ matrix.version }}
+        run: ./.scripts/build-watchos-xcode JBird ${{ matrix.version }}
+
   build-macos-xcode:
     name: Build JBird (macOS)
     strategy:
@@ -72,14 +78,15 @@ jobs:
             xcode: "16.4"
     runs-on: ${{ matrix.runner }}
     steps:
-    - name: Checkout
-      uses: actions/checkout@v6
-    - name: Select Xcode Version
-      run: ./.scripts/xcode-select ${{ matrix.xcode }}
-    - name: List SDKs
-      run: xcodebuild -showsdks | grep macosx
-    - name: Build JBird for macOS ${{ matrix.version }}
-      run: ./.scripts/build-macos-xcode JBird ${{ matrix.version }}
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Select Xcode Version
+        run: ./.scripts/xcode-select ${{ matrix.xcode }}
+      - name: List SDKs
+        run: xcodebuild -showsdks | grep macosx
+      - name: Build JBird for macOS ${{ matrix.version }}
+        run: ./.scripts/build-macos-xcode JBird ${{ matrix.version }}
+
   build-maccatalyst-xcode:
     name: Build JBird (Mac Catalyst)
     strategy:
@@ -95,14 +102,15 @@ jobs:
             xcode: "16.4"
     runs-on: ${{ matrix.runner }}
     steps:
-    - name: Checkout
-      uses: actions/checkout@v6
-    - name: Select Xcode Version
-      run: ./.scripts/xcode-select ${{ matrix.xcode }}
-    - name: List SDKs
-      run: xcodebuild -showsdks | grep macosx
-    - name: Build JBird for Mac Catalyst ${{ matrix.version }}
-      run: ./.scripts/build-maccatalyst-xcode JBird ${{ matrix.version }}
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Select Xcode Version
+        run: ./.scripts/xcode-select ${{ matrix.xcode }}
+      - name: List SDKs
+        run: xcodebuild -showsdks | grep macosx
+      - name: Build JBird for Mac Catalyst ${{ matrix.version }}
+        run: ./.scripts/build-maccatalyst-xcode JBird ${{ matrix.version }}
+
   build-visionos-xcode:
     name: Build JBird (visionOS)
     strategy:
@@ -111,65 +119,81 @@ jobs:
         version: ["26.1", "2.6", "1.7"]
     runs-on: macos-26
     steps:
-    - name: Checkout
-      uses: actions/checkout@v6
-    - name: Select Xcode Version
-      run: ./.scripts/xcode-select 26.1
-    - name: Build JBird for visionOS ${{ matrix.version }}
-      run: ./.scripts/build-visionos-xcode JBird ${{ matrix.version }}
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Select Xcode Version
+        run: ./.scripts/xcode-select 26.1
+      - name: Build JBird for visionOS ${{ matrix.version }}
+        run: ./.scripts/build-visionos-xcode JBird ${{ matrix.version }}
+
   swiftformat:
-    name: Run SwiftFormat 
+    name: Run SwiftFormat
     runs-on: macos-26
     steps:
-    - name: Checkout
-      uses: actions/checkout@v6
-    - name: Select Xcode Version
-      run: ./.scripts/xcode-select
-    - name: Lint with SwiftFormat
-      run: ./.scripts/lint-swiftformat
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Select Xcode Version
+        run: ./.scripts/xcode-select
+      - name: Lint with SwiftFormat
+        run: ./.scripts/lint-swiftformat
+
   build-macos-spm:
     name: Build JBird (macOS)
     strategy:
       fail-fast: false
       matrix:
-        swift: ['6.1', '6.2']
+        swift: ["6.1", "6.2"]
         include:
-          - swift: '6.1'
-            runner: 'macos-15'
-            xcode: '16.4'
-          - swift: '6.2'
-            runner: 'macos-26'
-            xcode: '26.1'
+          - swift: "6.1"
+            runner: "macos-15"
+            xcode: "16.4"
+          - swift: "6.2"
+            runner: "macos-26"
+            xcode: "26.1"
     runs-on: ${{ matrix.runner }}
     outputs:
       artifact-name: macos-build
     steps:
-    - name: Checkout
-      uses: actions/checkout@v6
-    - name: Select Xcode Version
-      run: ./.scripts/xcode-select ${{ matrix.xcode }}
-    - name: Build JBird
-      run: swift build -v --build-tests --build-path .build
-    - name: Compress Build
-      run: zip -r build.zip .build
-    - name: Upload Build
-      uses: actions/upload-artifact@v4
-      with:
-        name: macos-build-${{ matrix.swift }}
-        path: build.zip
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Select Xcode Version
+        run: ./.scripts/xcode-select ${{ matrix.xcode }}
+      - name: Cache SwiftPM
+        uses: actions/cache@v5
+        with:
+          path: |
+            .build
+            ~/Library/Caches/org.swift.swiftpm
+            ~/Library/org.swift.swiftpm
+            ~/.swiftpm
+          key: spm-macos-${{ matrix.swift }}-debug-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: |
+            spm-macos-${{ matrix.swift }}-debug-
+            spm-macos-${{ matrix.swift }}-
+            spm-macos-
+      - name: Build JBird
+        run: swift build -v --build-tests --build-path .build
+      - name: Compress Build
+        run: zip -r build.zip .build
+      - name: Upload Build
+        uses: actions/upload-artifact@v6
+        with:
+          name: macos-build-${{ matrix.swift }}
+          path: build.zip
+
   test-macos-spm:
     name: Test JBird (macOS)
     strategy:
       fail-fast: false
       matrix:
-        swift: ['6.1', '6.2']
+        swift: ["6.1", "6.2"]
         include:
-          - swift: '6.1'
-            runner: 'macos-15'
-            xcode: '16.4'
-          - swift: '6.2'
-            runner: 'macos-26'
-            xcode: '26.1'
+          - swift: "6.1"
+            runner: "macos-15"
+            xcode: "16.4"
+          - swift: "6.2"
+            runner: "macos-26"
+            xcode: "26.1"
     needs: build-macos-spm
     runs-on: ${{ matrix.runner }}
     steps:
@@ -178,7 +202,7 @@ jobs:
       - name: Xcode Version
         run: ./.scripts/xcode-select ${{ matrix.xcode }}
       - name: Download Build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: macos-build-${{ matrix.swift }}
           path: .
@@ -186,12 +210,13 @@ jobs:
         run: unzip build.zip
       - name: Test JBird
         run: swift test --skip-build
+
   build-ubuntu-spm:
     name: Build JBird (Ubuntu)
     strategy:
       fail-fast: false
       matrix:
-        swift: ['6.1', '6.2']
+        swift: ["6.1", "6.2"]
     runs-on: ubuntu-latest
     outputs:
       artifact-name: ubuntu-build
@@ -200,6 +225,26 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+      - name: Compute Package.resolved hash
+        shell: bash
+        run: |
+          if [ -f Package.resolved ]; then
+            echo "PACKAGE_RESOLVED_HASH=$(sha256sum Package.resolved | awk '{print $1}')" >> "$GITHUB_ENV"
+          else
+            echo "PACKAGE_RESOLVED_HASH=no-resolved" >> "$GITHUB_ENV"
+          fi
+      - name: Cache SwiftPM
+        uses: actions/cache@v5
+        with:
+          path: |
+            .build
+            ~/.cache/org.swift.swiftpm
+            ~/.swiftpm
+          key: spm-ubuntu-${{ matrix.swift }}-debug-${{ env.PACKAGE_RESOLVED_HASH }}
+          restore-keys: |
+            spm-ubuntu-${{ matrix.swift }}-debug-
+            spm-ubuntu-${{ matrix.swift }}-
+            spm-ubuntu-
       - name: Build JBird
         run: swift build -v --build-tests --build-path .build
       - name: Install `zip`
@@ -207,16 +252,17 @@ jobs:
       - name: Compress Build
         run: zip -r build.zip .build
       - name: Upload Build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ubuntu-build-${{ matrix.swift }}
           path: build.zip
+
   test-ubuntu-spm:
     name: Test JBird (Ubuntu)
     strategy:
       fail-fast: false
       matrix:
-        swift: ['6.1', '6.2']
+        swift: ["6.1", "6.2"]
     needs: build-ubuntu-spm
     runs-on: ubuntu-latest
     container:
@@ -225,7 +271,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Download Build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: ubuntu-build-${{ matrix.swift }}
           path: .
@@ -235,12 +281,13 @@ jobs:
         run: unzip build.zip
       - name: Test JBird
         run: swift test --skip-build
+
   build-windows-spm:
     name: Build JBird (Windows)
     strategy:
       fail-fast: false
       matrix:
-        swift: ['6.1', '6.2']
+        swift: ["6.1", "6.2"]
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -257,16 +304,17 @@ jobs:
         run: |
           Compress-Archive -Path ".build" -DestinationPath "build.zip" -Force
       - name: Upload Build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: windows-build-${{ matrix.swift }}
           path: build.zip
+
   test-windows-spm:
-    name: Test  (Windows)
+    name: Test (Windows)
     strategy:
       fail-fast: false
       matrix:
-        swift: ['6.1', '6.2']
+        swift: ["6.1", "6.2"]
     needs: build-windows-spm
     runs-on: windows-latest
     steps:
@@ -278,7 +326,7 @@ jobs:
           swift-version: swift-${{ matrix.swift }}-release
           swift-build: ${{ matrix.swift }}-RELEASE
       - name: Download Build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: windows-build-${{ matrix.swift }}
           path: .
@@ -288,62 +336,112 @@ jobs:
           Expand-Archive -Path "build.zip" -DestinationPath "." -Force
       - name: Test JBird
         run: swift test --disable-xctest --skip-build
+
   build-wasm-spm:
     name: Build JBird (WebAssembly)
     strategy:
       fail-fast: false
       matrix:
-        swift: ['6.1', '6.2']
+        swift: ["6.1", "6.2"]
     runs-on: ubuntu-latest
     container:
       image: swift:${{ matrix.swift }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+      - name: Compute Package.resolved hash
+        shell: bash
+        run: |
+          if [ -f Package.resolved ]; then
+            echo "PACKAGE_RESOLVED_HASH=$(sha256sum Package.resolved | awk '{print $1}')" >> "$GITHUB_ENV"
+          else
+            echo "PACKAGE_RESOLVED_HASH=no-resolved" >> "$GITHUB_ENV"
+          fi
+
+      - if: ${{ matrix.swift == '6.2' }}
+        name: Cache SwiftPM (WASM 6.2 upstream SDK)
+        uses: actions/cache@v5
+        with:
+          path: |
+            .build
+            ~/.cache/org.swift.swiftpm
+            ~/.swiftpm
+          key: spm-wasm-${{ matrix.swift }}-debug-swift-6.2.3-RELEASE_wasm-${{ env.PACKAGE_RESOLVED_HASH }}
+          restore-keys: |
+            spm-wasm-${{ matrix.swift }}-debug-swift-6.2.3-RELEASE_wasm-
+            spm-wasm-${{ matrix.swift }}-debug-
+            spm-wasm-${{ matrix.swift }}-
+            spm-wasm-
+
+      - if: ${{ matrix.swift != '6.2' }}
+        name: Cache SwiftPM (WASM SwiftWasm SDK)
+        uses: actions/cache@v5
+        with:
+          path: |
+            .build
+            ~/.cache/org.swift.swiftpm
+            ~/.swiftpm
+          key: spm-wasm-${{ matrix.swift }}-debug-swiftwasm-${{ env.PACKAGE_RESOLVED_HASH }}
+          restore-keys: |
+            spm-wasm-${{ matrix.swift }}-debug-swiftwasm-
+            spm-wasm-${{ matrix.swift }}-debug-
+            spm-wasm-${{ matrix.swift }}-
+            spm-wasm-
+
       - if: ${{ matrix.swift == '6.2' }}
         name: Setup Swift WASM (6.2)
         run: |
           swift sdk install https://download.swift.org/swift-6.2.3-release/wasm-sdk/swift-6.2.3-RELEASE/swift-6.2.3-RELEASE_wasm.artifactbundle.tar.gz \
             --checksum 394040ecd5260e68bb02f6c20aeede733b9b90702c2204e178f3e42413edad2a
           swift sdk list
-        # Important Note:
-        # 
-        # For 6.2 we're using the official toolchain since a lot of stuff from SwiftWasm has been upstreamed.
-        # This is why the build scripts diverge -- we use SwiftWasm SDKs for < 6.2
-        # Swift Testing also barely works on WASM (for now), so we're just going to build. No Tests.
+
       - if: ${{ matrix.swift != '6.2' }}
         name: Setup Swift WASM
         id: swiftwasm
         uses: swiftwasm/setup-swiftwasm@v2
         with:
-          tag: swift-${{ matrix.swift }}-RELEASE 
+          tag: swift-${{ matrix.swift }}-RELEASE
+
       - if: ${{ matrix.swift == '6.2' }}
         name: Build JBird (6.2)
         run: swift build -v --swift-sdk swift-6.2.3-RELEASE_wasm --build-path .build
+
       - if: ${{ matrix.swift != '6.2' }}
         name: Build JBird
         run: swift build -v --swift-sdk ${{ steps.swiftwasm.outputs.swift-sdk-id }} --build-path .build
+
       - name: Install `zip`
         run: apt-get update && apt-get install -y zip
       - name: Compress Build
         run: zip -r build.zip .build
       - name: Upload Build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: wasm-build-${{ matrix.swift }}
           path: build.zip
+
   build-android-spm:
     name: Build JBird (Android)
     strategy:
       fail-fast: false
       matrix:
-        swift: ['6.1', '6.2']
+        swift: ["6.1", "6.2"]
     runs-on: ubuntu-latest
     outputs:
       artifact-name: android-build-${{ matrix.swift }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+      - name: Cache SwiftPM
+        uses: actions/cache@v5
+        with:
+          path: |
+            .build
+          key: spm-android-${{ matrix.swift }}-debug-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: |
+            spm-android-${{ matrix.swift }}-debug-
+            spm-android-${{ matrix.swift }}-
+            spm-android-
       - name: Build JBird
         uses: skiptools/swift-android-action@v2
         with:
@@ -356,10 +454,11 @@ jobs:
       - name: Compress Build
         run: zip -r build.zip .build
       - name: Upload Build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: android-build-${{ matrix.swift }}
           path: build.zip
+
   clang-format:
     name: Run clang-format
     runs-on: ubuntu-latest
@@ -372,16 +471,18 @@ jobs:
           sudo apt-get install -y clang-format
       - name: Validate formatting
         run: ./.scripts/lint-clang-format
+
   lint-docc:
     name: Validate Documentation
     runs-on: macos-26
     steps:
-    - name: Checkout
-      uses: actions/checkout@v6
-    - name: Select Xcode Version
-      run: ./.scripts/xcode-select
-    - name: Validate Documentation
-      run: ./.scripts/lint-docc
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Select Xcode Version
+        run: ./.scripts/xcode-select
+      - name: Validate Documentation
+        run: ./.scripts/lint-docc
+
   build-xcframework:
     name: Build XCFrameworks
     strategy:
@@ -390,12 +491,13 @@ jobs:
         target: [JBird, JBirdCore, JBirdBuilders, JBirdCodableSupport]
     runs-on: macos-26
     steps:
-    - name: Checkout
-      uses: actions/checkout@v6
-    - name: Select Xcode Version
-      run: ./.scripts/xcode-select
-    - name: Build XCFramework
-      run: ./.scripts/build-xcframework ${{ matrix.target }}
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Select Xcode Version
+        run: ./.scripts/xcode-select
+      - name: Build XCFramework
+        run: ./.scripts/build-xcframework ${{ matrix.target }}
+
   coverage:
     name: Measure Test Coverage
     runs-on: macos-26
@@ -411,7 +513,7 @@ jobs:
           REPORT_DIR: "coverage"
         run: .scripts/coverage
       - name: Upload Coverage Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: coverage-${{ github.sha }}
           path: |
@@ -429,6 +531,7 @@ jobs:
           verbose: true
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
   static-analyzer:
     name: Run Static Analyzer
     runs-on: macos-26
@@ -451,6 +554,7 @@ jobs:
             -derivedDataPath "$DERIVED_DATA" \
             clean analyze
           rm -rf "$DERIVED_DATA"
+
   validate-pr:
     name: Validate Pull Request
     if: ${{ always() && github.event_name == 'pull_request' }}
@@ -478,7 +582,6 @@ jobs:
     steps:
       - name: Check upstream jobs
         run: |
-          # If any job failed, this status will not be 'success'
           if [[ "${{ needs.build-ios-xcode.result }}" == "failure" ]] || \
             [[ "${{ needs.build-tvos-xcode.result }}" == "failure" ]] || \
             [[ "${{ needs.build-watchos-xcode.result }}" == "failure" ]] || \
