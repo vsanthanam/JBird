@@ -389,7 +389,7 @@
 						CreatedOnToolsVersion = 16.4;
 					};
 					07FA698B2EDB9FA200124BCB = {
-						CreatedOnToolsVersion = 26.1;
+						CreatedOnToolsVersion = 26.2;
 					};
 					07FE9CD22DF3440A0033B758 = {
 						CreatedOnToolsVersion = 16.4;
