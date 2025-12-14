@@ -1447,6 +1447,7 @@ struct JBirdParserTests {
         #expect(json_get_int(value) == 123_456_789_012_345_678)
     }
 
+    @Test("Parse negative 18-digit number as integer")
     func parseNegative18DigitNumberAsInteger() throws {
         // 18 digits should still fit in int64 (within safe processing range)
         let raw = "-123456789012345678" // 18 digits
