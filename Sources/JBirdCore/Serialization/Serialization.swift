@@ -193,8 +193,9 @@ extension JSON {
         for string: String,
         options: DeserializationOptions = .default
     ) throws -> JSON {
-        try value(
-            for: string.data(using: .utf8)!,
+        let data = Data(string.utf8)
+        return try value(
+            for: data,
             options: options
         )
     }
@@ -236,8 +237,9 @@ extension JSON {
         _ string: String,
         options: DeserializationOptions = .default
     ) async throws -> JSON {
-        try await deserialize(
-            string.data(using: .utf8)!,
+        let data = Data(string.utf8)
+        return try await deserialize(
+            data,
             options: options
         )
     }
@@ -267,7 +269,10 @@ extension JSON {
         options: SerializationOptions = .default
     ) throws -> String {
         let data = try data(from: json, options: options)
-        return String(data: data, encoding: .utf8)!
+        guard let string = String(data: data, encoding: .utf8) else {
+            throw JSONSerializationError.stringMaterialization
+        }
+        return string
     }
 
     /// Create a byte buffer from a typed JSON value
@@ -295,7 +300,10 @@ extension JSON {
         options: SerializationOptions = .default
     ) async throws -> String {
         let data = try await serialize(value, options: options)
-        return String(data: data, encoding: .utf8)!
+        guard let string = String(data: data, encoding: .utf8) else {
+            throw JSONSerializationError.stringMaterialization
+        }
+        return string
     }
 
     // MARK: - Private
@@ -478,7 +486,9 @@ extension JSON {
         }
         let absValue = abs(double)
         if absValue != 0, (absValue >= 1e7 || absValue < 1e-6) {
-            let str = floatNumberFormatter.string(from: NSNumber(value: double))!
+            guard let str = floatNumberFormatter.string(from: NSNumber(value: double)) else {
+                throw JSONSerializationError.invalidFloat
+            }
             bytes += str.utf8
         } else {
             bytes += String(double).utf8
