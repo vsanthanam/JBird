@@ -37,6 +37,10 @@ public enum JSONSerializationError: Error, Equatable, Sendable, CustomStringConv
     /// Thrown when attempting to serialize a leaf JSON fragment without options that allow it
     case illegalFragment
 
+    /// Thrown when the serialized JSON bytes cannnot be represented as a Swift string.
+    /// You should effectively never run into this error, it suggests that there is bug in the library.
+    case stringMaterialization
+
     // MARK: - CustomStringConvertible
 
     public var description: String {
@@ -45,6 +49,8 @@ public enum JSONSerializationError: Error, Equatable, Sendable, CustomStringConv
             "Invalid floating point value"
         case .illegalFragment:
             "Attemped to serialize a JSON fragment without required `fragmentsAllowed` option"
+        case .stringMaterialization:
+            "Couldn't convert JSON bytes into a Swift string"
         }
     }
 

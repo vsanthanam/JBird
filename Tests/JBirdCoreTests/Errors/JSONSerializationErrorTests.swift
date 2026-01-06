@@ -35,4 +35,7 @@ func jSONSerializationErrorDescriptions() {
     let illegalFragment = JSONSerializationError.illegalFragment
     #expect(illegalFragment.description == "Attemped to serialize a JSON fragment without required `fragmentsAllowed` option")
 
+    let stringMaterialization = JSONSerializationError.stringMaterialization
+    #expect(stringMaterialization.description == "Couldn't convert JSON bytes into a Swift string")
+
 }
