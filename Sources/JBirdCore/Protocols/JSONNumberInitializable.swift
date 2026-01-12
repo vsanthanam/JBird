@@ -23,9 +23,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+/// A type that can be initialized from an external `JSON.Number` value.
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 public protocol JSONNumberInitializable {
 
+    /// Create an instance of the type from an external typed `JSON.Number` value.,
+    /// - Parameter jsonNumber: The `JSON.Number` value use for the initializer
     init(jsonNumber: JSON.Number) throws
 
 }
