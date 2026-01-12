@@ -32,7 +32,7 @@ $ afl-clang-fast -g -O2 -fsanitize=address,undefined \
     ../Sources/JBirdParser/JBirdParser.c
 ```
 
-You can also use GCC if LLVM is not available. See [the AFL++ documentation](https://aflplus.plus/docs/) for more information.
+LLVM is strongly suggested, but you can use GCC or another supported compiler if LLVM is not available. See [the AFL++ documentation](https://aflplus.plus/docs/) for more information.
 
 You can customize the build using the following flags:
 
