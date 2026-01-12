@@ -23,9 +23,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+/// A type that can convert itself into a `JSON.Key`
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 public protocol JSONKeyConvertible {
 
+    /// The `JSON.Key` value representing this instance.
     var jsonKey: JSON.Key { get }
 
 }
