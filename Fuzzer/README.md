@@ -8,21 +8,17 @@ To fascilitate this process, the repository includes a testing harness to run th
 
 ### Install AFL++
 
-For macOS
+For macOS, we recommend using [Homebrew](https://brew.sh/):
 
 ```bash
 $ brew install afl++
 ```
 
-```bash
-$ sudo apt-get install afl++
-```
-
-See the [AFL++ website](https://aflplus.plus/) for more information.
+You can also build from source or use `apt-get`. See the [AFL++ website](https://aflplus.plus/) for more information.
 
 ### Building the Harness
 
-Compile the harness from this directory (`Fuzzer/`) with LLVM:
+Compile the harness from this directory (`Fuzzer/`) with the AFL harness compiler:
 
 ```bash
 $ afl-clang-fast -g -O2 -fsanitize=address,undefined \
