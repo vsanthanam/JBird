@@ -1,8 +1,8 @@
 # Fuzzing Support
 
-For complex changes, espectially to `JBirdParser`, it is a good idea to run the library against a [software fuzzer](https://en.wikipedia.org/wiki/American_Fuzzy_Lop_(software))
+For complex changes, especially those involving `JBirdParser`, it is a good idea to run the library against a [software fuzzer](https://en.wikipedia.org/wiki/American_Fuzzy_Lop_(software)).
 
-To fascilitate this process, the repository includes a testing harness to run the `JBirdParser` against [AFL++](https://aflplus.plus/).
+To facilitate this process, the repository includes a testing harness to run the `JBirdParser` against [AFL++](https://aflplus.plus/).
 
 ## Setup
 
@@ -28,15 +28,14 @@ $ afl-clang-fast -g -O2 -fsanitize=address,undefined \
     ../Sources/JBirdParser/JBirdParser.c
 ```
 
-LLVM is strongly suggested, but you can use GCC or another supported compiler if LLVM is not available. See [the AFL++ documentation](https://aflplus.plus/docs/) for more information.
-
 You can customize the build using the following flags:
 
 - `-g`: Include debug symbols for better crash analysis
-- `-O2`: Optimization (use `-O0` for easier debugging)
-- `-fsanitize=address,undefined`: Enable AddressSanitizer and UBSan for detecting memory errors
-- `afl-clang-fast`: AFL++'s LLVM-based compiler wrapper with enhanced instrumentation.
+- `-O2`: Optimization level. You can use `-O0` for easier debugging.
+- `-fsanitize=address,undefined`: Enable `ASan` and `UBSan` for detecting memory errors.
 - `-DACCESSOR_ITERATION_LIMIT=N`: Limit how many array/object elements are accessed per parse (default: 100)
+
+Note that we do not use LLVM directly to compile the testing harness. Instead, we use `afl-clang-fast`, AFL++'s LLVM-based compiler wrapper with enhanced instrumentation. LLVM is strongly recommended, but AFL includes wrappers for other compilers such as `afl-gcc` which you can use instead of LLVM. See [the AFL++ documentation](https://aflplus.plus/docs/) for more information.
 
 ## Running the Fuzzer
 
@@ -57,15 +56,15 @@ $ launchctl load -w /System/Library/LaunchAgents/com.apple.ReportCrash.plist
 $ sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.ReportCrash.Root.plist
 ```
 
-For Apple Silicon users, you will most likely need to increase shared memory limits, especially if you want to use [ASan](https://github.com/google/sanitizers/wiki/AddressSanitizer). You can set up suggested AFL++ limits using `afl-system-config`, which is also installed with you install `afl++`.
+For Apple Silicon users, you will most likely need to increase shared memory limits, especially if you want to use [ASan](https://github.com/google/sanitizers/wiki/AddressSanitizer). You can set up suggested AFL++ limits using `afl-system-config`, which is also installed when you install `afl++`.
 
 ```bash
 $ sudo afl-system-config
 ```
 
-This change is not persistent will undo itself when you reboot your machine.
+This change is not persistent and will undo itself when you reboot your machine.
 
-For macOS users without Apple Silicon, go sell your machine and buy something with Apple Silicon in it. You will not reget this decision.
+For macOS users without Apple Silicon, go sell your machine and buy something with Apple Silicon in it. You will not regret this decision.
 
 Next, create a directory to store your findings inside this directory (`/Fuzzer`).
 
@@ -105,7 +104,7 @@ The AFL++ TUI also has a bunch of useful information about how many and what kin
 
 ### Analyzing Crashes
 
-To reproduce a crash get the identifier from the `/crashes` directory (or the AFL++ TUI)
+To reproduce a crash, get the identifier from the `/crashes` directory (or the AFL++ TUI)
 
 ```bash
 $ ./fuzz_harness < findings/crashes/id:000000,sig:11,...
@@ -146,7 +145,7 @@ llvm-cov gcov *.gcda
 
 ## Keyword Dictionaries
 
-By default, AFL++ uses random mutations (bit flips, byte swaps, etc.) which are "dumb" - they don't understand JSON syntax. The fuzzer might spend a lot of time generating invalid inputs like "tru3" or fAlse" instead of valid tokens. Depending on what you are trying to test, his default behavior might not actually be useful. To speed things up and get more targeted results, you can create a keyword dictionary for smarter, more relevent test cases that you are likely to encounter in production.
+By default, AFL++ uses random mutations (bit flips, byte swaps, etc.) which are "dumb" - they don't understand JSON syntax. The fuzzer might spend a lot of time generating invalid inputs like "tru3" or fAlse" instead of valid tokens. Depending on what you are trying to test, this default behavior might not actually be useful. To speed things up and get more targeted results, you can create a keyword dictionary for smarter, more relevant test cases that you are likely to encounter in production.
 
 First, copy the provided example dictionary:
 
@@ -160,11 +159,11 @@ Then, run the fuzzer with the dictionary input:
 $ afl-fuzz -i corpus -o findings -x json.dict -- ./fuzz_harness
 ```
 
-You can customize `json.dict` to target specific JSON token scenarious you want to validate. This way, you can tailor your fuzzing based on what kind of issues you're trying to find (e.g. bugs, malicious payloads, etc.)
+You can customize `json.dict` to target specific JSON token scenarios you want to validate. This way, you can tailor your fuzzing based on what kind of issues you're trying to find (e.g. bugs, malicious payloads, etc.)
 
 ## Tips for Effective Fuzzing
 
-1. **Run for extended periods** - Good fuzzing needs to betakes hours or even days, not minutes. Its not useful if its not thorough.
+1. **Run for extended periods** - Good fuzzing takes hours or even days, not minutes. It's not useful if it's not thorough.
 2. **Use multiple cores** - Parallel fuzzing dramatically improves coverage. Deterministic coverage reports are the only way you know you've tested everything.
 3. **Enable sanitizers** - ASan and other supported sanitizers can catch issues AFL alone might miss. See [the AFL++ documentation](https://aflplus.plus/docs/) for more information.
 
