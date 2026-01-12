@@ -26,3 +26,9 @@ Benchmarks/.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 *.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
 /*.gcno
 **/xcshareddata/WorkspaceSettings.xcsettings
+
+# Fuzzer
+Fuzzer/findings/
+Fuzzer/fuzz_harness
+Fuzzer/fuzz_harness.dSYM/
+Fuzzer/json.dict

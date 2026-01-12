@@ -1,0 +1,118 @@
+# JSON literal keywords
+"null"
+"true"
+"false"
+
+# Structural tokens
+"\""
+":"
+","
+"{"
+"}"
+"["
+"]"
+
+# All escape sequences
+"\\\\"
+"\\/"
+"\\b"
+"\\f"
+"\\n"
+"\\r"
+"\\t"
+
+# Unicode escapes - basic
+"\\u0000"
+"\\u0001"
+"\\u001f"
+"\\u0020"
+"\\u007f"
+"\\u00ff"
+"\\uffff"
+
+# Unicode escapes - surrogate pairs (valid)
+"\\uD800\\uDC00"
+"\\uD83D\\uDE00"
+"\\uDBFF\\uDFFF"
+
+# Unicode escapes - invalid surrogates (should error)
+"\\uD800"
+"\\uDFFF"
+"\\uDC00"
+"\\uD800\\uD800"
+
+# Numbers - integers
+"0"
+"-0"
+"1"
+"-1"
+"10"
+"123456789"
+"9223372036854775807"
+"-9223372036854775808"
+"9999999999999999999999"
+
+# Numbers - decimals
+"0.0"
+"0.1"
+"-0.1"
+"1.0"
+"1.23456789"
+"0.000000001"
+
+# Numbers - exponents
+"1e0"
+"1E0"
+"1e1"
+"1e-1"
+"1e+1"
+"1E10"
+"1e308"
+"-1e308"
+"1e-308"
+"1e309"
+"5e-324"
+"1.7976931348623157e308"
+
+# Numbers - edge cases
+"0e0"
+"0e1"
+"0.0e0"
+"-0.0"
+"1.0e0"
+
+# Whitespace (JSON allows these between tokens)
+" "
+"\t"
+"\n"
+"\r"
+"\r\n"
+
+# BOM (UTF-8 Byte Order Mark)
+"\xef\xbb\xbf"
+
+# Empty containers
+"{}"
+"[]"
+
+# Minimal valid structures
+"{\"\":0}"
+"{\"a\":1}"
+"[0]"
+"[null]"
+
+# Nested structures
+"[[]]"
+"{\"a\":{}}"
+"[{}]"
+"{\"a\":[]}"
+
+# Common attack patterns
+"\"\\u0000\""
+"\"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\""
+
+# Truncated tokens (test error handling)
+"nul"
+"tru"
+"fals"
+"\"unterminated"
