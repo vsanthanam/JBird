@@ -1,8 +1,8 @@
 # Fuzzing Support
 
-For complex changes, espectially to the C parsing core, it is a good idea to run the library against a [software fuzzer](https://en.wikipedia.org/wiki/American_Fuzzy_Lop_(software))
+For complex changes, espectially to `JBirdParser`, it is a good idea to run the library against a [software fuzzer](https://en.wikipedia.org/wiki/American_Fuzzy_Lop_(software))
 
-To fascilitate this process, the repository includes a testing harness to run the C parsing core against [AFL++](https://aflplus.plus/).
+To fascilitate this process, the repository includes a testing harness to run the `JBirdParser` against [AFL++](https://aflplus.plus/).
 
 ## Setup
 
@@ -44,7 +44,7 @@ You can customize the build using the following flags:
 
 ## Running the Fuzzer
 
-On macOS, you will most likely need to perform additional setup steps before you can run the fuzzer run `afl-fuzz` command:
+On macOS, you will most likely need to perform additional setup steps before you can run the `afl-fuzz` command:
 
 First, you will need to disable crash reporting:
 
@@ -54,22 +54,22 @@ $ launchctl unload -w ${SL}/LaunchAgents/${PL}.plist
 $ sudo launchctl unload -w ${SL}/LaunchDaemons/${PL}.Root.plist
 ```
 
-This is a persistent change that you should almost certainly undo after you finish testing:
+> ⚠️ This is a persistent change that you should almost certainly undo after you finish testing. You can undo it with the following commands:
 
 ```bash
 $ launchctl load -w /System/Library/LaunchAgents/com.apple.ReportCrash.plist
 $ sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.ReportCrash.Root.plist
 ```
 
-For Apple Silicon users, you will most likely need to increase shared memory limits, especially if you want to use [ASan](https://github.com/google/sanitizers/wiki/AddressSanitizer):
+For Apple Silicon users, you will most likely need to increase shared memory limits, especially if you want to use [ASan](https://github.com/google/sanitizers/wiki/AddressSanitizer). You can set up suggested AFL++ limits using `afl-system-config`, which is also installed with you install `afl++`.
 
 ```bash
 $ sudo afl-system-config
 ```
 
-This change will undo itself when you reboot your machine.
+This change is not persistent will undo itself when you reboot your machine.
 
-For using macOS without Apple Silicon, go sell your machine and buy something with Apple Silicon in it. You will not reget this decision.
+For macOS users without Apple Silicon, go sell your machine and buy something with Apple Silicon in it. You will not reget this decision.
 
 Next, create a directory to store your findings inside this directory (`/Fuzzer`).
 
@@ -86,7 +86,7 @@ $ afl-fuzz -i corpus -o findings \
     -- ./fuzz_harness
 ```
 
-You can run multiple fuzzer instances for faster coverage, at the expense of memory consumption:
+You can run multiple fuzzer instances for faster code coverage, at the expense of memory use:
 
 ```bash
 # Terminal 1 - Main fuzzer
@@ -99,11 +99,13 @@ $ afl-fuzz -i corpus -o findings -S secondary2 -- ./fuzz_harness
 
 ## Understanding Results
 
-AFL++ creates several directories in `findings/`:
+AFL++ creates several directories in `findings/` to help you understand the results of your testing:
 
 - `crashes/` - Inputs that caused crashes
 - `hangs/` - Inputs that caused timeouts
 - `queue/` - All interesting test cases discovered
+
+The AFL++ TUI also has a bunch of useful information about how many and what kinds of issues it has discovered while it is running. You should monitor this interface while testing.
 
 ### Analyzing Crashes
 
@@ -113,21 +115,21 @@ To reproduce a crash get the identifier from the `/crashes` directory (or the AF
 $ ./fuzz_harness < findings/crashes/id:000000,sig:11,...
 ```
 
-If you need ASan information to help you debug the crash, you can enable it:
+If you need `ASan` information to help you debug the crash, you can enable it before you run the same command:
 
 ```bash
-$ ASAN_OPTIONS=symbolize=1 ./fuzz_harness < findings/crashes/id:000000,...
+$ ASAN_OPTIONS=symbolize=1 ./fuzz_harness < findings/crashes/id:000000,sig:11,...
 ```
 
 To minimize a test case while preserving its behavior:
 
 ```bash
-$ afl-tmin -i findings/crashes/id:000000,... -o minimized.json -- ./fuzz_harness
+$ afl-tmin -i findings/crashes/id:000000,sig:11,... -o minimized.json -- ./fuzz_harness
 ```
 
 ### Getting Coverage Analysis
 
-You can use llvm-cov to deterministically ensure that your fuzzing has covered the codepaths you are interested in testing.  
+You can use `llvm-cov` to deterministically ensure that your fuzzing has covered the codepaths you are interested in testing.  
 
 ```bash
 # Build with coverage instrumentation
@@ -172,6 +174,6 @@ You can customize `json.dict` to target specific JSON token scenarious you want 
 
 ## Reporting Issues
 
-This tool exists primarily to help contributors validate the safety of their own changes, but if you find any issues on main, feel free to report them or submit pull requests to correct them. See the [contribution guidelines](https://github.com/vsanthanam/JBird?tab=contributing-ov-file) for more information.
+This tool exists primarily to help contributors validate the safety of their own changes, but if you find any issues on main, feel free to file issues or submit pull requests to correct them. See the [contribution guidelines](https://github.com/vsanthanam/JBird?tab=contributing-ov-file) for more information.
 
 The exception to this is security-related issues — report those privately instead. See [the security policy](https://github.com/vsanthanam/JBird?tab=security-ov-file) for more information.
