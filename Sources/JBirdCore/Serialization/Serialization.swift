@@ -480,8 +480,7 @@ extension JSON {
         into bytes: inout [UInt8]
     ) throws {
         guard double == double,
-              double != .infinity,
-              double != -.infinity else {
+              double.isFinite else {
             throw JSONSerializationError.invalidFloat
         }
         let absValue = abs(double)
