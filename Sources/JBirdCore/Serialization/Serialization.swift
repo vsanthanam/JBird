@@ -479,16 +479,25 @@ extension JSON {
         double: Double,
         into bytes: inout [UInt8]
     ) throws {
-        guard double == double,
-              double.isFinite else {
-            throw JSONSerializationError.invalidFloat
+        guard double.isFinite else { throw JSONSerializationError.invalidFloat }
+        if double == 0 {
+            bytes += "0".utf8
+            return
         }
+
         let absValue = abs(double)
-        if absValue != 0, (absValue >= 1e7 || absValue < 1e-6) {
+
+        if absValue >= 1e7 || absValue < 1e-6 {
             guard let str = floatNumberFormatter.string(from: NSNumber(value: double)) else {
                 throw JSONSerializationError.invalidFloat
             }
             bytes += str.utf8
+            return
+        }
+
+        if double.rounded(.towardZero) == double,
+           absValue <= Double(Int64.max) {
+            bytes += String(Int64(double)).utf8
         } else {
             bytes += String(double).utf8
         }
