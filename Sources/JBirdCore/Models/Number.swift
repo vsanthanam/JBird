@@ -33,9 +33,13 @@ extension JSON {
 
         // MARK: - Initializers
 
+        /// Create a JSON number from a ``JSONNumberConvertible`` type
+        /// - Parameter convertible: An instance of the type to convert to a JSON number
         public init(_ convertible: some JSONNumberConvertible) {
             self = convertible.jsonNumber
         }
+
+        // MARK: - API
 
         /// Whether or not the number value is an integer
         public var isInteger: Bool {
@@ -57,6 +61,36 @@ extension JSON {
             }
         }
 
+        /// Whether or not the number represents a finite value
+        public var isFinite: Bool {
+            switch storage {
+            case let .double(value):
+                value.isFinite
+            case .int:
+                true
+            }
+        }
+
+        /// Whether or not the number represents an infinite value
+        public var isInfinite: Bool {
+            switch storage {
+            case let .double(value):
+                value.isInfinite
+            case .int:
+                false
+            }
+        }
+
+        /// Whether or not the number is NaN (not a number)
+        public var isNaN: Bool {
+            switch storage {
+            case let .double(value):
+                value.isNaN
+            case .int:
+                false
+            }
+        }
+
         /// The untyped representation of the JSON literal
         /// - Returns: An `AnyHashable` containing an `Int` or a `Double` representing the JSON number.
         public func unboxed() -> AnyHashable {
@@ -68,6 +102,10 @@ extension JSON {
             }
         }
 
+        /// Convert the JSON numver into a ``JSONNumberInitializable`` type
+        /// - Parameter type: The type to convert into
+        /// - Returns: The converted value
+        /// - Throws: An error, if the JSON number cannot be converted into the provided type
         public func convert<T>(
             into type: T.Type = T.self
         ) throws -> T where T: JSONNumberInitializable {

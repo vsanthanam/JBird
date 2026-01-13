@@ -327,9 +327,9 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// Convert the JSON value into a ``JSONInitializable`` type
-    /// - Parameter type: The type to decode into
-    /// - Returns: The decoded value
-    /// - Throws: An error, if the JSON value cannot be decoded into the provided type
+    /// - Parameter type: The type to convert into
+    /// - Returns: The converted value
+    /// - Throws: An error, if the JSON value cannot be converted into the provided type
     public func convert<T>(
         into type: T.Type = T.self
     ) throws -> T where T: JSONInitializable {
