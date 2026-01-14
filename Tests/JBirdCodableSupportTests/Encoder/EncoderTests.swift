@@ -239,11 +239,11 @@ struct EncoderTests {
             struct A: Codable {
                 var value: Int
                 var b: B
-                
+
                 struct B: Codable {
                     var value: Int
                     var c: C
-                    
+
                     struct C: Codable {
                         var value: Int
                     }
@@ -253,12 +253,12 @@ struct EncoderTests {
             struct AnyKey: CodingKey {
                 var stringValue: String
                 var intValue: Int?
-                
+
                 init?(stringValue: String) {
                     self.stringValue = stringValue
                     self.intValue = nil
                 }
-                
+
                 init?(intValue: Int) {
                     self.stringValue = String(intValue)
                     self.intValue = intValue
@@ -270,11 +270,11 @@ struct EncoderTests {
             let foundationEncoder = JSONEncoder()
             foundationEncoder.keyEncodingStrategy = .custom { keys in
                 if keys.last!.stringValue == "value" {
-                    return AnyKey(stringValue: "a." + keys.map { key in
+                    AnyKey(stringValue: "a." + keys.map { key in
                         key.stringValue
                     }.joined(separator: "."))!
                 } else {
-                    return keys.last!
+                    keys.last!
                 }
             }
             foundationEncoder.outputFormatting = .sortedKeys
@@ -283,11 +283,11 @@ struct EncoderTests {
             let jbirdEncoder = JSON.Encoder()
             jbirdEncoder.keyEncodingStrategy = .custom { keys in
                 if keys.last!.stringValue == "value" {
-                    return AnyKey(stringValue: "a." + keys.map { key in
+                    AnyKey(stringValue: "a." + keys.map { key in
                         key.stringValue
                     }.joined(separator: "."))!
                 } else {
-                    return keys.last!
+                    keys.last!
                 }
             }
             jbirdEncoder.outputFormatting = .sortedKeys

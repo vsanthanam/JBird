@@ -225,13 +225,64 @@ struct SerializationTests {
                 #expect(asyncString == expected)
             }
 
-            @Test("Scientific Double Serialization")
-            func scientific() async throws {
+            @Test("Zero Double Serialization")
+            func zero() async throws {
+                let json: JSON = 0.0
+                let data = try json.serialize()
+                let str = try #require(String(data: data, encoding: .utf8))
+                let expected = #"""
+                0.0
+                """#
+                #expect(str == expected)
+                let stringified = try json.stringify()
+                #expect(stringified == expected)
+                let asyncData = try await JSON.serialize(json)
+                #expect(asyncData == data)
+                let asyncString = try await JSON.stringify(json)
+                #expect(asyncString == expected)
+            }
+
+            @Test("Whole Double Serialization")
+            func whole() async throws {
+                let json: JSON = 31.0
+                let data = try json.serialize()
+                let str = try #require(String(data: data, encoding: .utf8))
+                let expected = #"""
+                31.0
+                """#
+                #expect(str == expected)
+                let stringified = try json.stringify()
+                #expect(stringified == expected)
+                let asyncData = try await JSON.serialize(json)
+                #expect(asyncData == data)
+                let asyncString = try await JSON.stringify(json)
+                #expect(asyncString == expected)
+            }
+
+            @Test("Scientific Double Small Serialization")
+            func scientificSmall() async throws {
                 let json: JSON = 0.00000000123
                 let data = try json.serialize()
                 let str = try #require(String(data: data, encoding: .utf8))
                 let expected = #"""
                 1.23e-09
+                """#
+                #expect(str == expected)
+                let stringified = try json.stringify()
+                #expect(stringified == expected)
+                let asyncData = try await JSON.serialize(json)
+                #expect(asyncData == data)
+                let asyncString = try await JSON.stringify(json)
+                #expect(asyncString == expected)
+            }
+
+            @Test("Scientific Double Large Serialization")
+            func scientificLarge() async throws {
+                let json = JSON(Double(90_000_234_123_441_234_123))
+                let data = try json.serialize()
+                let str = try #require(String(data: data, encoding: .utf8))
+                let expected = #"""
+                9.000023412344124e+19
                 """#
                 #expect(str == expected)
                 let stringified = try json.stringify()
@@ -365,6 +416,41 @@ struct SerializationTests {
                         #expect(str == expected)
                     }
 
+                }
+
+            }
+
+            @Suite("Truncating Whole Numbers")
+            struct TruncatingWholeNumbers {
+
+                func zero() throws {
+                    let json: JSON = 0.0
+                    let data = try JSON.data(from: json, options: [.fragmentsAllowed, .truncateWholeFloatingPointValues])
+                    let str = try #require(String(data: data, encoding: .utf8))
+                    let expected = #"""
+                    0
+                    """#
+                    #expect(str == expected)
+                }
+
+                func positive() throws {
+                    let json: JSON = 5.0
+                    let data = try JSON.data(from: json, options: [.fragmentsAllowed, .truncateWholeFloatingPointValues])
+                    let str = try #require(String(data: data, encoding: .utf8))
+                    let expected = #"""
+                    5
+                    """#
+                    #expect(str == expected)
+                }
+
+                func negative() throws {
+                    let json: JSON = -75.0
+                    let data = try JSON.data(from: json, options: [.fragmentsAllowed, .truncateWholeFloatingPointValues])
+                    let str = try #require(String(data: data, encoding: .utf8))
+                    let expected = #"""
+                    -7
+                    """#
+                    #expect(str == expected)
                 }
 
             }
