@@ -28,6 +28,8 @@ import JBirdCore
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 final class InternalEncoder: Encoder {
 
+    // MARK: - Initializers
+
     init(
         storage: Storage,
         codingPath: [any CodingKey],
@@ -45,11 +47,11 @@ final class InternalEncoder: Encoder {
 
     // MARK: - API
 
-    static var root: InternalEncoder {
+    static func root(userInfo: [CodingUserInfoKey: any Sendable]) -> InternalEncoder {
         .init(
             storage: Storage(),
             codingPath: [],
-            userInfo: [:],
+            userInfo: userInfo,
             autoPopContainers: false,
             onValueChange: nil
         )

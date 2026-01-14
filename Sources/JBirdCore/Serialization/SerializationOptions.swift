@@ -79,7 +79,23 @@ extension JSON {
         /// This can be useful for preventing issues with certain parsers that may misIntegererpret the forward slash.
         public static let escapeForwardSlash = SerializationOptions(rawValue: 1 << 8)
 
-        /// The default set of options
+        /// Whether or not invalid numbers, such as `NaN` or `Double.infinity` should be sanitized into strings
+        ///
+        /// When this option is enabled, the serializer will replace invalid numbers with their string equivelents instead of throwing an error
+        /// For example, `JSON.number(Double.nan)` will be represented as the string`"NaN"`.
+        ///
+        /// This can be useful if you want to gaurantee that any ``JSON/Number`` will yield a serialized value, even if it cannot be represented numerically.
+        ///
+        /// When this option is not enabled,, the serializer will throw a ``JSONSerializationError/invalidFloat`` when such a number is encountered.
+        public static let sanitizeInvalidNumbers = SerializationOptions(rawValue: 1 << 9)
+
+        /// Whether or not floating point numbers that represent whole number should be truncated
+        ///
+        /// When this option is enabled, floating point values that represent whole numbers will have their decimal point and fractional digits will be removed from the serialized output.
+        /// For example, values like `-5.0` and `1.0` will be serialized as `-5` and `1`, respectively.
+        public static let truncateWholeFloatingPointValues = SerializationOptions(rawValue: 1 << 10)
+
+        /// The default set of serialization options
         public static let `default`: SerializationOptions = [.fragmentsAllowed, .escapeSpecialCharacters]
 
         // MARK: - OptionSet

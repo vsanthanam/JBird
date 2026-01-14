@@ -184,8 +184,8 @@ struct ArrayEncoderTests {
         let foundationEncoder = JSONEncoder()
         foundationEncoder.outputFormatting = [.sortedKeys]
         let foundation = try foundationEncoder.encode(value)
-        var jbirdEncoder = JSON.Encoder()
-        jbirdEncoder.serializationOptions = [.sortedKeys]
+        let jbirdEncoder = JSON.Encoder()
+        jbirdEncoder.outputFormatting = [.sortedKeys]
         let jbird = try jbirdEncoder.encode(value)
         #expect(foundation == jbird)
     }

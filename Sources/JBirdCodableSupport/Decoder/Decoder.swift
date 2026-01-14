@@ -1,5 +1,5 @@
 // JBird
-// EntryPoint.swift
+// Decoder.swift
 //
 // MIT License
 //
@@ -30,17 +30,12 @@ import JBirdCore
 extension JSON {
 
     /// A JSON decoder
-    public struct Decoder {
+    public final class Decoder {
 
         // MARK: - Initializers
 
         /// Create a JSON decoder
         public init() {}
-
-        // MARK: - API
-
-        /// Options used to deserialize the payload
-        public var deserializationOptions: JSON.DeserializationOptions = .default
 
         /// Decode a JSON payload into a `Decodable` type
         /// - Parameters:
@@ -52,41 +47,10 @@ extension JSON {
             from data: Data,
         ) throws -> T where T: Decodable {
             let json = try JSON.value(
-                for: data,
-                options: deserializationOptions
+                for: data
             )
-            let decoder = InternalDecoder.root(for: json)
+            let decoder = InternalDecoder.root(for: json, userInfo: [:])
             return try T(from: decoder)
-        }
-
-    }
-
-    /// A JSON encoder
-    public struct Encoder {
-
-        // MARK: - Initializers
-
-        /// Create a JSON encoder
-        public init() {}
-
-        // MARK: - API
-
-        /// Options used to create the serialized payload
-        public var serializationOptions: JSON.SerializationOptions = [.fragmentsAllowed]
-
-        /// Create a JSON payload based on an `Encodable` type
-        /// - Parameter value: The type to encode
-        /// - Returns: A serialized JSON payload, based on the provided `Encodable` type.
-        public func encode(
-            _ value: some Encodable
-        ) throws -> Data {
-            let encoder = InternalEncoder.root
-            try value.encode(to: encoder)
-            let json = encoder.finalize()
-            return try JSON.data(
-                from: json,
-                options: serializationOptions
-            )
         }
 
     }

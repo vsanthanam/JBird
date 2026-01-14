@@ -23,6 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import Foundation
 import JBirdCore
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
@@ -48,6 +49,7 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
     func encodeNil(
         forKey key: Key
     ) throws {
+        let key = JSON.Encoder.encodeKey(path: codingPath, key: key)
         set(.null, forKey: key)
     }
 
@@ -55,6 +57,7 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
         _ value: Bool,
         forKey key: Key
     ) throws {
+        let key = JSON.Encoder.encodeKey(path: codingPath, key: key)
         set(JSON(value), forKey: key)
     }
 
@@ -62,6 +65,7 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
         _ value: String,
         forKey key: Key
     ) throws {
+        let key = JSON.Encoder.encodeKey(path: codingPath, key: key)
         set(JSON(value), forKey: key)
     }
 
@@ -69,20 +73,23 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
         _ value: Double,
         forKey key: Key
     ) throws {
-        set(JSON(value), forKey: key)
+        let key = JSON.Encoder.encodeKey(path: codingPath, key: key)
+        set(JSON.Encoder.encodeDouble(value), forKey: key)
     }
 
     func encode(
         _ value: Float,
         forKey key: Key
     ) throws {
-        set(JSON(value), forKey: key)
+        let key = JSON.Encoder.encodeKey(path: codingPath, key: key)
+        set(JSON.Encoder.encodeFloat(value), forKey: key)
     }
 
     func encode(
         _ value: Int,
         forKey key: Key
     ) throws {
+        let key = JSON.Encoder.encodeKey(path: codingPath, key: key)
         set(JSON(value), forKey: key)
     }
 
@@ -90,6 +97,7 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
         _ value: Int8,
         forKey key: Key
     ) throws {
+        let key = JSON.Encoder.encodeKey(path: codingPath, key: key)
         set(JSON(value), forKey: key)
     }
 
@@ -97,6 +105,7 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
         _ value: Int16,
         forKey key: Key
     ) throws {
+        let key = JSON.Encoder.encodeKey(path: codingPath, key: key)
         set(JSON(value), forKey: key)
     }
 
@@ -104,6 +113,7 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
         _ value: Int32,
         forKey key: Key
     ) throws {
+        let key = JSON.Encoder.encodeKey(path: codingPath, key: key)
         set(JSON(value), forKey: key)
     }
 
@@ -111,6 +121,7 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
         _ value: Int64,
         forKey key: Key
     ) throws {
+        let key = JSON.Encoder.encodeKey(path: codingPath, key: key)
         set(JSON(value), forKey: key)
     }
 
@@ -118,6 +129,7 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
         _ value: UInt,
         forKey key: Key
     ) throws {
+        let key = JSON.Encoder.encodeKey(path: codingPath, key: key)
         set(JSON(value), forKey: key)
     }
 
@@ -125,6 +137,7 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
         _ value: UInt8,
         forKey key: Key
     ) throws {
+        let key = JSON.Encoder.encodeKey(path: codingPath, key: key)
         set(JSON(value), forKey: key)
     }
 
@@ -132,6 +145,7 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
         _ value: UInt16,
         forKey key: Key
     ) throws {
+        let key = JSON.Encoder.encodeKey(path: codingPath, key: key)
         set(JSON(value), forKey: key)
     }
 
@@ -139,6 +153,7 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
         _ value: UInt32,
         forKey key: Key
     ) throws {
+        let key = JSON.Encoder.encodeKey(path: codingPath, key: key)
         set(JSON(value), forKey: key)
     }
 
@@ -146,6 +161,7 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
         _ value: UInt64,
         forKey key: Key
     ) throws {
+        let key = JSON.Encoder.encodeKey(path: codingPath, key: key)
         set(JSON(value), forKey: key)
     }
 
@@ -160,7 +176,13 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
             autoPopContainers: false,
             onValueChange: nil
         )
-        try value.encode(to: nestedEncoder)
+        if let data = value as? Data {
+            try JSON.Encoder.encodeData(data, to: nestedEncoder)
+        } else if let date = value as? Date {
+            try JSON.Encoder.encodeDate(date, to: nestedEncoder)
+        } else {
+            try value.encode(to: nestedEncoder)
+        }
         let encoded = nestedEncoder.popContainer()
         set(encoded, forKey: key)
     }
@@ -231,7 +253,7 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
 
     private func set(
         _ json: JSON,
-        forKey key: Key
+        forKey key: any CodingKey
     ) {
         var object = encoder.object(at: containerIndex)
         object[key.stringValue] = json

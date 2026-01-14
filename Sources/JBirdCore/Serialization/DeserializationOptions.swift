@@ -119,7 +119,7 @@ extension JSON {
         /// - Note: The use of this option can impact parser performance, especially for large JSON objects with many keys.
         public static let requireUniqueKeys = DeserializationOptions(rawValue: 1 << 7)
 
-        /// The default set of options
+        /// The default set of deserialization options
         public static let `default`: DeserializationOptions = [.fragmentsAllowed, .allowByteOrderMark]
 
         // MARK: - OptionSet
