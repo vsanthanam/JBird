@@ -216,9 +216,10 @@ struct EncoderTests {
             struct Foo: Codable {
                 let someKey: String
                 let someOtherKey: Int
+                let FOOBar: Bool
             }
 
-            let value = Foo(someKey: "foo", someOtherKey: 12)
+            let value = Foo(someKey: "foo", someOtherKey: 12, FOOBar: false)
 
             let foundationEncoder = JSONEncoder()
             foundationEncoder.keyEncodingStrategy = .useDefaultKeys
@@ -235,41 +236,62 @@ struct EncoderTests {
 
         @Test("Custom Key Strategy")
         func customKeyStrategy() throws {
-            struct Foo: Codable {
-                let someKey: String
-                let someOtherKey: Int
+            struct A: Codable {
+                var value: Int
+                var b: B
+                
+                struct B: Codable {
+                    var value: Int
+                    var c: C
+                    
+                    struct C: Codable {
+                        var value: Int
+                    }
+                }
             }
 
-            struct CustomKey: CodingKey {
-
+            struct AnyKey: CodingKey {
+                var stringValue: String
+                var intValue: Int?
+                
                 init?(stringValue: String) {
-                    fatalError()
+                    self.stringValue = stringValue
+                    self.intValue = nil
                 }
-
+                
                 init?(intValue: Int) {
-                    fatalError()
+                    self.stringValue = String(intValue)
+                    self.intValue = intValue
                 }
-
-                init(_ keys: [any CodingKey]) {
-                    self.stringValue = String(keys.map(\.stringValue).joined(separator: "_").reversed())
-                }
-
-                let stringValue: String
-
-                let intValue: Int? = nil
             }
 
-            let value = Foo(someKey: "foo", someOtherKey: 12)
+            let a = A(value: 1, b: .init(value: 2, c: .init(value: 3)))
 
             let foundationEncoder = JSONEncoder()
-            foundationEncoder.keyEncodingStrategy = .custom { keys in CustomKey(keys) }
+            foundationEncoder.keyEncodingStrategy = .custom { keys in
+                if keys.last!.stringValue == "value" {
+                    return AnyKey(stringValue: "a." + keys.map { key in
+                        key.stringValue
+                    }.joined(separator: "."))!
+                } else {
+                    return keys.last!
+                }
+            }
             foundationEncoder.outputFormatting = .sortedKeys
-            let foundation = try foundationEncoder.encode(value)
+            let foundation = try foundationEncoder.encode(a)
 
             let jbirdEncoder = JSON.Encoder()
-            jbirdEncoder.keyEncodingStrategy = .custom { keys in CustomKey(keys) }
+            jbirdEncoder.keyEncodingStrategy = .custom { keys in
+                if keys.last!.stringValue == "value" {
+                    return AnyKey(stringValue: "a." + keys.map { key in
+                        key.stringValue
+                    }.joined(separator: "."))!
+                } else {
+                    return keys.last!
+                }
+            }
             jbirdEncoder.outputFormatting = .sortedKeys
-            let jbird = try jbirdEncoder.encode(value)
+            let jbird = try jbirdEncoder.encode(a)
 
             #expect(foundation == jbird)
         }

@@ -65,7 +65,7 @@ extension JSON {
         /// {
         ///     "foo": "bar",
         ///     "baz": null,
-        ///     "qux": [true, null]
+        ///     "qux": [true, null, false]
         /// }
         /// ```
         ///
@@ -102,7 +102,7 @@ extension JSON {
         /// Ignore the actively configured recursion depth limit.
         ///
         /// When this option is enabled, the deserialization will not be limited by the configured recursion depth limit.
-        /// This can be useful for deserializing deeply nested JSON structures, but may lead to excessive memory usage or stack overflow if the JSON is too deeply nested.
+        /// This can be useful for deserializing deeply nested JSON structures, but may lead to excessive memory usage or a stack overflow if the JSON is too deeply nested.
         public static let ignoreRecursionDepthLimit = DeserializationOptions(rawValue: 1 << 5)
 
         /// Ignore the actively configured input size limit
