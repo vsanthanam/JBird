@@ -29,12 +29,12 @@ import JBirdCore
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON {
 
-    /// Creates a new, reusable JSON encoder with the default formatting settings and encoding strategies.
+    /// An object that encode an`Encodable`-conforming type into JSON.
     public final class Encoder {
 
         // MARK: - Initializers
 
-        /// Create a JSON encoder
+        /// Creates a new, reusable JSON encoder with the default formatting settings and encoding strategies.
         public init() {}
 
         // MARK: - API
@@ -115,7 +115,7 @@ extension JSON {
 
         /// The strategies for encoding nonconforming floating-point numbers, also known as IEEE 754 exceptional values.
         ///
-        /// The IEEE 754 floating-point specification defines exceptional values, which include infinity and `NaN`.
+        /// The [IEEE 754 floating-point specification](https://en.wikipedia.org/wiki/IEEE_754) defines exceptional values, which include infinity and `NaN`.
         public enum NonConformingFloatEncodingStrategy: Sendable {
 
             /// The strategy that encodes exceptional floating-point values from a specified string representation.
@@ -218,7 +218,20 @@ extension JSON {
                 let str = data.base64EncodedString()
                 try str.encode(to: encoder)
             case let .custom(fn):
-                try fn(data, encoder)
+                do {
+                    try fn(data, encoder)
+                } catch let error as EncodingError {
+                    throw error
+                } catch {
+                    throw EncodingError.invalidValue(
+                        data,
+                        .init(
+                            codingPath: encoder.codingPath,
+                            debugDescription: "Couldn't encode data",
+                            underlyingError: error
+                        )
+                    )
+                }
             }
         }
 
@@ -237,7 +250,20 @@ extension JSON {
                 let str = f.string(from: date)
                 try str.encode(to: encoder)
             case let .custom(fn):
-                try fn(date, encoder)
+                do {
+                    try fn(date, encoder)
+                } catch let error as EncodingError {
+                    throw error
+                } catch {
+                    throw EncodingError.invalidValue(
+                        date,
+                        .init(
+                            codingPath: encoder.codingPath,
+                            debugDescription: "Couldn't encode date",
+                            underlyingError: error
+                        )
+                    )
+                }
             case .millisecondsSince1970:
                 let val = date.timeIntervalSince1970 * 1000
                 try val.encode(to: encoder)

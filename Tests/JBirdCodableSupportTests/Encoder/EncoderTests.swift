@@ -296,6 +296,105 @@ struct EncoderTests {
             #expect(foundation == jbird)
         }
 
+        @Test("Custom Key Strategy Nested Encodables")
+        func customKeyStrategyNestedEncodables() throws {
+            struct Container: Codable {
+                let foo: String
+                let nested: Nested
+            }
+
+            struct Nested: Codable {
+                let barValue: Int
+            }
+
+            struct AnyKey: CodingKey {
+                var stringValue: String
+                var intValue: Int?
+
+                init?(stringValue: String) {
+                    self.stringValue = stringValue
+                    self.intValue = nil
+                }
+
+                init?(intValue: Int) {
+                    self.stringValue = String(intValue)
+                    self.intValue = intValue
+                }
+            }
+
+            let value = Container(foo: "bar", nested: .init(barValue: 42))
+
+            let foundationEncoder = JSONEncoder()
+            foundationEncoder.keyEncodingStrategy = .custom { keys in
+                AnyKey(stringValue: "prefix_" + keys.map(\.stringValue).joined(separator: "_"))!
+            }
+            foundationEncoder.outputFormatting = .sortedKeys
+            let foundation = try foundationEncoder.encode(value)
+
+            let jbirdEncoder = JSON.Encoder()
+            jbirdEncoder.keyEncodingStrategy = .custom { keys in
+                AnyKey(stringValue: "prefix_" + keys.map(\.stringValue).joined(separator: "_"))!
+            }
+            jbirdEncoder.outputFormatting = .sortedKeys
+            let jbird = try jbirdEncoder.encode(value)
+
+            #expect(foundation == jbird)
+        }
+
+        @Test("Custom Key Strategy Nested Containers")
+        func customKeyStrategyNestedContainers() throws {
+            struct Manual: Encodable {
+                let value: Int
+
+                enum CodingKeys: String, CodingKey {
+                    case payload
+                }
+
+                enum PayloadKeys: String, CodingKey {
+                    case innerValue
+                }
+
+                func encode(to encoder: any Swift.Encoder) throws {
+                    var container = encoder.container(keyedBy: CodingKeys.self)
+                    var payload = container.nestedContainer(keyedBy: PayloadKeys.self, forKey: .payload)
+                    try payload.encode(value, forKey: .innerValue)
+                }
+            }
+
+            struct AnyKey: CodingKey {
+                var stringValue: String
+                var intValue: Int?
+
+                init?(stringValue: String) {
+                    self.stringValue = stringValue
+                    self.intValue = nil
+                }
+
+                init?(intValue: Int) {
+                    self.stringValue = String(intValue)
+                    self.intValue = intValue
+                }
+            }
+
+            let value = Manual(value: 7)
+
+            let foundationEncoder = JSONEncoder()
+            foundationEncoder.keyEncodingStrategy = .custom { keys in
+                AnyKey(stringValue: "prefix_" + keys.map(\.stringValue).joined(separator: "_"))!
+            }
+            foundationEncoder.outputFormatting = .sortedKeys
+            let foundation = try foundationEncoder.encode(value)
+
+            let jbirdEncoder = JSON.Encoder()
+            jbirdEncoder.keyEncodingStrategy = .custom { keys in
+                AnyKey(stringValue: "prefix_" + keys.map(\.stringValue).joined(separator: "_"))!
+            }
+            jbirdEncoder.outputFormatting = .sortedKeys
+            let jbird = try jbirdEncoder.encode(value)
+
+            #expect(foundation == jbird)
+        }
+
     }
 
     @Suite("Non Conforming Float Strategies")

@@ -81,15 +81,15 @@ extension JSON {
 
         /// Whether or not nonconforming floating-point numbers such as `NaN` or `Double.infinity` should be allowed in the serialized output.
         ///
-        /// Non conforming floating point values (also known as [IEEE 754 exceptional values](https://standards.ieee.org/standard/754-2019.html)) cannot be represented numerically in legal JSON
-        /// With this option enabled, the encoder will convert these values in to another legal JSON value instead of throwing an error:
+        /// Non conforming floating point values (also known as [IEEE 754 exceptional values](https://en.wikipedia.org/wiki/IEEE_754) cannot be represented numerically in legal JSON.
+        /// When this option enabled, the encoder will convert these values in to another legal JSON value instead of throwing an error, using the following rules:
         ///
         /// - `NaN` is represented as the JSON string `"NaN"`
         /// - Positive infinity is represented by the JSON string `"Infinity"`
         /// - Negative infinity is represented by the JSON string `"-Infinity"`.
         ///
-        /// You can also choose to replace these values with a JSON `null` instead of these stringified representations.
-        /// To do that, include this option, along with ``nullifyNonConformingFloatingPointValues``
+        /// You can also choose to replace these values with a JSON `null` instead of using these stringified representations.
+        /// To do that, enable this option along with the ``nullifyNonConformingFloatingPointValues`` option.
         public static let allowNonConformingFloatingPointValues = SerializationOptions(rawValue: 1 << 9)
 
         /// Whether or not floating point numbers that represent whole number should be truncated

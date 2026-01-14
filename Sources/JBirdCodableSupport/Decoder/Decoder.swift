@@ -29,13 +29,45 @@ import JBirdCore
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON {
 
-    /// A JSON decoder
+    /// An object that decodes JSON into a `Decodable`-conforming type
     public final class Decoder {
 
         // MARK: - Initializers
 
         /// Creates a new, reusable JSON decoder with the default formatting settings and decoding strategies.
         public init() {}
+
+        // MARK: - API
+
+        public enum KeyDecodingStrategy: Sendable {
+            case convertFromSnakeCase
+            case useDefaultKeys
+            case custom(@Sendable ([any CodingKey]) -> any CodingKey)
+        }
+
+        public enum DateDecodingStrategy: Sendable {
+            case deferredToDate
+            case iso8601
+            case formatted(DateFormatter)
+            case custom(@Sendable (any Swift.Decoder) throws -> Date)
+            case millisecondsSince1970
+            case secondsSince1970
+        }
+
+        public enum DataDecodingStrategy: Sendable {
+            case base64
+            case custom(@Sendable (any Swift.Decoder) throws -> Data)
+            case deferredToData
+
+        }
+
+        public var keyDecodingStrategy = KeyDecodingStrategy.useDefaultKeys
+
+        public var dateDecodingStrategy = DateDecodingStrategy.deferredToDate
+
+        public var dataDecodingStrategy = DataDecodingStrategy.base64
+
+        public var userInfo: [CodingUserInfoKey: any Sendable] = [:]
 
         /// Decode a JSON payload into a `Decodable` type
         /// - Parameters:
@@ -47,12 +79,138 @@ extension JSON {
             from data: Data,
         ) throws -> T where T: Decodable {
             let json = try JSON.value(
-                for: data
+                for: data,
+                options: [.fragmentsAllowed, .allowByteOrderMark]
             )
-            let decoder = InternalDecoder.root(for: json, userInfo: [:])
-            return try T(from: decoder)
+            let decodingStrategy = DecodingStrategy(
+                keyDecodingStrategy: keyDecodingStrategy,
+                dateDecodingStrategy: dateDecodingStrategy,
+                dataDecodingStrategy: dataDecodingStrategy
+            )
+            return try Decoder.$decodingStrategy.withValue(decodingStrategy) {
+                let decoder = InternalDecoder.root(for: json, userInfo: userInfo)
+                if type == Date.self {
+                    let date = try Decoder.decodeDate(decoder: decoder)
+                    return unsafeBitCast(date, to: type)
+                } else if type == Data.self {
+                    let data = try Decoder.decodeData(decoder: decoder)
+                    return unsafeBitCast(data, to: type)
+                } else {
+                    return try T(from: decoder)
+                }
+            }
         }
 
+        // MARK: - Private
+
+        private struct DecodingStrategy: Sendable {
+            let keyDecodingStrategy: KeyDecodingStrategy
+            let dateDecodingStrategy: DateDecodingStrategy
+            let dataDecodingStrategy: DataDecodingStrategy
+        }
+
+        @TaskLocal
+        private static var decodingStrategy: DecodingStrategy? = nil
+
+        static func decodeKey(
+            path: [any CodingKey],
+            key: JSON.Key
+        ) -> any CodingKey {
+            switch decodingStrategy.unsafelyUnwrapped.keyDecodingStrategy {
+            case .useDefaultKeys:
+                return ObjectCodingKey(key)
+            case .convertFromSnakeCase:
+                return CamelCaseCodingKey(key)
+            case let .custom(fn):
+                let codingKey = ObjectCodingKey(key)
+                let path = path + [codingKey]
+                return fn(path)
+            }
+        }
+
+        static func decodeDate(
+            decoder: any Swift.Decoder
+        ) throws -> Date {
+            switch decodingStrategy.unsafelyUnwrapped.dateDecodingStrategy {
+            case .deferredToDate:
+                return try Date(from: decoder)
+            case .iso8601:
+                let str = try String(from: decoder)
+                let formatter = ISO8601DateFormatter()
+                guard let date = formatter.date(from: str) else {
+                    throw DecodingError.dataCorrupted(
+                        .init(
+                            codingPath: decoder.codingPath,
+                            debugDescription: "Couldn't decode date using ISO8601 decoding strategy."
+                        )
+                    )
+                }
+                return date
+            case let .formatted(formatter):
+                let str = try String(from: decoder)
+                guard let date = formatter.date(from: str) else {
+                    throw DecodingError.dataCorrupted(
+                        .init(
+                            codingPath: decoder.codingPath,
+                            debugDescription: "Couldn't decode date using date formatter decoding strategy."
+                        )
+                    )
+                }
+                return date
+            case let .custom(fn):
+                do {
+                    return try fn(decoder)
+                } catch let error as DecodingError {
+                    throw error
+                } catch {
+                    throw DecodingError.dataCorrupted(
+                        .init(
+                            codingPath: decoder.codingPath,
+                            debugDescription: "Couldn't decode date using cusomg decoding strategy.",
+                            underlyingError: error
+                        )
+                    )
+                }
+            case .secondsSince1970:
+                let interval = try TimeInterval(from: decoder)
+                return Date(timeIntervalSince1970: interval)
+            case .millisecondsSince1970:
+                let interval = try TimeInterval(from: decoder) / 1000.0
+                return Date(timeIntervalSince1970: interval)
+            }
+        }
+
+        static func decodeData(decoder: any Swift.Decoder) throws -> Data {
+            switch decodingStrategy.unsafelyUnwrapped.dataDecodingStrategy {
+            case .base64:
+                let str = try String(from: decoder)
+                guard let data = Data(base64Encoded: str) else {
+                    throw DecodingError.dataCorrupted(
+                        .init(
+                            codingPath: decoder.codingPath,
+                            debugDescription: "Couldn't decode data using base64 decoding strategy."
+                        )
+                    )
+                }
+                return data
+            case let .custom(fn):
+                do {
+                    return try fn(decoder)
+                } catch let error as DecodingError {
+                    throw error
+                } catch {
+                    throw DecodingError.dataCorrupted(
+                        .init(
+                            codingPath: decoder.codingPath,
+                            debugDescription: "Couldn't decode using custom decoding strategy.",
+                            underlyingError: error
+                        )
+                    )
+                }
+            case .deferredToData:
+                return try Data(from: decoder)
+            }
+        }
     }
 
 }

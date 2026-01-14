@@ -35,7 +35,6 @@ struct SnakeCaseCodingKey: CodingKey {
 
     init(_ key: any CodingKey) {
 
-        @inline(__always)
         func camelCaseToSnakeCase(_ input: String) -> String {
             let utf8 = input.utf8
             var result = String()
