@@ -482,20 +482,31 @@ extension JSON {
         into bytes: inout [UInt8]
     ) throws {
         if double.isNaN {
-            if options.contains(.sanitizeInvalidNumbers) {
-                bytes += [0x4E, 0x61, 0x4E]
-                return
+            if options.contains(.allowNonConformingFloatingPointValues) {
+                if options.contains(.nullifyNonConformingFloatingPointValues) {
+                    serializeNull(into: &bytes)
+                    return
+                } else {
+                    serialize(string: "NaN", options: options, into: &bytes)
+                    return
+                }
             } else {
                 throw JSONSerializationError.invalidFloat
             }
         } else if double.isInfinite {
-            if options.contains(.sanitizeInvalidNumbers) {
-                if double == .infinity {
-                    bytes += "Infinity".utf8
+            if options.contains(.allowNonConformingFloatingPointValues) {
+                if options.contains(.nullifyNonConformingFloatingPointValues) {
+                    serializeNull(into: &bytes)
+                    return
                 } else {
-                    bytes += "-Infinity".utf8
+                    switch double.sign {
+                    case .plus:
+                        serialize(string: "Infinity", options: options, into: &bytes)
+                    case .minus:
+                        serialize(string: "-Infinity", options: options, into: &bytes)
+                    }
+                    return
                 }
-                return
             } else {
                 throw JSONSerializationError.invalidFloat
             }

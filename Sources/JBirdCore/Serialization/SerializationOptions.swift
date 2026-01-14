@@ -79,21 +79,31 @@ extension JSON {
         /// This can be useful for preventing issues with certain parsers that may misIntegererpret the forward slash.
         public static let escapeForwardSlash = SerializationOptions(rawValue: 1 << 8)
 
-        /// Whether or not invalid numbers, such as `NaN` or `Double.infinity` should be sanitized into strings
+        /// Whether or not nonconforming floating-point numbers such as `NaN` or `Double.infinity` should be allowed in the serialized output.
         ///
-        /// When this option is enabled, the serializer will replace invalid numbers with their string equivelents instead of throwing an error
-        /// For example, `JSON.number(Double.nan)` will be represented as the string`"NaN"`.
+        /// Non conforming floating point values (also known as [IEEE 754 exceptional values](https://standards.ieee.org/standard/754-2019.html)) cannot be represented numerically in legal JSON
+        /// With this option enabled, the encoder will convert these values in to another legal JSON value instead of throwing an error:
         ///
-        /// This can be useful if you want to gaurantee that any ``JSON/Number`` will yield a serialized value, even if it cannot be represented numerically.
+        /// - `NaN` is represented as the JSON string `"NaN"`
+        /// - Positive infinity is represented by the JSON string `"Infinity"`
+        /// - Negative infinity is represented by the JSON string `"-Infinity"`.
         ///
-        /// When this option is not enabled,, the serializer will throw a ``JSONSerializationError/invalidFloat`` when such a number is encountered.
-        public static let sanitizeInvalidNumbers = SerializationOptions(rawValue: 1 << 9)
+        /// You can also choose to replace these values with a JSON `null` instead of these stringified representations.
+        /// To do that, include this option, along with ``nullifyNonConformingFloatingPointValues``
+        public static let allowNonConformingFloatingPointValues = SerializationOptions(rawValue: 1 << 9)
 
         /// Whether or not floating point numbers that represent whole number should be truncated
         ///
         /// When this option is enabled, floating point values that represent whole numbers will have their decimal point and fractional digits will be removed from the serialized output.
         /// For example, values like `-5.0` and `1.0` will be serialized as `-5` and `1`, respectively.
         public static let truncateWholeFloatingPointValues = SerializationOptions(rawValue: 1 << 10)
+
+        /// Whether or not nonconforming floating point values should be replaced with null
+        ///
+        /// When this option is enabled, nonconforming floating point values will be replaced with a JSON null literal instead of their stringified representations.
+        /// This option also requires the presence of ``allowNonConformingFloatingPointValues``in the bitmask
+        /// The default behavior does not allow nonconforming values at all. If you do not also include ``allowNonConformingFloatingPointValues``, this option has no effect on the serialized output.
+        public static let nullifyNonConformingFloatingPointValues = SerializationOptions(rawValue: 1 << 11)
 
         /// The default set of serialization options
         public static let `default`: SerializationOptions = [.fragmentsAllowed, .escapeSpecialCharacters]

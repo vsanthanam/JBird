@@ -69,13 +69,13 @@ final class ArrayEncoder: UnkeyedEncodingContainer {
     func encode(
         _ value: Double
     ) throws {
-        append(JSON.Encoder.encodeDouble(value))
+        try append(JSON.Encoder.encodeDouble(value, codingPath: codingPath))
     }
 
     func encode(
         _ value: Float
     ) throws {
-        append(JSON.Encoder.encodeFloat(value))
+        try append(JSON.Encoder.encodeFloat(value, codingPath: codingPath))
     }
 
     func encode(

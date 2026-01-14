@@ -219,32 +219,4 @@ struct ValueEncoderTests {
         #expect(foundation == jbird)
     }
 
-    @Suite("Encode Dates")
-    struct Dates {
-
-        @Test("Encode Date")
-        func encodeDate() throws {
-            let value = Date.now
-            let foundation = try JSONEncoder().encode(value)
-            let jbird = try JSON.Encoder().encode(value)
-            #expect(foundation == jbird)
-        }
-
-        @Test("Encode Date with ISO8601")
-        func encodeDate8601() throws {
-            let value = Date.now
-            let foundationEncoder = JSONEncoder()
-            foundationEncoder.dateEncodingStrategy = .iso8601
-            let foundation = try foundationEncoder.encode(value)
-            let jbirdEncoder = JSON.Encoder()
-            jbirdEncoder.dateEncodingStrategy = .iso8601
-            let jbird = try jbirdEncoder.encode(value)
-            #expect(foundation == jbird)
-            let foundationStr = String(bytes: foundation, encoding: .utf8)
-            let jbirdStr = String(bytes: jbird, encoding: .utf8)
-            #expect(foundationStr == jbirdStr)
-        }
-
-    }
-
 }

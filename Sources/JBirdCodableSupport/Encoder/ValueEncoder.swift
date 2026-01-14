@@ -63,13 +63,13 @@ struct ValueEncoder: SingleValueEncodingContainer {
     mutating func encode(
         _ value: Double
     ) throws {
-        write(JSON.Encoder.encodeDouble(value))
+        try write(JSON.Encoder.encodeDouble(value, codingPath: codingPath))
     }
 
     mutating func encode(
         _ value: Float
     ) throws {
-        write(JSON.Encoder.encodeFloat(value))
+        try write(JSON.Encoder.encodeFloat(value, codingPath: codingPath))
     }
 
     mutating func encode(

@@ -74,7 +74,7 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
         forKey key: Key
     ) throws {
         let key = JSON.Encoder.encodeKey(path: codingPath, key: key)
-        set(JSON.Encoder.encodeDouble(value), forKey: key)
+        try set(JSON.Encoder.encodeDouble(value, codingPath: codingPath + [key]), forKey: key)
     }
 
     func encode(
@@ -82,7 +82,7 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
         forKey key: Key
     ) throws {
         let key = JSON.Encoder.encodeKey(path: codingPath, key: key)
-        set(JSON.Encoder.encodeFloat(value), forKey: key)
+        try set(JSON.Encoder.encodeFloat(value, codingPath: codingPath + [key]), forKey: key)
     }
 
     func encode(

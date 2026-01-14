@@ -119,10 +119,13 @@ extension JSON {
         public enum NonConformingFloatEncodingStrategy: Sendable {
 
             /// The strategy that encodes exceptional floating-point values from a specified string representation.
-            case convertToString(positiveInfinity: String, negativeInfinity: String, nan: String)
+            case convertToString(positiveInfinity: String = "Infinity", negativeInfinity: String = "-Infinity", nan: String = "NaN")
 
             /// The strategy that throws an error upon encoding an exceptional floating-point value.
             case `throw`
+
+            /// The strategy that replaces exceptional floating-point values with a `null` literal.
+            case useNull
         }
 
         /// A dictionary you use to customize the encoding process by providing contextual information.
@@ -204,7 +207,10 @@ extension JSON {
         @TaskLocal
         private static var encodingStrategy: EncodingStrategy? = nil
 
-        static func encodeData(_ data: Data, to encoder: any Swift.Encoder) throws {
+        static func encodeData(
+            _ data: Data,
+            to encoder: any Swift.Encoder
+        ) throws {
             switch encodingStrategy.unsafelyUnwrapped.dataEncodingStrategy {
             case .deferredToData:
                 try data.encode(to: encoder)
@@ -216,7 +222,10 @@ extension JSON {
             }
         }
 
-        static func encodeDate(_ date: Date, to encoder: any Swift.Encoder) throws {
+        static func encodeDate(
+            _ date: Date,
+            to encoder: any Swift.Encoder
+        ) throws {
             switch encodingStrategy.unsafelyUnwrapped.dateEncodingStrategy {
             case .deferredToDate:
                 try date.encode(to: encoder)
@@ -230,51 +239,78 @@ extension JSON {
             case let .custom(fn):
                 try fn(date, encoder)
             case .millisecondsSince1970:
-                let val = date.timeIntervalSince1970.rounded(.down) * 1000
+                let val = date.timeIntervalSince1970 * 1000
                 try val.encode(to: encoder)
             case .secondsSince1970:
-                let val = date.timeIntervalSince1970.rounded(.down)
+                let val = date.timeIntervalSince1970
                 try val.encode(to: encoder)
             }
         }
 
-        static func encodeDouble(_ double: Double) -> JSON {
+        static func encodeDouble(
+            _ double: Double,
+            codingPath: [any CodingKey]
+        ) throws -> JSON {
             switch encodingStrategy.unsafelyUnwrapped.nonConformingFloatEncodingStrategy {
             case let .convertToString(positiveInfinity, negativeInfinity, nan):
-                switch double {
-                case .nan:
-                    JSON(nan)
-                case .infinity:
-                    JSON(positiveInfinity)
-                case -.infinity:
-                    JSON(negativeInfinity)
-                default:
-                    JSON(double)
+                if double.isNaN {
+                    return JSON(nan)
+                } else if double.isInfinite {
+                    return JSON(double.sign == .minus ? negativeInfinity : positiveInfinity)
+                } else {
+                    return JSON(double)
                 }
             case .throw:
-                JSON(double)
+                if double.isNaN || double.isInfinite {
+                    throw EncodingError.invalidValue(
+                        double,
+                        .init(
+                            codingPath: codingPath,
+                            debugDescription: "Encountered a non conforming floating point value",
+                            underlyingError: JSONSerializationError.invalidFloat
+                        )
+                    )
+                }
+                return JSON(double)
+            case .useNull:
+                return .null
             }
         }
 
-        static func encodeFloat(_ float: Float) -> JSON {
+        static func encodeFloat(
+            _ float: Float,
+            codingPath: [any CodingKey]
+        ) throws -> JSON {
             switch encodingStrategy.unsafelyUnwrapped.nonConformingFloatEncodingStrategy {
             case let .convertToString(positiveInfinity, negativeInfinity, nan):
-                switch float {
-                case .nan:
-                    JSON(nan)
-                case .infinity:
-                    JSON(positiveInfinity)
-                case -.infinity:
-                    JSON(negativeInfinity)
-                default:
-                    JSON(float)
+                if float.isNaN {
+                    return JSON(nan)
+                } else if float.isInfinite {
+                    return JSON(float.sign == .minus ? negativeInfinity : positiveInfinity)
+                } else {
+                    return JSON(float)
                 }
             case .throw:
-                JSON(float)
+                if float.isNaN || float.isInfinite {
+                    throw EncodingError.invalidValue(
+                        float,
+                        .init(
+                            codingPath: codingPath,
+                            debugDescription: "Encountered a non conforming floating point value",
+                            underlyingError: JSONSerializationError.invalidFloat
+                        )
+                    )
+                }
+                return JSON(float)
+            case .useNull:
+                return .null
             }
         }
 
-        static func encodeKey(path: [any CodingKey], key: any CodingKey) -> any CodingKey {
+        static func encodeKey(
+            path: [any CodingKey],
+            key: any CodingKey
+        ) -> any CodingKey {
             switch encodingStrategy.unsafelyUnwrapped.keyEncodingStrategy {
             case .convertToSnakeCase:
                 return SnakeCaseCodingKey(key)
