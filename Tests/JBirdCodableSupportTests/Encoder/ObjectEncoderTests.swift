@@ -95,4 +95,24 @@ struct ObjectEncoderTests {
         let jbird = try jbirdEncoder.encode(value)
         #expect(foundation == jbird)
     }
+
+    @Test("Snake Case Key Strategy")
+    func snakeCaseKeyStrategy() throws {
+        struct Foo: Codable {
+            let someKey: String
+            let someOtherKey: Int
+        }
+
+        let value = Foo(someKey: "foo", someOtherKey: 12)
+
+        let foundationEncoder = JSONEncoder()
+        foundationEncoder.keyEncodingStrategy = .convertToSnakeCase
+        let foundation = try foundationEncoder.encode(value)
+
+        let jbirdEncoder = JSON.Encoder()
+        jbirdEncoder.keyEncodingStrategy = .convertToSnakeCase
+        let jbird = try jbirdEncoder.encode(value)
+
+        #expect(foundation == jbird)
+    }
 }

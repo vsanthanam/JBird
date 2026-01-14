@@ -34,7 +34,7 @@ extension JSON {
 
         // MARK: - Initializers
 
-        /// Create a JSON decoder
+        /// Creates a new, reusable JSON decoder with the default formatting settings and decoding strategies.
         public init() {}
 
         /// Decode a JSON payload into a `Decodable` type

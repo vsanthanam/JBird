@@ -29,7 +29,7 @@ import JBirdCore
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON {
 
-    /// A JSON encoder
+    /// Creates a new, reusable JSON encoder with the default formatting settings and encoding strategies.
     public final class Encoder {
 
         // MARK: - Initializers
@@ -43,7 +43,7 @@ extension JSON {
         public struct OutputFormatting: OptionSet, Sendable, Equatable {
 
             // MARK: - API
-            
+
             /// The output formatting option that uses ample white space and indentation to make output easy to read.
             public static let prettyPrinted = OutputFormatting(rawValue: 1 << 0)
 
@@ -54,7 +54,7 @@ extension JSON {
             public static let withoutEscapingSlashes = OutputFormatting(rawValue: 1 << 2)
 
             // MARK: - OptionSet
-            
+
             public init(rawValue: Int) {
                 self.rawValue = rawValue
             }
@@ -67,35 +67,35 @@ extension JSON {
         ///
         /// - Note: Key encoding strategies other than ``JSON/Encoder/KeyEncodingStrategy/useDefaultKeys`` may have a noticeable performance cost because those strategies may inspect and transform each key.
         public enum KeyEncodingStrategy: Sendable {
-            
+
             /// A key encoding strategy that converts camel-case keys to snake-case keys.
             case convertToSnakeCase
-            
+
             /// A key encoding strategy that doesn’t change key names during encoding.
             case useDefaultKeys
-            
+
             /// A key encoding strategy defined by the closure you supply.
             case custom(@Sendable ([any CodingKey]) -> any CodingKey)
         }
 
         /// The formatting strategies available for formatting dates when encoding a date as JSON.
         public enum DateEncodingStrategy: Sendable {
-            
+
             /// The strategy that uses formatting from the Date structure.
             case deferredToDate
-            
+
             /// The strategy that formats dates according to the ISO 8601 and RFC 3339 standards.
             case iso8601
-            
+
             /// The strategy that defers formatting settings to a supplied date formatter.
             case formatted(DateFormatter)
-            
+
             /// The strategy that formats custom dates by calling a user-defined function.
             case custom(@Sendable (Date, any Swift.Encoder) throws -> Void)
-            
+
             /// The strategy that encodes dates in terms of milliseconds since midnight UTC on January 1, 1970.
             case millisecondsSince1970
-            
+
             /// The strategy that encodes dates in terms of seconds since midnight UTC on January 1, 1970.
             case secondsSince1970
         }
@@ -103,13 +103,12 @@ extension JSON {
         /// The strategies for encoding raw data.
         public enum DataEncodingStrategy: Sendable {
 
-            
             /// The strategy that encodes data using Base 64 encoding.
             case base64
-            
+
             /// The strategy that encodes data using a user-defined function.
             case custom(@Sendable (Data, any Swift.Encoder) throws -> Void)
-            
+
             /// The strategy that encodes data using the encoding specified by the data instance itself.
             case deferredToData
         }
@@ -121,25 +120,25 @@ extension JSON {
 
             /// The strategy that encodes exceptional floating-point values from a specified string representation.
             case convertToString(positiveInfinity: String, negativeInfinity: String, nan: String)
-            
+
             /// The strategy that throws an error upon encoding an exceptional floating-point value.
             case `throw`
         }
 
         /// A dictionary you use to customize the encoding process by providing contextual information.
         public var userInfo: [CodingUserInfoKey : any Sendable] = [:]
-        
+
         /// A value that determines the readability, size, and element order of the encoded JSON object.
         public var outputFormatting: OutputFormatting = []
-        
+
         /// A value that determines how to encode a type’s coding keys as JSON keys.
         public var keyEncodingStrategy = KeyEncodingStrategy.useDefaultKeys
-        
+
         /// The strategy used when encoding dates as part of a JSON object.
         ///
         /// The default strategy is the ``JSON/Encoder/DateEncodingStrategy/deferredToDate`` strategy.
         public var dateEncodingStrategy = DateEncodingStrategy.deferredToDate
-        
+
         /// The strategy that an encoder uses to encode raw data.
         ///
         /// The default strategy is the ``JSON/Encoder/DataEncodingStrategy/base64`` strategy.
@@ -176,7 +175,7 @@ extension JSON {
             }
 
             var options: JSON.SerializationOptions = [.fragmentsAllowed, .truncateWholeFloatingPointValues, .escapeForwardSlash]
-            
+
             if outputFormatting.contains(.prettyPrinted) {
                 options.insert(.prettyPrinted)
             }
