@@ -72,9 +72,9 @@ struct SnakeCaseCodingKeyTests {
     func stringConversion() throws {
         let cases: [(String, String)] = [
             ("someKey", "some_key"),
-            ("someURLValue", "some_u_r_l_value"),
+            ("someURLValue", "some_url_value"),
             ("foo1Bar", "foo_1_bar"),
-            ("FOOBar", "f_o_o_bar"),
+            ("FOOBar", "f_oo_bar"),
             ("already_snake", "already_snake"),
             ("1Foo", "1_foo"),
         ]

@@ -208,8 +208,10 @@ struct EncoderTests {
             jbirdEncoder.keyEncodingStrategy = .convertToSnakeCase
             jbirdEncoder.outputFormatting = .sortedKeys
             let jbird = try jbirdEncoder.encode(value)
-
+            let foundationStr = String(data: foundation, encoding: .utf8)!
+            let jbirdStr = String(data: jbird, encoding: .utf8)!
             #expect(foundation == jbird)
+            #expect(foundationStr == jbirdStr)
         }
 
         @Test("Default Key Strategy")
