@@ -238,6 +238,26 @@ struct EncoderTests {
             #expect(foundation == jbird)
         }
 
+        @Test("Encode Unkeyed Dates")
+        func encodeUnkeyedDates() throws {
+            let dates = [Date.now, Date.now, Date.now]
+            let foundation = try JSONEncoder().encode(dates)
+            let jbird = try JSON.Encoder().encode(dates)
+            #expect(foundation == jbird)
+        }
+
+        @Test("Encode Keyed Dates")
+        func encodeKeyedDates() throws {
+            let dates = ["Foo": Date.now, "Baz": Date.now, "Bar": Date.now]
+            let foundationEncoder = JSONEncoder()
+            foundationEncoder.outputFormatting = .sortedKeys
+            let foundation = try foundationEncoder.encode(dates)
+            let jbirdEncoder = JSON.Encoder()
+            jbirdEncoder.outputFormatting = .sortedKeys
+            let jbird = try jbirdEncoder.encode(dates)
+            #expect(foundation == jbird)
+        }
+
     }
 
     @Suite("Encode Root Data")
@@ -339,6 +359,26 @@ struct EncoderTests {
                 #expect(context.debugDescription == "custom description")
                 return true
             }
+        }
+
+        @Test("Encode Unkeyed Data")
+        func encodeUnkeyedDates() throws {
+            let data = [Data("foo".utf8), Data("bar".utf8), Data("baz".utf8)]
+            let foundation = try JSONEncoder().encode(data)
+            let jbird = try JSON.Encoder().encode(data)
+            #expect(foundation == jbird)
+        }
+
+        @Test("Encode Keyed Data")
+        func encodeKeyedDates() throws {
+            let data = ["Foo": Data("Foo".utf8), "Bar": Data("Bar".utf8), "Baz": Data("Baz".utf8)]
+            let foundationEncoder = JSONEncoder()
+            foundationEncoder.outputFormatting = .sortedKeys
+            let foundation = try foundationEncoder.encode(data)
+            let jbirdEncoder = JSON.Encoder()
+            jbirdEncoder.outputFormatting = .sortedKeys
+            let jbird = try jbirdEncoder.encode(data)
+            #expect(foundation == jbird)
         }
 
     }

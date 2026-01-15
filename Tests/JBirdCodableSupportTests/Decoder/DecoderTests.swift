@@ -302,4 +302,147 @@ struct DecoderTests {
 
     }
 
+    @Suite("Decode Dates")
+    struct DecodeDates {
+
+        @Test("No Date Decoding Strategy")
+        func defaultStrategy() throws {
+            let source = Date.now
+            let data = try JSONEncoder().encode(source)
+            let foundation = try JSONDecoder().decode(Date.self, from: data)
+            let jbird = try JSON.Decoder().decode(Date.self, from: data)
+            #expect(foundation == jbird)
+        }
+
+        @Test("ISO 8601 Decoding Strategy")
+        func isoStrategy() throws {
+            let source = Date.now
+            let formatter = ISO8601DateFormatter()
+            let string = formatter.string(from: source)
+            let data = try JSONEncoder().encode(string)
+
+            let foundationDecoder = JSONDecoder()
+            foundationDecoder.dateDecodingStrategy = .iso8601
+            let foundation = try foundationDecoder.decode(Date.self, from: data)
+
+            let jbirdDecoder = JSON.Decoder()
+            jbirdDecoder.dateDecodingStrategy = .iso8601
+            let jbird = try jbirdDecoder.decode(Date.self, from: data)
+            #expect(foundation == jbird)
+        }
+
+        @Test("Date Formatter Decoding Strategy")
+        func formatterStrategy() throws {
+            let source = Date.now
+            let formatter = DateFormatter()
+            let string = formatter.string(from: source)
+            let data = try JSONEncoder().encode(string)
+
+            let foundationDecoder = JSONDecoder()
+            foundationDecoder.dateDecodingStrategy = .formatted(formatter)
+            let foundation = try foundationDecoder.decode(Date.self, from: data)
+
+            let jbirdDecoder = JSON.Decoder()
+            jbirdDecoder.dateDecodingStrategy = .formatted(formatter)
+            let jbird = try jbirdDecoder.decode(Date.self, from: data)
+            #expect(foundation == jbird)
+        }
+
+        @Test("Milliseconds Since 1970 Decoding Strategy")
+        func millisecondsSince1970() throws {
+            let source = Date.now.timeIntervalSince1970 * 1000
+            let data = try JSONEncoder().encode(source)
+
+            let foundationDecoder = JSONDecoder()
+            foundationDecoder.dateDecodingStrategy = .millisecondsSince1970
+            let foundation = try foundationDecoder.decode(Date.self, from: data)
+
+            let jbirdDecoder = JSON.Decoder()
+            jbirdDecoder.dateDecodingStrategy = .millisecondsSince1970
+            let jbird = try jbirdDecoder.decode(Date.self, from: data)
+            #expect(foundation == jbird)
+        }
+
+        @Test("Seconds Since 1970 Decoding Strategy")
+        func secondsSince1970() throws {
+            let source = Date.now.timeIntervalSince1970
+            let data = try JSONEncoder().encode(source)
+
+            let foundationDecoder = JSONDecoder()
+            foundationDecoder.dateDecodingStrategy = .secondsSince1970
+            let foundation = try foundationDecoder.decode(Date.self, from: data)
+
+            let jbirdDecoder = JSON.Decoder()
+            jbirdDecoder.dateDecodingStrategy = .secondsSince1970
+            let jbird = try jbirdDecoder.decode(Date.self, from: data)
+            #expect(foundation == jbird)
+        }
+
+        @Test("Custom Date Decoding Strategy")
+        func customDateDecodingStrategy() throws {
+            let source = Date.now.timeIntervalSince1970 + 2
+            let data = try JSONEncoder().encode(source)
+
+            let foundationDecoder = JSONDecoder()
+            foundationDecoder.dateDecodingStrategy = .custom { decoder in
+                let interval = try TimeInterval(from: decoder)
+                return Date(timeIntervalSince1970: interval - 2)
+            }
+            let foundation = try foundationDecoder.decode(Date.self, from: data)
+
+            let jbirdDecoder = JSON.Decoder()
+            jbirdDecoder.dateDecodingStrategy = .custom { decoder in
+                let interval = try TimeInterval(from: decoder)
+                return Date(timeIntervalSince1970: interval - 2)
+            }
+            let jbird = try jbirdDecoder.decode(Date.self, from: data)
+            #expect(foundation == jbird)
+        }
+
+        @Test("Custom Date Decoding Strategy That Fails")
+        func customDateDecodingStrategyThatFails() throws {
+            let source = Date.now
+            let data = try JSONEncoder().encode(source)
+            enum MyError: Error, Equatable {
+                case test
+            }
+            let decoder = JSON.Decoder()
+            decoder.dateDecodingStrategy = .custom { _ in
+                throw MyError.test
+            }
+            #expect {
+                _ = try decoder.decode(Date.self, from: data)
+            } throws: { error in
+                let error = try #require(error as? DecodingError)
+                guard case let .dataCorrupted(context) = error else {
+                    return false
+                }
+                #expect(context.codingPath.isEmpty)
+                #expect(context.debugDescription == "Couldn't decode date using cusomg decoding strategy.")
+                let underlying = try #require(context.underlyingError as? MyError)
+                #expect(underlying == .test)
+                return true
+            }
+        }
+
+        @Test("Unkeyed Date Decoding")
+        func decodeUnkeyedDates() throws {
+            let dates = [Date.now, Date.now, Date.now]
+            let data = try JSONEncoder().encode(dates)
+            let foundation = try JSONDecoder().decode([Date].self, from: data)
+            let jbird = try JSON.Decoder().decode([Date].self, from: data)
+            #expect(foundation == jbird)
+        }
+
+        @Test("Keyed Date Decoding")
+        func decodeKeyedDates() throws {
+            let dates = ["foo": Date.now, "bar": Date.now, "baz": Date.now]
+            let data = try JSONEncoder().encode(dates)
+            let foundation = try JSONDecoder().decode([String: Date].self, from: data)
+            let jbird = try JSON.Decoder().decode([String: Date].self, from: data)
+            #expect(foundation == jbird)
+        }
+
+    }
+
 }
