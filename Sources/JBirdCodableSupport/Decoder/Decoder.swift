@@ -59,7 +59,7 @@ extension JSON {
             case custom(@Sendable (any Swift.Decoder) throws -> Data)
             case deferredToData
         }
-        
+
         public enum NonComformingFloatDecodingStrategy: Sendable {
             case convertFromString(positiveInfinity: String, negativeInfinity: String, nan: String)
             case `throw`
@@ -72,7 +72,7 @@ extension JSON {
         public var dataDecodingStrategy = DataDecodingStrategy.base64
 
         public var nonConformingFloatDecodingStrategy = NonComformingFloatDecodingStrategy.throw
-        
+
         public var userInfo: [CodingUserInfoKey: any Sendable] = [:]
 
         /// Decode a JSON payload into a `Decodable` type
@@ -219,49 +219,58 @@ extension JSON {
                 return try Data(from: decoder)
             }
         }
-        
+
     }
 
 }
 
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON {
-    
+
     func decodeDouble() throws -> Double {
         switch JSON.Decoder.decodingStrategy.unsafelyUnwrapped.nonConformingFloatDecodingStrategy {
         case .throw:
             return try convert()
         case let .convertFromString(positiveInfinity, negativeInfinity, nan):
-            let str = try convert(into: String.self)
-            switch str {
-            case nan:
-                return .nan
-            case positiveInfinity:
-                return .infinity
-            case negativeInfinity:
-                return -.infinity
-            default:
-                throw JSONDeserializationError.invalidNumber
+            do {
+                return try convert()
+            } catch {
+                let str = try convert(into: String.self)
+                switch str {
+                case nan:
+                    return .nan
+                case positiveInfinity:
+                    return .infinity
+                case negativeInfinity:
+                    return -.infinity
+                default:
+                    throw error
+                }
             }
         }
     }
-    
+
     func decodeFloat() throws -> Float {
         switch JSON.Decoder.decodingStrategy.unsafelyUnwrapped.nonConformingFloatDecodingStrategy {
         case .throw:
             return try convert()
         case let .convertFromString(positiveInfinity, negativeInfinity, nan):
-            let str = try convert(into: String.self)
-            switch str {
-            case nan:
-                return .nan
-            case positiveInfinity:
-                return .infinity
-            case negativeInfinity:
-                return -.infinity
-            default:
-                throw JSONDeserializationError.invalidNumber
+            do {
+                return try convert()
+            } catch {
+                let str = try convert(into: String.self)
+                switch str {
+                case nan:
+                    return .nan
+                case positiveInfinity:
+                    return .infinity
+                case negativeInfinity:
+                    return -.infinity
+                default:
+                    throw error
+                }
             }
         }
     }
-    
+
 }
