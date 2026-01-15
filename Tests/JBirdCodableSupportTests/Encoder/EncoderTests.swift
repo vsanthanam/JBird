@@ -194,9 +194,10 @@ struct EncoderTests {
             struct Foo: Codable {
                 let someKey: String
                 let someOtherKey: Int
+                let FOOBar: Bool
             }
 
-            let value = Foo(someKey: "foo", someOtherKey: 12)
+            let value = Foo(someKey: "foo", someOtherKey: 12, FOOBar: false)
 
             let foundationEncoder = JSONEncoder()
             foundationEncoder.keyEncodingStrategy = .convertToSnakeCase

@@ -31,8 +31,132 @@ import Testing
 @Suite("Decoder Tests")
 struct DecoderTests {
 
+    @Suite("Key Decoding Strategies")
+    struct KeyDecodingStrategies {
+
+        @Test("Standard Key Decoding Strategy")
+        func standard() throws {
+
+            struct Foo: Codable, Equatable {
+                let someKey: String
+                let someOtherKey: Int
+                let FOOBar: Bool
+            }
+
+            let payload = #"""
+            {
+                "someKey": "foo",
+                "someOtherKey": 12,
+                "FOOBar": false
+            }
+            """#
+            let data = Data(payload.utf8)
+            let value = Foo(someKey: "foo", someOtherKey: 12, FOOBar: false)
+
+            let foundation = try JSONDecoder().decode(Foo.self, from: data)
+            let jbird = try JSON.Decoder().decode(Foo.self, from: data)
+            #expect(foundation == value)
+            #expect(jbird == value)
+        }
+
+        @Test("Snake Case Key Decoding Strategy")
+        func snake_case() throws {
+
+            struct Foo: Codable, Equatable {
+                let someKey: String
+                let someOtherKey: Int
+                let fOOBar: Bool
+            }
+
+            let payload = #"""
+            {
+                "some_key": "foo",
+                "some_other_key": 12,
+                "f_o_o_bar": false
+            }
+            """#
+            let data = Data(payload.utf8)
+            let value = Foo(someKey: "foo", someOtherKey: 12, fOOBar: false)
+
+            let foundationDecoder = JSONDecoder()
+            foundationDecoder.keyDecodingStrategy = .convertFromSnakeCase
+            let foundation = try foundationDecoder.decode(Foo.self, from: data)
+
+            let jbirdDecoder = JSON.Decoder()
+            jbirdDecoder.keyDecodingStrategy = .convertFromSnakeCase
+            let jbird = try jbirdDecoder.decode(Foo.self, from: data)
+
+            #expect(foundation == value)
+            #expect(jbird == value)
+        }
+
+        @Test("Custom Key Decoding Strategy")
+        func customKey() throws {
+
+            struct A: Codable, Equatable {
+                var value: Int
+                var b: B
+
+                struct B: Codable, Equatable {
+                    var value: Int
+                    var c: C
+
+                    struct C: Codable, Equatable {
+                        var value: Int
+                    }
+                }
+            }
+
+            let payload = #"""
+            {
+                "a.value": 1,
+                "b": {
+                    "a.b.value": 2,
+                    "c": {
+                        "a.b.c.value": 3
+                    }
+                }
+            }
+            """#
+
+            let data = Data(payload.utf8)
+
+            struct AnyKey: CodingKey {
+                var stringValue: String
+                var intValue: Int?
+
+                init?(stringValue: String) {
+                    self.stringValue = stringValue
+                    self.intValue = nil
+                }
+
+                init?(intValue: Int) {
+                    self.stringValue = String(intValue)
+                    self.intValue = intValue
+                }
+            }
+
+            let foundationDecoder = JSONDecoder()
+            foundationDecoder.keyDecodingStrategy = .custom { keys in
+                let lastComponent = keys.last!.stringValue.split(separator: ".").last!
+                return AnyKey(stringValue: String(lastComponent))!
+            }
+            let foundation = try foundationDecoder.decode(A.self, from: data)
+
+            let jbirdDecoder = JSON.Decoder()
+            jbirdDecoder.keyDecodingStrategy = .custom { keys in
+                let lastComponent = keys.last!.stringValue.split(separator: ".").last!
+                return AnyKey(stringValue: String(lastComponent))!
+            }
+            let jbird = try jbirdDecoder.decode(A.self, from: data)
+
+            #expect(foundation == jbird)
+        }
+
+    }
+
     @Suite("Decode Non Conforming Float Value")
-    struct NonConformingFloats {
+    struct NonConformingFloatingPointStrategy {
 
         @Suite("String Replace Strategy")
         struct StringReplaceStrategy {
