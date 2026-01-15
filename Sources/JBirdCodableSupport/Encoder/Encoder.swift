@@ -125,6 +125,8 @@ extension JSON {
             case `throw`
 
             /// The strategy that replaces exceptional floating-point values with a `null` literal.
+            ///
+            /// - Warning: Using this encoding strategy may result in encoded values that cannot be reliably decoded to the original encodable source.
             case useNull
         }
 
@@ -153,6 +155,7 @@ extension JSON {
         public var nonConformingFloatEncodingStrategy = NonConformingFloatEncodingStrategy.throw
 
         /// Create a JSON payload based on an `Encodable` type
+        ///
         /// - Parameter value: The type to encode
         /// - Returns: A serialized JSON payload, based on the provided `Encodable` type.
         public func encode(
@@ -227,7 +230,7 @@ extension JSON {
                         data,
                         .init(
                             codingPath: encoder.codingPath,
-                            debugDescription: "Couldn't encode data",
+                            debugDescription: "Couldn't encode data: custom encoding strategy produced an error.",
                             underlyingError: error
                         )
                     )
@@ -259,7 +262,7 @@ extension JSON {
                         date,
                         .init(
                             codingPath: encoder.codingPath,
-                            debugDescription: "Couldn't encode date",
+                            debugDescription: "Couldn't encode date: custom encoding strategy produced an error.",
                             underlyingError: error
                         )
                     )

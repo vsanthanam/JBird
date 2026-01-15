@@ -664,7 +664,7 @@ extension JSON {
             if let level {
                 addIndentation(level: level + 1, into: &bytes)
                 serialize(string: key, options: options, into: &bytes)
-                bytes += [0x3A, 0x20]
+                bytes += [0x20, 0x3A, 0x20]
                 try serialize(json: value, into: &bytes, level: level + 1, options: options, isCancellable: isAsync)
                 bytes += [0x2C, 0x0A]
             } else {
@@ -680,7 +680,7 @@ extension JSON {
             if let level {
                 addIndentation(level: level + 1, into: &bytes)
                 serialize(string: key, options: options, into: &bytes)
-                bytes += [0x3A, 0x20]
+                bytes += [0x20, 0x3A, 0x20]
                 try serialize(json: value, into: &bytes, level: level + 1, options: options, isCancellable: isAsync)
                 bytes += [0x0A]
             } else {

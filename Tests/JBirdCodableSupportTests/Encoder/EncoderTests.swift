@@ -31,6 +31,69 @@ import Testing
 @Suite("Encoder Tests")
 struct EncoderTests {
 
+    @Suite("Encoder Formatting Tests")
+    struct EnocoderFormattingTests {
+
+        struct Model: Codable {
+            let foo: Int
+            let bar: [String: Double]
+            struct Baz: Codable {
+                let qux: Bool
+                let quux: Bool
+            }
+
+            let baz: Baz
+        }
+
+        let model = Model(
+            foo: 12,
+            bar: [#"\foo"#: 1.0, #"\bar"#: 2.0],
+            baz: Model.Baz(
+                qux: false,
+                quux: true
+            )
+        )
+
+        @Test("Default Formatting")
+        func defaultFormatting() throws {
+            let foundationEncoder = JSONEncoder()
+            foundationEncoder.outputFormatting = [.sortedKeys]
+            let foundation = try foundationEncoder.encode(model)
+            let jbirdEncoder = JSON.Encoder()
+            jbirdEncoder.outputFormatting = [.sortedKeys]
+            let jbird = try jbirdEncoder.encode(model)
+            #expect(foundation == jbird)
+        }
+
+        @Test("Pretty Printed")
+        func prettyPrinted() throws {
+            let foundationEncoder = JSONEncoder()
+            foundationEncoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+            let foundation = try foundationEncoder.encode(model)
+            let jbirdEncoder = JSON.Encoder()
+            jbirdEncoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+            let jbird = try jbirdEncoder.encode(model)
+            #expect(foundation == jbird)
+        }
+
+        @Test("Without Escaping Slashes")
+        func withoutEscapingSlashes() throws {
+            let foundationEncoder = JSONEncoder()
+            foundationEncoder.outputFormatting = [.withoutEscapingSlashes, .sortedKeys]
+            let foundation = try foundationEncoder.encode(model)
+            let jbirdEncoder = JSON.Encoder()
+            jbirdEncoder.outputFormatting = [.withoutEscapingSlashes, .sortedKeys]
+            let jbird = try jbirdEncoder.encode(model)
+            #expect(foundation == jbird)
+            let foundationString = String(data: foundation, encoding: .utf8)!
+            let jbirdString = String(data: jbird, encoding: .utf8)!
+            print(foundationString)
+            print(jbirdString)
+            #expect(foundationString == jbirdString)
+        }
+
+    }
+
     @Suite("Encode Root Dates")
     struct DateTests {
 
@@ -74,19 +137,75 @@ struct EncoderTests {
         }
 
         @Test("Encode Date with Custom Stratetgy")
-        func encodeDateFormatter() throws {
+        func encodeDateCustomStrateg() throws {
             let value = Date.now
-            let formatter = DateFormatter()
 
             let foundationEncoder = JSONEncoder()
-            foundationEncoder.dateEncodingStrategy = .formatted(formatter)
+            foundationEncoder.dateEncodingStrategy = .custom { date, encoder in
+                try date.description.encode(to: encoder)
+            }
             let foundation = try foundationEncoder.encode(value)
 
             let jbirdEncoder = JSON.Encoder()
-            jbirdEncoder.dateEncodingStrategy = .formatted(formatter)
+            jbirdEncoder.dateEncodingStrategy = .custom { date, encoder in
+                try date.description.encode(to: encoder)
+            }
             let jbird = try jbirdEncoder.encode(value)
 
             #expect(foundation == jbird)
+        }
+
+        @Test("Encode Date with Custom Stratetgy That Fails")
+        func encodeDateFormatterThatFails() throws {
+            let value = Date.now
+
+            enum MyError: Error, Equatable {
+                case test
+            }
+
+            let encoder = JSON.Encoder()
+            encoder.dateEncodingStrategy = .custom { _, _ in
+                throw MyError.test
+            }
+            #expect {
+                _ = try encoder.encode(value)
+            } throws: { error in
+                guard let error = error as? EncodingError else {
+                    return false
+                }
+                guard case let .invalidValue(raw, context) = error else {
+                    return false
+                }
+                let date = try #require(raw as? Date)
+                #expect(date == value)
+                let underlying = try #require(context.underlyingError as? MyError)
+                #expect(underlying == .test)
+                return true
+            }
+        }
+
+        @Test("Encode Date with Custom Stratetgy That Fails With Encoding Error")
+        func encodeDateFormatterThatFailsWithEncodingError() throws {
+            let value = Date.now
+
+            let encoder = JSON.Encoder()
+            encoder.dateEncodingStrategy = .custom { _, _ in
+                throw EncodingError.invalidValue("obscured_value", .init(codingPath: [], debugDescription: "custom description"))
+            }
+            #expect {
+                _ = try encoder.encode(value)
+            } throws: { error in
+                guard let error = error as? EncodingError else {
+                    return false
+                }
+                guard case let .invalidValue(raw, context) = error else {
+                    return false
+                }
+                let str = try #require(raw as? String)
+                #expect(str == "obscured_value")
+                #expect(context.debugDescription == "custom description")
+                return true
+            }
         }
 
         @Test("Encode Date with Seconds Since 1970 Strategy")
@@ -114,21 +233,6 @@ struct EncoderTests {
 
             let jbirdEncoder = JSON.Encoder()
             jbirdEncoder.dateEncodingStrategy = .millisecondsSince1970
-            let jbird = try jbirdEncoder.encode(value)
-
-            #expect(foundation == jbird)
-        }
-
-        @Test("Encode Date with Custom Strategy")
-        func encodeDateCustomstrategy() throws {
-            let value = Date.now
-
-            let foundationEncoder = JSONEncoder()
-            foundationEncoder.dateEncodingStrategy = .custom { (date, encoder) in try date.description.encode(to: encoder) }
-            let foundation = try foundationEncoder.encode(value)
-
-            let jbirdEncoder = JSON.Encoder()
-            jbirdEncoder.dateEncodingStrategy = .custom { (date, encoder) in try date.description.encode(to: encoder) }
             let jbird = try jbirdEncoder.encode(value)
 
             #expect(foundation == jbird)
@@ -182,6 +286,59 @@ struct EncoderTests {
             let jbird = try jbirdEncoder.encode(data)
 
             #expect(foundation == jbird)
+        }
+
+        @Test("Encode Data with Custom Stratetgy That Fails")
+        func encodeDateFormatterThatFails() throws {
+            let value = Data("FooBarBaz".utf8)
+
+            enum MyError: Error, Equatable {
+                case test
+            }
+
+            let encoder = JSON.Encoder()
+            encoder.dataEncodingStrategy = .custom { _, _ in
+                throw MyError.test
+            }
+            #expect {
+                _ = try encoder.encode(value)
+            } throws: { error in
+                guard let error = error as? EncodingError else {
+                    return false
+                }
+                guard case let .invalidValue(raw, context) = error else {
+                    return false
+                }
+                let data = try #require(raw as? Data)
+                #expect(data == value)
+                let underlying = try #require(context.underlyingError as? MyError)
+                #expect(underlying == .test)
+                return true
+            }
+        }
+
+        @Test("Encode Data with Custom Stratetgy That Fails With Encoding Error")
+        func encodeDateFormatterThatFailsWithEncodingError() throws {
+            let value = Data("FooBarBaz".utf8)
+
+            let encoder = JSON.Encoder()
+            encoder.dataEncodingStrategy = .custom { _, _ in
+                throw EncodingError.invalidValue("plop", .init(codingPath: [], debugDescription: "custom description"))
+            }
+            #expect {
+                _ = try encoder.encode(value)
+            } throws: { error in
+                guard let error = error as? EncodingError else {
+                    return false
+                }
+                guard case let .invalidValue(raw, context) = error else {
+                    return false
+                }
+                let str = try #require(raw as? String)
+                #expect(str == "plop")
+                #expect(context.debugDescription == "custom description")
+                return true
+            }
         }
 
     }

@@ -554,12 +554,12 @@ struct SerializationTests {
             let str = try #require(String(data: data, encoding: .utf8))
             let expected = #"""
             {
-              "bar": false,
-              "baz": null,
-              "foo": true,
-              "qux": {
-                "a": null,
-                "b": [
+              "bar" : false,
+              "baz" : null,
+              "foo" : true,
+              "qux" : {
+                "a" : null,
+                "b" : [
                   1,
                   2,
                   3
