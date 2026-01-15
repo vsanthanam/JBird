@@ -37,6 +37,24 @@ struct DecoderTests {
         @Suite("String Replace Strategy")
         struct StringReplaceStrategy {
 
+            @Test("Decode Conforming")
+            func decodeConforming() throws {
+                let foundationDecoder = JSONDecoder()
+                foundationDecoder.nonConformingFloatDecodingStrategy = .convertFromString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
+                let jbirdDecoder = JSON.Decoder()
+                jbirdDecoder.nonConformingFloatDecodingStrategy = .convertFromString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
+                let payload = #"""
+                -4.1 
+                """#
+                let serialized = Data(payload.utf8)
+                let foundationDouble = try foundationDecoder.decode(Double.self, from: serialized)
+                let jbirdDouble = try jbirdDecoder.decode(Double.self, from: serialized)
+                #expect(foundationDouble == jbirdDouble)
+                let foundationFloat = try foundationDecoder.decode(Float.self, from: serialized)
+                let jbirdFloat = try jbirdDecoder.decode(Float.self, from: serialized)
+                #expect(foundationFloat == jbirdFloat)
+            }
+
             @Test("Decode Positive Infinity")
             func decodePositiveInfinity() throws {
                 let foundationDecoder = JSONDecoder()
@@ -100,7 +118,7 @@ struct DecoderTests {
                 let jbirdDecoder = JSON.Decoder()
                 jbirdDecoder.nonConformingFloatDecodingStrategy = .convertFromString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
                 let payload = #"""
-                ["Infinity", "-Infinity"] 
+                [-1.2, "Infinity", "-Infinity"] 
                 """#
                 let serialized = Data(payload.utf8)
                 let foundation = try foundationDecoder.decode([Double].self, from: serialized)
@@ -115,7 +133,7 @@ struct DecoderTests {
                 let jbirdDecoder = JSON.Decoder()
                 jbirdDecoder.nonConformingFloatDecodingStrategy = .convertFromString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
                 let payload = #"""
-                ["NaN"] 
+                ["NaN", -1.2] 
                 """#
                 let serialized = Data(payload.utf8)
                 let foundation = try foundationDecoder.decode([Double].self, from: serialized)
@@ -131,7 +149,7 @@ struct DecoderTests {
                 let jbirdDecoder = JSON.Decoder()
                 jbirdDecoder.nonConformingFloatDecodingStrategy = .convertFromString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
                 let payload = #"""
-                { "bar": "Infinity", "baz": "-Infinity" }    
+                { "foo": -1.2, "bar": "Infinity", "baz": "-Infinity" }    
                 """#
                 let serialized = Data(payload.utf8)
                 let foundation = try foundationDecoder.decode([String: Double].self, from: serialized)
@@ -146,13 +164,14 @@ struct DecoderTests {
                 let jbirdDecoder = JSON.Decoder()
                 jbirdDecoder.nonConformingFloatDecodingStrategy = .convertFromString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
                 let payload = #"""
-                { "foo": "NaN" }   
+                { "foo": "NaN", "bar": 2.1 }   
                 """#
                 let serialized = Data(payload.utf8)
                 let foundation = try foundationDecoder.decode([String: Double].self, from: serialized)
                 let jbird = try jbirdDecoder.decode([String: Double].self, from: serialized)
                 #expect(foundation["foo"]!.isNaN)
                 #expect(jbird["foo"]!.isNaN)
+                #expect(foundation["bar"] == jbird["bar"])
             }
 
         }

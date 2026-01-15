@@ -61,7 +61,7 @@ extension JSON {
         }
 
         public enum NonComformingFloatDecodingStrategy: Sendable {
-            case convertFromString(positiveInfinity: String, negativeInfinity: String, nan: String)
+            case convertFromString(positiveInfinity: String = "Infinity", negativeInfinity: String = "-Infinity", nan: String = "NaN")
             case `throw`
         }
 
