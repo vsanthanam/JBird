@@ -56,33 +56,69 @@ extension JSON {
             case custom(@Sendable ([any CodingKey]) -> any CodingKey)
         }
 
+        /// The strategies available for formatting dates when decoding them from JSON.
         public enum DateDecodingStrategy: Sendable {
+
+            /// The strategy that uses formatting from the Date structure.
             case deferredToDate
+
+            /// The strategy that formats dates according to the ISO 8601 standard.
             case iso8601
+
+            /// The strategy that defers formatting settings to a supplied date formatter.
             case formatted(DateFormatter)
+
+            /// The strategy that formats custom dates by calling a user-defined function.
             case custom(@Sendable (any Swift.Decoder) throws -> Date)
+
+            /// The strategy that decodes dates in terms of milliseconds since midnight UTC on January 1st, 1970.
             case millisecondsSince1970
+
+            /// The strategy that decodes dates in terms of seconds since midnight UTC on January 1st, 1970.
             case secondsSince1970
         }
 
+        /// The strategies for decoding raw data.
         public enum DataDecodingStrategy: Sendable {
+
+            /// The strategy that decodes data using Base 64 decoding.
             case base64
+
+            /// The strategy that decodes data using a user-defined function.
             case custom(@Sendable (any Swift.Decoder) throws -> Data)
+
+            /// The strategy that encodes data using the encoding specified by the data instance itself.
             case deferredToData
         }
 
+        /// The strategies for encoding nonconforming floating-point numbers, also known as IEEE 754 exceptional values.
+        ///
+        /// The IEEE 754 floating-point specification defines exceptional values, which include infinity and nan.
         public enum NonComformingFloatDecodingStrategy: Sendable {
+
+            /// The strategy that decodes exceptional floating-point values from a specified string representation.
             case convertFromString(positiveInfinity: String = "Infinity", negativeInfinity: String = "-Infinity", nan: String = "NaN")
+
+            /// The strategy that throws an error upon decoding an exceptional floating-point value.
             case `throw`
         }
 
         /// A value that determines how to decode a type’s coding keys from JSON keys.
         public var keyDecodingStrategy = KeyDecodingStrategy.useDefaultKeys
 
+        /// The strategy used when decoding dates from part of a JSON object.
+        ///
+        /// The default strategy is ``JSON/Decoder/DateDecodingStrategy/deferredToDate``.
         public var dateDecodingStrategy = DateDecodingStrategy.deferredToDate
 
+        /// The strategy that a decoder uses to decode raw data.
+        ///
+        /// The default strategy is ``JSON/Decoder/DataDecodingStrategy/base64``.
         public var dataDecodingStrategy = DataDecodingStrategy.base64
 
+        /// The strategy used by a decoder when it encounters exceptional floating-point values.
+        ///
+        /// The default strategy is ``JSON/Decoder/NonConformingFloatDecodingStrategy/throw``.
         public var nonConformingFloatDecodingStrategy = NonComformingFloatDecodingStrategy.throw
 
         /// A dictionary you use to customize the decoding process by providing contextual information.
