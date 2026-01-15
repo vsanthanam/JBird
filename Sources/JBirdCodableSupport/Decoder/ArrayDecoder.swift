@@ -98,7 +98,7 @@ final class ArrayDecoder: UnkeyedDecodingContainer {
     ) throws -> Float {
         let (value, index) = try next(type)
         do {
-            return try value.convert()
+            return try value.decodeFloat()
         } catch {
             let context = DecodingError.Context(
                 codingPath: codingPath + [IndexCodingKey(index)],
@@ -117,7 +117,7 @@ final class ArrayDecoder: UnkeyedDecodingContainer {
     ) throws -> Double {
         let (value, index) = try next(type)
         do {
-            return try value.convert()
+            return try value.decodeDouble()
         } catch {
             let context = DecodingError.Context(
                 codingPath: codingPath + [IndexCodingKey(index)],

@@ -58,7 +58,11 @@ extension JSON {
             case base64
             case custom(@Sendable (any Swift.Decoder) throws -> Data)
             case deferredToData
-
+        }
+        
+        public enum NonComformingFloatDecodingStrategy: Sendable {
+            case convertFromString(positiveInfinity: String, negativeInfinity: String, nan: String)
+            case `throw`
         }
 
         public var keyDecodingStrategy = KeyDecodingStrategy.useDefaultKeys
@@ -67,6 +71,8 @@ extension JSON {
 
         public var dataDecodingStrategy = DataDecodingStrategy.base64
 
+        public var nonConformingFloatDecodingStrategy = NonComformingFloatDecodingStrategy.throw
+        
         public var userInfo: [CodingUserInfoKey: any Sendable] = [:]
 
         /// Decode a JSON payload into a `Decodable` type
@@ -85,7 +91,8 @@ extension JSON {
             let decodingStrategy = DecodingStrategy(
                 keyDecodingStrategy: keyDecodingStrategy,
                 dateDecodingStrategy: dateDecodingStrategy,
-                dataDecodingStrategy: dataDecodingStrategy
+                dataDecodingStrategy: dataDecodingStrategy,
+                nonConformingFloatDecodingStrategy: nonConformingFloatDecodingStrategy
             )
             return try Decoder.$decodingStrategy.withValue(decodingStrategy) {
                 let decoder = InternalDecoder.root(for: json, userInfo: userInfo)
@@ -103,14 +110,15 @@ extension JSON {
 
         // MARK: - Private
 
-        private struct DecodingStrategy: Sendable {
+        struct DecodingStrategy: Sendable {
             let keyDecodingStrategy: KeyDecodingStrategy
             let dateDecodingStrategy: DateDecodingStrategy
             let dataDecodingStrategy: DataDecodingStrategy
+            let nonConformingFloatDecodingStrategy: NonComformingFloatDecodingStrategy
         }
 
         @TaskLocal
-        private static var decodingStrategy: DecodingStrategy? = nil
+        static var decodingStrategy: DecodingStrategy? = nil
 
         static func decodeKey(
             path: [any CodingKey],
@@ -211,6 +219,49 @@ extension JSON {
                 return try Data(from: decoder)
             }
         }
+        
     }
 
+}
+
+extension JSON {
+    
+    func decodeDouble() throws -> Double {
+        switch JSON.Decoder.decodingStrategy.unsafelyUnwrapped.nonConformingFloatDecodingStrategy {
+        case .throw:
+            return try convert()
+        case let .convertFromString(positiveInfinity, negativeInfinity, nan):
+            let str = try convert(into: String.self)
+            switch str {
+            case nan:
+                return .nan
+            case positiveInfinity:
+                return .infinity
+            case negativeInfinity:
+                return -.infinity
+            default:
+                throw JSONDeserializationError.invalidNumber
+            }
+        }
+    }
+    
+    func decodeFloat() throws -> Float {
+        switch JSON.Decoder.decodingStrategy.unsafelyUnwrapped.nonConformingFloatDecodingStrategy {
+        case .throw:
+            return try convert()
+        case let .convertFromString(positiveInfinity, negativeInfinity, nan):
+            let str = try convert(into: String.self)
+            switch str {
+            case nan:
+                return .nan
+            case positiveInfinity:
+                return .infinity
+            case negativeInfinity:
+                return -.infinity
+            default:
+                throw JSONDeserializationError.invalidNumber
+            }
+        }
+    }
+    
 }

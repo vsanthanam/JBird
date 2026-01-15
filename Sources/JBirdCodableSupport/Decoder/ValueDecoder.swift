@@ -71,7 +71,7 @@ struct ValueDecoder: SingleValueDecodingContainer {
         _ type: Float.Type
     ) throws -> Float {
         do {
-            return try value.convert()
+            return try value.decodeFloat()
         } catch {
             let context = DecodingError.Context(
                 codingPath: codingPath,
@@ -89,7 +89,7 @@ struct ValueDecoder: SingleValueDecodingContainer {
         _ type: Double.Type
     ) throws -> Double {
         do {
-            return try value.convert()
+            return try value.decodeDouble()
         } catch {
             let context = DecodingError.Context(
                 codingPath: codingPath,

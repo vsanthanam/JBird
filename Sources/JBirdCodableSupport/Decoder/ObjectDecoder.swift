@@ -94,7 +94,7 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
     ) throws -> Float {
         let value = try value(forKey: key)
         do {
-            return try value.convert()
+            return try value.decodeFloat()
         } catch {
             let context = DecodingError.Context(
                 codingPath: codingPath + [key],
@@ -114,7 +114,7 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
     ) throws -> Double {
         let value = try value(forKey: key)
         do {
-            return try value.convert()
+            return try value.decodeDouble()
         } catch {
             let context = DecodingError.Context(
                 codingPath: codingPath + [key],
