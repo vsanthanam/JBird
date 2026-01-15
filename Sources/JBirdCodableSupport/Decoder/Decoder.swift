@@ -39,9 +39,20 @@ extension JSON {
 
         // MARK: - API
 
+        /// The values that determine how to decode a type’s coding keys from JSON keys.
+        ///
+        /// - Note: Key decoding strategies other than ``JSON/Decoder/KeyDecodingStrategy/useDefaultKeys`` may have a noticeable performance cost because those strategies may inspect and transform each key.
         public enum KeyDecodingStrategy: Sendable {
+
+            /// A key decoding strategy that converts snake-case keys to camel-case keys.
             case convertFromSnakeCase
+
+            /// A key decoding strategy that doesn’t change key names during decoding.
+            ///
+            /// This strategy is the strategy used if you don’t specify one.
             case useDefaultKeys
+
+            /// A key decoding strategy defined by the closure you supply.
             case custom(@Sendable ([any CodingKey]) -> any CodingKey)
         }
 
@@ -65,6 +76,7 @@ extension JSON {
             case `throw`
         }
 
+        /// A value that determines how to decode a type’s coding keys from JSON keys.
         public var keyDecodingStrategy = KeyDecodingStrategy.useDefaultKeys
 
         public var dateDecodingStrategy = DateDecodingStrategy.deferredToDate
@@ -73,6 +85,7 @@ extension JSON {
 
         public var nonConformingFloatDecodingStrategy = NonComformingFloatDecodingStrategy.throw
 
+        /// A dictionary you use to customize the decoding process by providing contextual information.
         public var userInfo: [CodingUserInfoKey: any Sendable] = [:]
 
         /// Decode a JSON payload into a `Decodable` type
