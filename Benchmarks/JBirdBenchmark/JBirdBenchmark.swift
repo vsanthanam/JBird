@@ -25,13 +25,9 @@
 
 import Benchmark
 import Foundation
-#if USE_FREDDY
-    import Freddy
-#elseif USE_SWIFTY_JSON
-    import SwiftyJSON
-#elseif USE_JBIRD || USE_JBIRD_PARALLEL
-    import JBird
-#endif
+import Freddy
+import JBird
+import SwiftyJSON
 
 func load(benchmark name: String) -> (String, Data) {
     let resource = "benchmark-\(name)"
@@ -57,29 +53,40 @@ let files = [
 ]
 .map(load)
 
+enum Library: String {
+    case foundation
+    case jbird
+    case swiftyjson
+    case freddy
+}
+
+func getLibrary() -> Library {
+    let raw = ProcessInfo.processInfo.environment["BENCHMARK_TARGET"]
+    return raw.flatMap(Library.init)!
+}
+
+let library = getLibrary()
+
 nonisolated(unsafe) let benchmarks = {
     for (name, data) in files {
         Benchmark.defaultConfiguration.maxIterations = 1_000_000_000
         Benchmark("Parse (\(name))") { benchmark in
             for _ in benchmark.scaledIterations {
-                #if USE_FOUNDATION
+                switch library {
+                case .foundation:
                     _ = try JSONSerialization.jsonObject(with: data)
-                #elseif USE_FREDDY
-                    _ = try Freddy.JSON(data: data)
-                #elseif USE_SWIFTY_JSON
-                    _ = try SwiftyJSON.JSON(data: data)
-                #elseif USE_JBIRD
+                case .jbird:
                     _ = try JBird.JSON(data)
-                #elseif USE_JBIRD_PARALLEL
-                    _ = try await JBird.JSON.deserialize(data)
-                #else
-                    fatalError("NO FLAG WAS SET")
-                #endif
+                case .swiftyjson:
+                    _ = try SwiftyJSON.JSON(data: data)
+                case .freddy:
+                    _ = try Freddy.JSON(data: data)
+                }
             }
         } setup: {
-            #if USE_JBIRD || USE_JBIRD_PARALLEL
+            if library == .jbird {
                 JBird.JSON.warmLimits()
-            #endif
+            }
         }
     }
 }
