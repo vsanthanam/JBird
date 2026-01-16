@@ -3,27 +3,27 @@
 
 import PackageDescription
 
-enum BenchmarkTarget: String {
+enum Source: String {
     case release
     case remote
     case local
 }
 
-let benchmarkTarget: BenchmarkTarget? = if Context.environment["BENCHMARK_TARGET"] == "release" {
+let source: Source? = if Context.environment["JBIRD_SOURCE"] == "release" {
     .release
-} else if Context.environment["BENCHMARK_TARGET"] == "remote" {
+} else if Context.environment["JBIRD_SOURCE"] == "remote" {
     .remote
-} else if Context.environment["BENCHMARK_TARGET"] == "local" {
+} else if Context.environment["JBIRD_SOURCE"] == "local" {
     .local
 } else {
     nil
 }
 
-if let benchmarkTarget {
-    print("Benchmark target: \(benchmarkTarget.rawValue)")
+if let source {
+    print("Benchmark target: \(source.rawValue)")
 }
 
-let jbird: PackageDescription.Package.Dependency = switch benchmarkTarget {
+let jbird: PackageDescription.Package.Dependency = switch source {
 case .release:
     .package(
         url: "https://github.com/vsanthanam/JBird.git",
