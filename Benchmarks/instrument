@@ -1,0 +1,35 @@
+#!/bin/bash
+
+rm -rf .build
+
+export JBIRD_SOURCE=local
+
+export BENCHMARK_TARGET=jbird
+
+swift package --allow-writing-to-package-directory benchmark baseline update jbird
+
+rm -rf .build
+
+export BENCHMARK_TARGET=freddy
+
+swift package --allow-writing-to-package-directory benchmark baseline update freddy
+
+rm -rf .build
+
+export BENCHMARK_TARGET=foundation
+
+swift package --allow-writing-to-package-directory benchmark baseline update foundation
+
+rm -rf .build
+
+export BENCHMARK_TARGET=swiftyjson
+
+swift package --allow-writing-to-package-directory benchmark baseline update swiftyjson
+
+rm -rf Results
+
+mkdir Results
+
+swift package benchmark baseline compare foundation jbird --format markdown > Results/foundation.md
+swift package benchmark baseline compare swiftyjson jbird --format markdown > Results.swiftyjson.md
+swift package benchmark baseline compare freddy jbird --format markdown > Results/freddy.md

@@ -32,3 +32,6 @@ Fuzzer/findings/
 Fuzzer/fuzz_harness
 Fuzzer/fuzz_harness.dSYM/
 Fuzzer/json.dict
+
+# Benchmark Results
+Benchmarks/.benchmarkBaselines/
