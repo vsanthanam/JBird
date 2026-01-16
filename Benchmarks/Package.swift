@@ -22,14 +22,14 @@ let source: Source? = if Context.environment["JBIRD_SOURCE"] == "release" {
 if let source {
     print("🧪 Benchmark source: \(source.rawValue)")
 } else {
-    fatalError("⚠️ No benchmark source set!")
+    print("⚠️ No benchmark source configured, using `local`")
 }
 
 let jbird: PackageDescription.Package.Dependency = switch source {
 case .release:
     .package(
         url: "https://github.com/vsanthanam/JBird.git",
-        from: "2.0.0"
+        exact: "2.0.2"
     )
 case .remote:
     .package(
@@ -87,7 +87,10 @@ let package = Package(
                 .copy("benchmark-strings.json"),
                 .copy("benchmark-numeric.json"),
                 .copy("benchmark-integers.json"),
-                .copy("benchmark-deeply-nested.json")
+                .copy("benchmark-deeply-nested.json"),
+                .copy("benchmark-array.json"),
+                .copy("benchmark-canada.json"),
+                .copy("benchmark-twitter.json")
             ],
             plugins: [
                 .plugin(name: "BenchmarkPlugin", package: "package-benchmark")

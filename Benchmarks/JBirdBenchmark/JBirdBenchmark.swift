@@ -35,7 +35,7 @@ func load(benchmark name: String) -> (String, Data) {
     return (name, try! Data(contentsOf: url))
 }
 
-let files = [
+let files: [(String, Data)] = [
     "64kb",
     "64kb-pretty",
     "256kb",
@@ -50,8 +50,10 @@ let files = [
     "numeric",
     "integers",
     "deeply-nested",
-]
-.map(load)
+    "array",
+    "canada",
+    "twitter"
+].map(load)
 
 enum Library: String {
     case foundation
@@ -60,36 +62,47 @@ enum Library: String {
     case freddy
 }
 
-func getLibrary() -> Library {
+func selectedLibrary() -> Library {
     let raw = ProcessInfo.processInfo.environment["BENCHMARK_TARGET"]
-    guard let library = raw.flatMap(Library.init) else {
-        fatalError("NO TARGET SET!")
+    guard let raw, let library = Library(rawValue: raw) else {
+        fatalError("Set BENCHMARK_TARGET to one of: foundation, jbird, swiftyjson, freddy")
     }
     return library
 }
 
-let library = getLibrary()
-
 nonisolated(unsafe) let benchmarks = {
+    Benchmark.defaultConfiguration.maxIterations = 1_000_000_000
+
+    let library = selectedLibrary()
+
+    let parse: (Data) throws -> Void
+    let setup: (() -> Void)?
+
+    switch library {
+    case .foundation:
+        parse = { data in _ = try JSONSerialization.jsonObject(with: data) }
+        setup = nil
+
+    case .jbird:
+        parse = { data in _ = try JBird.JSON(data) }
+        setup = { JBird.JSON.warmLimits() }
+
+    case .swiftyjson:
+        parse = { data in _ = try SwiftyJSON.JSON(data: data) }
+        setup = nil
+
+    case .freddy:
+        parse = { data in _ = try Freddy.JSON(data: data) }
+        setup = nil
+    }
+
     for (name, data) in files {
-        Benchmark.defaultConfiguration.maxIterations = 1_000_000_000
         Benchmark("Parse (\(name))") { benchmark in
             for _ in benchmark.scaledIterations {
-                switch library {
-                case .foundation:
-                    _ = try JSONSerialization.jsonObject(with: data)
-                case .jbird:
-                    _ = try JBird.JSON(data)
-                case .swiftyjson:
-                    _ = try SwiftyJSON.JSON(data: data)
-                case .freddy:
-                    _ = try Freddy.JSON(data: data)
-                }
+                try parse(data)
             }
         } setup: {
-            if library == .jbird {
-                JBird.JSON.warmLimits()
-            }
+            setup?()
         }
     }
 }

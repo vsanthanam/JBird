@@ -47,7 +47,7 @@ The `JBird` product re-exports all three so you can import the umbrella module w
 
 ### Swift Package Traits
 
-JBird publishes two traits: `DeclarativeAPI` (which controls `JBirdBuilders`) and `ConformanceMacros` (which controls `JBirdMacros`). Both are enabled by the package’s default trait, so you keep importing the umbrella product but configure its features on the dependency declaration:
+JBird publishes three traits: `DeclarativeAPI` (which controls `JBirdBuilders`), `ConformanceMacros` (which controls `JBirdMacros`) and `CodableSupport` (which controls `JBirdCodableSupport`). All three are enabled by the package’s default trait, so you keep importing the umbrella product but configure its features on the dependency declaration:
 
 ```swift
 let package = Package(
@@ -55,10 +55,10 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/vsanthanam/JBird.git",
-            from: "2.0.0",
+            from: "2.0.2",
             traits: [
-                .defaults // Enables `DeclarativeAPI` and `ConformanceMacros`. Alternatively, you could explicit opt into only `DeclarativeAPI`, only `ConformanceMacros`, or neither.
-            ]
+                .defaults // Enables `DeclarativeAPI`, `ConformanceMacros` and `CodableSupport`.
+                          // Alternatively, you could explicit opt into `DeclarativeAPI`, `ConformanceMacros`, `CodableSupport`, or any combination of the three.
         )
     ],
     targets: [
