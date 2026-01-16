@@ -1,6 +1,7 @@
 #!/bin/bash
 
-rm -rf .build
+rm Package.resolved
+swift package reset
 
 export BENCHMARK_TARGET=jbird
 
@@ -8,10 +9,11 @@ export JBIRD_SOURCE=release
 
 swift package --allow-writing-to-package-directory benchmark baseline update release
 
-rm -rf .build
+rm Package.resolved
+swift package reset
 
 export JBIRD_SOURCE=local
 
 swift package --allow-writing-to-package-directory benchmark baseline update main
 
-swift package benchmark baseline compare release main
+swift package benchmark baseline compare release main > results.txt

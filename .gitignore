@@ -35,3 +35,4 @@ Fuzzer/json.dict
 
 # Benchmark Results
 Benchmarks/.benchmarkBaselines/
+Benchmarks/results.txt

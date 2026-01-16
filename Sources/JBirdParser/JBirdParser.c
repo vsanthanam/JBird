@@ -985,7 +985,7 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
     bool is_negative = false;
     bool is_double = false;
     double double_value = 0.0;
-    int64_t int_value = 0;
+    uint64_t int_value = 0;
     bool integer_overflow = false;
 
     if (json_peek(parser) == '-') {
@@ -1103,11 +1103,12 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
                 uint8_t digit = json_next(parser) - '0';
 
                 if (!integer_overflow) {
-                    // Check for overflow considering the sign
-                    int64_t limit = is_negative ? -(INT64_MIN / 10) : (INT64_MAX / 10);
-                    int64_t last_digit_limit = is_negative ? -(INT64_MIN % 10) : (INT64_MAX % 10);
+                    // Check for overflow considering the sign using unsigned math
+                    uint64_t limit = is_negative ? ((uint64_t)INT64_MAX + 1u) : (uint64_t)INT64_MAX;
+                    uint64_t limit_div10 = limit / 10;
+                    uint64_t limit_mod10 = limit % 10;
 
-                    if (int_value > limit || (int_value == limit && digit > last_digit_limit)) {
+                    if (int_value > limit_div10 || (int_value == limit_div10 && digit > limit_mod10)) {
                         integer_overflow = true;
                         double_value = (double)int_value;
                         is_double = true;
@@ -1125,11 +1126,12 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
                 uint8_t digit = json_next(parser) - '0';
 
                 if (!integer_overflow) {
-                    // Check for overflow considering the sign
-                    int64_t limit = is_negative ? -(INT64_MIN / 10) : (INT64_MAX / 10);
-                    int64_t last_digit_limit = is_negative ? -(INT64_MIN % 10) : (INT64_MAX % 10);
+                    // Check for overflow considering the sign using unsigned math
+                    uint64_t limit = is_negative ? ((uint64_t)INT64_MAX + 1u) : (uint64_t)INT64_MAX;
+                    uint64_t limit_div10 = limit / 10;
+                    uint64_t limit_mod10 = limit % 10;
 
-                    if (int_value > limit || (int_value == limit && digit > last_digit_limit)) {
+                    if (int_value > limit_div10 || (int_value == limit_div10 && digit > limit_mod10)) {
                         integer_overflow = true;
                         double_value = (double)int_value;
                         is_double = true;
@@ -1214,7 +1216,13 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
     if (is_double) {
         *out_value = json_create_double(parser->arena, is_negative ? -double_value : double_value);
     } else {
-        *out_value = json_create_int(parser->arena, is_negative ? -int_value : int_value);
+        int64_t signed_value;
+        if (is_negative) {
+            signed_value = (int_value == ((uint64_t)INT64_MAX + 1u)) ? INT64_MIN : -(int64_t)int_value;
+        } else {
+            signed_value = (int64_t)int_value;
+        }
+        *out_value = json_create_int(parser->arena, signed_value);
     }
 
     return *out_value ? JSON_NO_ERROR : JSON_OUT_OF_MEMORY;
