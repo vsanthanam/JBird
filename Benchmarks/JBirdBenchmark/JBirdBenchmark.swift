@@ -62,7 +62,10 @@ enum Library: String {
 
 func getLibrary() -> Library {
     let raw = ProcessInfo.processInfo.environment["BENCHMARK_TARGET"]
-    return raw.flatMap(Library.init)!
+    guard let library = raw.flatMap(Library.init) else {
+        fatalError("NO TARGET SET!")
+    }
+    return library
 }
 
 let library = getLibrary()

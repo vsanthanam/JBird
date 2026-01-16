@@ -20,7 +20,9 @@ let source: Source? = if Context.environment["JBIRD_SOURCE"] == "release" {
 }
 
 if let source {
-    print("Benchmark target: \(source.rawValue)")
+    print("🧪 Benchmark source: \(source.rawValue)")
+} else {
+    fatalError("⚠️ No benchmark source set!")
 }
 
 let jbird: PackageDescription.Package.Dependency = switch source {

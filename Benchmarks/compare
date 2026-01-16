@@ -1,0 +1,17 @@
+#!/bin/bash
+
+rm -rf .build
+
+export BENCHMARK_TARGET=jbird
+
+export JBIRD_SOURCE=release
+
+swift package --allow-writing-to-package-directory benchmark baseline update release
+
+rm -rf .build
+
+export JBIRD_SOURCE=local
+
+swift package --allow-writing-to-package-directory benchmark baseline update main
+
+swift package benchmark baseline compare release main
