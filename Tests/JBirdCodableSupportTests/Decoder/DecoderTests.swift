@@ -602,6 +602,32 @@ struct DecoderTests {
             }
         }
 
+        @Test("Unkeyed Data Decoding")
+        func decodeUnkeyedData() throws {
+            let dates = [
+                Data("foo".utf8).base64EncodedString(),
+                Data("bar".utf8).base64EncodedString(),
+                Data("baz".utf8).base64EncodedString()
+            ]
+            let data = try JSONEncoder().encode(dates)
+            let foundation = try JSONDecoder().decode([Data].self, from: data)
+            let jbird = try JSON.Decoder().decode([Data].self, from: data)
+            #expect(foundation == jbird)
+        }
+
+        @Test("Keyed Data Decoding")
+        func decodeKeyedData() throws {
+            let dataDict = [
+                "foo": Data("foo".utf8).base64EncodedString(),
+                "bar": Data("bar".utf8).base64EncodedString(),
+                "baz": Data("baz".utf8).base64EncodedString()
+            ]
+            let data = try JSONEncoder().encode(dataDict)
+            let foundation = try JSONDecoder().decode([String: Data].self, from: data)
+            let jbird = try JSON.Decoder().decode([String: Data].self, from: data)
+            #expect(foundation == jbird)
+        }
+
     }
 
 }
