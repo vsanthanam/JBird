@@ -25,13 +25,7 @@
 
 struct CamelCaseCodingKey: CodingKey {
 
-    init?(stringValue: String) {
-        fatalError()
-    }
-
-    init?(intValue: Int) {
-        fatalError()
-    }
+    // MARK: - Initializers
 
     init(_ key: String) {
 
@@ -73,6 +67,16 @@ struct CamelCaseCodingKey: CodingKey {
             return result
         }
         self.stringValue = convertFromSnakeCase(key)
+    }
+
+    // MARK: - CodingKey
+
+    init?(stringValue: String) {
+        nil
+    }
+
+    init?(intValue: Int) {
+        nil
     }
 
     let intValue: Int? = nil

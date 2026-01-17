@@ -38,7 +38,7 @@ struct IndexCodingKey: CodingKey {
     }
 
     init?(stringValue: String) {
-        fatalError()
+        nil
     }
 
     var intValue: Int? {

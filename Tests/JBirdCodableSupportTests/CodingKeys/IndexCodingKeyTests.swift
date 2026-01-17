@@ -29,14 +29,11 @@ import Testing
 @Suite("Index CodingKey Tests")
 struct IndexCodingKeyTests {
 
-    #if compiler(>=6.2)
-        @Test("String Init")
-        func stringInit() async {
-            await #expect(processExitsWith: .failure) {
-                _ = IndexCodingKey(stringValue: "foo")
-            }
-        }
-    #endif
+    @Test("String Init")
+    func stringInit() async {
+        let key = IndexCodingKey(stringValue: "foo")
+        #expect(key == nil)
+    }
 
     @Test("Int Init")
     func intInit() async throws {

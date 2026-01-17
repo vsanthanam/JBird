@@ -52,25 +52,21 @@ struct SnakeCaseCodingKeyTests {
         }
     }
 
-    #if compiler(>=6.2)
-        @Test("String Init")
-        func stringInit() async {
-            await #expect(processExitsWith: .failure) {
-                _ = SnakeCaseCodingKey(stringValue: "foo")
-            }
-        }
+    @Test("String Init")
+    func stringInit() {
+        let key = SnakeCaseCodingKey(stringValue: "foo")
+        #expect(key == nil)
+    }
 
-        @Test("Int Init")
-        func intInit() async {
-            await #expect(processExitsWith: .failure) {
-                _ = SnakeCaseCodingKey(intValue: 12)
-            }
-        }
-    #endif
+    @Test("Int Init")
+    func intInit() {
+        let key = SnakeCaseCodingKey(intValue: 12)
+        #expect(key == nil)
+    }
 
-    @Test("String Conversion")
-    func stringConversion() throws {
-        let cases: [(String, String)] = [
+    @Test(
+        "String Conversion",
+        arguments: [
             ("someKey", "some_key"),
             ("someURLValue", "some_url_value"),
             ("foo1Bar", "foo_1_bar"),
@@ -78,13 +74,15 @@ struct SnakeCaseCodingKeyTests {
             ("already_snake", "already_snake"),
             ("1Foo", "1_foo"),
         ]
-
-        for (input, expected) in cases {
-            let key = TestKey(input)
-            let snakeKey = SnakeCaseCodingKey(key)
-            #expect(snakeKey.stringValue == expected)
-            #expect(snakeKey.intValue == nil)
-        }
+    )
+    func stringConversion(
+        key: String,
+        newKey: String
+    ) throws {
+        let key = TestKey(key)
+        let snakeKey = SnakeCaseCodingKey(key)
+        #expect(snakeKey.stringValue == newKey)
+        #expect(snakeKey.intValue == nil)
     }
 
 }

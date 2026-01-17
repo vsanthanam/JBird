@@ -25,13 +25,7 @@
 
 struct SnakeCaseCodingKey: CodingKey {
 
-    init?(stringValue: String) {
-        fatalError()
-    }
-
-    init?(intValue: Int) {
-        fatalError()
-    }
+    // MARK: - Initializers
 
     init(_ key: any CodingKey) {
 
@@ -94,6 +88,16 @@ struct SnakeCaseCodingKey: CodingKey {
         }
 
         self.stringValue = camelCaseToSnakeCase(key.stringValue)
+    }
+
+    // MARK: - CodingKey
+
+    init?(stringValue: String) {
+        nil
+    }
+
+    init?(intValue: Int) {
+        nil
     }
 
     let intValue: Int? = nil

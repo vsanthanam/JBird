@@ -1,5 +1,5 @@
 // JBird
-// ObjectCodingKey.swift
+// ObjectCodingKeyTests.swift
 //
 // MIT License
 //
@@ -23,34 +23,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Foundation
+@testable import JBirdCodableSupport
+import Testing
 
-struct ObjectCodingKey: CodingKey {
-
-    // MARK: - Initializers
-
-    init(_ key: String) {
-        self.key = key
-    }
-
-    // MARK: - CodingKey
-
-    var stringValue: String {
-        key
-    }
-
-    init?(stringValue: String) {
-        self.init(stringValue)
-    }
-
-    let intValue: Int? = nil
-
-    init?(intValue: Int) {
-        nil
-    }
-
-    // MARK: - Private
-
-    private let key: String
-
+@Test("Test Object CodingKey")
+func objectCodingKey() throws {
+    let key = ObjectCodingKey("foo")
+    #expect(key.stringValue == "foo")
+    #expect(key.intValue == nil)
+    let stringInitKey = try #require(ObjectCodingKey(stringValue: "bar"))
+    #expect(stringInitKey.stringValue == "bar")
+    #expect(stringInitKey.intValue == nil)
+    let intInitKey = ObjectCodingKey(intValue: 12)
+    #expect(intInitKey == nil)
 }
