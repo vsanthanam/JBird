@@ -53,14 +53,6 @@ struct SerializationTests {
         #expect(withBom == Data([0xEF, 0xBB, 0xBF, 0x74, 0x72, 0x75, 0x65]))
     }
 
-    @Test("Invalid Float Serialization")
-    func invalidFloatSerialization() {
-        let json: JSON = .number(.init(.double(.infinity)))
-        #expect(throws: JSONSerializationError.invalidFloat) {
-            try json.serialize()
-        }
-    }
-
     @Test("Omit Single Null Key")
     func omitSingleNullKey() async throws {
         let json: JSON = ["a": nil]
@@ -233,8 +225,42 @@ struct SerializationTests {
                 #expect(asyncString == expected)
             }
 
-            @Test("Scientific Double Serialization")
-            func scientific() async throws {
+            @Test("Zero Double Serialization")
+            func zero() async throws {
+                let json: JSON = 0.0
+                let data = try json.serialize()
+                let str = try #require(String(data: data, encoding: .utf8))
+                let expected = #"""
+                0.0
+                """#
+                #expect(str == expected)
+                let stringified = try json.stringify()
+                #expect(stringified == expected)
+                let asyncData = try await JSON.serialize(json)
+                #expect(asyncData == data)
+                let asyncString = try await JSON.stringify(json)
+                #expect(asyncString == expected)
+            }
+
+            @Test("Whole Double Serialization")
+            func whole() async throws {
+                let json: JSON = 31.0
+                let data = try json.serialize()
+                let str = try #require(String(data: data, encoding: .utf8))
+                let expected = #"""
+                31.0
+                """#
+                #expect(str == expected)
+                let stringified = try json.stringify()
+                #expect(stringified == expected)
+                let asyncData = try await JSON.serialize(json)
+                #expect(asyncData == data)
+                let asyncString = try await JSON.stringify(json)
+                #expect(asyncString == expected)
+            }
+
+            @Test("Scientific Double Small Serialization")
+            func scientificSmall() async throws {
                 let json: JSON = 0.00000000123
                 let data = try json.serialize()
                 let str = try #require(String(data: data, encoding: .utf8))
@@ -248,6 +274,185 @@ struct SerializationTests {
                 #expect(asyncData == data)
                 let asyncString = try await JSON.stringify(json)
                 #expect(asyncString == expected)
+            }
+
+            @Test("Scientific Double Large Serialization")
+            func scientificLarge() async throws {
+                let json = JSON(Double(90_000_234_123_441_234_123))
+                let data = try json.serialize()
+                let str = try #require(String(data: data, encoding: .utf8))
+                let expected = #"""
+                9.000023412344124e+19
+                """#
+                #expect(str == expected)
+                let stringified = try json.stringify()
+                #expect(stringified == expected)
+                let asyncData = try await JSON.serialize(json)
+                #expect(asyncData == data)
+                let asyncString = try await JSON.stringify(json)
+                #expect(asyncString == expected)
+            }
+
+            @Suite("Non Conforming Floating Point Serialization")
+            struct NonConforming {
+
+                @Test("Standard Behavior")
+                func standard() async throws {
+                    let nan = JSON(Double.nan)
+                    let inf = JSON(Double.infinity)
+                    let negInf = JSON(-Double.infinity)
+                    #expect(throws: JSONSerializationError.invalidFloat) {
+                        try nan.serialize()
+                    }
+                    await #expect(throws: JSONSerializationError.invalidFloat) {
+                        try await JSON.serialize(nan)
+                    }
+                    #expect(throws: JSONSerializationError.invalidFloat) {
+                        try inf.serialize()
+                    }
+                    await #expect(throws: JSONSerializationError.invalidFloat) {
+                        try await JSON.serialize(inf)
+                    }
+                    #expect(throws: JSONSerializationError.invalidFloat) {
+                        try negInf.serialize()
+                    }
+                    await #expect(throws: JSONSerializationError.invalidFloat) {
+                        try await JSON.serialize(negInf)
+                    }
+                }
+
+                @Suite("Allow Non Conforming Behavior")
+                struct AllowNonConforming {
+
+                    @Test("Allowed NaN")
+                    func nan() throws {
+                        let json = JSON(Double.nan)
+                        let data = try JSON.data(from: json, options: [.fragmentsAllowed, .allowNonConformingFloatingPointValues])
+                        let str = try #require(String(data: data, encoding: .utf8))
+                        let expected = #"""
+                        "NaN"
+                        """#
+                        #expect(str == expected)
+                    }
+
+                    @Test("Allowed Positive Infinity")
+                    func positiveInfinity() throws {
+                        let json = JSON(Double.infinity)
+                        let data = try JSON.data(from: json, options: [.fragmentsAllowed, .allowNonConformingFloatingPointValues])
+                        let str = try #require(String(data: data, encoding: .utf8))
+                        let expected = #"""
+                        "Infinity"
+                        """#
+                        #expect(str == expected)
+                    }
+
+                    @Test("Allowed Negative Infinity")
+                    func negativeInfinity() throws {
+                        let json = JSON(-Double.infinity)
+                        let data = try JSON.data(from: json, options: [.fragmentsAllowed, .allowNonConformingFloatingPointValues])
+                        let str = try #require(String(data: data, encoding: .utf8))
+                        let expected = #"""
+                        "-Infinity"
+                        """#
+                        #expect(str == expected)
+                    }
+
+                }
+
+                @Suite("Nullify Non Conforming Behavior")
+                struct NullifyNonConformingStandard {
+
+                    @Test("Allowed NaN")
+                    func nan() throws {
+                        let json = JSON(Double.nan)
+                        let data = try JSON.data(
+                            from: json,
+                            options: [
+                                .fragmentsAllowed,
+                                .allowNonConformingFloatingPointValues,
+                                .nullifyNonConformingFloatingPointValues
+                            ]
+                        )
+                        let str = try #require(String(data: data, encoding: .utf8))
+                        let expected = #"""
+                        null
+                        """#
+                        #expect(str == expected)
+                    }
+
+                    @Test("Allowed Positive Infinity")
+                    func positiveInfinity() throws {
+                        let json = JSON(Double.infinity)
+                        let data = try JSON.data(
+                            from: json,
+                            options: [
+                                .fragmentsAllowed,
+                                .allowNonConformingFloatingPointValues,
+                                .nullifyNonConformingFloatingPointValues
+                            ]
+                        )
+                        let str = try #require(String(data: data, encoding: .utf8))
+                        let expected = #"""
+                        null
+                        """#
+                        #expect(str == expected)
+                    }
+
+                    @Test("Allowed Negative Infinity")
+                    func negativeInfinity() throws {
+                        let json = JSON(-Double.infinity)
+                        let data = try JSON.data(
+                            from: json,
+                            options: [
+                                .fragmentsAllowed,
+                                .allowNonConformingFloatingPointValues,
+                                .nullifyNonConformingFloatingPointValues
+                            ]
+                        )
+                        let str = try #require(String(data: data, encoding: .utf8))
+                        let expected = #"""
+                        null
+                        """#
+                        #expect(str == expected)
+                    }
+
+                }
+
+            }
+
+            @Suite("Truncating Whole Numbers")
+            struct TruncatingWholeNumbers {
+
+                func zero() throws {
+                    let json: JSON = 0.0
+                    let data = try JSON.data(from: json, options: [.fragmentsAllowed, .truncateWholeFloatingPointValues])
+                    let str = try #require(String(data: data, encoding: .utf8))
+                    let expected = #"""
+                    0
+                    """#
+                    #expect(str == expected)
+                }
+
+                func positive() throws {
+                    let json: JSON = 5.0
+                    let data = try JSON.data(from: json, options: [.fragmentsAllowed, .truncateWholeFloatingPointValues])
+                    let str = try #require(String(data: data, encoding: .utf8))
+                    let expected = #"""
+                    5
+                    """#
+                    #expect(str == expected)
+                }
+
+                func negative() throws {
+                    let json: JSON = -75.0
+                    let data = try JSON.data(from: json, options: [.fragmentsAllowed, .truncateWholeFloatingPointValues])
+                    let str = try #require(String(data: data, encoding: .utf8))
+                    let expected = #"""
+                    -7
+                    """#
+                    #expect(str == expected)
+                }
+
             }
 
         }
@@ -349,12 +554,12 @@ struct SerializationTests {
             let str = try #require(String(data: data, encoding: .utf8))
             let expected = #"""
             {
-              "bar": false,
-              "baz": null,
-              "foo": true,
-              "qux": {
-                "a": null,
-                "b": [
+              "bar" : false,
+              "baz" : null,
+              "foo" : true,
+              "qux" : {
+                "a" : null,
+                "b" : [
                   1,
                   2,
                   3

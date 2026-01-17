@@ -23,6 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import Foundation
 import JBirdCore
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
@@ -36,6 +37,13 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
     ) {
         self.decoder = decoder
         self.object = object
+        var mapping: [String: JSON.Key] = [:]
+        mapping.reserveCapacity(object.count)
+        for key in object.keys {
+            let decodedKey = JSON.Decoder.decodeKey(path: decoder.codingPath, key: key)
+            mapping[decodedKey.stringValue] = key
+        }
+        keyMapping = mapping
     }
 
     // MARK: - KeyedDecodingContainerProtocol
@@ -45,13 +53,13 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
     }
 
     var allKeys: [Key] {
-        object.keys.compactMap(Key.init(stringValue:))
+        keyMapping.keys.compactMap(Key.init(stringValue:))
     }
 
     func contains(
         _ key: Key
     ) -> Bool {
-        object.keys.contains(key.stringValue)
+        keyMapping[key.stringValue] != nil
     }
 
     func decodeNil(
@@ -86,7 +94,7 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
     ) throws -> Float {
         let value = try value(forKey: key)
         do {
-            return try value.convert()
+            return try value.decodeFloat()
         } catch {
             let context = DecodingError.Context(
                 codingPath: codingPath + [key],
@@ -106,7 +114,7 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
     ) throws -> Double {
         let value = try value(forKey: key)
         do {
-            return try value.convert()
+            return try value.decodeDouble()
         } catch {
             let context = DecodingError.Context(
                 codingPath: codingPath + [key],
@@ -352,7 +360,15 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
             userInfo: decoder.userInfo,
             parent: decoder
         )
-        return try T(from: nestedDecoder)
+        if type == Date.self {
+            let date = try JSON.Decoder.decodeDate(decoder: nestedDecoder)
+            return unsafeBitCast(date, to: type)
+        } else if type == Data.self {
+            let data = try JSON.Decoder.decodeData(decoder: nestedDecoder)
+            return unsafeBitCast(data, to: type)
+        } else {
+            return try T(from: nestedDecoder)
+        }
     }
 
     func nestedContainer<NestedKey>(
@@ -412,9 +428,12 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
 
     private let decoder: InternalDecoder
     private let object: JSON.Object
+    private let keyMapping: [String: JSON.Key]
 
     private func value(forKey key: Key) throws -> JSON {
-        guard let value = object[key.stringValue] else {
+        guard let objectKey = keyMapping[key.stringValue],
+              let value = object[objectKey]
+        else {
             throw DecodingError.keyNotFound(key, .init(codingPath: codingPath + [key], debugDescription: "Couldn't find value for key '\(key.stringValue)'"))
         }
         return value

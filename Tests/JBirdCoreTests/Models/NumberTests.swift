@@ -102,4 +102,23 @@ struct NumberTests {
         #expect(double.isFloatingPoint)
     }
 
+    @Test("Number Is Finite")
+    func isFinite() {
+        let finite = JSON.Number(1.2)
+        let inf = JSON.Number(Double.infinity)
+        let negInf = JSON.Number(-Double.infinity)
+        #expect(finite.isFinite)
+        #expect(!inf.isFinite)
+        #expect(!negInf.isInteger)
+    }
+
+    @Test("Number Is Infinite")
+    func isInfinite() {
+        let finite = JSON.Number(1.2)
+        let inf = JSON.Number(Double.infinity)
+        let negInf = JSON.Number(-Double.infinity)
+        #expect(!finite.isInfinite)
+        #expect(inf.isInfinite)
+        #expect(negInf.isInfinite)
+    }
 }

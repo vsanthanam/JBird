@@ -1,5 +1,5 @@
 // JBird
-// IndexCodingKey.swift
+// CamelCaseCodingKeyTests.swift
 //
 // MIT License
 //
@@ -23,34 +23,42 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-struct IndexCodingKey: CodingKey {
+@testable import JBirdCodableSupport
+import Testing
 
-    // MARK: - Initializers
+@Suite("Camel Case CodingKey Tests")
+struct CamelCaseCodingKeyTests {
 
-    init(_ index: Int) {
-        self.index = index
+    @Test("String Init")
+    func stringInit() {
+        let key = CamelCaseCodingKey(stringValue: "foo")
+        #expect(key == nil)
     }
 
-    // MARK: - CodingKey
-
-    var stringValue: String {
-        index.description
+    @Test("Int Init")
+    func intInit() {
+        let key = CamelCaseCodingKey(intValue: 12)
+        #expect(key == nil)
     }
 
-    init?(stringValue: String) {
-        fatalError()
+    @Test(
+        "String Conversion",
+        arguments: [
+            ("some_key", "someKey"),
+            ("some_url_value", "someUrlValue"),
+            ("foo_1_bar", "foo1Bar"),
+            ("f_o_o_bar", "fOOBar"),
+            ("alreadyCamel", "alreadyCamel"),
+            ("1_foo", "1Foo")
+        ]
+    )
+    func stringConversion(
+        key: String,
+        newKey: String
+    ) throws {
+        let snakeKey = CamelCaseCodingKey(key)
+        #expect(snakeKey.stringValue == newKey)
+        #expect(snakeKey.intValue == nil)
     }
-
-    var intValue: Int? {
-        index
-    }
-
-    init?(intValue: Int) {
-        self.init(intValue)
-    }
-
-    // MARK: - Private
-
-    private let index: Int
 
 }

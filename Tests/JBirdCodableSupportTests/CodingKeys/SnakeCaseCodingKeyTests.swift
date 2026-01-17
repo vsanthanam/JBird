@@ -1,0 +1,88 @@
+// JBird
+// SnakeCaseCodingKeyTests.swift
+//
+// MIT License
+//
+// Copyright (c) 2025 Varun Santhanam
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the  Software), to deal
+//
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED  AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+@testable import JBirdCodableSupport
+import Testing
+
+@Suite("Snake Case CodingKey Tests")
+struct SnakeCaseCodingKeyTests {
+
+    private struct TestKey: CodingKey {
+        let stringValue: String
+        let intValue: Int? = nil
+
+        init(
+            _ stringValue: String
+        ) {
+            self.stringValue = stringValue
+        }
+
+        init?(
+            stringValue: String
+        ) {
+            self.stringValue = stringValue
+        }
+
+        init?(
+            intValue: Int
+        ) {
+            nil
+        }
+    }
+
+    @Test("String Init")
+    func stringInit() {
+        let key = SnakeCaseCodingKey(stringValue: "foo")
+        #expect(key == nil)
+    }
+
+    @Test("Int Init")
+    func intInit() {
+        let key = SnakeCaseCodingKey(intValue: 12)
+        #expect(key == nil)
+    }
+
+    @Test(
+        "String Conversion",
+        arguments: [
+            ("someKey", "some_key"),
+            ("someURLValue", "some_url_value"),
+            ("foo1Bar", "foo_1_bar"),
+            ("FOOBar", "f_oo_bar"),
+            ("already_snake", "already_snake"),
+            ("1Foo", "1_foo"),
+        ]
+    )
+    func stringConversion(
+        key: String,
+        newKey: String
+    ) throws {
+        let key = TestKey(key)
+        let snakeKey = SnakeCaseCodingKey(key)
+        #expect(snakeKey.stringValue == newKey)
+        #expect(snakeKey.intValue == nil)
+    }
+
+}

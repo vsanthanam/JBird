@@ -23,6 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import Foundation
 import JBirdCore
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
@@ -68,13 +69,13 @@ final class ArrayEncoder: UnkeyedEncodingContainer {
     func encode(
         _ value: Double
     ) throws {
-        append(JSON(value))
+        try append(JSON.Encoder.encodeDouble(value, codingPath: codingPath))
     }
 
     func encode(
         _ value: Float
     ) throws {
-        append(JSON(value))
+        try append(JSON.Encoder.encodeFloat(value, codingPath: codingPath))
     }
 
     func encode(
@@ -147,7 +148,13 @@ final class ArrayEncoder: UnkeyedEncodingContainer {
             autoPopContainers: false,
             onValueChange: nil
         )
-        try value.encode(to: nestedEncoder)
+        if let data = value as? Data {
+            try JSON.Encoder.encodeData(data, to: nestedEncoder)
+        } else if let date = value as? Date {
+            try JSON.Encoder.encodeDate(date, to: nestedEncoder)
+        } else {
+            try value.encode(to: nestedEncoder)
+        }
         let encoded = nestedEncoder.popContainer()
         append(encoded)
     }

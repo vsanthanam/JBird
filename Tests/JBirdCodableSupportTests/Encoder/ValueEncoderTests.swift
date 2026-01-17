@@ -167,13 +167,11 @@ struct ValueEncoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test("Beyong BMP String")
+        @Test("Beyond BMP String")
         func emoji() throws {
             let value = "Hello 😉"
             let foundation = try JSONEncoder().encode(value)
-            var encoder = JSON.Encoder()
-            encoder.serializationOptions = [.fragmentsAllowed]
-            let jbird = try encoder.encode(value)
+            let jbird = try JSON.Encoder().encode(value)
             #expect(foundation == jbird)
         }
 
@@ -220,4 +218,5 @@ struct ValueEncoderTests {
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
+
 }

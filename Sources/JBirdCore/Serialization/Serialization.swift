@@ -424,7 +424,7 @@ extension JSON {
         case let .array(array):
             try serialize(array: array, into: &bytes, level: level, options: options, isAsync: isCancellable)
         case let .number(number):
-            try serialize(number: number, into: &bytes)
+            try serialize(number: number, options: options, into: &bytes)
         case let .string(string):
             serialize(string: string, options: options, into: &bytes)
         case .null:
@@ -455,13 +455,14 @@ extension JSON {
     @inline(__always)
     private static func serialize(
         number: Number,
+        options: SerializationOptions,
         into bytes: inout [UInt8]
     ) throws {
         switch number.storage {
         case let .int(value):
             serialize(integer: value, into: &bytes)
         case let .double(value):
-            try serialize(double: value, into: &bytes)
+            try serialize(double: value, options: options, into: &bytes)
         }
     }
 
@@ -477,30 +478,48 @@ extension JSON {
     @inline(__always)
     private static func serialize(
         double: Double,
+        options: SerializationOptions,
         into bytes: inout [UInt8]
     ) throws {
-        guard double.isFinite else { throw JSONSerializationError.invalidFloat }
-        if double == 0 {
-            bytes += "0".utf8
-            return
-        }
-
-        let absValue = abs(double)
-
-        if absValue >= 1e7 || absValue < 1e-6 {
-            guard let str = floatNumberFormatter.string(from: NSNumber(value: double)) else {
+        if double.isNaN {
+            if options.contains(.allowNonConformingFloatingPointValues) {
+                if options.contains(.nullifyNonConformingFloatingPointValues) {
+                    serializeNull(into: &bytes)
+                    return
+                } else {
+                    serialize(string: "NaN", options: options, into: &bytes)
+                    return
+                }
+            } else {
                 throw JSONSerializationError.invalidFloat
             }
-            bytes += str.utf8
-            return
+        } else if double.isInfinite {
+            if options.contains(.allowNonConformingFloatingPointValues) {
+                if options.contains(.nullifyNonConformingFloatingPointValues) {
+                    serializeNull(into: &bytes)
+                    return
+                } else {
+                    switch double.sign {
+                    case .plus:
+                        serialize(string: "Infinity", options: options, into: &bytes)
+                    case .minus:
+                        serialize(string: "-Infinity", options: options, into: &bytes)
+                    }
+                    return
+                }
+            } else {
+                throw JSONSerializationError.invalidFloat
+            }
         }
 
-        if double.rounded(.towardZero) == double,
-           absValue <= Double(Int64.max) {
-            bytes += String(Int64(double)).utf8
-        } else {
-            bytes += String(double).utf8
+        var string = String(double)
+        if options.contains(.truncateWholeFloatingPointValues),
+           !string.contains("e"),
+           !string.contains("E"),
+           string.hasSuffix(".0") {
+            string.removeLast(2)
         }
+        bytes += string.utf8
     }
 
     @inline(__always)
@@ -645,7 +664,7 @@ extension JSON {
             if let level {
                 addIndentation(level: level + 1, into: &bytes)
                 serialize(string: key, options: options, into: &bytes)
-                bytes += [0x3A, 0x20]
+                bytes += [0x20, 0x3A, 0x20]
                 try serialize(json: value, into: &bytes, level: level + 1, options: options, isCancellable: isAsync)
                 bytes += [0x2C, 0x0A]
             } else {
@@ -661,7 +680,7 @@ extension JSON {
             if let level {
                 addIndentation(level: level + 1, into: &bytes)
                 serialize(string: key, options: options, into: &bytes)
-                bytes += [0x3A, 0x20]
+                bytes += [0x20, 0x3A, 0x20]
                 try serialize(json: value, into: &bytes, level: level + 1, options: options, isCancellable: isAsync)
                 bytes += [0x0A]
             } else {
@@ -1118,14 +1137,3 @@ extension JSON {
     }
 
 }
-
-private let floatNumberFormatter: NumberFormatter = {
-    let formatter = NumberFormatter()
-    formatter.locale = Locale(identifier: "en_US_POSIX")
-    formatter.numberStyle = .scientific
-    formatter.positiveFormat = "0.################E+00"
-    formatter.negativeFormat = "-0.################E+00"
-    formatter.exponentSymbol = "e"
-
-    return formatter
-}()

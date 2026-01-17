@@ -23,6 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import Foundation
 import JBirdCore
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
@@ -70,7 +71,7 @@ struct ValueDecoder: SingleValueDecodingContainer {
         _ type: Float.Type
     ) throws -> Float {
         do {
-            return try value.convert()
+            return try value.decodeFloat()
         } catch {
             let context = DecodingError.Context(
                 codingPath: codingPath,
@@ -88,7 +89,7 @@ struct ValueDecoder: SingleValueDecodingContainer {
         _ type: Double.Type
     ) throws -> Double {
         do {
-            return try value.convert()
+            return try value.decodeDouble()
         } catch {
             let context = DecodingError.Context(
                 codingPath: codingPath,
@@ -310,7 +311,15 @@ struct ValueDecoder: SingleValueDecodingContainer {
             userInfo: decoder.userInfo,
             parent: decoder
         )
-        return try T(from: nestedDecoder)
+        if type == Date.self {
+            let date = try JSON.Decoder.decodeDate(decoder: decoder)
+            return unsafeBitCast(date, to: type)
+        } else if type == Data.self {
+            let data = try JSON.Decoder.decodeData(decoder: decoder)
+            return unsafeBitCast(data, to: type)
+        } else {
+            return try T(from: nestedDecoder)
+        }
     }
 
     // MARK: - Private
