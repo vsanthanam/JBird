@@ -444,5 +444,61 @@ struct DecoderTests {
         }
 
     }
+    
+    @Suite("Decode Data")
+    struct DecodeData {
+
+        @Test("Base 64 Data Decoding Strategy")
+        func defaultStrategy() throws {
+            let source = Data("Hello, World".utf8).base64EncodedString()
+            let data = try JSONEncoder().encode(source)
+            let foundation = try JSONDecoder().decode(Data.self, from: data)
+            let jbird = try JSON.Decoder().decode(Data.self, from: data)
+            #expect(foundation == jbird)
+        }
+        
+        @Test("Deferred Data Decoding Strategy")
+        func deferredStrategy() throws {
+            let source = Data("Hello, World".utf8)
+            let encoder = JSONEncoder()
+            encoder.dataEncodingStrategy = .deferredToData
+            let data = try encoder.encode(source)
+            
+            let foundationDecoder = JSONDecoder()
+            foundationDecoder.dataDecodingStrategy = .deferredToData
+            let foundation = try foundationDecoder.decode(Data.self, from: data)
+            
+            let jbirdDecoder = JSON.Decoder()
+            jbirdDecoder.dataDecodingStrategy = .deferredToData
+            let jbird = try jbirdDecoder.decode(Data.self, from: data)
+            #expect(foundation == jbird)
+        }
+
+        @Test("Custom Data Decoding Strategy")
+        func customDataDecodingStrategy() throws {
+            let source = Data("Hello, World".utf8)
+            let encoder = JSONEncoder()
+            encoder.dataEncodingStrategy = .custom { data, encoder in
+                try data.base64EncodedString().encode(to: encoder)
+            }
+            let data = try encoder.encode(source)
+
+            let foundationDecoder = JSONDecoder()
+            foundationDecoder.dataDecodingStrategy = .custom { decoder in
+                let str = try String(from: decoder)
+                return Data(str.utf8)
+            }
+            let foundation = try foundationDecoder.decode(Data.self, from: data)
+
+            let jbirdDecoder = JSON.Decoder()
+            jbirdDecoder.dataDecodingStrategy = .custom { decoder in
+                let str = try String(from: decoder)
+                return Data(str.utf8)
+            }
+            let jbird = try jbirdDecoder.decode(Data.self, from: data)
+            #expect(foundation == jbird)
+        }
+
+    }
 
 }
