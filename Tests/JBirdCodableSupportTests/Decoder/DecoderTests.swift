@@ -314,38 +314,86 @@ struct DecoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test("ISO 8601 Decoding Strategy")
-        func isoStrategy() throws {
-            let source = Date.now
-            let formatter = ISO8601DateFormatter()
-            let string = formatter.string(from: source)
-            let data = try JSONEncoder().encode(string)
+        @Suite("ISO 8601 Decoding Strategy ")
+        struct ISOStrategy {
 
-            let foundationDecoder = JSONDecoder()
-            foundationDecoder.dateDecodingStrategy = .iso8601
-            let foundation = try foundationDecoder.decode(Date.self, from: data)
+            @Test("Sucessful ISO 8601 Decoding Strategy")
+            func success() throws {
+                let source = Date.now
+                let formatter = ISO8601DateFormatter()
+                let string = formatter.string(from: source)
+                let data = try JSONEncoder().encode(string)
 
-            let jbirdDecoder = JSON.Decoder()
-            jbirdDecoder.dateDecodingStrategy = .iso8601
-            let jbird = try jbirdDecoder.decode(Date.self, from: data)
-            #expect(foundation == jbird)
+                let foundationDecoder = JSONDecoder()
+                foundationDecoder.dateDecodingStrategy = .iso8601
+                let foundation = try foundationDecoder.decode(Date.self, from: data)
+
+                let jbirdDecoder = JSON.Decoder()
+                jbirdDecoder.dateDecodingStrategy = .iso8601
+                let jbird = try jbirdDecoder.decode(Date.self, from: data)
+                #expect(foundation == jbird)
+            }
+
+            @Test("Broken ISO 8601 Decoding Strategy")
+            func failure() throws {
+                let data = try JSONEncoder().encode("Some JSON String")
+
+                let decoder = JSON.Decoder()
+                decoder.dateDecodingStrategy = .iso8601
+                #expect {
+                    _ = try decoder.decode(Date.self, from: data)
+                } throws: { error in
+                    let error = try #require(error as? DecodingError)
+                    guard case let .dataCorrupted(context) = error else {
+                        return false
+                    }
+                    #expect(context.codingPath.isEmpty)
+                    #expect(context.debugDescription == "Couldn't decode date using ISO8601 decoding strategy.")
+                    return true
+                }
+            }
+
         }
 
-        @Test("Date Formatter Decoding Strategy")
-        func formatterStrategy() throws {
-            let source = Date.now
-            let formatter = DateFormatter()
-            let string = formatter.string(from: source)
-            let data = try JSONEncoder().encode(string)
+        @Suite("Date Formatter Decoding Strategy")
+        struct FormatterDecodingStrategy {
 
-            let foundationDecoder = JSONDecoder()
-            foundationDecoder.dateDecodingStrategy = .formatted(formatter)
-            let foundation = try foundationDecoder.decode(Date.self, from: data)
+            @Test("Successful Date Formatter Decoding Strategy")
+            func success() throws {
+                let source = Date.now
+                let formatter = DateFormatter()
+                let string = formatter.string(from: source)
+                let data = try JSONEncoder().encode(string)
 
-            let jbirdDecoder = JSON.Decoder()
-            jbirdDecoder.dateDecodingStrategy = .formatted(formatter)
-            let jbird = try jbirdDecoder.decode(Date.self, from: data)
-            #expect(foundation == jbird)
+                let foundationDecoder = JSONDecoder()
+                foundationDecoder.dateDecodingStrategy = .formatted(formatter)
+                let foundation = try foundationDecoder.decode(Date.self, from: data)
+
+                let jbirdDecoder = JSON.Decoder()
+                jbirdDecoder.dateDecodingStrategy = .formatted(formatter)
+                let jbird = try jbirdDecoder.decode(Date.self, from: data)
+                #expect(foundation == jbird)
+            }
+
+            @Test("Broken Formatter Decoding Strategy")
+            func failure() throws {
+                let data = try JSONEncoder().encode("Some JSON String")
+
+                let decoder = JSON.Decoder()
+                decoder.dateDecodingStrategy = .formatted(DateFormatter())
+                #expect {
+                    _ = try decoder.decode(Date.self, from: data)
+                } throws: { error in
+                    let error = try #require(error as? DecodingError)
+                    guard case let .dataCorrupted(context) = error else {
+                        return false
+                    }
+                    #expect(context.codingPath.isEmpty)
+                    #expect(context.debugDescription == "Couldn't decode date using date formatter decoding strategy.")
+                    return true
+                }
+            }
+
         }
 
         @Test("Milliseconds Since 1970 Decoding Strategy")
@@ -444,30 +492,53 @@ struct DecoderTests {
         }
 
     }
-    
+
     @Suite("Decode Data")
     struct DecodeData {
 
-        @Test("Base 64 Data Decoding Strategy")
-        func defaultStrategy() throws {
-            let source = Data("Hello, World".utf8).base64EncodedString()
-            let data = try JSONEncoder().encode(source)
-            let foundation = try JSONDecoder().decode(Data.self, from: data)
-            let jbird = try JSON.Decoder().decode(Data.self, from: data)
-            #expect(foundation == jbird)
+        @Suite("Base64 Data Decoding Strategy")
+        struct Base64 {
+
+            @Test("Successful Base64 Data Decoding Strategy")
+            func success() throws {
+                let source = Data("Hello, World".utf8).base64EncodedString()
+                let data = try JSONEncoder().encode(source)
+                let foundation = try JSONDecoder().decode(Data.self, from: data)
+                let jbird = try JSON.Decoder().decode(Data.self, from: data)
+                #expect(foundation == jbird)
+            }
+
+            @Test("Broken Base64 Decoding Strategy")
+            func failure() throws {
+                let data = try JSONEncoder().encode("Some JSON String")
+
+                let decoder = JSON.Decoder()
+                #expect {
+                    _ = try decoder.decode(Data.self, from: data)
+                } throws: { error in
+                    let error = try #require(error as? DecodingError)
+                    guard case let .dataCorrupted(context) = error else {
+                        return false
+                    }
+                    #expect(context.codingPath.isEmpty)
+                    #expect(context.debugDescription == "Couldn't decode data using base64 decoding strategy.")
+                    return true
+                }
+            }
+
         }
-        
+
         @Test("Deferred Data Decoding Strategy")
         func deferredStrategy() throws {
             let source = Data("Hello, World".utf8)
             let encoder = JSONEncoder()
             encoder.dataEncodingStrategy = .deferredToData
             let data = try encoder.encode(source)
-            
+
             let foundationDecoder = JSONDecoder()
             foundationDecoder.dataDecodingStrategy = .deferredToData
             let foundation = try foundationDecoder.decode(Data.self, from: data)
-            
+
             let jbirdDecoder = JSON.Decoder()
             jbirdDecoder.dataDecodingStrategy = .deferredToData
             let jbird = try jbirdDecoder.decode(Data.self, from: data)
@@ -497,6 +568,38 @@ struct DecoderTests {
             }
             let jbird = try jbirdDecoder.decode(Data.self, from: data)
             #expect(foundation == jbird)
+        }
+
+        @Test("Custom Data Decoding Strategy That Fails")
+        func customDataDecodingStrategyThatFails() throws {
+            let source = Data("Hello, World".utf8)
+            let encoder = JSONEncoder()
+            encoder.dataEncodingStrategy = .custom { data, encoder in
+                try data.base64EncodedString().encode(to: encoder)
+            }
+            let data = try encoder.encode(source)
+
+            enum MyError: Error, Equatable {
+                case test
+            }
+
+            let decoder = JSON.Decoder()
+            decoder.dataDecodingStrategy = .custom { _ in
+                throw MyError.test
+            }
+            #expect {
+                _ = try decoder.decode(Data.self, from: data)
+            } throws: { error in
+                let error = try #require(error as? DecodingError)
+                guard case let .dataCorrupted(context) = error else {
+                    return false
+                }
+                #expect(context.codingPath.isEmpty)
+                #expect(context.debugDescription == "Couldn't decode data using custom decoding strategy.")
+                let underlying = try #require(context.underlyingError as? MyError)
+                #expect(underlying == .test)
+                return true
+            }
         }
 
     }

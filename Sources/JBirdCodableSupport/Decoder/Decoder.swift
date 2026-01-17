@@ -94,7 +94,7 @@ extension JSON {
         /// The strategies for encoding nonconforming floating-point numbers, also known as IEEE 754 exceptional values.
         ///
         /// The IEEE 754 floating-point specification defines exceptional values, which include infinity and nan.
-        public enum NonComformingFloatDecodingStrategy: Sendable {
+        public enum NonConformingFloatDecodingStrategy: Sendable {
 
             /// The strategy that decodes exceptional floating-point values from a specified string representation.
             case convertFromString(positiveInfinity: String = "Infinity", negativeInfinity: String = "-Infinity", nan: String = "NaN")
@@ -119,7 +119,7 @@ extension JSON {
         /// The strategy used by a decoder when it encounters exceptional floating-point values.
         ///
         /// The default strategy is ``JSON/Decoder/NonConformingFloatDecodingStrategy/throw``.
-        public var nonConformingFloatDecodingStrategy = NonComformingFloatDecodingStrategy.throw
+        public var nonConformingFloatDecodingStrategy = NonConformingFloatDecodingStrategy.throw
 
         /// A dictionary you use to customize the decoding process by providing contextual information.
         public var userInfo: [CodingUserInfoKey: any Sendable] = [:]
@@ -163,7 +163,7 @@ extension JSON {
             let keyDecodingStrategy: KeyDecodingStrategy
             let dateDecodingStrategy: DateDecodingStrategy
             let dataDecodingStrategy: DataDecodingStrategy
-            let nonConformingFloatDecodingStrategy: NonComformingFloatDecodingStrategy
+            let nonConformingFloatDecodingStrategy: NonConformingFloatDecodingStrategy
         }
 
         @TaskLocal
@@ -259,7 +259,7 @@ extension JSON {
                     throw DecodingError.dataCorrupted(
                         .init(
                             codingPath: decoder.codingPath,
-                            debugDescription: "Couldn't decode using custom decoding strategy.",
+                            debugDescription: "Couldn't decode data using custom decoding strategy.",
                             underlyingError: error
                         )
                     )
