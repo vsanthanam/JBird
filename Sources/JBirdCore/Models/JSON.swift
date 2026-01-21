@@ -121,7 +121,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             case let .array(array):
                 array.count
             case .bool, .null, .number, .string:
-                throw JSONError.illegalCollectionConversion
+                throw OperationError.illegalCollectionConversion
             }
         }
     }
@@ -164,7 +164,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             case let .bool(bool):
                 return bool
             case .null, .array, .number, .object, .string:
-                throw JSONError.illegalBoolConversion
+                throw OperationError.illegalBoolConversion
             }
         }
     }
@@ -180,7 +180,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             case let .object(object):
                 object
             case .bool, .null, .array, .number, .string:
-                throw JSONError.illegalObjectConversion
+                throw OperationError.illegalObjectConversion
             }
         }
     }
@@ -196,7 +196,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             case let .array(array):
                 array
             case .bool, .null, .object, .number, .string:
-                throw JSONError.illegalArrayConversion
+                throw OperationError.illegalArrayConversion
             }
         }
     }
@@ -212,7 +212,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             case let .number(number):
                 number
             case .bool, .null, .object, .array, .string:
-                throw JSONError.illegalNumberConversion
+                throw OperationError.illegalNumberConversion
             }
         }
     }
@@ -226,7 +226,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             case let .string(string):
                 string
             case .bool, .null, .object, .array, .number:
-                throw JSONError.illegalStringConversion
+                throw OperationError.illegalStringConversion
             }
         }
     }
@@ -368,18 +368,18 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         switch `subscript` {
         case let .key(key):
             guard case let .object(object) = self else {
-                throw JSONError.invalidSubscript(`subscript`)
+                throw OperationError.invalidSubscript(`subscript`)
             }
             guard object.keys.contains(key) else {
-                throw JSONError.keyNotFound(key)
+                throw OperationError.keyNotFound(key)
             }
             return object[key].unsafelyUnwrapped
         case let .index(index):
             guard case let .array(array) = self else {
-                throw JSONError.invalidSubscript(`subscript`)
+                throw OperationError.invalidSubscript(`subscript`)
             }
             guard case array.indices = index else {
-                throw JSONError.indexOutOfBounds(index)
+                throw OperationError.indexOutOfBounds(index)
             }
             return array[index]
         }
@@ -526,7 +526,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         switch (self, `subscript`) {
         case (var .array(array), let .index(index)):
             guard case array.indices = index else {
-                throw JSONError.indexOutOfBounds(index)
+                throw OperationError.indexOutOfBounds(index)
             }
             array[index] = value
             self = .array(array)
@@ -539,7 +539,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
              (.number, _),
              (.bool, _),
              (.null, _):
-            throw JSONError.invalidSubscript(`subscript`)
+            throw OperationError.invalidSubscript(`subscript`)
         }
     }
 
@@ -879,7 +879,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         let index = Int(index)
         var array = try arrayValue
         guard array.indices.contains(index) else {
-            throw JSONError.indexOutOfBounds(index)
+            throw OperationError.indexOutOfBounds(index)
         }
         array.insert(value, at: index)
         self = .array(array)
@@ -903,10 +903,10 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         let i = Int(i)
         let j = Int(j)
         guard array.indices.contains(i) else {
-            throw JSONError.indexOutOfBounds(i)
+            throw OperationError.indexOutOfBounds(i)
         }
         guard array.indices.contains(j) else {
-            throw JSONError.indexOutOfBounds(j)
+            throw OperationError.indexOutOfBounds(j)
         }
         array.swapAt(i, j)
         self = .array(array)
@@ -938,13 +938,13 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         switch (self, `subscript`) {
         case (var .array(array), let .index(index)):
             guard case array.indices = index else {
-                throw JSONError.indexOutOfBounds(index)
+                throw OperationError.indexOutOfBounds(index)
             }
             array.remove(at: index)
             self = .array(array)
         case (var .object(object), let .key(key)):
             guard object.keys.contains(key) else {
-                throw JSONError.keyNotFound(key)
+                throw OperationError.keyNotFound(key)
             }
             object.removeValue(forKey: key)
             self = .object(object)
@@ -954,7 +954,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
              (.number, _),
              (.bool, _),
              (.null, _):
-            throw JSONError.invalidSubscript(`subscript`)
+            throw OperationError.invalidSubscript(`subscript`)
         }
     }
 
@@ -1067,7 +1067,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
                         try FileManager.default.removeItem(at: fileURL)
                         try Task.checkCancellation()
                     } else {
-                        throw JSONError.fileExists(fileURL)
+                        throw OperationError.fileExists(fileURL)
                     }
                 }
 
@@ -1100,7 +1100,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
                         try FileManager.default.removeItem(at: fileURL)
                         try Task.checkCancellation()
                     } else {
-                        throw JSONError.fileExists(fileURL)
+                        throw OperationError.fileExists(fileURL)
                     }
                 }
 

@@ -296,7 +296,7 @@ extension JSON {
                         .init(
                             codingPath: codingPath,
                             debugDescription: "Encountered a non conforming floating point value",
-                            underlyingError: JSONSerializationError.invalidFloat
+                            underlyingError: JSON.SerializationError.invalidFloat
                         )
                     )
                 }
@@ -326,7 +326,7 @@ extension JSON {
                         .init(
                             codingPath: codingPath,
                             debugDescription: "Encountered a non conforming floating point value",
-                            underlyingError: JSONSerializationError.invalidFloat
+                            underlyingError: JSON.SerializationError.invalidFloat
                         )
                     )
                 }

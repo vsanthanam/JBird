@@ -54,31 +54,31 @@ struct JSONTests {
         try #expect(emptyArray.isEmpty == true)
         try #expect(emptyObject.isEmpty == true)
 
-        #expect(throws: JSONError.illegalCollectionConversion) {
+        #expect(throws: JSON.OperationError.illegalCollectionConversion) {
             _ = try number.count
         }
-        #expect(throws: JSONError.illegalCollectionConversion) {
+        #expect(throws: JSON.OperationError.illegalCollectionConversion) {
             _ = try number.isEmpty
         }
 
-        #expect(throws: JSONError.illegalCollectionConversion) {
+        #expect(throws: JSON.OperationError.illegalCollectionConversion) {
             _ = try string.count
         }
-        #expect(throws: JSONError.illegalCollectionConversion) {
+        #expect(throws: JSON.OperationError.illegalCollectionConversion) {
             _ = try string.isEmpty
         }
 
-        #expect(throws: JSONError.illegalCollectionConversion) {
+        #expect(throws: JSON.OperationError.illegalCollectionConversion) {
             _ = try bool.count
         }
-        #expect(throws: JSONError.illegalCollectionConversion) {
+        #expect(throws: JSON.OperationError.illegalCollectionConversion) {
             _ = try bool.isEmpty
         }
 
-        #expect(throws: JSONError.illegalCollectionConversion) {
+        #expect(throws: JSON.OperationError.illegalCollectionConversion) {
             _ = try null.count
         }
-        #expect(throws: JSONError.illegalCollectionConversion) {
+        #expect(throws: JSON.OperationError.illegalCollectionConversion) {
             _ = try null.isEmpty
         }
     }
@@ -196,7 +196,7 @@ struct JSONTests {
             let nonObjectJson = JSON.string("foo")
             let object = try jsonObject.objectValue
             #expect(object == ["foo": "bar"])
-            #expect(throws: JSONError.illegalObjectConversion) {
+            #expect(throws: JSON.OperationError.illegalObjectConversion) {
                 _ = try nonObjectJson.objectValue
             }
         }
@@ -207,7 +207,7 @@ struct JSONTests {
             let nonArrayJson = JSON.string("foo")
             let array = try jsonArray.arrayValue
             #expect(array == ["foo", "bar"])
-            #expect(throws: JSONError.illegalArrayConversion) {
+            #expect(throws: JSON.OperationError.illegalArrayConversion) {
                 _ = try nonArrayJson.arrayValue
             }
         }
@@ -218,7 +218,7 @@ struct JSONTests {
             let nonStringJson = JSON.object(["foo": "bar"])
             let string = try jsonString.stringValue
             #expect(string == "foo")
-            #expect(throws: JSONError.illegalStringConversion) {
+            #expect(throws: JSON.OperationError.illegalStringConversion) {
                 _ = try nonStringJson.stringValue
             }
         }
@@ -229,7 +229,7 @@ struct JSONTests {
             let nonNumberJson = JSON.string("foo")
             let number = try jsonNumber.numberValue
             #expect(number == .init(123))
-            #expect(throws: JSONError.illegalNumberConversion) {
+            #expect(throws: JSON.OperationError.illegalNumberConversion) {
                 _ = try nonNumberJson.numberValue
             }
         }
@@ -240,7 +240,7 @@ struct JSONTests {
             let nonBoolJson = JSON.string("foo")
             let bool = try jsonBool.boolValue
             #expect(bool == false)
-            #expect(throws: JSONError.illegalBoolConversion) {
+            #expect(throws: JSON.OperationError.illegalBoolConversion) {
                 _ = try nonBoolJson.boolValue
             }
         }
@@ -257,10 +257,10 @@ struct JSONTests {
             let nonBoolButLiteralJSON = JSON.null
             let bool = try jsonBool.boolValue
             #expect(bool == true)
-            #expect(throws: JSONError.illegalBoolConversion) {
+            #expect(throws: JSON.OperationError.illegalBoolConversion) {
                 _ = try nonBoolJson.boolValue
             }
-            #expect(throws: JSONError.illegalBoolConversion) {
+            #expect(throws: JSON.OperationError.illegalBoolConversion) {
                 _ = try nonBoolButLiteralJSON.boolValue
             }
         }
@@ -271,7 +271,7 @@ struct JSONTests {
             let nonIntJson = JSON.string("foo")
             let int = try jsonInt.numberValue.convert(into: Int.self)
             #expect(int == 123)
-            #expect(throws: JSONError.illegalNumberConversion) {
+            #expect(throws: JSON.OperationError.illegalNumberConversion) {
                 _ = try nonIntJson.numberValue
             }
         }
@@ -282,7 +282,7 @@ struct JSONTests {
             let nonDoubleJson = JSON.string("foo")
             let double = try jsonDouble.numberValue.convert(into: Double.self)
             #expect(double == 123.456)
-            #expect(throws: JSONError.illegalNumberConversion) {
+            #expect(throws: JSON.OperationError.illegalNumberConversion) {
                 _ = try nonDoubleJson.numberValue
             }
         }
@@ -384,13 +384,13 @@ struct JSONTests {
 
             let value = try json.value(atPath: .key("foo"), .key("bar"), .index(1))
             #expect(value == 2)
-            #expect(throws: JSONError.invalidSubscript(.key("qux"))) {
+            #expect(throws: JSON.OperationError.invalidSubscript(.key("qux"))) {
                 _ = try json.value(atPath: .key("foo"), .key("bar"), .key("qux"))
             }
-            #expect(throws: JSONError.keyNotFound("baz")) {
+            #expect(throws: JSON.OperationError.keyNotFound("baz")) {
                 _ = try json.value(atPath: .key("foo"), .key("baz"))
             }
-            #expect(throws: JSONError.indexOutOfBounds(5)) {
+            #expect(throws: JSON.OperationError.indexOutOfBounds(5)) {
                 _ = try json.value(atPath: .key("foo"), .key("bar"), .index(5))
             }
         }
@@ -406,13 +406,13 @@ struct JSONTests {
 
             let value = try json.value(atPath: [.key("foo"), .key("bar"), .index(1)])
             #expect(value == 2)
-            #expect(throws: JSONError.invalidSubscript(.key("qux"))) {
+            #expect(throws: JSON.OperationError.invalidSubscript(.key("qux"))) {
                 _ = try json.value(atPath: [.key("foo"), .key("bar"), .key("qux")])
             }
-            #expect(throws: JSONError.keyNotFound("baz")) {
+            #expect(throws: JSON.OperationError.keyNotFound("baz")) {
                 _ = try json.value(atPath: [.key("foo"), .key("baz")])
             }
-            #expect(throws: JSONError.indexOutOfBounds(5)) {
+            #expect(throws: JSON.OperationError.indexOutOfBounds(5)) {
                 _ = try json.value(atPath: [.key("foo"), .key("bar"), .index(5)])
             }
         }
@@ -427,13 +427,13 @@ struct JSONTests {
 
             let value = try json.value(atPath: "foo", "bar", 1)
             #expect(value == 2)
-            #expect(throws: JSONError.invalidSubscript(.key("qux"))) {
+            #expect(throws: JSON.OperationError.invalidSubscript(.key("qux"))) {
                 _ = try json.value(atPath: "foo", "bar", "qux")
             }
-            #expect(throws: JSONError.keyNotFound("baz")) {
+            #expect(throws: JSON.OperationError.keyNotFound("baz")) {
                 _ = try json.value(atPath: "foo", "baz")
             }
-            #expect(throws: JSONError.indexOutOfBounds(5)) {
+            #expect(throws: JSON.OperationError.indexOutOfBounds(5)) {
                 _ = try json.value(atPath: "foo", "bar", 5)
             }
         }
@@ -447,7 +447,7 @@ struct JSONTests {
 
             #expect(try json.value(forKey: "foo") == "bar")
             #expect(try json.value(forKey: "baz") == 123)
-            #expect(throws: JSONError.keyNotFound("qux")) {
+            #expect(throws: JSON.OperationError.keyNotFound("qux")) {
                 _ = try json.value(forKey: "qux")
             }
         }
@@ -459,7 +459,7 @@ struct JSONTests {
             #expect(try json.value(atIndex: 0) == 1)
             #expect(try json.value(atIndex: 1) == "bar")
             #expect(try json.value(atIndex: 2) == true)
-            #expect(throws: JSONError.indexOutOfBounds(3)) {
+            #expect(throws: JSON.OperationError.indexOutOfBounds(3)) {
                 _ = try json.value(atIndex: 3)
             }
         }
@@ -483,10 +483,10 @@ struct JSONTests {
             #expect(try jsonArray.value(forSubscript: .index(0)) == 1)
             #expect(try jsonArray.value(forSubscript: .index(1)) == "bar")
             #expect(try jsonArray.value(forSubscript: .index(2)) == true)
-            #expect(throws: JSONError.invalidSubscript(.key("qux"))) {
+            #expect(throws: JSON.OperationError.invalidSubscript(.key("qux"))) {
                 _ = try jsonArray.value(forSubscript: "qux")
             }
-            #expect(throws: JSONError.invalidSubscript(.index(3))) {
+            #expect(throws: JSON.OperationError.invalidSubscript(.index(3))) {
                 _ = try jsonObject.value(forSubscript: 3)
             }
         }
@@ -527,7 +527,7 @@ struct JSONTests {
             #expect(json == ["foo": "bar", "qux": "baz"])
 
             var nonObjectJson: JSON = "string"
-            #expect(throws: JSONError.invalidSubscript(JSON.Subscript("key"))) {
+            #expect(throws: JSON.OperationError.invalidSubscript(JSON.Subscript("key"))) {
                 try nonObjectJson.setValue("value", forKey: "key")
             }
 
@@ -540,12 +540,12 @@ struct JSONTests {
             try json.setValue(4, atIndex: 1)
             #expect(json == [1, 4, 3])
 
-            #expect(throws: JSONError.indexOutOfBounds(5)) {
+            #expect(throws: JSON.OperationError.indexOutOfBounds(5)) {
                 try json.setValue(5, atIndex: 5)
             }
 
             var nonArrayJson: JSON = "string"
-            #expect(throws: JSONError.invalidSubscript(JSON.Subscript(0))) {
+            #expect(throws: JSON.OperationError.invalidSubscript(JSON.Subscript(0))) {
                 try nonArrayJson.setValue("value", atIndex: 0)
             }
         }
@@ -586,12 +586,12 @@ struct JSONTests {
             try json.insert(5, at: 2)
             #expect(json == [1, 2, 5, 3, 4, 1, 2, 3, 4, true])
 
-            #expect(throws: JSONError.indexOutOfBounds(11)) {
+            #expect(throws: JSON.OperationError.indexOutOfBounds(11)) {
                 try json.insert(6, at: 11)
             }
 
             var nonArrayJson: JSON = "string"
-            #expect(throws: JSONError.illegalArrayConversion) {
+            #expect(throws: JSON.OperationError.illegalArrayConversion) {
                 try nonArrayJson.append(1)
             }
         }
@@ -619,15 +619,15 @@ struct JSONTests {
             try jsonArray.removeValue(forSubscript: 1)
             #expect(jsonArray == [1])
 
-            #expect(throws: JSONError.keyNotFound("nonexistent")) {
+            #expect(throws: JSON.OperationError.keyNotFound("nonexistent")) {
                 try jsonObject.removeValue(forKey: "nonexistent")
             }
-            #expect(throws: JSONError.indexOutOfBounds(10)) {
+            #expect(throws: JSON.OperationError.indexOutOfBounds(10)) {
                 try jsonArray.removeValue(atIndex: 10)
             }
 
             var stringJson: JSON = "string"
-            #expect(throws: JSONError.invalidSubscript(JSON.Subscript("key"))) {
+            #expect(throws: JSON.OperationError.invalidSubscript(JSON.Subscript("key"))) {
                 try stringJson.removeValue(forKey: "key")
             }
         }
@@ -671,7 +671,7 @@ struct JSONTests {
                     "baz": nil
                 ]
 
-                await #expect(throws: JSONError.fileExists(testURL)) {
+                await #expect(throws: JSON.OperationError.fileExists(testURL)) {
                     try await json.write(to: testURL)
                 }
             }
@@ -737,31 +737,31 @@ struct JSONTests {
         try #expect(empty.first == nil)
         try #expect(empty.last == nil)
 
-        #expect(throws: JSONError.illegalArrayConversion) {
+        #expect(throws: JSON.OperationError.illegalArrayConversion) {
             _ = try object.first
         }
-        #expect(throws: JSONError.illegalArrayConversion) {
+        #expect(throws: JSON.OperationError.illegalArrayConversion) {
             _ = try object.last
         }
 
-        #expect(throws: JSONError.illegalArrayConversion) {
+        #expect(throws: JSON.OperationError.illegalArrayConversion) {
             _ = try literal.first
         }
-        #expect(throws: JSONError.illegalArrayConversion) {
+        #expect(throws: JSON.OperationError.illegalArrayConversion) {
             _ = try literal.last
         }
 
-        #expect(throws: JSONError.illegalArrayConversion) {
+        #expect(throws: JSON.OperationError.illegalArrayConversion) {
             _ = try number.first
         }
-        #expect(throws: JSONError.illegalArrayConversion) {
+        #expect(throws: JSON.OperationError.illegalArrayConversion) {
             _ = try number.last
         }
 
-        #expect(throws: JSONError.illegalArrayConversion) {
+        #expect(throws: JSON.OperationError.illegalArrayConversion) {
             _ = try string.first
         }
-        #expect(throws: JSONError.illegalArrayConversion) {
+        #expect(throws: JSON.OperationError.illegalArrayConversion) {
             _ = try string.last
         }
     }
@@ -785,24 +785,24 @@ struct JSONTests {
         try #expect(emptyObject.count == 0)
         try #expect(emptyObject.isEmpty == true)
 
-        #expect(throws: JSONError.illegalCollectionConversion) {
+        #expect(throws: JSON.OperationError.illegalCollectionConversion) {
             _ = try literal.count
         }
-        #expect(throws: JSONError.illegalCollectionConversion) {
+        #expect(throws: JSON.OperationError.illegalCollectionConversion) {
             _ = try literal.isEmpty
         }
 
-        #expect(throws: JSONError.illegalCollectionConversion) {
+        #expect(throws: JSON.OperationError.illegalCollectionConversion) {
             _ = try number.count
         }
-        #expect(throws: JSONError.illegalCollectionConversion) {
+        #expect(throws: JSON.OperationError.illegalCollectionConversion) {
             _ = try number.isEmpty
         }
 
-        #expect(throws: JSONError.illegalCollectionConversion) {
+        #expect(throws: JSON.OperationError.illegalCollectionConversion) {
             _ = try string.count
         }
-        #expect(throws: JSONError.illegalCollectionConversion) {
+        #expect(throws: JSON.OperationError.illegalCollectionConversion) {
             _ = try string.isEmpty
         }
     }
@@ -816,7 +816,7 @@ struct JSONTests {
             let object: JSON = ["foo": "bar"]
             try #expect(array.allSatisfy { (element: JSON) in element.isString } == true)
             try #expect(array.allSatisfy { (element: JSON) in element.isNumber } == false)
-            #expect(throws: JSONError.illegalArrayConversion) {
+            #expect(throws: JSON.OperationError.illegalArrayConversion) {
                 try object.allSatisfy { (element: JSON) in true }
             }
         }
@@ -827,7 +827,7 @@ struct JSONTests {
             let array: JSON = ["a", "b", "c", "d"]
             try #expect(object.allSatisfy { key, _ in key.count == 3 } == true)
             try #expect(object.allSatisfy { key, value in key.count == 3 && value.isString } == false)
-            #expect(throws: JSONError.illegalObjectConversion) {
+            #expect(throws: JSON.OperationError.illegalObjectConversion) {
                 try array.allSatisfy { _, _ in true }
             }
         }
@@ -842,10 +842,10 @@ struct JSONTests {
         let values = try object.values
         #expect(keys == ["foo", "baz"] || keys == ["baz", "foo"])
         #expect(values == ["bar", 42] || values == [42, "bar"])
-        #expect(throws: JSONError.illegalObjectConversion) {
+        #expect(throws: JSON.OperationError.illegalObjectConversion) {
             _ = try array.keys
         }
-        #expect(throws: JSONError.illegalObjectConversion) {
+        #expect(throws: JSON.OperationError.illegalObjectConversion) {
             _ = try array.values
         }
     }
@@ -859,7 +859,7 @@ struct JSONTests {
             let object: JSON = ["foo": "bar"]
             let mapped = try array.map { try $0.stringValue.uppercased() }
             #expect(mapped == ["A", "B", "C", "D"])
-            #expect(throws: JSONError.illegalArrayConversion) {
+            #expect(throws: JSON.OperationError.illegalArrayConversion) {
                 _ = try object.map { try $0.stringValue.uppercased() }
             }
         }
@@ -870,7 +870,7 @@ struct JSONTests {
             let array: JSON = ["a", "b", "c", "d"]
             let mapped = try object.map { key, _ in key.uppercased() }
             #expect(mapped == ["FOO", "BAZ"] || mapped == ["BAZ", "FOO"])
-            #expect(throws: JSONError.illegalObjectConversion) {
+            #expect(throws: JSON.OperationError.illegalObjectConversion) {
                 _ = try array.map { key, _ in key.uppercased() }
             }
         }
@@ -881,7 +881,7 @@ struct JSONTests {
             let array: JSON = ["a", "b", "c", "d"]
             let mapped = try object.mapValues(\.isNumber)
             #expect(mapped == ["foo": false, "baz": true])
-            #expect(throws: JSONError.illegalObjectConversion) {
+            #expect(throws: JSON.OperationError.illegalObjectConversion) {
                 _ = try array.mapValues(\.isNumber)
             }
         }
@@ -894,7 +894,7 @@ struct JSONTests {
                 JSON.null
             }
             #expect(mapped == ["foo": nil, "baz": nil])
-            #expect(throws: JSONError.illegalObjectConversion) {
+            #expect(throws: JSON.OperationError.illegalObjectConversion) {
                 _ = try array.mapValues(\.isNumber)
             }
         }
@@ -918,7 +918,7 @@ struct JSONTests {
                 }
             }
             #expect(mapped == ["B", "D"])
-            #expect(throws: JSONError.illegalArrayConversion) {
+            #expect(throws: JSON.OperationError.illegalArrayConversion) {
                 _ = try object.compactMap { value in
                     if let str = try? value.stringValue,
                        let char = str.first,
@@ -939,7 +939,7 @@ struct JSONTests {
                 value.isNumber ? key.uppercased() : nil
             }
             #expect(mapped == ["BAZ"])
-            #expect(throws: JSONError.illegalObjectConversion) {
+            #expect(throws: JSON.OperationError.illegalObjectConversion) {
                 _ = try array.compactMap { key, value in
                     value.isNumber ? key.uppercased() : nil
                 }
@@ -954,7 +954,7 @@ struct JSONTests {
                 try? value.convert(into: Int.self)
             }
             #expect(mapped == ["baz": 42])
-            #expect(throws: JSONError.illegalObjectConversion) {
+            #expect(throws: JSON.OperationError.illegalObjectConversion) {
                 _ = try array.compactMapValues { value in
                     try? value.convert(into: Int.self)
                 }
@@ -974,7 +974,7 @@ struct JSONTests {
                 try (total + json.convert())
             }
             #expect(total == 15)
-            #expect(throws: JSONError.illegalArrayConversion) {
+            #expect(throws: JSON.OperationError.illegalArrayConversion) {
                 try object.reduce(0) { total, json in
                     try (total + json.convert())
                 }
@@ -989,7 +989,7 @@ struct JSONTests {
                 total += try json.convert()
             }
             #expect(total == 15)
-            #expect(throws: JSONError.illegalArrayConversion) {
+            #expect(throws: JSON.OperationError.illegalArrayConversion) {
                 try object.reduce(into: 0) { total, json in
                     total += try json.convert()
                 }
@@ -1005,7 +1005,7 @@ struct JSONTests {
                 return try prev + [key + "-" + (value.stringValue)]
             }
             #expect(list == ["foo-bar", "baz-qux"] || list == ["baz-qux", "foo-bar"])
-            #expect(throws: JSONError.illegalObjectConversion) {
+            #expect(throws: JSON.OperationError.illegalObjectConversion) {
                 _ = try array.reduce([]) { prev, pair in
                     let (key, value) = pair
                     return try prev + [key + "-" + (value.stringValue)]
@@ -1022,7 +1022,7 @@ struct JSONTests {
                 try prev += [key + "-" + (value.stringValue)]
             }
             #expect(list == ["foo-bar", "baz-qux"] || list == ["baz-qux", "foo-bar"])
-            #expect(throws: JSONError.illegalObjectConversion) {
+            #expect(throws: JSON.OperationError.illegalObjectConversion) {
                 try array.reduce(into: []) { prev, pair in
                     let (key, value) = pair
                     try prev += [key + "-" + (value.stringValue)]
@@ -1045,7 +1045,7 @@ struct JSONTests {
                 result.append(value)
             }
             #expect(result == [2, 3, 4, 5, 6])
-            #expect(throws: JSONError.illegalArrayConversion) {
+            #expect(throws: JSON.OperationError.illegalArrayConversion) {
                 try object.forEach { element in
                     let value = try element.convert() + 1
                     result.append(value)
@@ -1063,7 +1063,7 @@ struct JSONTests {
                 result.append(str)
             }
             #expect(result == ["foo-bar", "baz-qux"] || result == ["baz-qux", "foo-bar"])
-            #expect(throws: JSONError.illegalObjectConversion) {
+            #expect(throws: JSON.OperationError.illegalObjectConversion) {
                 try array.forEach { key, value in
                     let str = try key + "-" + (value.stringValue)
                     result.append(str)
@@ -1081,13 +1081,13 @@ struct JSONTests {
         try array.swapAt(0, 3)
         #expect(array == [4, 2, 3, 1])
 
-        #expect(throws: JSONError.indexOutOfBounds(4)) {
+        #expect(throws: JSON.OperationError.indexOutOfBounds(4)) {
             try array.swapAt(2, 4)
         }
-        #expect(throws: JSONError.indexOutOfBounds(4)) {
+        #expect(throws: JSON.OperationError.indexOutOfBounds(4)) {
             try array.swapAt(4, 3)
         }
-        #expect(throws: JSONError.illegalArrayConversion) {
+        #expect(throws: JSON.OperationError.illegalArrayConversion) {
             try object.swapAt(0, 1)
         }
     }
@@ -1112,7 +1112,7 @@ struct JSONTests {
             let object: JSON = ["foo": "bar", "baz": "qux", "qux": "corge"]
             let filteredArray = try array.filter { element in try element.stringValue.hasPrefix("q") }
             #expect(filteredArray == ["qux", "qux"])
-            #expect(throws: JSONError.illegalArrayConversion) {
+            #expect(throws: JSON.OperationError.illegalArrayConversion) {
                 try object.filter { element in try element.stringValue.hasPrefix("q") }
             }
         }
@@ -1123,7 +1123,7 @@ struct JSONTests {
             let array: JSON = ["foo", "baz", "qux", "qux"]
             let filteredObject = try object.filter { key, _ in key != "qux" }
             #expect(filteredObject == ["foo": "bar", "baz": "qux"])
-            #expect(throws: JSONError.illegalObjectConversion) {
+            #expect(throws: JSON.OperationError.illegalObjectConversion) {
                 try array.filter { key, _ in key != "qux" }
             }
         }
@@ -1134,7 +1134,7 @@ struct JSONTests {
             let array: JSON = ["foo", "baz", "qux", "qux"]
             let filteredObject = try object.filterKeys { key in key.starts(with: "q") }
             #expect(filteredObject == ["qux": "corge"])
-            #expect(throws: JSONError.illegalObjectConversion) {
+            #expect(throws: JSON.OperationError.illegalObjectConversion) {
                 try array.filter { key, _ in key != "qux" }
             }
         }
@@ -1145,7 +1145,7 @@ struct JSONTests {
             let array: JSON = ["foo", "baz", "qux", "qux"]
             let filteredObject = try object.filterValues(\.isString)
             #expect(filteredObject == ["foo": "bar"])
-            #expect(throws: JSONError.illegalObjectConversion) {
+            #expect(throws: JSON.OperationError.illegalObjectConversion) {
                 try array.filter { key, _ in key != "qux" }
             }
         }
@@ -1156,7 +1156,7 @@ struct JSONTests {
             let object: JSON = ["foo": "bar", "baz": 2.0, "qux": 1]
             let filteredArray = try array.filterNils()
             #expect(filteredArray == ["foo", "bar", "baz"])
-            #expect(throws: JSONError.illegalArrayConversion) {
+            #expect(throws: JSON.OperationError.illegalArrayConversion) {
                 try object.filterNils()
             }
         }

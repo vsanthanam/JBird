@@ -28,6 +28,6 @@ APIs to create, deserialize, manipulate, and serialize JSON data in Swift
 
 ### Errors
 
-- ``JSONError``
-- ``JSONSerializationError``
-- ``JSONDeserializationError``
+- ``JSON/OperationError``
+- ``JSON/SerializationError``
+- ``JSON/DeserializationError``

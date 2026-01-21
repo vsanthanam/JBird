@@ -123,7 +123,7 @@ extension URL: JSONRepresentable {
     public init(json: JSON) throws {
         let str = try json.stringValue
         guard let url = URL(string: str) else {
-            throw JSONError.urlDecodingFailure(str)
+            throw JSON.OperationError.urlDecodingFailure(str)
         }
         self = url
     }
@@ -140,7 +140,7 @@ extension UUID: JSONRepresentable {
     public init(json: JSON) throws {
         let str = try json.stringValue
         guard let uuid = UUID(uuidString: str) else {
-            throw JSONError.uuidDecodingFailure(str)
+            throw JSON.OperationError.uuidDecodingFailure(str)
         }
         self = uuid
     }

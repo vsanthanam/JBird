@@ -70,7 +70,7 @@ extension JSONInitializable where Self: RawRepresentable, RawValue: JSONInitiali
     public init(json: JSON) throws {
         let rawValue = try RawValue(json: json)
         guard let value = Self(rawValue: rawValue) else {
-            throw JSONError.invalidRawRepresentable
+            throw JSON.OperationError.invalidRawRepresentable
         }
         self = value
     }

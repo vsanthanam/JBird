@@ -37,7 +37,7 @@ func rawRepKey() throws {
     #expect(foo == .foo)
     let bar = try RawRepKey(jsonKey: "bar")
     #expect(bar == .bar)
-    #expect(throws: JSONError.invalidRawRepresentable) {
+    #expect(throws: JSON.OperationError.invalidRawRepresentable) {
         _ = try RawRepKey(jsonKey: "baz")
     }
 }

@@ -61,7 +61,7 @@ extension Int: JSONNumberRepresentable {
                let int = Int(exactly: value) {
                 self = int
             } else {
-                throw JSONError.illegalIntegerConversion
+                throw JSON.OperationError.illegalIntegerConversion
             }
         }
     }
