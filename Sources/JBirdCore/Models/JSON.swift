@@ -70,8 +70,10 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
 
     // MARK: - API
 
+    /// A null JSON value
     case null
 
+    /// A boolean JSON value
     case bool(Bool)
 
     /// A JSON object
@@ -1073,6 +1075,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
                     self,
                     options: options
                 )
+                try Task.checkCancellation()
                 try data.write(
                     to: fileURL,
                     options: .withoutOverwriting

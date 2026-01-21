@@ -24,225 +24,11 @@
 // SOFTWARE.
 
 import Foundation
-#if BUILD_XCFRAMEWORK
-    @_implementationOnly import JBirdParser
-#else
-    import JBirdParser
-#endif
-
-#if os(Windows)
-    import WinSDK
-#endif
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON {
 
     // MARK: - API
-
-    /// Precalculate the default recurstion and depth limits
-    ///
-    /// Calling this method ahead of your first deserialization operation will marginally improve performance
-    /// - Note: If you have already performed on deserialization operation, or if you have already called this method once before, this method is a no-op
-    public static func warmLimits() {
-        _ = defaultRecursionDepthLimit
-        _ = defaultInputSizeLimit
-    }
-
-    /// The default recursion depth limit
-    ///
-    /// This is calculated based on the memory profile of the system upon the first invocation of a deserialization operation.
-    /// Subsequent invocations will use the same limit to avoid recalculating it again.
-    ///
-    /// You can alter this behavior in two ways:
-    /// - By calling ``JSON/withRecursionDepthLimit(_:operation:)-8riei`` to set a custom limit for the current task
-    /// - By providing the ``JSON/DeserializationOptions/ignoreRecursionDepthLimit`` option when deserializing JSON
-    public static let defaultRecursionDepthLimit: size_t = calculateMaxDepth()
-
-    /// The default input size limit
-    ///
-    /// This is calculated based on the memory profile of the system upon the first invocation of a deserialization operation.
-    /// Subsequent invocations will use the same calculated limit to avoid recalculating it again.
-    ///
-    /// You can alter this behavior in two ways:
-    /// - By calling ``JSON/withInputSizeLimit(_:operation:)-2sm2h`` to set a custom limit for the current task
-    /// - By providing the ``JSON/DeserializationOptions/ignoreInputSizeLimit`` option when deserializing JSON
-    public static let defaultInputSizeLimit: size_t = calculateMaxInputSize()
-
-    /// Perform the provided operation with a custom recursion depth limit
-    ///
-    /// By default, the recursion depth limit is set to a value that is calculated based on memory profile of the system upon the first invocation of a deserialization operation.
-    /// Subsequent invocations will use the same limit and avoid recalculating it again.
-    ///
-    /// You can use this method to set a custom recursion depth limit:
-    ///
-    /// ```swift
-    /// let data = Data( ... )
-    /// let json = try JSON.withRecursionDepthLimit(1000) {
-    ///     // All JSON operations performed within this closure will use a recursion depth limit of 1000
-    ///     try JSON(data)
-    /// }
-    /// ```
-    ///
-    /// To remove the recursion depth limit entirely, use `0`
-    ///
-    /// - Parameters:
-    ///   - limit: The desired recursion depth limit
-    ///   - operation: The operation to perform
-    /// - Returns: The return value of the operation
-    public static func withRecursionDepthLimit<T>(
-        _ limit: size_t,
-        operation: () throws -> T
-    ) rethrows -> T {
-        assert(limit >= 0, "Recursion depth limit must be greater than or equal to 0")
-        return try $recursionDepthLimit.withValue(limit, operation: operation)
-    }
-
-    /// Perform the provided async operation with a custom recursion depth limit
-    ///
-    /// By default, the recursion depth limit is set to a value that is calculated based on the memory profile of the system upon the first invocation of a deserialization operation.
-    /// Subsequent invocations will use the same limit and avoid recalculating it again.
-    ///
-    /// You can use this method to set a custom recursion depth limit:
-    ///
-    /// ```swift
-    /// let data = Data( ... )
-    /// let json = try await JSON.withRecursionDepthLimit(1000) {
-    ///     // All JSON operations performed within this closure will use a recursion depth limit of 1000
-    ///     try await JSON.deserialize(data)
-    /// }
-    /// ```
-    ///
-    /// To remove the recursion depth limit entirely, use `0`
-    ///
-    /// - Parameters:
-    ///   - limit: The desired recursion depth limit
-    ///   - operation: The operation to perform
-    /// - Returns: The return value of the operation
-    public static func withRecursionDepthLimit<T>(
-        _ limit: size_t,
-        operation: () async throws -> T
-    ) async rethrows -> T {
-        assert(limit >= 0, "Recursion depth limit must be greater than or equal to 0")
-        return try await $recursionDepthLimit.withValue(limit, operation: operation)
-    }
-
-    /// Perform the provided operation with a custom input size limit
-    ///
-    /// By default, the input size limit is set to a value that is calculated based on the memory profile of the system upon the first invocation of a deserialization operation.
-    /// Subsequent invocations will use the same limit and avoid recalculating it again.
-    ///
-    /// You can use this method to set a custom input size limit:
-    ///
-    /// ```swift
-    /// let data = Data( ... )
-    /// let json = try JSON.withInputSizeLimit(1024 * 1024) {
-    ///    // All JSON operations performed within this closure will use an input size limit of 1 MB
-    ///    try JSON(data)
-    /// }
-    /// ```
-    ///
-    /// To remove the input size limit entirely, use `0`
-    ///
-    /// - Parameters:
-    ///   - limit: The desired input size limit, in bytes
-    ///   - operation: The operation to perform
-    /// - Returns: The return value of the operation
-    public static func withInputSizeLimit<T>(
-        _ limit: Int,
-        operation: () throws -> T
-    ) rethrows -> T {
-        assert(limit >= 0, "Input size limit must be greater than or equal to 0")
-        return try $inputSizeLimit.withValue(limit, operation: operation)
-    }
-
-    /// Perform the provided async operation with a custom input size limit
-    ///
-    /// By default, the input size limit is set to a value that is calculated based on the available memory on the first invocation of a deserialization operation.
-    /// Subsequent invocations will use the same limit and avoid recalculating it again.
-    ///
-    /// You can use this method to set a custom input size limit:
-    ///
-    /// ```swift
-    /// let data = Data( ... )
-    /// let json = try await JSON.withInputSizeLimit(1024 * 1024) {
-    ///    // All JSON operations performed within this closure will use an input size limit of 1 MB
-    ///    try await JSON.deserialize(data)
-    /// }
-    /// ```
-    ///
-    /// To remove the input size limit entirely, use `0`
-    ///
-    /// - Parameters:
-    ///   - limit: The desired input size limit, in bytes
-    ///   - operation: The operation to perform
-    /// - Returns: The return value of the operation
-    public static func withInputSizeLimit<T>(
-        _ limit: Int,
-        operation: () async throws -> T
-    ) async rethrows -> T {
-        assert(limit >= 0, "Input size limit must be greater than or equal to 0")
-        return try await $inputSizeLimit.withValue(limit, operation: operation)
-    }
-
-    /// Create a typed JSON value from a JSON string
-    /// - Parameters:
-    ///   - string: The JSON string
-    ///   - options: The deserialization options
-    /// - Returns: The typed JSON value
-    public static func value(
-        for string: String,
-        options: DeserializationOptions = .default
-    ) throws -> JSON {
-        let data = Data(string.utf8)
-        return try value(
-            for: data,
-            options: options
-        )
-    }
-
-    /// Create a typed JSON value from a UTF-8 encoded byte buffer
-    /// - Parameters:
-    ///   - data: The byte buffer
-    ///   - options: The deserialization options
-    /// - Returns: The typed JSON value
-    public static func value(
-        for data: Data,
-        options: DeserializationOptions = .default
-    ) throws -> JSON {
-        try parse(data, options)
-    }
-
-    /// Create a typed JSON value from a JSON string, asynchronously
-    ///
-    /// Use this method if you need to be able to cancel the deserialization after you start it. This can be useful when deserializing large payloads.
-    /// - Parameters:
-    ///   - data: The JSON string
-    ///   - options: The deserialization options
-    /// - Returns: The typed JSON value
-    public static func deserialize(
-        _ data: Data,
-        options: DeserializationOptions = .default
-    ) async throws -> JSON {
-        try await parseAsync(data, options)
-    }
-
-    /// Create a typed JSON value from a UTF-8 encoded byte buffer, asynchronously
-    ///
-    /// Use this method if you need to be able to cancel the deserialization after you start it. This can be useful when deserializing large payloads.
-    /// - Parameters:
-    ///   - string: The byte buffer
-    ///   - options: The deserialization options
-    /// - Returns: The typed JSON value
-    public static func deserialize(
-        _ string: String,
-        options: DeserializationOptions = .default
-    ) async throws -> JSON {
-        let data = Data(string.utf8)
-        return try await deserialize(
-            data,
-            options: options
-        )
-    }
 
     /// Create a byte buffer from a typed `JSON` value
     /// - Parameters:
@@ -253,7 +39,7 @@ extension JSON {
         from json: JSON,
         options: SerializationOptions = .default
     ) throws -> Data {
-        try startSerialization(
+        try SynchronousSerialization.start(
             from: json,
             options: options
         )
@@ -275,173 +61,914 @@ extension JSON {
         return string
     }
 
-    /// Create a byte buffer from a typed JSON value
-    /// - Parameters:
-    ///   - value: The JSON value to serialize
-    ///   - options: The serialization options
-    /// - Returns: The byte buffer containing a UTF-8 encoded string representing the provided JSON value
-    public static func serialize(
-        _ value: JSON,
-        options: SerializationOptions = .default
-    ) async throws -> Data {
-        try await startSerializationAsync(
-            from: value,
-            options: options
-        )
-    }
-
-    /// Create a Swift string from a typed JSON value
-    /// - Parameters:
-    ///   - value: The JSON value to serialize
-    ///   - options: The serialization options
-    /// - Returns: A Swift string representing the provided JSON value
-    public static func stringify(
-        _ value: JSON,
-        options: SerializationOptions = .default
-    ) async throws -> String {
-        let data = try await serialize(value, options: options)
-        guard let string = String(data: data, encoding: .utf8) else {
-            throw JSONSerializationError.stringMaterialization
-        }
-        return string
-    }
-
-    // MARK: - Private
-
-    private static func startSerialization(
-        from json: JSON,
-        options: SerializationOptions
-    ) throws -> Data {
-        if !options.contains(.fragmentsAllowed) {
-            switch json {
-            case .bool, .null, .number, .string:
-                throw JSONSerializationError.illegalFragment
-            case .array, .object:
-                break
-            }
-        }
-        if options.contains(.omitNullValues), json.isNull {
-            throw JSONSerializationError.illegalFragment
-        }
-        var bytes = [UInt8]()
-        if options.contains(.includeByteOrderMark) {
-            serializeBOM(into: &bytes)
-        }
-        try serialize(
-            json: json,
-            into: &bytes,
-            level: options.contains(.prettyPrinted) ? 0 : nil,
-            options: options,
-            isCancellable: false
-        )
-        return Data(bytes)
-    }
-
     #if compiler(>=6.2) && hasFeature(NonisolatedNonsendingByDefault)
+        /// Create a byte buffer from a typed JSON value
+        /// - Parameters:
+        ///   - value: The JSON value to serialize
+        ///   - options: The serialization options
+        /// - Returns: The byte buffer containing a UTF-8 encoded string representing the provided JSON value
         @concurrent
-        private static func startSerializationAsync(
-            from json: JSON,
-            options: SerializationOptions
+        public static func serialize(
+            _ value: JSON,
+            options: SerializationOptions = .default
         ) async throws -> Data {
-            if !options.contains(.fragmentsAllowed) {
-                switch json {
-                case .bool, .null, .number, .string:
-                    throw JSONSerializationError.illegalFragment
-                case .array, .object:
-                    break
-                }
-            }
-            if options.contains(.omitNullValues), json.isNull {
-                throw JSONSerializationError.illegalFragment
-            }
-            var bytes = [UInt8]()
-            if options.contains(.includeByteOrderMark) {
-                serializeBOM(into: &bytes)
-            }
-            try serialize(
-                json: json,
-                into: &bytes,
-                level: options.contains(.prettyPrinted) ? 0 : nil,
-                options: options,
-                isCancellable: true
+            try await AsynchronousSerialization.start(
+                from: value,
+                options: options
             )
-            return Data(bytes)
         }
     #else
-        private static func startSerializationAsync(
-            from json: JSON,
-            options: SerializationOptions
+        /// Create a byte buffer from a typed JSON value
+        /// - Parameters:
+        ///   - value: The JSON value to serialize
+        ///   - options: The serialization options
+        /// - Returns: The byte buffer containing a UTF-8 encoded string representing the provided JSON value
+        public static func serialize(
+            _ value: JSON,
+            options: SerializationOptions = .default
         ) async throws -> Data {
-            if !options.contains(.fragmentsAllowed) {
-                switch json {
-                case .bool, .null, .number, .string:
-                    throw JSONSerializationError.illegalFragment
-                case .array, .object:
-                    break
-                }
-            }
-            if options.contains(.omitNullValues), json.isNull {
-                throw JSONSerializationError.illegalFragment
-            }
-            var bytes = [UInt8]()
-            if options.contains(.includeByteOrderMark) {
-                serializeBOM(into: &bytes)
-            }
-            try serialize(
-                json: json,
-                into: &bytes,
-                level: options.contains(.prettyPrinted) ? 0 : nil,
-                options: options,
-                isCancellable: true
+            try await AsynchronousSerialization.start(
+                from: value,
+                options: options
             )
-            return Data(bytes)
         }
     #endif
 
+    #if compiler(>=6.2)
+        #if hasFeature(NonisolatedNonsendingByDefault)
+            /// Create a Swift string from a typed JSON value
+            /// - Parameters:
+            ///   - value: The JSON value to serialize
+            ///   - options: The serialization options
+            /// - Returns: A Swift string representing the provided JSON value
+            public static func stringify(
+                _ value: JSON,
+                options: SerializationOptions = .default
+            ) async throws -> String {
+                let data = try await serialize(value, options: options)
+                guard let string = String(data: data, encoding: .utf8) else {
+                    throw JSONSerializationError.stringMaterialization
+                }
+                return string
+            }
+        #else
+            /// Create a Swift string from a typed JSON value
+            /// - Parameters:
+            ///   - value: The JSON value to serialize
+            ///   - options: The serialization options
+            /// - Returns: A Swift string representing the provided JSON value
+            public nonisolated(nonsending) static func stringify(
+                _ value: JSON,
+                options: SerializationOptions = .default
+            ) async throws -> String {
+                let data = try await serialize(value, options: options)
+                guard let string = String(data: data, encoding: .utf8) else {
+                    throw JSONSerializationError.stringMaterialization
+                }
+                return string
+            }
+        #endif
+    #else
+        /// Create a Swift string from a typed JSON value
+        /// - Parameters:
+        ///   - value: The JSON value to serialize
+        ///   - options: The serialization options
+        /// - Returns: A Swift string representing the provided JSON value
+        public static func stringify(
+            _ value: JSON,
+            options: SerializationOptions = .default,
+            isolation: (any Actor)? = #isolation
+        ) async throws -> String {
+            let data = try await serialize(value, options: options)
+            guard let string = String(data: data, encoding: .utf8) else {
+                throw JSONSerializationError.stringMaterialization
+            }
+            return string
+        }
+    #endif
+
+    // MARK: - Private
+
+    private enum SynchronousSerialization {
+
+        static func start(
+            from json: JSON,
+            options: SerializationOptions
+        ) throws -> Data {
+            if !options.contains(.fragmentsAllowed) {
+                switch json {
+                case .bool, .null, .number, .string:
+                    throw JSONSerializationError.illegalFragment
+                case .array, .object:
+                    break
+                }
+            }
+            if options.contains(.omitNullValues), json.isNull {
+                throw JSONSerializationError.illegalFragment
+            }
+            var bytes = [UInt8]()
+            if options.contains(.includeByteOrderMark) {
+                serializeByteOrderMark(into: &bytes)
+            }
+            try serializeValue(
+                json: json,
+                into: &bytes,
+                level: options.contains(.prettyPrinted) ? 0 : nil,
+                options: options
+            )
+            return Data(bytes)
+        }
+
+        private static func serializeValue(
+            json: JSON,
+            into bytes: inout [UInt8],
+            level: Int?,
+            options: SerializationOptions
+        ) throws {
+
+            func serializeArray(
+                _ array: Array,
+                into bytes: inout [UInt8],
+                level: Int?,
+                options: SerializationOptions
+            ) throws {
+                serializeOpenBracket(into: &bytes)
+
+                let realArray: Array = if options.contains(.omitNullValues) {
+                    array.compactMap { value in value.isNull ? JSON?.none : value }
+                } else {
+                    array
+                }
+
+                if realArray.isEmpty {
+                    serializeCloseBracket(into: &bytes)
+                    return
+                }
+
+                if level != nil {
+                    serializeNewLine(into: &bytes)
+                }
+
+                let indices = realArray.indices
+                let last = indices.last.unsafelyUnwrapped
+                for index in indices {
+                    let value = realArray[index]
+                    if index == last {
+                        if let level {
+                            serializeIndentation(level: level + 1, into: &bytes)
+                            try serializeValue(json: value, into: &bytes, level: level + 1, options: options)
+                            serializeNewLine(into: &bytes)
+                        } else {
+                            try serializeValue(json: value, into: &bytes, level: level, options: options)
+                        }
+                    } else {
+                        if let level {
+                            serializeIndentation(level: level + 1, into: &bytes)
+                            try serializeValue(json: value, into: &bytes, level: level + 1, options: options)
+                            serializeComma(into: &bytes)
+                            serializeNewLine(into: &bytes)
+                        } else {
+                            try serializeValue(json: value, into: &bytes, level: level, options: options)
+                            serializeComma(into: &bytes)
+                        }
+                    }
+                }
+
+                if let level {
+                    serializeIndentation(level: level, into: &bytes)
+                }
+
+                serializeCloseBracket(into: &bytes)
+            }
+
+            func serializeObject(
+                _ object: Object,
+                into bytes: inout [UInt8],
+                level: Int?,
+                options: SerializationOptions
+            ) throws {
+                serializeOpenBrace(into: &bytes)
+
+                if object.isEmpty {
+                    serializeCloseBrace(into: &bytes)
+                    return
+                }
+
+                if level != nil {
+                    serializeNewLine(into: &bytes)
+                }
+
+                let usableObject: Object = if options.contains(.omitNullKeys) || options.contains(.omitNullValues) {
+                    object.compactMapValues { value in value.isNull ? JSON?.none : value }
+                } else {
+                    object
+                }
+                if usableObject.isEmpty {
+                    serializeCloseBrace(into: &bytes)
+                    return
+                }
+                let keys = options.contains(.sortedKeys) ? Swift.Array(usableObject.keys.sorted()) : Swift.Array(usableObject.keys)
+                let indices = keys.indices
+                let last = indices.last.unsafelyUnwrapped
+                for index in indices {
+                    let key = keys[index]
+                    let value = usableObject[key].unsafelyUnwrapped
+                    if index == last {
+                        if let level {
+                            serializeIndentation(level: level + 1, into: &bytes)
+                            serializeString(key, options: options, into: &bytes)
+                            serializeSpace(into: &bytes)
+                            serializeColon(into: &bytes)
+                            serializeSpace(into: &bytes)
+                            try serializeValue(json: value, into: &bytes, level: level + 1, options: options)
+                            serializeNewLine(into: &bytes)
+                        } else {
+                            serializeString(key, options: options, into: &bytes)
+                            serializeColon(into: &bytes)
+                            try serializeValue(json: value, into: &bytes, level: nil, options: options)
+                        }
+                    } else {
+                        if let level {
+                            serializeIndentation(level: level + 1, into: &bytes)
+                            serializeString(key, options: options, into: &bytes)
+                            serializeSpace(into: &bytes)
+                            serializeColon(into: &bytes)
+                            serializeSpace(into: &bytes)
+                            try serializeValue(json: value, into: &bytes, level: level + 1, options: options)
+                            serializeComma(into: &bytes)
+                            serializeNewLine(into: &bytes)
+                        } else {
+                            serializeString(key, options: options, into: &bytes)
+                            serializeColon(into: &bytes)
+                            try serializeValue(json: value, into: &bytes, level: level, options: options)
+                            serializeComma(into: &bytes)
+                        }
+                    }
+                }
+
+                if let level {
+                    serializeIndentation(level: level, into: &bytes)
+                }
+
+                serializeCloseBrace(into: &bytes)
+            }
+
+            switch json {
+            case let .bool(bool):
+                serializeBool(bool, into: &bytes)
+            case let .object(object):
+                try serializeObject(object, into: &bytes, level: level, options: options)
+            case let .array(array):
+                try serializeArray(array, into: &bytes, level: level, options: options)
+            case let .number(number):
+                try serializeNumber(number, options: options, into: &bytes)
+            case let .string(string):
+                serializeString(string, options: options, into: &bytes)
+            case .null:
+                serializeNull(into: &bytes)
+            }
+        }
+
+    }
+
+    private enum AsynchronousSerialization {
+
+        #if compiler(>=6.2)
+            #if hasFeature(NonisolatedNonsendingByDefault)
+                static func start(
+                    from json: JSON,
+                    options: SerializationOptions
+                ) async throws -> Data {
+                    if !options.contains(.fragmentsAllowed) {
+                        switch json {
+                        case .bool, .null, .number, .string:
+                            throw JSONSerializationError.illegalFragment
+                        case .array, .object:
+                            break
+                        }
+                    }
+                    if options.contains(.omitNullValues), json.isNull {
+                        throw JSONSerializationError.illegalFragment
+                    }
+                    var bytes = [UInt8]()
+                    if options.contains(.includeByteOrderMark) {
+                        serializeByteOrderMark(into: &bytes)
+                    }
+                    try await serializeValue(
+                        json: json,
+                        into: &bytes,
+                        level: options.contains(.prettyPrinted) ? 0 : nil,
+                        options: options
+                    )
+                    return Data(bytes)
+                }
+            #else
+                nonisolated(nonsending) static func start(
+                    from json: JSON,
+                    options: SerializationOptions
+                ) async throws -> Data {
+                    if !options.contains(.fragmentsAllowed) {
+                        switch json {
+                        case .bool, .null, .number, .string:
+                            throw JSONSerializationError.illegalFragment
+                        case .array, .object:
+                            break
+                        }
+                    }
+                    if options.contains(.omitNullValues), json.isNull {
+                        throw JSONSerializationError.illegalFragment
+                    }
+                    var bytes = [UInt8]()
+                    if options.contains(.includeByteOrderMark) {
+                        serializeByteOrderMark(into: &bytes)
+                    }
+                    try await serializeValue(
+                        json: json,
+                        into: &bytes,
+                        level: options.contains(.prettyPrinted) ? 0 : nil,
+                        options: options
+                    )
+                    return Data(bytes)
+                }
+            #endif
+        #else
+            static func start(
+                from json: JSON,
+                options: SerializationOptions,
+                isolation: (any Actor)? = #isolation
+            ) async throws -> Data {
+                if !options.contains(.fragmentsAllowed) {
+                    switch json {
+                    case .bool, .null, .number, .string:
+                        throw JSONSerializationError.illegalFragment
+                    case .array, .object:
+                        break
+                    }
+                }
+                if options.contains(.omitNullValues), json.isNull {
+                    throw JSONSerializationError.illegalFragment
+                }
+                var bytes = [UInt8]()
+                if options.contains(.includeByteOrderMark) {
+                    serializeByteOrderMark(into: &bytes)
+                }
+                try await serializeValue(
+                    json: json,
+                    into: &bytes,
+                    level: options.contains(.prettyPrinted) ? 0 : nil,
+                    options: options
+                )
+                return Data(bytes)
+            }
+        #endif
+
+        #if compiler(>=6.2)
+            #if hasFeature(NonisolatedNonsendingByDefault)
+                private static func serializeValue(
+                    json: JSON,
+                    into bytes: inout [UInt8],
+                    level: Int?,
+                    options: SerializationOptions
+                ) async throws {
+
+                    func serializeArray(
+                        _ array: Array,
+                        into bytes: inout [UInt8],
+                        level: Int?,
+                        options: SerializationOptions
+                    ) async throws {
+                        serializeOpenBracket(into: &bytes)
+
+                        let realArray: Array = if options.contains(.omitNullValues) {
+                            array.compactMap { value in value.isNull ? JSON?.none : value }
+                        } else {
+                            array
+                        }
+
+                        if array.isEmpty {
+                            serializeCloseBracket(into: &bytes)
+                            return
+                        }
+
+                        if level != nil {
+                            serializeNewLine(into: &bytes)
+                        }
+
+                        let indices = realArray.indices
+                        let last = indices.last.unsafelyUnwrapped
+                        for index in indices {
+                            let value = realArray[index]
+                            if index == last {
+                                if let level {
+                                    serializeIndentation(level: level + 1, into: &bytes)
+                                    try await serializeValue(json: value, into: &bytes, level: level + 1, options: options)
+                                    serializeNewLine(into: &bytes)
+                                } else {
+                                    try await serializeValue(json: value, into: &bytes, level: level, options: options)
+                                }
+                            } else {
+                                if let level {
+                                    serializeIndentation(level: level + 1, into: &bytes)
+                                    try await serializeValue(json: value, into: &bytes, level: level + 1, options: options)
+                                    serializeComma(into: &bytes)
+                                    serializeNewLine(into: &bytes)
+                                } else {
+                                    try await serializeValue(json: value, into: &bytes, level: level, options: options)
+                                    serializeComma(into: &bytes)
+                                }
+                            }
+                        }
+
+                        if let level {
+                            serializeIndentation(level: level, into: &bytes)
+                        }
+
+                        serializeCloseBracket(into: &bytes)
+                    }
+
+                    func serializeObject(
+                        _ object: Object,
+                        into bytes: inout [UInt8],
+                        level: Int?,
+                        options: SerializationOptions
+                    ) async throws {
+                        serializeOpenBrace(into: &bytes)
+
+                        if object.isEmpty {
+                            serializeCloseBrace(into: &bytes)
+                            return
+                        }
+
+                        if level != nil {
+                            serializeNewLine(into: &bytes)
+                        }
+
+                        let usableObject: Object = if options.contains(.omitNullKeys) || options.contains(.omitNullValues) {
+                            object.compactMapValues { value in value.isNull ? JSON?.none : value }
+                        } else {
+                            object
+                        }
+                        if usableObject.isEmpty {
+                            serializeCloseBrace(into: &bytes)
+                            return
+                        }
+                        let keys = options.contains(.sortedKeys) ? Swift.Array(usableObject.keys.sorted()) : Swift.Array(usableObject.keys)
+                        let indices = keys.indices
+                        let last = indices.last.unsafelyUnwrapped
+                        for index in indices {
+                            let key = keys[index]
+                            let value = usableObject[key].unsafelyUnwrapped
+                            if index == last {
+                                if let level {
+                                    serializeIndentation(level: level + 1, into: &bytes)
+                                    serializeString(key, options: options, into: &bytes)
+                                    serializeSpace(into: &bytes)
+                                    serializeColon(into: &bytes)
+                                    serializeSpace(into: &bytes)
+                                    try await serializeValue(json: value, into: &bytes, level: level + 1, options: options)
+                                    serializeNewLine(into: &bytes)
+                                } else {
+                                    serializeString(key, options: options, into: &bytes)
+                                    serializeColon(into: &bytes)
+                                    try await serializeValue(json: value, into: &bytes, level: nil, options: options)
+                                }
+                            } else {
+                                if let level {
+                                    serializeIndentation(level: level + 1, into: &bytes)
+                                    serializeString(key, options: options, into: &bytes)
+                                    serializeSpace(into: &bytes)
+                                    serializeColon(into: &bytes)
+                                    serializeSpace(into: &bytes)
+                                    try await serializeValue(json: value, into: &bytes, level: level + 1, options: options)
+                                    serializeComma(into: &bytes)
+                                    serializeNewLine(into: &bytes)
+                                } else {
+                                    serializeString(key, options: options, into: &bytes)
+                                    serializeColon(into: &bytes)
+                                    try await serializeValue(json: value, into: &bytes, level: level, options: options)
+                                    serializeComma(into: &bytes)
+                                }
+                            }
+                        }
+
+                        if let level {
+                            serializeIndentation(level: level, into: &bytes)
+                        }
+
+                        serializeCloseBrace(into: &bytes)
+                    }
+
+                    try Task.checkCancellation()
+
+                    switch json {
+                    case let .bool(bool):
+                        serializeBool(bool, into: &bytes)
+                    case let .object(object):
+                        try await serializeObject(object, into: &bytes, level: level, options: options)
+                    case let .array(array):
+                        try await serializeArray(array, into: &bytes, level: level, options: options)
+                    case let .number(number):
+                        try serializeNumber(number, options: options, into: &bytes)
+                    case let .string(string):
+                        serializeString(string, options: options, into: &bytes)
+                    case .null:
+                        serializeNull(into: &bytes)
+                    }
+                }
+            #else
+                private nonisolated(nonsending) static func serializeValue(
+                    json: JSON,
+                    into bytes: inout [UInt8],
+                    level: Int?,
+                    options: SerializationOptions
+                ) async throws {
+
+                    nonisolated(nonsending) func serializeArray(
+                        _ array: Array,
+                        into bytes: inout [UInt8],
+                        level: Int?,
+                        options: SerializationOptions
+                    ) async throws {
+                        serializeOpenBracket(into: &bytes)
+
+                        let realArray: Array = if options.contains(.omitNullValues) {
+                            array.compactMap { value in value.isNull ? JSON?.none : value }
+                        } else {
+                            array
+                        }
+
+                        if array.isEmpty {
+                            serializeCloseBracket(into: &bytes)
+                            return
+                        }
+
+                        if level != nil {
+                            serializeNewLine(into: &bytes)
+                        }
+
+                        let indices = realArray.indices
+                        let last = indices.last.unsafelyUnwrapped
+                        for index in indices {
+                            let value = realArray[index]
+                            if index == last {
+                                if let level {
+                                    serializeIndentation(level: level + 1, into: &bytes)
+                                    try await serializeValue(json: value, into: &bytes, level: level + 1, options: options)
+                                    serializeNewLine(into: &bytes)
+                                } else {
+                                    try await serializeValue(json: value, into: &bytes, level: level, options: options)
+                                }
+                            } else {
+                                if let level {
+                                    serializeIndentation(level: level + 1, into: &bytes)
+                                    try await serializeValue(json: value, into: &bytes, level: level + 1, options: options)
+                                    serializeComma(into: &bytes)
+                                    serializeNewLine(into: &bytes)
+                                } else {
+                                    try await serializeValue(json: value, into: &bytes, level: level, options: options)
+                                    serializeComma(into: &bytes)
+                                }
+                            }
+                        }
+
+                        if let level {
+                            serializeIndentation(level: level, into: &bytes)
+                        }
+
+                        serializeCloseBracket(into: &bytes)
+                    }
+
+                    nonisolated(nonsending) func serializeObject(
+                        _ object: Object,
+                        into bytes: inout [UInt8],
+                        level: Int?,
+                        options: SerializationOptions
+                    ) async throws {
+                        serializeOpenBrace(into: &bytes)
+
+                        if object.isEmpty {
+                            serializeCloseBrace(into: &bytes)
+                            return
+                        }
+
+                        if level != nil {
+                            serializeNewLine(into: &bytes)
+                        }
+
+                        let usableObject: Object = if options.contains(.omitNullKeys) || options.contains(.omitNullValues) {
+                            object.compactMapValues { value in value.isNull ? JSON?.none : value }
+                        } else {
+                            object
+                        }
+                        if usableObject.isEmpty {
+                            serializeCloseBrace(into: &bytes)
+                            return
+                        }
+                        let keys = options.contains(.sortedKeys) ? Swift.Array(usableObject.keys.sorted()) : Swift.Array(usableObject.keys)
+                        let indices = keys.indices
+                        let last = indices.last.unsafelyUnwrapped
+                        for index in indices {
+                            let key = keys[index]
+                            let value = usableObject[key].unsafelyUnwrapped
+                            if index == last {
+                                if let level {
+                                    serializeIndentation(level: level + 1, into: &bytes)
+                                    serializeString(key, options: options, into: &bytes)
+                                    serializeSpace(into: &bytes)
+                                    serializeColon(into: &bytes)
+                                    serializeSpace(into: &bytes)
+                                    try await serializeValue(json: value, into: &bytes, level: level + 1, options: options)
+                                    serializeNewLine(into: &bytes)
+                                } else {
+                                    serializeString(key, options: options, into: &bytes)
+                                    serializeColon(into: &bytes)
+                                    try await serializeValue(json: value, into: &bytes, level: nil, options: options)
+                                }
+                            } else {
+                                if let level {
+                                    serializeIndentation(level: level + 1, into: &bytes)
+                                    serializeString(key, options: options, into: &bytes)
+                                    serializeSpace(into: &bytes)
+                                    serializeColon(into: &bytes)
+                                    serializeSpace(into: &bytes)
+                                    try await serializeValue(json: value, into: &bytes, level: level + 1, options: options)
+                                    serializeComma(into: &bytes)
+                                    serializeNewLine(into: &bytes)
+                                } else {
+                                    serializeString(key, options: options, into: &bytes)
+                                    serializeColon(into: &bytes)
+                                    try await serializeValue(json: value, into: &bytes, level: level, options: options)
+                                    serializeComma(into: &bytes)
+                                }
+                            }
+                        }
+
+                        if let level {
+                            serializeIndentation(level: level, into: &bytes)
+                        }
+
+                        serializeCloseBrace(into: &bytes)
+                    }
+
+                    try Task.checkCancellation()
+
+                    switch json {
+                    case let .bool(bool):
+                        serializeBool(bool, into: &bytes)
+                    case let .object(object):
+                        try await serializeObject(object, into: &bytes, level: level, options: options)
+                    case let .array(array):
+                        try await serializeArray(array, into: &bytes, level: level, options: options)
+                    case let .number(number):
+                        try serializeNumber(number, options: options, into: &bytes)
+                    case let .string(string):
+                        serializeString(string, options: options, into: &bytes)
+                    case .null:
+                        serializeNull(into: &bytes)
+                    }
+                }
+            #endif
+        #else
+            private static func serializeValue(
+                json: JSON,
+                into bytes: inout [UInt8],
+                level: Int?,
+                options: SerializationOptions,
+                isolation: (any Actor)? = #isolation
+            ) async throws {
+
+                func serializeArray(
+                    _ array: Array,
+                    into bytes: inout [UInt8],
+                    level: Int?,
+                    options: SerializationOptions,
+                    isolation: (any Actor)? = #isolation
+                ) async throws {
+                    serializeOpenBracket(into: &bytes)
+
+                    let realArray: Array = if options.contains(.omitNullValues) {
+                        array.compactMap { value in value.isNull ? JSON?.none : value }
+                    } else {
+                        array
+                    }
+
+                    if array.isEmpty {
+                        serializeCloseBracket(into: &bytes)
+                        return
+                    }
+
+                    if level != nil {
+                        serializeNewLine(into: &bytes)
+                    }
+
+                    let indices = realArray.indices
+                    let last = indices.last.unsafelyUnwrapped
+                    for index in indices {
+                        let value = realArray[index]
+                        if index == last {
+                            if let level {
+                                serializeIndentation(level: level + 1, into: &bytes)
+                                try await serializeValue(json: value, into: &bytes, level: level + 1, options: options)
+                                serializeNewLine(into: &bytes)
+                            } else {
+                                try await serializeValue(json: value, into: &bytes, level: level, options: options)
+                            }
+                        } else {
+                            if let level {
+                                serializeIndentation(level: level + 1, into: &bytes)
+                                try await serializeValue(json: value, into: &bytes, level: level + 1, options: options)
+                                serializeComma(into: &bytes)
+                                serializeNewLine(into: &bytes)
+                            } else {
+                                try await serializeValue(json: value, into: &bytes, level: level, options: options)
+                                serializeComma(into: &bytes)
+                            }
+                        }
+                    }
+
+                    if let level {
+                        serializeIndentation(level: level, into: &bytes)
+                    }
+
+                    serializeCloseBracket(into: &bytes)
+                }
+
+                func serializeObject(
+                    _ object: Object,
+                    into bytes: inout [UInt8],
+                    level: Int?,
+                    options: SerializationOptions,
+                    isolation: (any Actor)? = #isolation
+                ) async throws {
+                    serializeOpenBrace(into: &bytes)
+
+                    if object.isEmpty {
+                        serializeCloseBrace(into: &bytes)
+                        return
+                    }
+
+                    if level != nil {
+                        serializeNewLine(into: &bytes)
+                    }
+
+                    let usableObject: Object = if options.contains(.omitNullKeys) || options.contains(.omitNullValues) {
+                        object.compactMapValues { value in value.isNull ? JSON?.none : value }
+                    } else {
+                        object
+                    }
+                    if usableObject.isEmpty {
+                        serializeCloseBrace(into: &bytes)
+                        return
+                    }
+                    let keys = options.contains(.sortedKeys) ? Swift.Array(usableObject.keys.sorted()) : Swift.Array(usableObject.keys)
+                    let indices = keys.indices
+                    let last = indices.last.unsafelyUnwrapped
+                    for index in indices {
+                        let key = keys[index]
+                        let value = usableObject[key].unsafelyUnwrapped
+                        if index == last {
+                            if let level {
+                                serializeIndentation(level: level + 1, into: &bytes)
+                                serializeString(key, options: options, into: &bytes)
+                                serializeSpace(into: &bytes)
+                                serializeColon(into: &bytes)
+                                serializeSpace(into: &bytes)
+                                try await serializeValue(json: value, into: &bytes, level: level + 1, options: options)
+                                serializeNewLine(into: &bytes)
+                            } else {
+                                serializeString(key, options: options, into: &bytes)
+                                serializeColon(into: &bytes)
+                                try await serializeValue(json: value, into: &bytes, level: nil, options: options)
+                            }
+                        } else {
+                            if let level {
+                                serializeIndentation(level: level + 1, into: &bytes)
+                                serializeString(key, options: options, into: &bytes)
+                                serializeSpace(into: &bytes)
+                                serializeColon(into: &bytes)
+                                serializeSpace(into: &bytes)
+                                try await serializeValue(json: value, into: &bytes, level: level + 1, options: options)
+                                serializeComma(into: &bytes)
+                                serializeNewLine(into: &bytes)
+                            } else {
+                                serializeString(key, options: options, into: &bytes)
+                                serializeColon(into: &bytes)
+                                try await serializeValue(json: value, into: &bytes, level: level, options: options)
+                                serializeComma(into: &bytes)
+                            }
+                        }
+                    }
+
+                    if let level {
+                        serializeIndentation(level: level, into: &bytes)
+                    }
+
+                    serializeCloseBrace(into: &bytes)
+                }
+
+                try Task.checkCancellation()
+
+                switch json {
+                case let .bool(bool):
+                    serializeBool(bool, into: &bytes)
+                case let .object(object):
+                    try await serializeObject(object, into: &bytes, level: level, options: options)
+                case let .array(array):
+                    try await serializeArray(array, into: &bytes, level: level, options: options)
+                case let .number(number):
+                    try serializeNumber(number, options: options, into: &bytes)
+                case let .string(string):
+                    serializeString(string, options: options, into: &bytes)
+                case .null:
+                    serializeNull(into: &bytes)
+                }
+            }
+        #endif
+
+    }
+
     @inline(__always)
-    private static func serializeBOM(
+    private static func serializeByteOrderMark(
         into bytes: inout [UInt8]
     ) {
         bytes += [0xEF, 0xBB, 0xBF]
     }
 
     @inline(__always)
-    private static func serialize(
-        json: JSON,
-        into bytes: inout [UInt8],
-        level: Int?,
-        options: SerializationOptions,
-        isCancellable: Bool
-    ) throws {
-        if isCancellable {
-            try Task.checkCancellation()
-        }
-        switch json {
-        case let .bool(bool):
-            serialize(bool: bool, into: &bytes)
-        case let .object(object):
-            try serialize(object: object, into: &bytes, level: level, options: options, isAsync: isCancellable)
-        case let .array(array):
-            try serialize(array: array, into: &bytes, level: level, options: options, isAsync: isCancellable)
-        case let .number(number):
-            try serialize(number: number, options: options, into: &bytes)
-        case let .string(string):
-            serialize(string: string, options: options, into: &bytes)
-        case .null:
-            serializeNull(into: &bytes)
-        }
+    private static func serializeOpenBracket(
+        into bytes: inout [UInt8]
+    ) {
+        bytes.append(0x5B)
     }
 
     @inline(__always)
-    private static func serialize(
-        bool: Bool,
+    private static func serializeCloseBracket(
         into bytes: inout [UInt8]
     ) {
+        bytes.append(0x5D)
+    }
+
+    @inline(__always)
+    private static func serializeNewLine(
+        into bytes: inout [UInt8]
+    ) {
+        bytes.append(0x0A)
+    }
+
+    @inline(__always)
+    private static func serializeComma(
+        into bytes: inout [UInt8]
+    ) {
+        bytes.append(0x2C)
+    }
+
+    @inline(__always)
+    private static func serializeOpenBrace(
+        into bytes: inout [UInt8]
+    ) {
+        bytes.append(0x7B)
+    }
+
+    @inline(__always)
+    private static func serializeCloseBrace(
+        into bytes: inout [UInt8]
+    ) {
+        bytes.append(0x7D)
+    }
+
+    @inline(__always)
+    private static func serializeSpace(
+        into bytes: inout [UInt8]
+    ) {
+        bytes.append(0x20)
+    }
+
+    @inline(__always)
+    private static func serializeColon(
+        into bytes: inout [UInt8]
+    ) {
+        bytes.append(0x3A)
+    }
+
+    @inline(__always)
+    private static func serializeBool(
+        _ bool: Bool,
+        into bytes: inout [UInt8]
+    ) {
+
+        func serializeTrue(into bytes: inout [UInt8]) {
+            bytes += [0x74, 0x72, 0x75, 0x65]
+        }
+
+        func serializeFalse(into bytes: inout [UInt8]) {
+            bytes += [0x66, 0x61, 0x6C, 0x73, 0x65]
+        }
+
         switch bool {
         case true:
-            bytes += [0x74, 0x72, 0x75, 0x65]
+            serializeTrue(into: &bytes)
         case false:
-            bytes += [0x66, 0x61, 0x6C, 0x73, 0x65]
+            serializeFalse(into: &bytes)
         }
     }
 
@@ -453,78 +980,77 @@ extension JSON {
     }
 
     @inline(__always)
-    private static func serialize(
-        number: Number,
+    private static func serializeNumber(
+        _ number: Number,
         options: SerializationOptions,
         into bytes: inout [UInt8]
     ) throws {
+
+        func serializeInteger(
+            _ integer: Int,
+            into bytes: inout [UInt8]
+        ) {
+            let str = String(integer)
+            bytes += Swift.Array(str.utf8)
+        }
+
+        func serializeDouble(
+            _ double: Double,
+            options: SerializationOptions,
+            into bytes: inout [UInt8]
+        ) throws {
+            if double.isNaN {
+                if options.contains(.allowNonConformingFloatingPointValues) {
+                    if options.contains(.nullifyNonConformingFloatingPointValues) {
+                        serializeNull(into: &bytes)
+                        return
+                    } else {
+                        serializeString("NaN", options: options, into: &bytes)
+                        return
+                    }
+                } else {
+                    throw JSONSerializationError.invalidFloat
+                }
+            } else if double.isInfinite {
+                if options.contains(.allowNonConformingFloatingPointValues) {
+                    if options.contains(.nullifyNonConformingFloatingPointValues) {
+                        serializeNull(into: &bytes)
+                        return
+                    } else {
+                        switch double.sign {
+                        case .plus:
+                            serializeString("Infinity", options: options, into: &bytes)
+                        case .minus:
+                            serializeString("-Infinity", options: options, into: &bytes)
+                        }
+                        return
+                    }
+                } else {
+                    throw JSONSerializationError.invalidFloat
+                }
+            }
+
+            var string = String(double)
+            if options.contains(.truncateWholeFloatingPointValues),
+               !string.contains("e"),
+               !string.contains("E"),
+               string.hasSuffix(".0") {
+                string.removeLast(2)
+            }
+            bytes += string.utf8
+        }
+
         switch number.storage {
         case let .int(value):
-            serialize(integer: value, into: &bytes)
+            serializeInteger(value, into: &bytes)
         case let .double(value):
-            try serialize(double: value, options: options, into: &bytes)
+            try serializeDouble(value, options: options, into: &bytes)
         }
     }
 
     @inline(__always)
-    private static func serialize(
-        integer: Int,
-        into bytes: inout [UInt8]
-    ) {
-        let str = String(integer)
-        bytes += Swift.Array(str.utf8)
-    }
-
-    @inline(__always)
-    private static func serialize(
-        double: Double,
-        options: SerializationOptions,
-        into bytes: inout [UInt8]
-    ) throws {
-        if double.isNaN {
-            if options.contains(.allowNonConformingFloatingPointValues) {
-                if options.contains(.nullifyNonConformingFloatingPointValues) {
-                    serializeNull(into: &bytes)
-                    return
-                } else {
-                    serialize(string: "NaN", options: options, into: &bytes)
-                    return
-                }
-            } else {
-                throw JSONSerializationError.invalidFloat
-            }
-        } else if double.isInfinite {
-            if options.contains(.allowNonConformingFloatingPointValues) {
-                if options.contains(.nullifyNonConformingFloatingPointValues) {
-                    serializeNull(into: &bytes)
-                    return
-                } else {
-                    switch double.sign {
-                    case .plus:
-                        serialize(string: "Infinity", options: options, into: &bytes)
-                    case .minus:
-                        serialize(string: "-Infinity", options: options, into: &bytes)
-                    }
-                    return
-                }
-            } else {
-                throw JSONSerializationError.invalidFloat
-            }
-        }
-
-        var string = String(double)
-        if options.contains(.truncateWholeFloatingPointValues),
-           !string.contains("e"),
-           !string.contains("E"),
-           string.hasSuffix(".0") {
-            string.removeLast(2)
-        }
-        bytes += string.utf8
-    }
-
-    @inline(__always)
-    private static func serialize(
-        string: String,
+    private static func serializeString(
+        _ string: String,
         options: SerializationOptions,
         into bytes: inout [UInt8]
     ) {
@@ -578,562 +1104,19 @@ extension JSON {
     }
 
     @inline(__always)
-    private static func serialize(
-        array: Array,
-        into bytes: inout [UInt8],
-        level: Int?,
-        options: SerializationOptions,
-        isAsync: Bool
-    ) throws {
-        bytes += [0x5B]
-
-        let realArray: Array = if options.contains(.omitNullValues) {
-            array.compactMap { value in value.isNull ? JSON?.none : value }
-        } else {
-            array
-        }
-
-        if array.isEmpty {
-            bytes += [0x5D]
-            return
-        }
-
-        if level != nil {
-            bytes += [0x0A] // Newline
-        }
-
-        for value in realArray.dropLast() {
-            if let level {
-                addIndentation(level: level + 1, into: &bytes)
-                try serialize(json: value, into: &bytes, level: level + 1, options: options, isCancellable: isAsync)
-                bytes += [0x2C, 0x0A]
-            } else {
-                try serialize(json: value, into: &bytes, level: level, options: options, isCancellable: isAsync)
-                bytes += [0x2C]
-            }
-
-        }
-
-        if let lastValue = realArray.last {
-            if let level {
-                addIndentation(level: level + 1, into: &bytes)
-                try serialize(json: lastValue, into: &bytes, level: level + 1, options: options, isCancellable: isAsync)
-                bytes += [0x0A]
-            } else {
-                try serialize(json: lastValue, into: &bytes, level: nil, options: options, isCancellable: isAsync)
-            }
-        }
-
-        if let level {
-            addIndentation(level: level, into: &bytes)
-        }
-
-        bytes += [0x5D]
-    }
-
-    static func serialize(
-        object: Object,
-        into bytes: inout [UInt8],
-        level: Int?,
-        options: SerializationOptions,
-        isAsync: Bool
-    ) throws {
-        bytes += [0x7B]
-
-        if object.isEmpty {
-            bytes += [0x7D]
-            return
-        }
-
-        if level != nil {
-            bytes += [0x0A] // Newline
-        }
-
-        let usableObject: Object = if options.contains(.omitNullKeys) || options.contains(.omitNullValues) {
-            object.compactMapValues { value in value.isNull ? JSON?.none : value }
-        } else {
-            object
-        }
-        if usableObject.isEmpty {
-            bytes += [0x7D]
-            return
-        }
-        let keys = options.contains(.sortedKeys) ? Swift.Array(usableObject.keys.sorted()) : Swift.Array(usableObject.keys)
-        for key in keys.dropLast() {
-            let value = usableObject[key].unsafelyUnwrapped
-            if let level {
-                addIndentation(level: level + 1, into: &bytes)
-                serialize(string: key, options: options, into: &bytes)
-                bytes += [0x20, 0x3A, 0x20]
-                try serialize(json: value, into: &bytes, level: level + 1, options: options, isCancellable: isAsync)
-                bytes += [0x2C, 0x0A]
-            } else {
-                serialize(string: key, options: options, into: &bytes)
-                bytes += [0x3A]
-                try serialize(json: value, into: &bytes, level: level, options: options, isCancellable: isAsync)
-                bytes += [0x2C]
-            }
-        }
-
-        if let key = keys.last {
-            let value = usableObject[key].unsafelyUnwrapped
-            if let level {
-                addIndentation(level: level + 1, into: &bytes)
-                serialize(string: key, options: options, into: &bytes)
-                bytes += [0x20, 0x3A, 0x20]
-                try serialize(json: value, into: &bytes, level: level + 1, options: options, isCancellable: isAsync)
-                bytes += [0x0A]
-            } else {
-                serialize(string: key, options: options, into: &bytes)
-                bytes += [0x3A]
-                try serialize(json: value, into: &bytes, level: nil, options: options, isCancellable: isAsync)
-            }
-        }
-
-        if let level {
-            addIndentation(level: level, into: &bytes)
-        }
-
-        bytes += [0x7D]
-    }
-
-    @inline(__always)
-    private static func addIndentation(
+    private static func serializeIndentation(
         level: Int,
         into bytes: inout [UInt8]
     ) {
-        for _ in 0..<(level * 2) {
-            bytes += [0x20]
-        }
-    }
 
-    @TaskLocal
-    private static var recursionDepthLimit: size_t = defaultRecursionDepthLimit
-
-    @TaskLocal
-    private static var inputSizeLimit: size_t = defaultInputSizeLimit
-
-    @inline(__always)
-    private static func parse(
-        _ data: Data,
-        _ options: DeserializationOptions
-    ) throws -> JSON {
-        if inputSizeLimit != 0, !options.contains(.ignoreInputSizeLimit), data.count > inputSizeLimit {
-            throw JSONDeserializationError.inputSizeLimitExceeded
+        func indent(into bytes: inout [UInt8]) {
+            serializeSpace(into: &bytes)
+            serializeSpace(into: &bytes)
         }
 
-        var jsonValue: OpaquePointer?
-        let result = data.withUnsafeBytes { buffer in
-            json_parse(
-                buffer.baseAddress?.assumingMemoryBound(to: UInt8.self),
-                buffer.count,
-                &jsonValue,
-                options.contains(.allowByteOrderMark),
-                options.contains(.requireMinified),
-                options.contains(.requireUniqueKeys),
-                options.contains(.ignoreRecursionDepthLimit) ? 0 : recursionDepthLimit
-            )
+        for _ in 0..<level {
+            indent(into: &bytes)
         }
-
-        defer {
-            json_free(jsonValue)
-        }
-
-        guard result == JSON_NO_ERROR else {
-            throw JSONDeserializationError(result)
-        }
-
-        guard let jsonValue else {
-            throw JSONDeserializationError.unknown
-        }
-
-        @inline(__always)
-        func materialize(
-            _ value: OpaquePointer,
-            _ options: DeserializationOptions
-        ) throws -> JSON {
-            let type = json_get_type(value)
-            switch type {
-            case JSON_NULL:
-                return .null
-            case JSON_BOOLEAN:
-                return .bool(json_get_boolean(value))
-            case JSON_NUMBER_INT:
-                return .number(JSON.Number(json_get_int(value)))
-            case JSON_NUMBER_DOUBLE:
-                return .number(JSON.Number(json_get_double(value)))
-            case JSON_STRING:
-                let str = String(cString: json_get_string(value))
-                return .string(str)
-            case JSON_ARRAY:
-                let count = json_get_array_size(value)
-                var array = Array()
-                array.reserveCapacity(count)
-
-                for i in 0..<count {
-                    let element = json_get_array_element(value, i).unsafelyUnwrapped
-                    let value = try materialize(element, options)
-                    if !options.contains(.omitNullValues) || !value.isNull {
-                        array.append(value)
-                    }
-                }
-
-                return .array(array)
-            case JSON_OBJECT:
-                let count = json_get_object_size(value)
-                var object = Object()
-                object.reserveCapacity(count)
-
-                for i in 0..<count {
-                    let key = String(cString: json_get_object_key(value, i))
-                    let objValue = json_get_object_value(value, i).unsafelyUnwrapped
-                    let value = try materialize(objValue, options)
-                    if (!options.contains(.omitNullKeys) && !options.contains(.omitNullValues)) || !value.isNull {
-                        object[key] = value
-                    }
-                }
-                return .object(object)
-            default:
-                throw JSONDeserializationError.unknown
-            }
-        }
-
-        let json = try materialize(jsonValue, options)
-        if !options.contains(.fragmentsAllowed) {
-            switch json {
-            case .array, .object:
-                return json
-            case .bool, .null, .number, .string:
-                throw JSONDeserializationError.illegalFragment
-            }
-        }
-        if options.contains(.omitNullValues), json.isNull {
-            throw JSONDeserializationError.illegalFragment
-        }
-        return json
-    }
-
-    #if compiler(>=6.2) && hasFeature(NonisolatedNonsendingByDefault)
-        @concurrent
-        private static func parseAsync(
-            _ data: Data,
-            _ options: DeserializationOptions
-        ) async throws -> JSON {
-            if inputSizeLimit != 0, !options.contains(.ignoreInputSizeLimit), data.count > inputSizeLimit {
-                throw JSONDeserializationError.inputSizeLimitExceeded
-            }
-
-            var jsonValue: OpaquePointer?
-            let result = data.withUnsafeBytes { buffer in
-                json_parse(
-                    buffer.baseAddress?.assumingMemoryBound(to: UInt8.self),
-                    buffer.count,
-                    &jsonValue,
-                    options.contains(.allowByteOrderMark),
-                    options.contains(.requireMinified),
-                    options.contains(.requireUniqueKeys),
-                    options.contains(.ignoreRecursionDepthLimit) ? 0 : recursionDepthLimit
-                )
-            }
-
-            defer {
-                json_free(jsonValue)
-            }
-
-            guard result == JSON_NO_ERROR else {
-                throw JSONDeserializationError(result)
-            }
-
-            guard let jsonValue else {
-                throw JSONDeserializationError.unknown
-            }
-
-            @inline(__always)
-            func materialize(
-                _ value: OpaquePointer,
-                _ options: DeserializationOptions
-            ) async throws -> JSON {
-                let type = json_get_type(value)
-                switch type {
-                case JSON_NULL:
-                    return .null
-                case JSON_BOOLEAN:
-                    return .bool(json_get_boolean(value))
-                case JSON_NUMBER_INT:
-                    return .number(JSON.Number(json_get_int(value)))
-                case JSON_NUMBER_DOUBLE:
-                    return .number(JSON.Number(json_get_double(value)))
-                case JSON_STRING:
-                    let str = String(cString: json_get_string(value))
-                    return .string(str)
-                case JSON_ARRAY:
-                    let count = json_get_array_size(value)
-                    let array = try await withThrowingTaskGroup { group in
-                        for i in 0..<count {
-                            let element = unsafe_closure {
-                                json_get_array_element(value, i).unsafelyUnwrapped
-                            }
-                            group.addTask {
-                                let value = try await materialize(element(), options)
-                                return (value, i)
-                            }
-                        }
-                        do {
-                            var results: [(JSON, Int)] = []
-                            results.reserveCapacity(count)
-                            for try await result in group {
-                                results.append(result)
-                            }
-                            return results
-                                .sorted { $0.1 < $1.1 }
-                                .map(\.0)
-                                .filter { value in
-                                    !options.contains(.omitNullValues) || !value.isNull
-                                }
-                        } catch {
-                            group.cancelAll()
-                            throw error
-                        }
-                    }
-                    return .array(array)
-                case JSON_OBJECT:
-                    let count = json_get_object_size(value)
-                    let object = try await withThrowingTaskGroup { group in
-                        for i in 0..<count {
-                            let key = unsafe_closure {
-                                String(cString: json_get_object_key(value, i))
-                            }
-                            let objValue = unsafe_closure {
-                                json_get_object_value(value, i).unsafelyUnwrapped
-                            }
-                            group.addTask {
-                                let value = try await materialize(objValue(), options)
-                                return (key(), value)
-                            }
-                        }
-                        do {
-                            var object = Object()
-                            object.reserveCapacity(count)
-                            for try await (key, value) in group {
-                                if (!options.contains(.omitNullKeys) && !options.contains(.omitNullValues)) || !value.isNull {
-                                    object[key] = value
-                                }
-                            }
-                            return object
-                        } catch {
-                            group.cancelAll()
-                            throw error
-                        }
-                    }
-                    return .object(object)
-                default:
-                    throw JSONDeserializationError.unknown
-                }
-            }
-
-            let json = try await materialize(jsonValue, options)
-            if !options.contains(.fragmentsAllowed) {
-                switch json {
-                case .array, .object:
-                    return json
-                case .bool, .null, .number, .string:
-                    throw JSONDeserializationError.illegalFragment
-                }
-            }
-            if options.contains(.omitNullValues), json.isNull {
-                throw JSONDeserializationError.illegalFragment
-            }
-            return json
-        }
-    #else
-        private static func parseAsync(
-            _ data: Data,
-            _ options: DeserializationOptions
-        ) async throws -> JSON {
-            if inputSizeLimit != 0, !options.contains(.ignoreInputSizeLimit), data.count > inputSizeLimit {
-                throw JSONDeserializationError.inputSizeLimitExceeded
-            }
-
-            var jsonValue: OpaquePointer?
-            let result = data.withUnsafeBytes { buffer in
-                json_parse(
-                    buffer.baseAddress?.assumingMemoryBound(to: UInt8.self),
-                    buffer.count,
-                    &jsonValue,
-                    options.contains(.allowByteOrderMark),
-                    options.contains(.requireMinified),
-                    options.contains(.requireUniqueKeys),
-                    options.contains(.ignoreRecursionDepthLimit) ? 0 : recursionDepthLimit
-                )
-            }
-
-            defer {
-                json_free(jsonValue)
-            }
-
-            guard result == JSON_NO_ERROR else {
-                throw JSONDeserializationError(result)
-            }
-
-            guard let jsonValue else {
-                throw JSONDeserializationError.unknown
-            }
-
-            @inline(__always)
-            func materialize(
-                _ value: OpaquePointer,
-                _ options: DeserializationOptions
-            ) async throws -> JSON {
-                let type = json_get_type(value)
-                switch type {
-                case JSON_NULL:
-                    return .null
-                case JSON_BOOLEAN:
-                    return .bool(json_get_boolean(value))
-                case JSON_NUMBER_INT:
-                    return .number(JSON.Number(json_get_int(value)))
-                case JSON_NUMBER_DOUBLE:
-                    return .number(JSON.Number(json_get_double(value)))
-                case JSON_STRING:
-                    let str = String(cString: json_get_string(value))
-                    return .string(str)
-                case JSON_ARRAY:
-                    let count = json_get_array_size(value)
-                    let array = try await withThrowingTaskGroup { group in
-                        for i in 0..<count {
-                            let element = unsafe_closure {
-                                json_get_array_element(value, i).unsafelyUnwrapped
-                            }
-                            group.addTask {
-                                let value = try await materialize(element(), options)
-                                return (value, i)
-                            }
-                        }
-                        do {
-                            var results: [(JSON, Int)] = []
-                            results.reserveCapacity(count)
-                            for try await result in group {
-                                results.append(result)
-                            }
-                            return results
-                                .sorted { $0.1 < $1.1 }
-                                .map(\.0)
-                                .filter { value in
-                                    !options.contains(.omitNullValues) || !value.isNull
-                                }
-                        } catch {
-                            group.cancelAll()
-                            throw error
-                        }
-                    }
-                    return .array(array)
-                case JSON_OBJECT:
-                    let count = json_get_object_size(value)
-                    let object = try await withThrowingTaskGroup { group in
-                        for i in 0..<count {
-                            let key = unsafe_closure {
-                                String(cString: json_get_object_key(value, i))
-                            }
-                            let objValue = unsafe_closure {
-                                json_get_object_value(value, i).unsafelyUnwrapped
-                            }
-                            group.addTask {
-                                let value = try await materialize(objValue(), options)
-                                return (key(), value)
-                            }
-                        }
-                        do {
-                            var object = Object()
-                            object.reserveCapacity(count)
-                            for try await (key, value) in group {
-                                if (!options.contains(.omitNullKeys) && !options.contains(.omitNullValues)) || !value.isNull {
-                                    object[key] = value
-                                }
-                            }
-                            return object
-                        } catch {
-                            group.cancelAll()
-                            throw error
-                        }
-                    }
-                    return .object(object)
-                default:
-                    throw JSONDeserializationError.unknown
-                }
-            }
-
-            let json = try await materialize(jsonValue, options)
-            if !options.contains(.fragmentsAllowed) {
-                switch json {
-                case .array, .object:
-                    return json
-                case .bool, .null, .number, .string:
-                    throw JSONDeserializationError.illegalFragment
-                }
-            }
-            if options.contains(.omitNullValues), json.isNull {
-                throw JSONDeserializationError.illegalFragment
-            }
-            return json
-        }
-    #endif
-
-    #if os(Windows)
-        @inline(__always)
-        private static func calculateMaxDepth() -> size_t {
-            var low: ULONG_PTR = 0
-            var high: ULONG_PTR = 0
-            GetCurrentThreadStackLimits(&low, &high)
-
-            let stackBytes = size_t(high &- low)
-            return min(1024, max(16, stackBytes / 512))
-        }
-
-    #elseif os(WASI) || arch(wasm32)
-        @inline(__always)
-        private static func calculateMaxDepth() -> size_t {
-            // There is no way to do this on Web Assembly. Makes sense.
-            256
-        }
-    #else
-        @inline(__always)
-        private static func calculateMaxDepth() -> size_t {
-            var attr = pthread_attr_t()
-            pthread_attr_init(&attr)
-            defer { pthread_attr_destroy(&attr) }
-
-            var size: size_t = 0
-            pthread_attr_getstacksize(&attr, &size)
-            return min(1024, max(16, size / 512))
-        }
-    #endif
-
-    private static func calculateMaxInputSize() -> size_t {
-        let physicalMemory = Double(ProcessInfo.processInfo.physicalMemory)
-        let cap = size_t(physicalMemory * 0.01)
-        return min(max(cap, 1 * 1024 * 1024), 50 * 1024 * 1024)
-    }
-
-    private struct unsafe_closure<Arguments, Product, Failure: Error>: @unchecked Sendable {
-
-        init(
-            closure: @escaping (Arguments) throws(Failure) -> Product
-        ) {
-            self.closure = closure
-        }
-
-        func callAsFunction(
-            _ argument: Arguments
-        ) throws(Failure) -> Product {
-            try closure(argument)
-        }
-
-        func callAsFunction() throws(Failure) -> Product where Arguments == Void {
-            try closure(())
-        }
-
-        private let closure: (Arguments) throws(Failure) -> Product
-
     }
 
 }
