@@ -56,7 +56,7 @@ extension JSON {
     ) throws -> String {
         let data = try data(from: json, options: options)
         guard let string = String(data: data, encoding: .utf8) else {
-            throw JSONSerializationError.stringMaterialization
+            throw SerializationError.stringMaterialization
         }
         return string
     }
@@ -107,7 +107,7 @@ extension JSON {
             ) async throws -> String {
                 let data = try await serialize(value, options: options)
                 guard let string = String(data: data, encoding: .utf8) else {
-                    throw JSONSerializationError.stringMaterialization
+                    throw SerializationError.stringMaterialization
                 }
                 return string
             }
@@ -123,7 +123,7 @@ extension JSON {
             ) async throws -> String {
                 let data = try await serialize(value, options: options)
                 guard let string = String(data: data, encoding: .utf8) else {
-                    throw JSONSerializationError.stringMaterialization
+                    throw SerializationError.stringMaterialization
                 }
                 return string
             }
@@ -141,7 +141,7 @@ extension JSON {
         ) async throws -> String {
             let data = try await serialize(value, options: options)
             guard let string = String(data: data, encoding: .utf8) else {
-                throw JSONSerializationError.stringMaterialization
+                throw SerializationError.stringMaterialization
             }
             return string
         }
@@ -158,13 +158,13 @@ extension JSON {
             if !options.contains(.fragmentsAllowed) {
                 switch json {
                 case .bool, .null, .number, .string:
-                    throw JSONSerializationError.illegalFragment
+                    throw SerializationError.illegalFragment
                 case .array, .object:
                     break
                 }
             }
             if options.contains(.omitNullValues), json.isNull {
-                throw JSONSerializationError.illegalFragment
+                throw SerializationError.illegalFragment
             }
             var bytes = [UInt8]()
             if options.contains(.includeByteOrderMark) {
@@ -342,13 +342,13 @@ extension JSON {
                     if !options.contains(.fragmentsAllowed) {
                         switch json {
                         case .bool, .null, .number, .string:
-                            throw JSONSerializationError.illegalFragment
+                            throw SerializationError.illegalFragment
                         case .array, .object:
                             break
                         }
                     }
                     if options.contains(.omitNullValues), json.isNull {
-                        throw JSONSerializationError.illegalFragment
+                        throw SerializationError.illegalFragment
                     }
                     var bytes = [UInt8]()
                     if options.contains(.includeByteOrderMark) {
@@ -370,13 +370,13 @@ extension JSON {
                     if !options.contains(.fragmentsAllowed) {
                         switch json {
                         case .bool, .null, .number, .string:
-                            throw JSONSerializationError.illegalFragment
+                            throw SerializationError.illegalFragment
                         case .array, .object:
                             break
                         }
                     }
                     if options.contains(.omitNullValues), json.isNull {
-                        throw JSONSerializationError.illegalFragment
+                        throw SerializationError.illegalFragment
                     }
                     var bytes = [UInt8]()
                     if options.contains(.includeByteOrderMark) {
@@ -400,13 +400,13 @@ extension JSON {
                 if !options.contains(.fragmentsAllowed) {
                     switch json {
                     case .bool, .null, .number, .string:
-                        throw JSONSerializationError.illegalFragment
+                        throw SerializationError.illegalFragment
                     case .array, .object:
                         break
                     }
                 }
                 if options.contains(.omitNullValues), json.isNull {
-                    throw JSONSerializationError.illegalFragment
+                    throw SerializationError.illegalFragment
                 }
                 var bytes = [UInt8]()
                 if options.contains(.includeByteOrderMark) {
@@ -1009,7 +1009,7 @@ extension JSON {
                         return
                     }
                 } else {
-                    throw JSONSerializationError.invalidFloat
+                    throw SerializationError.invalidFloat
                 }
             } else if double.isInfinite {
                 if options.contains(.allowNonConformingFloatingPointValues) {
@@ -1026,7 +1026,7 @@ extension JSON {
                         return
                     }
                 } else {
-                    throw JSONSerializationError.invalidFloat
+                    throw SerializationError.invalidFloat
                 }
             }
 

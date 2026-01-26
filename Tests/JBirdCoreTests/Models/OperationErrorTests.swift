@@ -1,5 +1,5 @@
 // JBird
-// JSONErrorTests.swift
+// OperationErrorTests.swift
 //
 // MIT License
 //
@@ -26,52 +26,52 @@
 import JBirdCore
 import Testing
 
-@Test("JSONError Description Tests")
-func jsonErrorDescriptionTests() {
+@Test("OperationError Description Tests")
+func operationErrorDescriptionTests() {
 
-    let invalidIndex = JSONError.invalidSubscript(.index(1))
+    let invalidIndex = JSON.OperationError.invalidSubscript(.index(1))
     #expect(invalidIndex.description == "Invalid JSON subscript '1'")
 
-    let invalidKey = JSONError.invalidSubscript(.key("foo"))
+    let invalidKey = JSON.OperationError.invalidSubscript(.key("foo"))
     #expect(invalidKey.description == "Invalid JSON subscript 'foo'")
 
-    let keyNotFound = JSONError.keyNotFound("foo")
+    let keyNotFound = JSON.OperationError.keyNotFound("foo")
     #expect(keyNotFound.description == "Key 'foo' not found in JSON object")
 
-    let indexOutOfBounds = JSONError.indexOutOfBounds(12)
+    let indexOutOfBounds = JSON.OperationError.indexOutOfBounds(12)
     #expect(indexOutOfBounds.description == "Index '12' out of bounds in JSON array")
 
-    let illegalBoolConversion = JSONError.illegalBoolConversion
+    let illegalBoolConversion = JSON.OperationError.illegalBoolConversion
     #expect(illegalBoolConversion.description == "JSON cannot be represented as a Boolean value")
 
-    let illegalArrayConversion = JSONError.illegalArrayConversion
+    let illegalArrayConversion = JSON.OperationError.illegalArrayConversion
     #expect(illegalArrayConversion.description == "JSON cannot be represented as an array")
 
-    let illegalObjectConversion = JSONError.illegalObjectConversion
+    let illegalObjectConversion = JSON.OperationError.illegalObjectConversion
     #expect(illegalObjectConversion.description == "JSON cannot be represented as an object")
 
-    let illegalNumberConversion = JSONError.illegalNumberConversion
+    let illegalNumberConversion = JSON.OperationError.illegalNumberConversion
     #expect(illegalNumberConversion.description == "JSON cannot be represented as a number value")
 
-    let illegalStringConversion = JSONError.illegalStringConversion
+    let illegalStringConversion = JSON.OperationError.illegalStringConversion
     #expect(illegalStringConversion.description == "JSON cannot be represented as a string")
 
-    let illegalIntegerConversion = JSONError.illegalIntegerConversion
+    let illegalIntegerConversion = JSON.OperationError.illegalIntegerConversion
     #expect(illegalIntegerConversion.description == "JSON cannot be represented as an integer")
 
-    let illegalFloatConversion = JSONError.illegalFloatConversion
+    let illegalFloatConversion = JSON.OperationError.illegalFloatConversion
     #expect(illegalFloatConversion.description == "JSON cannot be represented as a double")
 
-    let illegalCollectionConversion = JSONError.illegalCollectionConversion
+    let illegalCollectionConversion = JSON.OperationError.illegalCollectionConversion
     #expect(illegalCollectionConversion.description == "JSON cannot be represented as a collection")
 
-    let invalidRawRepresentable = JSONError.invalidRawRepresentable
+    let invalidRawRepresentable = JSON.OperationError.invalidRawRepresentable
     #expect(invalidRawRepresentable.description == "JSON contains invalid raw representable")
 
-    let urlDecodingFailure = JSONError.urlDecodingFailure("foo")
+    let urlDecodingFailure = JSON.OperationError.urlDecodingFailure("foo")
     #expect(urlDecodingFailure.description == "Cannot decode URL from 'foo'")
 
-    let uuidDecodingFailure = JSONError.uuidDecodingFailure("foo")
+    let uuidDecodingFailure = JSON.OperationError.uuidDecodingFailure("foo")
     #expect(uuidDecodingFailure.description == "Cannot decode UUID from 'foo'")
 
 }

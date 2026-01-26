@@ -39,7 +39,7 @@ struct SerializationTests {
         true
         """#
         #expect(str == expected)
-        #expect(throws: JSONSerializationError.illegalFragment) {
+        #expect(throws: JSON.SerializationError.illegalFragment) {
             try JSON.data(from: fragment, options: [])
         }
     }
@@ -139,7 +139,7 @@ struct SerializationTests {
             #expect(asyncData == data)
             let asyncString = try await JSON.stringify(json)
             #expect(asyncString == expected)
-            #expect(throws: JSONSerializationError.illegalFragment) {
+            #expect(throws: JSON.SerializationError.illegalFragment) {
                 try JSON.data(from: json, options: [.omitNullValues, .fragmentsAllowed])
             }
         }
@@ -301,22 +301,22 @@ struct SerializationTests {
                     let nan = JSON(Double.nan)
                     let inf = JSON(Double.infinity)
                     let negInf = JSON(-Double.infinity)
-                    #expect(throws: JSONSerializationError.invalidFloat) {
+                    #expect(throws: JSON.SerializationError.invalidFloat) {
                         try nan.serialize()
                     }
-                    await #expect(throws: JSONSerializationError.invalidFloat) {
+                    await #expect(throws: JSON.SerializationError.invalidFloat) {
                         try await JSON.serialize(nan)
                     }
-                    #expect(throws: JSONSerializationError.invalidFloat) {
+                    #expect(throws: JSON.SerializationError.invalidFloat) {
                         try inf.serialize()
                     }
-                    await #expect(throws: JSONSerializationError.invalidFloat) {
+                    await #expect(throws: JSON.SerializationError.invalidFloat) {
                         try await JSON.serialize(inf)
                     }
-                    #expect(throws: JSONSerializationError.invalidFloat) {
+                    #expect(throws: JSON.SerializationError.invalidFloat) {
                         try negInf.serialize()
                     }
-                    await #expect(throws: JSONSerializationError.invalidFloat) {
+                    await #expect(throws: JSON.SerializationError.invalidFloat) {
                         try await JSON.serialize(negInf)
                     }
                 }

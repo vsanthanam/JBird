@@ -182,7 +182,7 @@ struct JSONRepresentableTests {
         @Test("Double Decode As Int Fails For Fractional Values")
         func doubleDecodeAsIntFractionalFailure() {
             let json = JSON.number(4.1)
-            #expect(throws: JSONError.illegalIntegerConversion) {
+            #expect(throws: JSON.OperationError.illegalIntegerConversion) {
                 _ = try json.convert(into: Int.self)
             }
         }
@@ -308,7 +308,7 @@ struct JSONRepresentableTests {
             let bar = try Test(json: barJson)
             #expect(foo == .foo)
             #expect(bar == .bar)
-            #expect(throws: JSONError.invalidRawRepresentable) {
+            #expect(throws: JSON.OperationError.invalidRawRepresentable) {
                 _ = try Test(json: "baz")
             }
         }
@@ -388,7 +388,7 @@ struct JSONRepresentableTests {
         @Test("Illegal URL Convert")
         func illegalUrlConvert() throws {
             let json = JSON.string("")
-            #expect(throws: JSONError.urlDecodingFailure("")) {
+            #expect(throws: JSON.OperationError.urlDecodingFailure("")) {
                 _ = try json.convert(into: URL.self)
             }
         }
@@ -416,7 +416,7 @@ struct JSONRepresentableTests {
         @Test("Illegal UUID Convert")
         func illegalUuidConvert() throws {
             let json = JSON.string("E6218-C-4A-C-0C243EF")
-            #expect(throws: JSONError.uuidDecodingFailure("E6218-C-4A-C-0C243EF")) {
+            #expect(throws: JSON.OperationError.uuidDecodingFailure("E6218-C-4A-C-0C243EF")) {
                 _ = try json.convert(into: UUID.self)
             }
         }

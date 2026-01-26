@@ -1,5 +1,5 @@
 // JBird
-// JSONSerializationErrorTests.swift
+// SerializationErrorTests.swift
 //
 // MIT License
 //
@@ -26,16 +26,16 @@
 import JBirdCore
 import Testing
 
-@Test("JSONSerializationError Descriptions")
-func jSONSerializationErrorDescriptions() {
+@Test("SerializationError Descriptions")
+func serializationErrorDescriptions() {
 
-    let invalidFloat = JSONSerializationError.invalidFloat
+    let invalidFloat = JSON.SerializationError.invalidFloat
     #expect(invalidFloat.description == "Invalid floating point value")
 
-    let illegalFragment = JSONSerializationError.illegalFragment
+    let illegalFragment = JSON.SerializationError.illegalFragment
     #expect(illegalFragment.description == "Attemped to serialize a JSON fragment without required `fragmentsAllowed` option")
 
-    let stringMaterialization = JSONSerializationError.stringMaterialization
+    let stringMaterialization = JSON.SerializationError.stringMaterialization
     #expect(stringMaterialization.description == "Couldn't convert JSON bytes into a Swift string")
 
 }

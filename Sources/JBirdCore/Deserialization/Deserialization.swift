@@ -314,7 +314,7 @@ extension JSON {
         _ options: DeserializationOptions
     ) throws -> JSON {
         if inputSizeLimit != 0, !options.contains(.ignoreInputSizeLimit), data.count > inputSizeLimit {
-            throw JSONDeserializationError.inputSizeLimitExceeded
+            throw DeserializationError.inputSizeLimitExceeded
         }
 
         var jsonValue: OpaquePointer?
@@ -335,11 +335,11 @@ extension JSON {
         }
 
         guard result == JSON_NO_ERROR else {
-            throw JSONDeserializationError(result)
+            throw DeserializationError(result)
         }
 
         guard let jsonValue else {
-            throw JSONDeserializationError.unknown
+            throw DeserializationError.unknown
         }
 
         @inline(__always)
@@ -389,7 +389,7 @@ extension JSON {
                 }
                 return .object(object)
             default:
-                throw JSONDeserializationError.unknown
+                throw DeserializationError.unknown
             }
         }
 
@@ -399,11 +399,11 @@ extension JSON {
             case .array, .object:
                 return json
             case .bool, .null, .number, .string:
-                throw JSONDeserializationError.illegalFragment
+                throw DeserializationError.illegalFragment
             }
         }
         if options.contains(.omitNullValues), json.isNull {
-            throw JSONDeserializationError.illegalFragment
+            throw DeserializationError.illegalFragment
         }
         return json
     }
@@ -415,7 +415,7 @@ extension JSON {
                 _ options: DeserializationOptions
             ) async throws -> JSON {
                 if inputSizeLimit != 0, !options.contains(.ignoreInputSizeLimit), data.count > inputSizeLimit {
-                    throw JSONDeserializationError.inputSizeLimitExceeded
+                    throw DeserializationError.inputSizeLimitExceeded
                 }
 
                 var jsonValue: OpaquePointer?
@@ -436,11 +436,11 @@ extension JSON {
                 }
 
                 guard result == JSON_NO_ERROR else {
-                    throw JSONDeserializationError(result)
+                    throw DeserializationError(result)
                 }
 
                 guard let jsonValue else {
-                    throw JSONDeserializationError.unknown
+                    throw DeserializationError.unknown
                 }
 
                 func materialize(
@@ -490,7 +490,7 @@ extension JSON {
                         }
                         return .object(object)
                     default:
-                        throw JSONDeserializationError.unknown
+                        throw DeserializationError.unknown
                     }
                 }
 
@@ -500,11 +500,11 @@ extension JSON {
                     case .array, .object:
                         return json
                     case .bool, .null, .number, .string:
-                        throw JSONDeserializationError.illegalFragment
+                        throw DeserializationError.illegalFragment
                     }
                 }
                 if options.contains(.omitNullValues), json.isNull {
-                    throw JSONDeserializationError.illegalFragment
+                    throw DeserializationError.illegalFragment
                 }
                 try Task.checkCancellation()
                 return json
@@ -515,7 +515,7 @@ extension JSON {
                 _ options: DeserializationOptions
             ) async throws -> JSON {
                 if inputSizeLimit != 0, !options.contains(.ignoreInputSizeLimit), data.count > inputSizeLimit {
-                    throw JSONDeserializationError.inputSizeLimitExceeded
+                    throw DeserializationError.inputSizeLimitExceeded
                 }
 
                 var jsonValue: OpaquePointer?
@@ -536,11 +536,11 @@ extension JSON {
                 }
 
                 guard result == JSON_NO_ERROR else {
-                    throw JSONDeserializationError(result)
+                    throw DeserializationError(result)
                 }
 
                 guard let jsonValue else {
-                    throw JSONDeserializationError.unknown
+                    throw DeserializationError.unknown
                 }
 
                 nonisolated(nonsending) func materialize(
@@ -590,7 +590,7 @@ extension JSON {
                         }
                         return .object(object)
                     default:
-                        throw JSONDeserializationError.unknown
+                        throw DeserializationError.unknown
                     }
                 }
 
@@ -600,11 +600,11 @@ extension JSON {
                     case .array, .object:
                         return json
                     case .bool, .null, .number, .string:
-                        throw JSONDeserializationError.illegalFragment
+                        throw DeserializationError.illegalFragment
                     }
                 }
                 if options.contains(.omitNullValues), json.isNull {
-                    throw JSONDeserializationError.illegalFragment
+                    throw DeserializationError.illegalFragment
                 }
                 try Task.checkCancellation()
                 return json
@@ -617,7 +617,7 @@ extension JSON {
             isolation: (any Actor)? = #isolation
         ) async throws -> JSON {
             if inputSizeLimit != 0, !options.contains(.ignoreInputSizeLimit), data.count > inputSizeLimit {
-                throw JSONDeserializationError.inputSizeLimitExceeded
+                throw DeserializationError.inputSizeLimitExceeded
             }
 
             var jsonValue: OpaquePointer?
@@ -638,11 +638,11 @@ extension JSON {
             }
 
             guard result == JSON_NO_ERROR else {
-                throw JSONDeserializationError(result)
+                throw DeserializationError(result)
             }
 
             guard let jsonValue else {
-                throw JSONDeserializationError.unknown
+                throw DeserializationError.unknown
             }
 
             func materialize(
@@ -693,7 +693,7 @@ extension JSON {
                     }
                     return .object(object)
                 default:
-                    throw JSONDeserializationError.unknown
+                    throw DeserializationError.unknown
                 }
             }
 
@@ -703,11 +703,11 @@ extension JSON {
                 case .array, .object:
                     return json
                 case .bool, .null, .number, .string:
-                    throw JSONDeserializationError.illegalFragment
+                    throw DeserializationError.illegalFragment
                 }
             }
             if options.contains(.omitNullValues), json.isNull {
-                throw JSONDeserializationError.illegalFragment
+                throw DeserializationError.illegalFragment
             }
             try Task.checkCancellation()
             return json
