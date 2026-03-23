@@ -29,7 +29,7 @@ let jbird: PackageDescription.Package.Dependency = switch source {
 case .release:
     .package(
         url: "https://github.com/vsanthanam/JBird.git",
-        exact: "2.0.4"
+        exact: "2.0.5"
     )
 case .remote:
     .package(

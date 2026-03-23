@@ -55,7 +55,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/vsanthanam/JBird.git",
-            from: "2.0.4",
+            from: "2.0.5",
             traits: [
                 .defaults // Enables `DeclarativeAPI`, `ConformanceMacros` and `CodableSupport`.
                           // Alternatively, you could explicit opt into `DeclarativeAPI`, `ConformanceMacros`, `CodableSupport`, or any combination of the three.
