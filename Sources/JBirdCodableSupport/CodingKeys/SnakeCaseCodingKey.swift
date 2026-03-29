@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -33,9 +33,15 @@ struct SnakeCaseCodingKey: CodingKey {
             let bytes = Array(input.utf8)
             if bytes.isEmpty { return input }
 
-            func isUpper(_ b: UInt8) -> Bool { (65...90).contains(b) }
-            func isLower(_ b: UInt8) -> Bool { (97...122).contains(b) }
-            func isDigit(_ b: UInt8) -> Bool { (48...57).contains(b) }
+            func isUpper(_ b: UInt8) -> Bool {
+                (65...90).contains(b)
+            }
+            func isLower(_ b: UInt8) -> Bool {
+                (97...122).contains(b)
+            }
+            func isDigit(_ b: UInt8) -> Bool {
+                (48...57).contains(b)
+            }
 
             var out = String()
             out.reserveCapacity(bytes.count + bytes.count / 4)

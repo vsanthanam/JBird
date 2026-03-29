@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -96,9 +96,9 @@ final class InternalDecoder: Decoder {
 
     var userInfo: [CodingUserInfoKey: Any]
 
-    func container<Key>(
+    func container<Key: CodingKey>(
         keyedBy type: Key.Type
-    ) throws -> KeyedDecodingContainer<Key> where Key: CodingKey {
+    ) throws -> KeyedDecodingContainer<Key> {
         do {
             let container = try ObjectDecoder<Key>(
                 decoder: self,

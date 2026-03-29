@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -301,9 +301,9 @@ struct ValueDecoder: SingleValueDecodingContainer {
         }
     }
 
-    func decode<T>(
+    func decode<T: Decodable>(
         _ type: T.Type
-    ) throws -> T where T: Decodable {
+    ) throws -> T {
         let nestedDecoder = InternalDecoder(
             storage: decoder.storage,
             value: value,

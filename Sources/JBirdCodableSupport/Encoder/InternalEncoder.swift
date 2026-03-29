@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -163,7 +163,7 @@ final class InternalEncoder: Encoder {
 
     var userInfo: [CodingUserInfoKey: Any]
 
-    func container<Key>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> where Key : CodingKey {
+    func container<Key: CodingKey>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> {
         precondition(containerType == nil, "Attempted to create multiple containers at coding path \(codingPath)")
         containerType = .keyed
         let container = ObjectEncoder<Key>(encoder: self, autoPopContainers: autoPopContainers)

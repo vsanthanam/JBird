@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -27,7 +27,7 @@ import Foundation
 import JBirdCore
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: CodingKey {
+final class ObjectEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
 
     // MARK: - Initializer
 
@@ -165,10 +165,10 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
         set(JSON(value), forKey: encodedKey)
     }
 
-    func encode<T>(
+    func encode<T: Encodable>(
         _ value: T,
         forKey key: Key
-    ) throws where T : Encodable {
+    ) throws {
         let encodedKey = JSON.Encoder.encodeKey(path: codingPath, key: key)
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
@@ -188,10 +188,10 @@ final class ObjectEncoder<Key>: KeyedEncodingContainerProtocol where Key: Coding
         set(encoded, forKey: encodedKey)
     }
 
-    func nestedContainer<NestedKey>(
+    func nestedContainer<NestedKey: CodingKey>(
         keyedBy keyType: NestedKey.Type,
         forKey key: Key
-    ) -> KeyedEncodingContainer<NestedKey> where NestedKey : CodingKey {
+    ) -> KeyedEncodingContainer<NestedKey> {
         let encodedKey = JSON.Encoder.encodeKey(path: codingPath, key: key)
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,

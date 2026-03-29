@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -293,8 +293,10 @@ struct DecoderTests {
                 let serialized = Data(payload.utf8)
                 let foundation = try foundationDecoder.decode([String: Double].self, from: serialized)
                 let jbird = try jbirdDecoder.decode([String: Double].self, from: serialized)
-                #expect(foundation["foo"]!.isNaN)
-                #expect(jbird["foo"]!.isNaN)
+                let foundationDouble = try #require(foundation["foo"])
+                let jbirdDouble = try #require(jbird["foo"])
+                #expect(foundationDouble.isNaN)
+                #expect(jbirdDouble.isNaN)
                 #expect(foundation["bar"] == jbird["bar"])
             }
 

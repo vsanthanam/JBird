@@ -1,4 +1,4 @@
-// swift-tools-version: 6.3
+// swift-tools-version: 6.2
 
 import CompilerPluginSupport
 import PackageDescription
@@ -54,16 +54,8 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/swiftlang/swift-syntax.git",
-            exact: "603.0.0"
+            exact: "602.0.0"
         ),
-        .package(
-            url: "https://github.com/swiftlang/swift-docc-plugin.git",
-            exact: "1.4.5"
-        ),
-        .package(
-            url: "https://github.com/nicklockwood/SwiftFormat.git",
-            exact: "0.60.1"
-        )
     ],
     targets: [
         .target(

@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -43,7 +43,7 @@ import Testing
 struct OmitIfNullMacroTestsV2 {
 
     @Test("Annotated Optional Type With Question Mark")
-    func optionalTypeWithQuestionMark() throws {
+    func optionalTypeWithQuestionMark() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -118,7 +118,7 @@ struct OmitIfNullMacroTestsV2 {
     }
 
     @Test("Annotated non-optional")
-    func nonOptionalType() throws {
+    func nonOptionalType() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """

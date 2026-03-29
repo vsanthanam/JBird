@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -85,8 +85,8 @@ struct EncoderTests {
             jbirdEncoder.outputFormatting = [.withoutEscapingSlashes, .sortedKeys]
             let jbird = try jbirdEncoder.encode(model)
             #expect(foundation == jbird)
-            let foundationString = String(data: foundation, encoding: .utf8)!
-            let jbirdString = String(data: jbird, encoding: .utf8)!
+            let foundationString = try #require(String(data: foundation, encoding: .utf8))
+            let jbirdString = try #require(String(data: jbird, encoding: .utf8))
             print(foundationString)
             print(jbirdString)
             #expect(foundationString == jbirdString)
@@ -294,7 +294,7 @@ struct EncoderTests {
         }
 
         @Test("Encode Data Custom Strategy")
-        func custom() async throws {
+        func custom() throws {
             let data = Data("FooBarBaz".utf8)
 
             let foundationEncoder = JSONEncoder()
@@ -405,8 +405,8 @@ struct EncoderTests {
             jbirdEncoder.keyEncodingStrategy = .convertToSnakeCase
             jbirdEncoder.outputFormatting = .sortedKeys
             let jbird = try jbirdEncoder.encode(value)
-            let foundationStr = String(data: foundation, encoding: .utf8)!
-            let jbirdStr = String(data: jbird, encoding: .utf8)!
+            let foundationStr = try #require(String(data: foundation, encoding: .utf8))
+            let jbirdStr = try #require(String(data: jbird, encoding: .utf8))
             #expect(foundation == jbird)
             #expect(foundationStr == jbirdStr)
         }

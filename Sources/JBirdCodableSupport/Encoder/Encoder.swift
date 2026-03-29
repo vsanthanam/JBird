@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -200,7 +200,7 @@ extension JSON {
 
         // MARK: - Private
 
-        private struct EncodingStrategy: Sendable {
+        private struct EncodingStrategy {
             let keyEncodingStrategy: KeyEncodingStrategy
             let dateEncodingStrategy: DateEncodingStrategy
             let dataEncodingStrategy: DataEncodingStrategy

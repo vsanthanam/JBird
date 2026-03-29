@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -132,9 +132,9 @@ struct ValueEncoder: SingleValueEncodingContainer {
         write(JSON(value))
     }
 
-    mutating func encode<T>(
+    mutating func encode<T: Encodable>(
         _ value: T
-    ) throws where T: Encodable {
+    ) throws {
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
             codingPath: codingPath,

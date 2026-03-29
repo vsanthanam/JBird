@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -129,10 +129,10 @@ extension JSON {
         ///   - type: The type to decode into
         ///   - data: The payload to decode
         /// - Returns: An instance of the decoded type, based on the provided payload
-        public func decode<T>(
+        public func decode<T: Decodable>(
             _ type: T.Type = T.self,
             from data: Data,
-        ) throws -> T where T: Decodable {
+        ) throws -> T {
             let json = try JSON.value(
                 for: data,
                 options: [.fragmentsAllowed, .allowByteOrderMark]
@@ -159,7 +159,7 @@ extension JSON {
 
         // MARK: - Private
 
-        struct DecodingStrategy: Sendable {
+        struct DecodingStrategy {
             let keyDecodingStrategy: KeyDecodingStrategy
             let dateDecodingStrategy: DateDecodingStrategy
             let dataDecodingStrategy: DataDecodingStrategy

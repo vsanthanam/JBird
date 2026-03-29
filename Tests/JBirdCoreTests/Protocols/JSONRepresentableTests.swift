@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -353,7 +353,7 @@ struct JSONRepresentableTests {
 
         @Test("Set JSON Value")
         func arrayJSONValue() {
-            let set: Set<String> = ["foo", "bar"]
+            let set: Set = ["foo", "bar"]
             let json = set.jsonValue
             #expect(json == .array([.string("foo"), .string("bar")]) || json == .array([.string("bar"), .string("foo")]))
         }

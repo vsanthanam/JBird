@@ -6,5 +6,5 @@ Use JBird to encode and decode `Codable` types
 
 ### Encoders and Decoders
 
-- ``/JBirdCore/JSON/Encoder``
-- ``/JBirdCore/JSON/Decoder``
+- ``JBirdCore/JSON/Encoder``
+- ``JBirdCore/JSON/Decoder``

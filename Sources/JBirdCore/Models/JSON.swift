@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -332,9 +332,9 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameter type: The type to convert into
     /// - Returns: The converted value
     /// - Throws: An error, if the JSON value cannot be converted into the provided type
-    public func convert<T>(
+    public func convert<T: JSONInitializable>(
         into type: T.Type = T.self
-    ) throws -> T where T: JSONInitializable {
+    ) throws -> T {
         try T(json: self)
     }
 

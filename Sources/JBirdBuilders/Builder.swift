@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -187,10 +187,10 @@ public func => (
 /// An infix operator allowing key value assignment, for use with a ``JBirdCore/JSON/Builder``
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 @_disfavoredOverload
-public func => <Key, Value>(
+public func => <Key: JSONKeyConvertible, Value: JSONConvertible>(
     lhs: Key,
     rhs: Value
-) -> (Key, Value) where Key: JSONKeyConvertible, Value: JSONConvertible {
+) -> (Key, Value) {
     (lhs, rhs)
 }
 
@@ -205,9 +205,9 @@ public func => (
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 @_disfavoredOverload
-public func => <Key>(
+public func => <Key: JSONKeyConvertible>(
     lhs: Key,
     @JSON.Builder rhs: () -> JSON
-) -> (Key, JSON.Value) where Key: JSONKeyConvertible {
+) -> (Key, JSON.Value) {
     (lhs, rhs())
 }

@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -30,13 +30,13 @@ import Testing
 struct IndexCodingKeyTests {
 
     @Test("String Init")
-    func stringInit() async {
+    func stringInit() {
         let key = IndexCodingKey(stringValue: "foo")
         #expect(key == nil)
     }
 
     @Test("Int Init")
-    func intInit() async throws {
+    func intInit() throws {
         let key = try #require(IndexCodingKey(intValue: 12))
         #expect(key.intValue == 12)
         #expect(key.stringValue == "12")

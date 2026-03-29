@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -937,7 +937,7 @@ struct DeserializationTests {
     struct DuplicateKeyTests {
 
         @Test("Duplicate Keys in Object")
-        func duplicateKeys() async throws {
+        func duplicateKeys() throws {
             let raw = #"""
             {"foo": true, "foo": false}
             """#

@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -35,20 +35,26 @@ public protocol JSONSubscriptConvertible {
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension String: JSONSubscriptConvertible {
 
-    public var jsonSubscript: JSON.Subscript { .key(self) }
+    public var jsonSubscript: JSON.Subscript {
+        .key(self)
+    }
 
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension Int: JSONSubscriptConvertible {
 
-    public var jsonSubscript: JSON.Subscript { .index(self) }
+    public var jsonSubscript: JSON.Subscript {
+        .index(self)
+    }
 
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSONSubscriptConvertible where Self: RawRepresentable, RawValue: JSONSubscriptConvertible {
 
-    public var jsonSubscript: JSON.Subscript { rawValue.jsonSubscript }
+    public var jsonSubscript: JSON.Subscript {
+        rawValue.jsonSubscript
+    }
 
 }

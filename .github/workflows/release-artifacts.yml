@@ -15,9 +15,9 @@ jobs:
         artifact-name: ${{ matrix.target }}.xcframework.zip
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Xcode Version
-        run: ./.scripts/xcode-select
+        run: ./.scripts/xcode-select 26.2
       - name: Build XCFramework
         run: ./.scripts/build-xcframework ${{ matrix.target }}
       - name: Upload XCFramework
@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Download XCFramework
         uses: actions/download-artifact@v7
         with:
@@ -51,11 +51,11 @@ jobs:
       artifact-name: archive
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Xcode Version
         run: ./.scripts/xcode-select
       - name: Build Documentation
-        run: swift package generate-documentation --enable-experimental-combined-documentation --product JBird --product JBirdCore --product JBirdBuilders --product JBirdMacros
+        run: swift package generate-documentation --enable-experimental-combined-documentation --product JBird --product JBirdCore --product JBirdBuilders --product JBirdMacros --product JBirdCodableSupport
       - name: Locate DocC Archive
         run: cd .build/plugins/Swift-DocC/outputs
       - name: Compress DocC Archive
@@ -73,7 +73,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Download DocC Archive
         uses: actions/download-artifact@v7
         with:

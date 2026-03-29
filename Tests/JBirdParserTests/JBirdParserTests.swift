@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -239,7 +239,7 @@ struct JBirdParserTests {
 
         let str = json_get_string(value)
         #expect(str != nil)
-        #expect(String(cString: str!) == "hello")
+        #expect(try String(cString: #require(str)) == "hello")
 
     }
 
@@ -265,7 +265,7 @@ struct JBirdParserTests {
 
         let str = json_get_string(value)
         #expect(str != nil)
-        #expect(String(cString: str!) == "")
+        #expect(try String(cString: #require(str)) == "")
 
     }
 
@@ -291,7 +291,7 @@ struct JBirdParserTests {
 
         let str = json_get_string(value)
         #expect(str != nil)
-        #expect(String(cString: str!) == "hello\nworld\t!")
+        #expect(try String(cString: #require(str)) == "hello\nworld\t!")
     }
 
     @Test("Parse string with unicode")
@@ -316,7 +316,7 @@ struct JBirdParserTests {
 
         let str = json_get_string(value)
         #expect(str != nil)
-        #expect(String(cString: str!) == "Hello")
+        #expect(try String(cString: #require(str)) == "Hello")
     }
 
     @Test("Parse string with surrogate pairs")
@@ -341,7 +341,7 @@ struct JBirdParserTests {
 
         let str = json_get_string(value)
         #expect(str != nil)
-        #expect(String(cString: str!) == "😀")
+        #expect(try String(cString: #require(str)) == "😀")
     }
 
     @Test("Parse empty array")
@@ -478,16 +478,16 @@ struct JBirdParserTests {
 
         let key0 = json_get_object_key(value, 0)
         #expect(key0 != nil)
-        #expect(String(cString: key0!) == "name")
+        #expect(try String(cString: #require(key0)) == "name")
 
         let val0 = json_get_object_value(value, 0)
         #expect(val0 != nil)
         #expect(json_get_type(val0) == JSON_STRING)
-        #expect(String(cString: json_get_string(val0)!) == "John")
+        #expect(try String(cString: #require(json_get_string(val0))) == "John")
 
         let key1 = json_get_object_key(value, 1)
         #expect(key1 != nil)
-        #expect(String(cString: key1!) == "age")
+        #expect(try String(cString: #require(key1)) == "age")
 
         let val1 = json_get_object_value(value, 1)
         #expect(val1 != nil)
@@ -535,7 +535,7 @@ struct JBirdParserTests {
     // MARK: - BOM Tests
 
     @Test("Parse with BOM allowed")
-    func parseWithBOMAllowed() throws {
+    func parseWithBOMAllowed() {
         let bom: [UInt8] = [0xEF, 0xBB, 0xBF]
         let jsonString = "true"
         let jsonData = Data(bom + jsonString.utf8)
@@ -557,7 +557,7 @@ struct JBirdParserTests {
     }
 
     @Test("Parse with BOM not allowed")
-    func parseWithBOMNotAllowed() throws {
+    func parseWithBOMNotAllowed() {
         let bom: [UInt8] = [0xEF, 0xBB, 0xBF]
         let jsonString = "true"
         let jsonData = Data(bom + jsonString.utf8)
@@ -657,7 +657,7 @@ struct JBirdParserTests {
     }
 
     @Test("Parse null input")
-    func parseNullInput() throws {
+    func parseNullInput() {
         var value: OpaquePointer?
         let result = json_parse(nil, 0, &value, true, false, false, 0)
 
@@ -843,7 +843,7 @@ struct JBirdParserTests {
     }
 
     @Test("Parse string with control character")
-    func parseStringWithControlCharacter() throws {
+    func parseStringWithControlCharacter() {
         let jsonData = Data([0x22, 0x01, 0x22])
         var value: OpaquePointer?
 
@@ -1161,37 +1161,37 @@ struct JBirdParserTests {
     }
 
     @Test("Get type from null pointer")
-    func getTypeFromNullPointer() throws {
+    func getTypeFromNullPointer() {
         #expect(json_get_type(nil) == JSON_NULL)
     }
 
     @Test("Get boolean from null pointer")
-    func getBooleanFromNullPointer() throws {
+    func getBooleanFromNullPointer() {
         #expect(json_get_boolean(nil) == false)
     }
 
     @Test("Get int from null pointer")
-    func getIntFromNullPointer() throws {
+    func getIntFromNullPointer() {
         #expect(json_get_int(nil) == 0)
     }
 
     @Test("Get double from null pointer")
-    func getDoubleFromNullPointer() throws {
+    func getDoubleFromNullPointer() {
         #expect(json_get_double(nil) == 0.0)
     }
 
     @Test("Get string from null pointer")
-    func getStringFromNullPointer() throws {
+    func getStringFromNullPointer() {
         #expect(json_get_string(nil) == nil)
     }
 
     @Test("Get array size from null pointer")
-    func getArraySizeFromNullPointer() throws {
+    func getArraySizeFromNullPointer() {
         #expect(json_get_array_size(nil) == 0)
     }
 
     @Test("Get object size from null pointer")
-    func getObjectSizeFromNullPointer() throws {
+    func getObjectSizeFromNullPointer() {
         #expect(json_get_object_size(nil) == 0)
     }
 
@@ -1571,7 +1571,7 @@ struct JBirdParserTests {
 
         let str = json_get_string(value)
         #expect(str != nil)
-        #expect(String(cString: str!) == longString)
+        #expect(try String(cString: #require(str)) == longString)
     }
 
     @Test("Parse string with all escape sequences")
@@ -1593,7 +1593,7 @@ struct JBirdParserTests {
         let str = json_get_string(value)
         #expect(str != nil)
         let expectedString = "\"" + "/" + "\u{08}\u{0C}\n\r\t"
-        #expect(String(cString: str!) == expectedString)
+        #expect(try String(cString: #require(str)) == expectedString)
 
         json_free(value)
     }
@@ -1649,7 +1649,7 @@ struct JBirdParserTests {
 
         let firstKey = json_get_object_key(value, 0)
         #expect(firstKey != nil)
-        #expect(String(cString: firstKey!) == "key1")
+        #expect(try String(cString: #require(firstKey)) == "key1")
 
         let firstValue = json_get_object_value(value, 0)
         #expect(firstValue != nil)
@@ -1657,7 +1657,7 @@ struct JBirdParserTests {
     }
 
     @Test("Free null value")
-    func freeNullValue() throws {
+    func freeNullValue() {
         json_free(nil)
     }
 
@@ -1715,15 +1715,15 @@ struct JBirdParserTests {
 
         let key0 = json_get_object_key(value, 0)
         #expect(key0 != nil)
-        #expect(String(cString: key0!) == "key with spaces")
+        #expect(try String(cString: #require(key0)) == "key with spaces")
 
         let key1 = json_get_object_key(value, 1)
         #expect(key1 != nil)
-        #expect(String(cString: key1!) == "key\nwith\tescapes")
+        #expect(try String(cString: #require(key1)) == "key\nwith\tescapes")
 
         let key2 = json_get_object_key(value, 2)
         #expect(key2 != nil)
-        #expect(String(cString: key2!) == "keyA")
+        #expect(try String(cString: #require(key2)) == "keyA")
     }
 
     @Test(
