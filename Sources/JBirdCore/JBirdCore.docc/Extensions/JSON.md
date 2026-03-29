@@ -173,10 +173,10 @@ let steve: JSON = [
 - ``deserialize(_:options:)-(Data,_)``
 - ``deserialize(_:options:)-(String,_)``
 - ``DeserializationOptions``
-- ``withRecursionDepthLimit(_:operation:)-8riei``
-- ``withRecursionDepthLimit(_:operation:)-9u6jf``
-- ``withInputSizeLimit(_:operation:)-2sm2h``
-- ``withInputSizeLimit(_:operation:)-7cgom``
+- ``withRecursionDepthLimit(_:operation:)``
+- ``withRecursionDepthLimit(_:isolation:operation:)``
+- ``withInputSizeLimit(_:operation:)``
+- ``withInputSizeLimit(_:isolation:operation:)``
 - ``defaultRecursionDepthLimit``
 - ``defaultInputSizeLimit``
 
