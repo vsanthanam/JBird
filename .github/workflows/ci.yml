@@ -23,25 +23,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["26.2", "18.6", "17.7", "16.6"]
+        version: ["26.4", "18.6", "17.7", "16.6"]
     runs-on: macos-26
     steps:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Select Xcode Version
-        run: ./.scripts/xcode-select 26.2
+        run: ./.scripts/xcode-select 26.4
       - name: Configure DerivedData
         run: |
-          DERIVED_DATA_PATH="${{ runner.temp }}/DerivedData/JBird/${{ github.job }}/xcode-26.2/sdk-${{ matrix.version }}"
+          DERIVED_DATA_PATH="${{ runner.temp }}/DerivedData/JBird/${{ github.job }}/xcode-26.4/sdk-${{ matrix.version }}"
           echo "DERIVED_DATA_PATH=$DERIVED_DATA_PATH" >> "$GITHUB_ENV"
           mkdir -p "$DERIVED_DATA_PATH"
       - name: Load Build Cache
         uses: actions/cache@v5
         with:
           path: ${{ env.DERIVED_DATA_PATH }}
-          key: xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.2-sdk-${{ matrix.version }}-${{ hashFiles('**/*.xcodeproj/project.pbxproj', '**/*.xcworkspace/contents.xcworkspacedata', '**/Package.resolved') }}
+          key: xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.4-sdk-${{ matrix.version }}-${{ hashFiles('**/*.xcodeproj/project.pbxproj', '**/*.xcworkspace/contents.xcworkspacedata', '**/Package.resolved') }}
           restore-keys: |
-            xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.2-sdk-${{ matrix.version }}-
+            xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.4-sdk-${{ matrix.version }}-
       - name: Build JBird for iOS ${{ matrix.version }}
         run: ./.scripts/build-ios-xcode JBird ${{ matrix.version }}
 
@@ -50,25 +50,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["26.2", "18.6", "17.7", "16.6"]
+        version: ["26.4", "18.6", "17.7", "16.6"]
     runs-on: macos-26
     steps:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Select Xcode Version
-        run: ./.scripts/xcode-select 26.2
+        run: ./.scripts/xcode-select 26.4
       - name: Configure DerivedData
         run: |
-          DERIVED_DATA_PATH="${{ runner.temp }}/DerivedData/JBird/${{ github.job }}/xcode-26.2/sdk-${{ matrix.version }}"
+          DERIVED_DATA_PATH="${{ runner.temp }}/DerivedData/JBird/${{ github.job }}/xcode-26.4/sdk-${{ matrix.version }}"
           echo "DERIVED_DATA_PATH=$DERIVED_DATA_PATH" >> "$GITHUB_ENV"
           mkdir -p "$DERIVED_DATA_PATH"
       - name: Load Build Cache
         uses: actions/cache@v5
         with:
           path: ${{ env.DERIVED_DATA_PATH }}
-          key: xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.2-sdk-${{ matrix.version }}-${{ hashFiles('**/*.xcodeproj/project.pbxproj', '**/*.xcworkspace/contents.xcworkspacedata', '**/Package.resolved') }}
+          key: xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.4-sdk-${{ matrix.version }}-${{ hashFiles('**/*.xcodeproj/project.pbxproj', '**/*.xcworkspace/contents.xcworkspacedata', '**/Package.resolved') }}
           restore-keys: |
-            xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.2-sdk-${{ matrix.version }}-
+            xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.4-sdk-${{ matrix.version }}-
       - name: Build JBird for tvOS ${{ matrix.version }}
         run: ./.scripts/build-tvos-xcode JBird ${{ matrix.version }}
 
@@ -77,25 +77,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["26.2", "11.6", "10.7", "9.6"]
+        version: ["26.4", "11.6", "10.7", "9.6"]
     runs-on: macos-26
     steps:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Select Xcode Version
-        run: ./.scripts/xcode-select 26.2
+        run: ./.scripts/xcode-select 26.4
       - name: Configure DerivedData
         run: |
-          DERIVED_DATA_PATH="${{ runner.temp }}/DerivedData/JBird/${{ github.job }}/xcode-26.2/sdk-${{ matrix.version }}"
+          DERIVED_DATA_PATH="${{ runner.temp }}/DerivedData/JBird/${{ github.job }}/xcode-26.4/sdk-${{ matrix.version }}"
           echo "DERIVED_DATA_PATH=$DERIVED_DATA_PATH" >> "$GITHUB_ENV"
           mkdir -p "$DERIVED_DATA_PATH"
       - name: Load Build Cache
         uses: actions/cache@v5
         with:
           path: ${{ env.DERIVED_DATA_PATH }}
-          key: xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.2-sdk-${{ matrix.version }}-${{ hashFiles('**/*.xcodeproj/project.pbxproj', '**/*.xcworkspace/contents.xcworkspacedata', '**/Package.resolved') }}
+          key: xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.4-sdk-${{ matrix.version }}-${{ hashFiles('**/*.xcodeproj/project.pbxproj', '**/*.xcworkspace/contents.xcworkspacedata', '**/Package.resolved') }}
           restore-keys: |
-            xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.2-sdk-${{ matrix.version }}-
+            xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.4-sdk-${{ matrix.version }}-
       - name: Build JBird for watchOS ${{ matrix.version }}
         run: ./.scripts/build-watchos-xcode JBird ${{ matrix.version }}
 
@@ -104,11 +104,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["26.2", "15.5"]
+        version: ["26.4", "15.5"]
         include:
-          - version: "26.2"
+          - version: "26.4"
             runner: macos-26
-            xcode: "26.2"
+            xcode: "26.4"
           - version: "15.5"
             runner: macos-15
             xcode: "16.4"
@@ -140,11 +140,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["26.2", "15.5"]
+        version: ["26.4", "15.5"]
         include:
-          - version: "26.2"
+          - version: "26.4"
             runner: macos-26
-            xcode: "26.2"
+            xcode: "26.4"
           - version: "15.5"
             runner: macos-15
             xcode: "16.4"
@@ -176,25 +176,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["26.2", "2.6", "1.7"]
+        version: ["26.4", "2.6", "1.7"]
     runs-on: macos-26
     steps:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Select Xcode Version
-        run: ./.scripts/xcode-select 26.2
+        run: ./.scripts/xcode-select 26.4
       - name: Configure DerivedData
         run: |
-          DERIVED_DATA_PATH="${{ runner.temp }}/DerivedData/JBird/${{ github.job }}/xcode-26.2/sdk-${{ matrix.version }}"
+          DERIVED_DATA_PATH="${{ runner.temp }}/DerivedData/JBird/${{ github.job }}/xcode-26.4/sdk-${{ matrix.version }}"
           echo "DERIVED_DATA_PATH=$DERIVED_DATA_PATH" >> "$GITHUB_ENV"
           mkdir -p "$DERIVED_DATA_PATH"
       - name: Load Build Cache
         uses: actions/cache@v5
         with:
           path: ${{ env.DERIVED_DATA_PATH }}
-          key: xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.2-sdk-${{ matrix.version }}-${{ hashFiles('**/*.xcodeproj/project.pbxproj', '**/*.xcworkspace/contents.xcworkspacedata', '**/Package.resolved') }}
+          key: xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.4-sdk-${{ matrix.version }}-${{ hashFiles('**/*.xcodeproj/project.pbxproj', '**/*.xcworkspace/contents.xcworkspacedata', '**/Package.resolved') }}
           restore-keys: |
-            xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.2-sdk-${{ matrix.version }}-
+            xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.4-sdk-${{ matrix.version }}-
       - name: Build JBird for visionOS ${{ matrix.version }}
         run: ./.scripts/build-visionos-xcode JBird ${{ matrix.version }}
 
@@ -221,7 +221,7 @@ jobs:
             xcode: "16.4"
           - swift: "6.2"
             runner: "macos-26"
-            xcode: "26.2"
+            xcode: "26.4"
     runs-on: ${{ matrix.runner }}
     outputs:
       artifact-name: macos-build
@@ -263,7 +263,7 @@ jobs:
             xcode: "16.4"
           - swift: "6.2"
             runner: "macos-26"
-            xcode: "26.2"
+            xcode: "26.4"
     needs: build-macos-spm
     runs-on: ${{ matrix.runner }}
     steps:
