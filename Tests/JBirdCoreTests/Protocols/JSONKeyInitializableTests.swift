@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -31,8 +31,8 @@ enum RawRepKey: String, JSONKeyInitializable, Equatable {
     case bar
 }
 
-@Test
-func `Raw Representable Key`() throws {
+@Test("Test Raw Representable Key")
+func rawRepKey() throws {
     let foo = try RawRepKey(jsonKey: "foo")
     #expect(foo == .foo)
     let bar = try RawRepKey(jsonKey: "bar")

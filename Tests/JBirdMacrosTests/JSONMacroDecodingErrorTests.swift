@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -26,16 +26,17 @@
 import JBirdMacros
 import Testing
 
+@Suite("Macro Decoding Error Tests")
 struct JSONMacroDecodingErrorTests {
 
-    @Test
-    func `Macro error message`() {
+    @Test("Macro error message")
+    func errorMessage() {
         let error = JSONMacroDecodingError("foo")
         #expect(error.message == "foo")
     }
 
-    @Test
-    func `Macro description tests`() {
+    @Test("Macro description tests")
+    func errorDescription() {
         let error = JSONMacroDecodingError("bar")
         #expect(error.description == "bar")
     }

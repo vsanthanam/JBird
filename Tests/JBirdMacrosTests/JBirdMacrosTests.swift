@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -29,10 +29,11 @@ import JBirdCore
 import JBirdMacros
 import Testing
 
+@Suite("@JSONRepresentable Tests")
 struct JSONRepresentableTests {
 
-    @Test
-    func `@JSONRepresentable Class Support`() throws {
+    @Test("@JSONRepresentable Class Support")
+    func classSupport() throws {
         let model = TestSubClass(foo: nil, bar: "foo")
         let json = JSON(model)
         let decoded = try TestClass(json: json)
@@ -44,8 +45,8 @@ struct JSONRepresentableTests {
         ])
     }
 
-    @Test
-    func `@JSONRepresentable Struct Support`() throws {
+    @Test("@JSONRepresentable Struct Support")
+    func structSupport() throws {
 
         let model = Foo(
             fooBar: 12,
@@ -65,10 +66,11 @@ struct JSONRepresentableTests {
 
     }
 
+    @Suite("@JSONRepresentable Enum Support")
     struct EnumSupport {
 
-        @Test
-        func `Basic enum decode`() throws {
+        @Test("Basic enum decode")
+        func basic() throws {
             let model = TestEnum.foo
             let json = JSON(model)
             let decoded = try TestEnum(json: json)
@@ -76,8 +78,8 @@ struct JSONRepresentableTests {
             #expect(json == "foo")
         }
 
-        @Test
-        func `Enum with unlabled value`() throws {
+        @Test("Enum with unlabled value")
+        func singleUnlabledValue() throws {
             let model = TestEnum.baz(12)
             let json = JSON(model)
             let decoded = try TestEnum(json: json)
@@ -85,8 +87,8 @@ struct JSONRepresentableTests {
             #expect(json == ["baz": 12])
         }
 
-        @Test
-        func `Enum with multiple unlabled values`() throws {
+        @Test("Enum with multiple unlabled values")
+        func multipleUnlabledValue() throws {
             let model = TestEnum.corge("foo", nil)
             let json = JSON(model)
             let decoded = try TestEnum(json: json)
@@ -94,8 +96,8 @@ struct JSONRepresentableTests {
             #expect(json == ["corge": ["foo", nil]])
         }
 
-        @Test
-        func `Enum with multiple unlabled values of the same type`() throws {
+        @Test("Enum with multiple unlabled values of the same type")
+        func multipleUnlabledSameTypeValue() throws {
             let model = TestEnum.qux("foo", "bar")
             let json = JSON(model)
             let decoded = try TestEnum(json: json)
@@ -103,8 +105,8 @@ struct JSONRepresentableTests {
             #expect(json == ["qux": ["foo", "bar"]])
         }
 
-        @Test
-        func `Enum with mixed label associated values`() throws {
+        @Test("Enum with mixed label associated values")
+        func mixedValues() throws {
             let model = TestEnum.quux(foo: 12, 3.4)
             let json = JSON(model)
             print(json)
@@ -113,8 +115,8 @@ struct JSONRepresentableTests {
             #expect(json == ["quux": ["foo": 12, "1": 3.4]])
         }
 
-        @Test
-        func `Enum with multiple labeled associated values`() throws {
+        @Test("Enum with multiple labeled associated values")
+        func labeledValues() throws {
             let model = TestEnum.grault(foo: "bar", bar: "foo")
             let json = JSON(model)
             print(json)
@@ -129,7 +131,7 @@ struct JSONRepresentableTests {
 
 @JSONRepresentable
 struct Foo: Equatable {
-    
+
     init(
         fooBar: Int?,
         nested: TestNested?,

@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -26,8 +26,8 @@
 import JBirdCore
 import Testing
 
-@Test
-func `SerializationError Descriptions`() {
+@Test("SerializationError Descriptions")
+func serializationErrorDescriptions() {
 
     let invalidFloat = JSON.SerializationError.invalidFloat
     #expect(invalidFloat.description == "Invalid floating point value")

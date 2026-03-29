@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -26,8 +26,8 @@
 import JBirdCore
 import Testing
 
-@Test
-func `OperationError Description Tests`() {
+@Test("OperationError Description Tests")
+func operationErrorDescriptionTests() {
 
     let invalidIndex = JSON.OperationError.invalidSubscript(.index(1))
     #expect(invalidIndex.description == "Invalid JSON subscript '1'")

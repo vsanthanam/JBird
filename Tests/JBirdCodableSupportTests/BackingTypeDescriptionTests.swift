@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -27,46 +27,47 @@
 import JBirdCore
 import Testing
 
+@Suite("Backing Type Description Tests")
 struct BackingTypeDescriptionTests {
 
-    @Test
-    func `Null Type Description`() {
+    @Test("Null Type Description")
+    func testNull() {
         let json = JSON.null
         #expect(json.backingTypeDescription == .null)
     }
 
-    @Test
-    func `True Type Description`() {
+    @Test("True Type Description")
+    func testTrue() {
         let json = JSON.bool(true)
         #expect(json.backingTypeDescription == .bool)
     }
 
-    @Test
-    func `False Type Description`() {
+    @Test("False Type Description")
+    func testFalse() {
         let json = JSON.bool(false)
         #expect(json.backingTypeDescription == .bool)
     }
 
-    @Test
-    func `Number Type Description`() {
+    @Test("Number Type Description")
+    func int() {
         let json = JSON.number(12)
         #expect(json.backingTypeDescription == .number)
     }
 
-    @Test
-    func `String Type Description`() {
+    @Test("String Type Description")
+    func testString() {
         let json = JSON.string("foo")
         #expect(json.backingTypeDescription == .string)
     }
 
-    @Test
-    func `Array Type Description`() {
+    @Test("Array Type Description")
+    func testArray() {
         let json = JSON.array([.string("foo"), .string("bar")])
         #expect(json.backingTypeDescription == .array)
     }
 
-    @Test
-    func `Object Type Description`() {
+    @Test("Object Type Description")
+    func testObject() {
         let json = JSON.object(["foo": .string("bar"), "bar": .string("foo")])
         #expect(json.backingTypeDescription == .object)
     }

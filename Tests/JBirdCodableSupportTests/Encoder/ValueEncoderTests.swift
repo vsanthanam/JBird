@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -28,20 +28,22 @@ import JBirdCodableSupport
 import JBirdCore
 import Testing
 
+@Suite("Value Encoder Tests")
 struct ValueEncoderTests {
 
+    @Suite("Encode Booleans")
     struct Bools {
 
-        @Test
-        func `Encode True`() throws {
+        @Test("Encode True")
+        func encodeTrue() throws {
             let value = true
             let foundation = try JSONEncoder().encode(value)
             let jbird = try JSON.Encoder().encode(value)
             #expect(foundation == jbird)
         }
 
-        @Test
-        func `Encode False`() throws {
+        @Test("Encode False")
+        func encodeFalse() throws {
             let value = false
             let foundation = try JSONEncoder().encode(value)
             let jbird = try JSON.Encoder().encode(value)
@@ -50,42 +52,43 @@ struct ValueEncoderTests {
 
     }
 
+    @Suite("Encode Signed Integers")
     struct SignedIntegers {
 
-        @Test
-        func `Encode Int`() throws {
+        @Test("Encode Int")
+        func encodeInt() throws {
             let value = Int.max
             let foundation = try JSONEncoder().encode(value)
             let jbird = try JSON.Encoder().encode(value)
             #expect(foundation == jbird)
         }
 
-        @Test
-        func `Encode Int8`() throws {
+        @Test("Encode Int8")
+        func encodeInt8() throws {
             let value: Int8 = 32
             let foundation = try JSONEncoder().encode(value)
             let jbird = try JSON.Encoder().encode(value)
             #expect(foundation == jbird)
         }
 
-        @Test
-        func `Encode Int16`() throws {
+        @Test("Encode Int16")
+        func encodeInt16() throws {
             let value: Int16 = 64
             let foundation = try JSONEncoder().encode(value)
             let jbird = try JSON.Encoder().encode(value)
             #expect(foundation == jbird)
         }
 
-        @Test
-        func `Encode Int32`() throws {
+        @Test("Encode Int32")
+        func encodeInt32() throws {
             let value: Int32 = 128
             let foundation = try JSONEncoder().encode(value)
             let jbird = try JSON.Encoder().encode(value)
             #expect(foundation == jbird)
         }
 
-        @Test
-        func `Encode Int64`() throws {
+        @Test("Encode Int64")
+        func encodeInt64() throws {
             let value: Int64 = -256
             let foundation = try JSONEncoder().encode(value)
             let jbird = try JSON.Encoder().encode(value)
@@ -93,42 +96,43 @@ struct ValueEncoderTests {
         }
     }
 
+    @Suite("Encode Unsigned Integers")
     struct UnsignedIntegers {
 
-        @Test
-        func `Encode UInt`() throws {
+        @Test("Encode UInt")
+        func encodeUInt() throws {
             let value: UInt = 1029
             let foundation = try JSONEncoder().encode(value)
             let jbird = try JSON.Encoder().encode(value)
             #expect(foundation == jbird)
         }
 
-        @Test
-        func `Encode UInt8`() throws {
+        @Test("Encode UInt8")
+        func encodeUInt8() throws {
             let value: UInt8 = 32
             let foundation = try JSONEncoder().encode(value)
             let jbird = try JSON.Encoder().encode(value)
             #expect(foundation == jbird)
         }
 
-        @Test
-        func `Encode UInt16`() throws {
+        @Test("Encode UInt16")
+        func encodeUInt16() throws {
             let value: UInt16 = 64
             let foundation = try JSONEncoder().encode(value)
             let jbird = try JSON.Encoder().encode(value)
             #expect(foundation == jbird)
         }
 
-        @Test
-        func `Encode UInt32`() throws {
+        @Test("Encode UInt32")
+        func encodeUInt32() throws {
             let value: UInt32 = 128
             let foundation = try JSONEncoder().encode(value)
             let jbird = try JSON.Encoder().encode(value)
             #expect(foundation == jbird)
         }
 
-        @Test
-        func `encode U int64`() throws {
+        @Test("Encode Int64")
+        func encodeUInt64() throws {
             let value: UInt64 = 256
             let foundation = try JSONEncoder().encode(value)
             let jbird = try JSON.Encoder().encode(value)
@@ -136,42 +140,43 @@ struct ValueEncoderTests {
         }
     }
 
-    @Test
-    func `Encode Double`() throws {
+    @Test("Encode Double")
+    func encodeDouble() throws {
         let value = -0.00000023
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test
-    func `Encode Float`() throws {
+    @Test("Encode Float")
+    func encodeFloat() throws {
         let value: Float = 121.2e14
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
+    @Suite("Encode String")
     struct EncodeStrings {
 
-        @Test
-        func `Regular String`() throws {
+        @Test("Regular String")
+        func regular() throws {
             let value = "abcdefgHIJKLMNOPqrstuvWXYZ"
             let foundation = try JSONEncoder().encode(value)
             let jbird = try JSON.Encoder().encode(value)
             #expect(foundation == jbird)
         }
 
-        @Test
-        func `Beyond BMP String`() throws {
+        @Test("Beyond BMP String")
+        func emoji() throws {
             let value = "Hello 😉"
             let foundation = try JSONEncoder().encode(value)
             let jbird = try JSON.Encoder().encode(value)
             #expect(foundation == jbird)
         }
 
-        @Test
-        func `Escaped String`() throws {
+        @Test("Escaped String")
+        func escaped() throws {
             let value = "\"\n\t\""
             let foundation = try JSONEncoder().encode(value)
             let jbird = try JSON.Encoder().encode(value)
@@ -179,16 +184,16 @@ struct ValueEncoderTests {
         }
     }
 
-    @Test
-    func `Encode Optional`() throws {
+    @Test("Encode Optional")
+    func optional() throws {
         let value: String? = nil
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test
-    func `Encode Codable`() throws {
+    @Test("Encode Codable")
+    func encodeCodable() throws {
         struct SomeCodable: Codable {
             var foo = "bar"
         }
@@ -198,16 +203,16 @@ struct ValueEncoderTests {
         #expect(foundation == jbird)
     }
 
-    @Test
-    func `Unkeyed Super Encoder`() throws {
+    @Test("Unkeyed Super Encoder")
+    func encodeUnkeyedSuper() throws {
         let value = UnkeyedSub(foo: "bar", bar: "foo")
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test
-    func `Encode Single Value`() throws {
+    @Test("Encode Single Value")
+    func encodeSingleValue() throws {
         let value = Transparent(foo: Transparent.Bar(baz: "qux"))
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)

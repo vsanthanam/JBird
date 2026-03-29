@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -38,7 +38,7 @@ struct User: Equatable {
         self.age = age
         self.tags = tags
     }
-    
+
     let username: String
     let age: Int
     let tags: [String]
@@ -46,8 +46,8 @@ struct User: Equatable {
 }
 
 /// Ensures the API surface of `JBirdCore`, `JBirdBuilders` and `JBirdMacros` is available through the single `JBird` import
-@Test
-func `user convert`() throws {
+@Test("Test user convert")
+func userEncode() throws {
     let json = JSON {
         "username" => "sjobs"
         "age" => 50

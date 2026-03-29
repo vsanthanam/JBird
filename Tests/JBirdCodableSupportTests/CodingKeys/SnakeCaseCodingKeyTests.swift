@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -26,6 +26,7 @@
 @testable import JBirdCodableSupport
 import Testing
 
+@Suite("Snake Case CodingKey Tests")
 struct SnakeCaseCodingKeyTests {
 
     private struct TestKey: CodingKey {
@@ -51,20 +52,20 @@ struct SnakeCaseCodingKeyTests {
         }
     }
 
-    @Test
-    func `String Init`() {
+    @Test("String Init")
+    func stringInit() {
         let key = SnakeCaseCodingKey(stringValue: "foo")
         #expect(key == nil)
     }
 
-    @Test
-    func `Int Init`() {
+    @Test("Int Init")
+    func intInit() {
         let key = SnakeCaseCodingKey(intValue: 12)
         #expect(key == nil)
     }
 
     @Test(
-
+        "String Conversion",
         arguments: [
             ("someKey", "some_key"),
             ("someURLValue", "some_url_value"),
@@ -74,7 +75,7 @@ struct SnakeCaseCodingKeyTests {
             ("1Foo", "1_foo"),
         ]
     )
-    func `String Conversion`(
+    func stringConversion(
         key: String,
         newKey: String
     ) {

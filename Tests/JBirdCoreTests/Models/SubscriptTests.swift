@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -26,10 +26,11 @@
 import JBirdCore
 import Testing
 
+@Suite("Subscript Tests")
 struct SubscriptTests {
 
-    @Test
-    func `subscript convertible init`() {
+    @Test("SubscriptConvertibleInit")
+    func subscriptConvertibleInit() {
         let key = JSON.Subscript("foo")
         #expect(key == .key("foo"))
 
@@ -59,14 +60,14 @@ struct SubscriptTests {
         #expect(two == .index(2))
     }
 
-    @Test
-    func `Key Description`() {
+    @Test("Key Description")
+    func keyDescription() {
         let key = JSON.Subscript("foo")
         #expect(key.description == "foo")
     }
 
-    @Test
-    func `Index Description`() {
+    @Test("Index Description")
+    func indexDescription() {
         let index = JSON.Subscript(12)
         #expect(index.description == "12")
     }

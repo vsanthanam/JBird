@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -28,12 +28,14 @@ import JBirdCodableSupport
 import JBirdCore
 import Testing
 
-enum DecoderTests {
+@Suite("Decoder Tests")
+struct DecoderTests {
 
+    @Suite("Key Decoding Strategies")
     struct KeyDecodingStrategies {
 
-        @Test
-        func `Standard Key Decoding Strategy`() throws {
+        @Test("Standard Key Decoding Strategy")
+        func standard() throws {
 
             struct Foo: Codable, Equatable {
                 let someKey: String
@@ -57,8 +59,8 @@ enum DecoderTests {
             #expect(jbird == value)
         }
 
-        @Test
-        func `Snake Case Key Decoding Strategy`() throws {
+        @Test("Snake Case Key Decoding Strategy")
+        func snake_case() throws {
 
             struct Foo: Codable, Equatable {
                 let someKey: String
@@ -88,8 +90,8 @@ enum DecoderTests {
             #expect(jbird == value)
         }
 
-        @Test
-        func `Custom Key Decoding Strategy`() throws {
+        @Test("Custom Key Decoding Strategy")
+        func customKey() throws {
 
             struct A: Codable, Equatable {
                 var value: Int
@@ -153,12 +155,14 @@ enum DecoderTests {
 
     }
 
-    enum NonConformingFloatingPointStrategy {
+    @Suite("Decode Non Conforming Float Value")
+    struct NonConformingFloatingPointStrategy {
 
+        @Suite("String Replace Strategy")
         struct StringReplaceStrategy {
 
-            @Test
-            func `Decode Conforming`() throws {
+            @Test("Decode Conforming")
+            func decodeConforming() throws {
                 let foundationDecoder = JSONDecoder()
                 foundationDecoder.nonConformingFloatDecodingStrategy = .convertFromString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
                 let jbirdDecoder = JSON.Decoder()
@@ -175,8 +179,8 @@ enum DecoderTests {
                 #expect(foundationFloat == jbirdFloat)
             }
 
-            @Test
-            func `Decode Positive Infinity`() throws {
+            @Test("Decode Positive Infinity")
+            func decodePositiveInfinity() throws {
                 let foundationDecoder = JSONDecoder()
                 foundationDecoder.nonConformingFloatDecodingStrategy = .convertFromString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
                 let jbirdDecoder = JSON.Decoder()
@@ -193,8 +197,8 @@ enum DecoderTests {
                 #expect(foundationFloat == jbirdFloat)
             }
 
-            @Test
-            func `Decode Negative Infinity`() throws {
+            @Test("Decode Negative Infinity")
+            func decodeNegativeInfinity() throws {
                 let foundationDecoder = JSONDecoder()
                 foundationDecoder.nonConformingFloatDecodingStrategy = .convertFromString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
                 let jbirdDecoder = JSON.Decoder()
@@ -211,8 +215,8 @@ enum DecoderTests {
                 #expect(foundationFloat == jbirdFloat)
             }
 
-            @Test
-            func `Decode NaN`() throws {
+            @Test("Decode NaN")
+            func decodeNan() throws {
                 let foundationDecoder = JSONDecoder()
                 foundationDecoder.nonConformingFloatDecodingStrategy = .convertFromString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
                 let jbirdDecoder = JSON.Decoder()
@@ -231,8 +235,8 @@ enum DecoderTests {
                 #expect(jbirdFloat.isNaN)
             }
 
-            @Test
-            func `Decode Infinity Unkeyed`() throws {
+            @Test("Decode Infinity Unkeyed")
+            func decodeInfinityUnkeyed() throws {
                 let foundationDecoder = JSONDecoder()
                 foundationDecoder.nonConformingFloatDecodingStrategy = .convertFromString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
                 let jbirdDecoder = JSON.Decoder()
@@ -246,8 +250,8 @@ enum DecoderTests {
                 #expect(foundation == jbird)
             }
 
-            @Test
-            func `Decode NaN Unkeyed`() throws {
+            @Test("Decode NaN Unkeyed")
+            func decodeNanUnkeyed() throws {
                 let foundationDecoder = JSONDecoder()
                 foundationDecoder.nonConformingFloatDecodingStrategy = .convertFromString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
                 let jbirdDecoder = JSON.Decoder()
@@ -262,8 +266,8 @@ enum DecoderTests {
                 #expect(jbird[0].isNaN)
             }
 
-            @Test
-            func `Decode Infinity Keyed`() throws {
+            @Test("Decode Infinity Keyed")
+            func decodeInfinityKeyed() throws {
                 let foundationDecoder = JSONDecoder()
                 foundationDecoder.nonConformingFloatDecodingStrategy = .convertFromString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
                 let jbirdDecoder = JSON.Decoder()
@@ -277,8 +281,8 @@ enum DecoderTests {
                 #expect(foundation == jbird)
             }
 
-            @Test
-            func `Decode NaN Keyed`() throws {
+            @Test("Decode NaN Keyed")
+            func decodeNanKeyed() throws {
                 let foundationDecoder = JSONDecoder()
                 foundationDecoder.nonConformingFloatDecodingStrategy = .convertFromString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
                 let jbirdDecoder = JSON.Decoder()
@@ -289,8 +293,10 @@ enum DecoderTests {
                 let serialized = Data(payload.utf8)
                 let foundation = try foundationDecoder.decode([String: Double].self, from: serialized)
                 let jbird = try jbirdDecoder.decode([String: Double].self, from: serialized)
-                #expect(try #require(foundation["foo"]?.isNaN))
-                #expect(try #require(jbird["foo"]?.isNaN))
+                let foundationDouble = try #require(foundation["foo"])
+                let jbirdDouble = try #require(jbird["foo"])
+                #expect(foundationDouble.isNaN)
+                #expect(jbirdDouble.isNaN)
                 #expect(foundation["bar"] == jbird["bar"])
             }
 
@@ -298,10 +304,11 @@ enum DecoderTests {
 
     }
 
+    @Suite("Decode Dates")
     struct DecodeDates {
 
-        @Test
-        func `No Date Decoding Strategy`() throws {
+        @Test("No Date Decoding Strategy")
+        func defaultStrategy() throws {
             let source = Date.now
             let data = try JSONEncoder().encode(source)
             let foundation = try JSONDecoder().decode(Date.self, from: data)
@@ -309,10 +316,11 @@ enum DecoderTests {
             #expect(foundation == jbird)
         }
 
+        @Suite("ISO 8601 Decoding Strategy ")
         struct ISOStrategy {
 
-            @Test
-            func `Sucessful ISO 8601 Decoding Strategy`() throws {
+            @Test("Sucessful ISO 8601 Decoding Strategy")
+            func success() throws {
                 let source = Date.now
                 let formatter = ISO8601DateFormatter()
                 let string = formatter.string(from: source)
@@ -328,8 +336,8 @@ enum DecoderTests {
                 #expect(foundation == jbird)
             }
 
-            @Test
-            func `Broken ISO 8601 Decoding Strategy`() throws {
+            @Test("Broken ISO 8601 Decoding Strategy")
+            func failure() throws {
                 let data = try JSONEncoder().encode("Some JSON String")
 
                 let decoder = JSON.Decoder()
@@ -349,10 +357,11 @@ enum DecoderTests {
 
         }
 
+        @Suite("Date Formatter Decoding Strategy")
         struct FormatterDecodingStrategy {
 
-            @Test
-            func `Successful Date Formatter Decoding Strategy`() throws {
+            @Test("Successful Date Formatter Decoding Strategy")
+            func success() throws {
                 let source = Date.now
                 let formatter = DateFormatter()
                 let string = formatter.string(from: source)
@@ -368,8 +377,8 @@ enum DecoderTests {
                 #expect(foundation == jbird)
             }
 
-            @Test
-            func `Broken Formatter Decoding Strategy`() throws {
+            @Test("Broken Formatter Decoding Strategy")
+            func failure() throws {
                 let data = try JSONEncoder().encode("Some JSON String")
 
                 let decoder = JSON.Decoder()
@@ -389,8 +398,8 @@ enum DecoderTests {
 
         }
 
-        @Test
-        func `Milliseconds Since 1970 Decoding Strategy`() throws {
+        @Test("Milliseconds Since 1970 Decoding Strategy")
+        func millisecondsSince1970() throws {
             let source = Date.now.timeIntervalSince1970 * 1000
             let data = try JSONEncoder().encode(source)
 
@@ -404,8 +413,8 @@ enum DecoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test
-        func `Seconds Since 1970 Decoding Strategy`() throws {
+        @Test("Seconds Since 1970 Decoding Strategy")
+        func secondsSince1970() throws {
             let source = Date.now.timeIntervalSince1970
             let data = try JSONEncoder().encode(source)
 
@@ -419,8 +428,8 @@ enum DecoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test
-        func `Custom Date Decoding Strategy`() throws {
+        @Test("Custom Date Decoding Strategy")
+        func customDateDecodingStrategy() throws {
             let source = Date.now.timeIntervalSince1970 + 2
             let data = try JSONEncoder().encode(source)
 
@@ -440,8 +449,8 @@ enum DecoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test
-        func `Custom Date Decoding Strategy That Fails`() throws {
+        @Test("Custom Date Decoding Strategy That Fails")
+        func customDateDecodingStrategyThatFails() throws {
             let source = Date.now
             let data = try JSONEncoder().encode(source)
             enum MyError: Error, Equatable {
@@ -466,8 +475,8 @@ enum DecoderTests {
             }
         }
 
-        @Test
-        func `Unkeyed Date Decoding`() throws {
+        @Test("Unkeyed Date Decoding")
+        func decodeUnkeyedDates() throws {
             let dates = [Date.now, Date.now, Date.now]
             let data = try JSONEncoder().encode(dates)
             let foundation = try JSONDecoder().decode([Date].self, from: data)
@@ -475,8 +484,8 @@ enum DecoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test
-        func `Keyed Date Decoding`() throws {
+        @Test("Keyed Date Decoding")
+        func decodeKeyedDates() throws {
             let dates = ["foo": Date.now, "bar": Date.now, "baz": Date.now]
             let data = try JSONEncoder().encode(dates)
             let foundation = try JSONDecoder().decode([String: Date].self, from: data)
@@ -486,12 +495,14 @@ enum DecoderTests {
 
     }
 
+    @Suite("Decode Data")
     struct DecodeData {
 
+        @Suite("Base64 Data Decoding Strategy")
         struct Base64 {
 
-            @Test
-            func `Successful Base64 Data Decoding Strategy`() throws {
+            @Test("Successful Base64 Data Decoding Strategy")
+            func success() throws {
                 let source = Data("Hello, World".utf8).base64EncodedString()
                 let data = try JSONEncoder().encode(source)
                 let foundation = try JSONDecoder().decode(Data.self, from: data)
@@ -499,8 +510,8 @@ enum DecoderTests {
                 #expect(foundation == jbird)
             }
 
-            @Test
-            func `Broken Base64 Decoding Strategy`() throws {
+            @Test("Broken Base64 Decoding Strategy")
+            func failure() throws {
                 let data = try JSONEncoder().encode("Some JSON String")
 
                 let decoder = JSON.Decoder()
@@ -519,8 +530,8 @@ enum DecoderTests {
 
         }
 
-        @Test
-        func `Deferred Data Decoding Strategy`() throws {
+        @Test("Deferred Data Decoding Strategy")
+        func deferredStrategy() throws {
             let source = Data("Hello, World".utf8)
             let encoder = JSONEncoder()
             encoder.dataEncodingStrategy = .deferredToData
@@ -536,8 +547,8 @@ enum DecoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test
-        func `Custom Data Decoding Strategy`() throws {
+        @Test("Custom Data Decoding Strategy")
+        func customDataDecodingStrategy() throws {
             let source = Data("Hello, World".utf8)
             let encoder = JSONEncoder()
             encoder.dataEncodingStrategy = .custom { data, encoder in
@@ -561,8 +572,8 @@ enum DecoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test
-        func `Custom Data Decoding Strategy That Fails`() throws {
+        @Test("Custom Data Decoding Strategy That Fails")
+        func customDataDecodingStrategyThatFails() throws {
             let source = Data("Hello, World".utf8)
             let encoder = JSONEncoder()
             encoder.dataEncodingStrategy = .custom { data, encoder in
@@ -593,8 +604,8 @@ enum DecoderTests {
             }
         }
 
-        @Test
-        func `Unkeyed Data Decoding`() throws {
+        @Test("Unkeyed Data Decoding")
+        func decodeUnkeyedData() throws {
             let dates = [
                 Data("foo".utf8).base64EncodedString(),
                 Data("bar".utf8).base64EncodedString(),
@@ -606,8 +617,8 @@ enum DecoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test
-        func `Keyed Data Decoding`() throws {
+        @Test("Keyed Data Decoding")
+        func decodeKeyedData() throws {
             let dataDict = [
                 "foo": Data("foo".utf8).base64EncodedString(),
                 "bar": Data("bar".utf8).base64EncodedString(),

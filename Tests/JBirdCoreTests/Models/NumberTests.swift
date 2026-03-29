@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -26,10 +26,11 @@
 @testable import JBirdCore
 import Testing
 
+@Suite("Number Tests")
 struct NumberTests {
 
-    @Test
-    func `Convertible Initializers`() {
+    @Test("Convertible Initializers")
+    func convertibleInitializers() {
         let rawInt = 42
         let int = JSON.Number(rawInt)
         #expect(int == .init(.int(42)))
@@ -39,8 +40,8 @@ struct NumberTests {
         #expect(double == .init(.double(4.2)))
     }
 
-    @Test
-    func `Mismatched Equivalence`() {
+    @Test("Mismatched Equivalence")
+    func mismatchedEquivalence() {
         #expect(JSON.Number(42) == JSON.Number(42.0))
         #expect(JSON.Number(42.0) == JSON.Number(42))
         #expect(JSON.Number(42) != JSON.Number(42.1))
@@ -52,8 +53,8 @@ struct NumberTests {
 
     }
 
-    @Test
-    func `Literal Expressions`() {
+    @Test("Literal Expressions")
+    func literalExpressions() {
         let int: JSON.Number = 42
         #expect(int == .init(.int(42)))
 
@@ -61,8 +62,8 @@ struct NumberTests {
         #expect(double == .init(.double(4.2)))
     }
 
-    @Test
-    func `Unboxed Number`() throws {
+    @Test("Unboxed Number")
+    func unboxedNumber() throws {
         let int: JSON.Number = 12
         let untypedInt = try #require(int.unboxed().base as? Int)
         #expect(untypedInt == 12)
@@ -72,8 +73,8 @@ struct NumberTests {
         #expect(untypedDouble == 12.34)
     }
 
-    @Test
-    func `Number Description`() {
+    @Test("Number Description")
+    func numberDescription() {
         let int: JSON.Number = 12
         let intDescription = 12.description
         #expect(int.description == intDescription)
@@ -83,8 +84,8 @@ struct NumberTests {
         #expect(double.description == doubledescription)
     }
 
-    @Test
-    func `Number isInteger`() {
+    @Test("Number isInteger")
+    func isInteger() {
         let int: JSON.Number = 12
         #expect(int.isInteger)
 
@@ -92,8 +93,8 @@ struct NumberTests {
         #expect(!double.isInteger)
     }
 
-    @Test
-    func `Number isFloatingPoint`() {
+    @Test("Number isFloatingPoint")
+    func isFloatingPoint() {
         let int: JSON.Number = 12
         #expect(!int.isFloatingPoint)
 
@@ -101,8 +102,8 @@ struct NumberTests {
         #expect(double.isFloatingPoint)
     }
 
-    @Test
-    func `Number Is Finite`() {
+    @Test("Number Is Finite")
+    func isFinite() {
         let finite = JSON.Number(1.2)
         let inf = JSON.Number(Double.infinity)
         let negInf = JSON.Number(-Double.infinity)
@@ -111,8 +112,8 @@ struct NumberTests {
         #expect(!negInf.isInteger)
     }
 
-    @Test
-    func `Number Is Infinite`() {
+    @Test("Number Is Infinite")
+    func isInfinite() {
         let finite = JSON.Number(1.2)
         let inf = JSON.Number(Double.infinity)
         let negInf = JSON.Number(-Double.infinity)

@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -28,6 +28,7 @@ import JBirdCodableSupport
 import JBirdCore
 import Testing
 
+@Suite("Value Decoder Tests")
 struct ValueDecoderTests {
 
     struct SomeCodable: Codable {
@@ -36,8 +37,8 @@ struct ValueDecoderTests {
 
     static let someCodableData = try! JSONEncoder().encode(SomeCodable(foo: "foo"))
 
-    @Test
-    func `Decode String`() throws {
+    @Test("Decode String")
+    func decodeString() throws {
         let value = "\n"
         let data = try JSONEncoder().encode(value)
         let foundation = try JSONDecoder().decode(String.self, from: data)
@@ -51,8 +52,8 @@ struct ValueDecoderTests {
         }
     }
 
-    @Test
-    func `Decode Null`() throws {
+    @Test("Decode Null")
+    func decodeNull() throws {
         let value: String? = nil
         let data = try JSONEncoder().encode(value)
         let foundation = try JSONDecoder().decode(String?.self, from: data)
@@ -66,8 +67,8 @@ struct ValueDecoderTests {
         }
     }
 
-    @Test
-    func `Decode Float`() throws {
+    @Test("Decode Float")
+    func decodeFloat() throws {
         let value: Float = -3.14
         let data = try JSONEncoder().encode(value)
         let foundation = try JSONDecoder().decode(Float.self, from: data)
@@ -81,8 +82,8 @@ struct ValueDecoderTests {
         }
     }
 
-    @Test
-    func `Decode Double`() throws {
+    @Test("Decode Double")
+    func decodeDouble() throws {
         let value = 9.1
         let data = try JSONEncoder().encode(value)
         let foundation = try JSONDecoder().decode(Double.self, from: data)
@@ -96,8 +97,8 @@ struct ValueDecoderTests {
         }
     }
 
-    @Test
-    func `Decode Bool`() throws {
+    @Test("Decode Bool")
+    func decodeBool() throws {
         let value = false
         let data = try JSONEncoder().encode(value)
         let foundation = try JSONDecoder().decode(Bool.self, from: data)
@@ -111,10 +112,11 @@ struct ValueDecoderTests {
         }
     }
 
+    @Suite("Decode Signed Integers")
     struct SignedIntegers {
 
-        @Test
-        func `Decode Int`() throws {
+        @Test("Decode Int")
+        func decodeInt() throws {
             let value = 12
             let data = try JSONEncoder().encode(value)
             let foundation = try JSONDecoder().decode(Int.self, from: data)
@@ -128,8 +130,8 @@ struct ValueDecoderTests {
             }
         }
 
-        @Test
-        func `Decode Int8`() throws {
+        @Test("Decode Int8")
+        func decodeInt8() throws {
             let value: Int8 = 94
             let data = try JSONEncoder().encode(value)
             let foundation = try JSONDecoder().decode(Int8.self, from: data)
@@ -143,8 +145,8 @@ struct ValueDecoderTests {
             }
         }
 
-        @Test
-        func `Decode Int16`() throws {
+        @Test("Decode Int16")
+        func decodeInt16() throws {
             let value: Int16 = -1029
             let data = try JSONEncoder().encode(value)
             let foundation = try JSONDecoder().decode(Int16.self, from: data)
@@ -158,8 +160,8 @@ struct ValueDecoderTests {
             }
         }
 
-        @Test
-        func `Decode Int32`() throws {
+        @Test("Decode Int32")
+        func decodeInt32() throws {
             let value: Int32 = 90210
             let data = try JSONEncoder().encode(value)
             let foundation = try JSONDecoder().decode(Int32.self, from: data)
@@ -173,8 +175,8 @@ struct ValueDecoderTests {
             }
         }
 
-        @Test
-        func `Decode Int64`() throws {
+        @Test("Decode Int64")
+        func decodeInt64() throws {
             let value: Int64 = -1_000_001
             let data = try JSONEncoder().encode(value)
             let foundation = try JSONDecoder().decode(Int64.self, from: data)
@@ -190,10 +192,11 @@ struct ValueDecoderTests {
 
     }
 
+    @Suite("Decode Unsigned Integers")
     struct UnsignedIntegers {
 
-        @Test
-        func `Decode UInt`() throws {
+        @Test("Decode UInt")
+        func decodeUInt() throws {
             let value: UInt = 12
             let data = try JSONEncoder().encode(value)
             let foundation = try JSONDecoder().decode(UInt.self, from: data)
@@ -207,8 +210,8 @@ struct ValueDecoderTests {
             }
         }
 
-        @Test
-        func `Decode UInt8`() throws {
+        @Test("Decode UInt8")
+        func decodeUInt8() throws {
             let value: UInt8 = 94
             let data = try JSONEncoder().encode(value)
             let foundation = try JSONDecoder().decode(UInt8.self, from: data)
@@ -222,8 +225,8 @@ struct ValueDecoderTests {
             }
         }
 
-        @Test
-        func `Decode UInt16`() throws {
+        @Test("Decode UInt16")
+        func decodeUInt16() throws {
             let value: UInt16 = 1029
             let data = try JSONEncoder().encode(value)
             let foundation = try JSONDecoder().decode(UInt16.self, from: data)
@@ -237,8 +240,8 @@ struct ValueDecoderTests {
             }
         }
 
-        @Test
-        func `Decode UInt32`() throws {
+        @Test("Decode UInt32")
+        func decodeUInt32() throws {
             let value: UInt32 = 90210
             let data = try JSONEncoder().encode(value)
             let foundation = try JSONDecoder().decode(UInt32.self, from: data)
@@ -252,8 +255,8 @@ struct ValueDecoderTests {
             }
         }
 
-        @Test
-        func `Decode UInt64`() throws {
+        @Test("Decode UInt64")
+        func decodeUInt64() throws {
             let value: UInt64 = 1_000_001
             let data = try JSONEncoder().encode(value)
             let foundation = try JSONDecoder().decode(UInt64.self, from: data)
@@ -269,8 +272,8 @@ struct ValueDecoderTests {
 
     }
 
-    @Test
-    func `Decode Single Value`() throws {
+    @Test("Decode Single Value")
+    func decodeSingleValue() throws {
         let value = Transparent(foo: Transparent.Bar(baz: "qux"))
         let data = try JSONEncoder().encode(value)
         let foundation = try JSONDecoder().decode(Transparent.self, from: data)

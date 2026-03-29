@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -26,8 +26,8 @@
 @testable import JBirdCodableSupport
 import Testing
 
-@Test
-func `Super CodingKey`() throws {
+@Test("Test Super CodingKey")
+func superCodingKey() throws {
     let key = SuperCodingKey()
     #expect(key.stringValue == "super")
     #expect(key.intValue == nil)

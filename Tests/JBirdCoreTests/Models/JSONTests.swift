@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -27,16 +27,17 @@ import Foundation
 import JBirdCore
 import Testing
 
+@Suite("JSON Tests")
 struct JSONTests {
 
-    @Test
-    func `Empty Init`() {
+    @Test("Empty Init")
+    func emptyInit() {
         let json = JSON()
         #expect(json == .object([:]))
     }
 
-    @Test
-    func `JSON Count`() throws {
+    @Test("JSON Count")
+    func jsonCount() throws {
         let jsonObject = JSON.object(["foo": "bar"])
         let jsonArray = JSON.array(["foo", "bar"])
         let emptyArray = JSON.array([])
@@ -82,8 +83,8 @@ struct JSONTests {
         }
     }
 
-    @Test
-    func `Unboxed JSON`() {
+    @Test("Unboxed JSON")
+    func unboxedJSON() {
         let `true`: JSON = true
         let `false`: JSON = false
         let null: JSON = nil
@@ -102,10 +103,11 @@ struct JSONTests {
         #expect(object.unboxed().base is [String: AnyHashable])
     }
 
+    @Suite("Value Checking Tests")
     struct ValueCheckingTests {
 
-        @Test
-        func `Null Value Check`() {
+        @Test("Null Value Check")
+        func nullValue() {
             let nullValue: JSON = .null
             #expect(nullValue.isNull)
             #expect(!nullValue.isBool)
@@ -115,8 +117,8 @@ struct JSONTests {
             #expect(!nullValue.isArray)
         }
 
-        @Test
-        func `Bool Value Check`() {
+        @Test("Bool Value Check")
+        func boolValue() {
             let trueValue: JSON = true
             let falseValue: JSON = false
             #expect(!trueValue.isNull)
@@ -133,8 +135,8 @@ struct JSONTests {
             #expect(!falseValue.isArray)
         }
 
-        @Test
-        func `Number Value Check`() {
+        @Test("Number Value Check")
+        func numberValue() {
             let intValue: JSON = 42
             let floatValue: JSON = 4.2
             #expect(!intValue.isNull)
@@ -151,8 +153,8 @@ struct JSONTests {
             #expect(!floatValue.isArray)
         }
 
-        @Test
-        func `String Value Check`() {
+        @Test("String Value Check")
+        func stringValue() {
             let stringValue: JSON = "Hello, World!"
             #expect(!stringValue.isNull)
             #expect(!stringValue.isBool)
@@ -162,8 +164,8 @@ struct JSONTests {
             #expect(!stringValue.isArray)
         }
 
-        @Test
-        func `Array Value Check`() {
+        @Test("Array Value Check")
+        func arrayValue() {
             let arrayValue: JSON = [1, 2, 3]
             #expect(!arrayValue.isNull)
             #expect(!arrayValue.isBool)
@@ -173,8 +175,8 @@ struct JSONTests {
             #expect(arrayValue.isArray)
         }
 
-        @Test
-        func `Object Value Check`() {
+        @Test("Object Value Check")
+        func objectValue() {
             let objectValue: JSON = ["key": "value"]
             #expect(!objectValue.isNull)
             #expect(!objectValue.isBool)
@@ -185,10 +187,11 @@ struct JSONTests {
         }
     }
 
+    @Suite("Enum Value Access Tests")
     struct EnumValueAccessTests {
 
-        @Test
-        func `Object value access`() throws {
+        @Test("Object value access")
+        func objectValue() throws {
             let jsonObject = JSON.object(["foo": "bar"])
             let nonObjectJson = JSON.string("foo")
             let object = try jsonObject.objectValue
@@ -198,8 +201,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `Array value access`() throws {
+        @Test("Array value access")
+        func arrayValue() throws {
             let jsonArray = JSON.array(["foo", "bar"])
             let nonArrayJson = JSON.string("foo")
             let array = try jsonArray.arrayValue
@@ -209,8 +212,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `String value access`() throws {
+        @Test("String value access")
+        func stringValue() throws {
             let jsonString = JSON.string("foo")
             let nonStringJson = JSON.object(["foo": "bar"])
             let string = try jsonString.stringValue
@@ -220,8 +223,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `Number value access`() throws {
+        @Test("Number value access")
+        func numberValue() throws {
             let jsonNumber = JSON.number(123)
             let nonNumberJson = JSON.string("foo")
             let number = try jsonNumber.numberValue
@@ -231,8 +234,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `Bool value access`() throws {
+        @Test("Bool value access")
+        func boolValue() throws {
             let jsonBool = JSON.bool(false)
             let nonBoolJson = JSON.string("foo")
             let bool = try jsonBool.boolValue
@@ -244,10 +247,11 @@ struct JSONTests {
 
     }
 
+    @Suite("Subtype Helper Tests")
     struct SubtypeHelperTests {
 
-        @Test
-        func `Bool access tests`() throws {
+        @Test("Bool access tests")
+        func boolValue() throws {
             let jsonBool = JSON.bool(true)
             let nonBoolJson = JSON.string("foo")
             let nonBoolButLiteralJSON = JSON.null
@@ -261,8 +265,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `Integer access tests`() throws {
+        @Test("Integer access tests")
+        func intValue() throws {
             let jsonInt = JSON.number(123)
             let nonIntJson = JSON.string("foo")
             let int = try jsonInt.numberValue.convert(into: Int.self)
@@ -272,8 +276,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `Floating point access tests`() throws {
+        @Test("Floating point access tests")
+        func doubleValue() throws {
             let jsonDouble = JSON.number(123.456)
             let nonDoubleJson = JSON.string("foo")
             let double = try jsonDouble.numberValue.convert(into: Double.self)
@@ -285,59 +289,60 @@ struct JSONTests {
 
     }
 
+    @Suite("Literal expression support")
     struct LiteralExpressionTests {
 
-        @Test
-        func `Literal null`() {
+        @Test("Literal null")
+        func literalNil() {
             let literal: JSON = nil
             let standard = JSON.null
             #expect(literal == standard)
         }
 
-        @Test
-        func `Literal true`() {
+        @Test("Literal true")
+        func literalTrue() {
             let literal: JSON = true
             let standard = JSON.bool(true)
             #expect(literal == standard)
         }
 
-        @Test
-        func `Literal false`() {
+        @Test("Literal false")
+        func literalFalse() {
             let literal: JSON = false
             let standard = JSON.bool(false)
             #expect(literal == standard)
         }
 
-        @Test
-        func `Literal int`() {
+        @Test("Literal int")
+        func literalInt() {
             let literal: JSON = 123
             let standard = JSON.number(123)
             #expect(literal == standard)
         }
 
-        @Test
-        func `Literal double`() {
+        @Test("Literal double")
+        func literalDouble() {
             let literal: JSON = 123.456
             let standard = JSON.number(123.456)
             #expect(literal == standard)
         }
 
-        @Test
-        func `Literal string`() {
+        @Test("Literal string")
+        func literalString() {
             let literal: JSON = "foo"
             let standard = JSON.string("foo")
             #expect(literal == standard)
         }
 
-        @Test
-        func `Literal array`() {
+        @Test("Literal array")
+        func literalArray() {
             let literal: JSON = ["foo", "bar"]
             let standard = JSON.array(["foo", "bar"])
             #expect(literal == standard)
         }
 
-        @Test
-        func `Literal object`() {
+        @Test("Literal object")
+        func literalObject() {
             let literal: JSON = ["foo": "bar"]
             let standard = JSON.object(["foo": "bar"])
             #expect(literal == standard)
@@ -345,18 +350,19 @@ struct JSONTests {
 
     }
 
+    @Suite("Initializer Tests")
     struct InitializerTests {
 
-        @Test
-        func `Initialize from String`() throws {
+        @Test("Initialize from String")
+        func stringInit() throws {
             let jsonString = "{\"foo\":\"bar\"}"
             let json = try JSON(jsonString: jsonString)
             #expect(json == ["foo": "bar"])
         }
     }
 
-    @Test
-    func `Subcript Tests`() throws {
+    @Test("Subcript Tests")
+    func subscriptAccess() throws {
         let json: JSON = [
             "foo": [1, 2, 3]
         ]
@@ -365,10 +371,11 @@ struct JSONTests {
         #expect(try json[.key("foo")][.index(1)] == 2)
     }
 
+    @Suite("Introspection Tests")
     struct IntrospectionTests {
 
-        @Test
-        func `Value at path tests`() throws {
+        @Test("Value at path tests")
+        func valueAtPath() throws {
             let json: JSON = [
                 "foo": [
                     "bar": [1, 2, 3]
@@ -388,9 +395,9 @@ struct JSONTests {
             }
         }
 
-        @Test
+        @Test("Value at path tests (deprecated)")
         @available(*, deprecated)
-        func `Value at path tests (deprecated)`() throws {
+        func valueAtPathDeprecated() throws {
             let json: JSON = [
                 "foo": [
                     "bar": [1, 2, 3]
@@ -410,8 +417,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `Value at path tests (parameter packs)`() throws {
+        @Test("Value at path tests (parameter packs)")
+        func valueAtPathWithPacks() throws {
             let json: JSON = [
                 "foo": [
                     "bar": [1, 2, 3]
@@ -431,8 +438,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `Value for key tests`() throws {
+        @Test("Value for key tests")
+        func valueForKey() throws {
             let json: JSON = [
                 "foo": "bar",
                 "baz": 123
@@ -445,8 +452,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `Value at index tests`() throws {
+        @Test("Value at index tests")
+        func valueAtIndex() throws {
             let json: JSON = [1, "bar", true]
 
             #expect(try json.value(atIndex: 0) == 1)
@@ -457,8 +464,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `Value for subscript tests`() throws {
+        @Test("Value for subscript tests")
+        func valueForSubscript() throws {
             let jsonObject: JSON = [
                 "foo": "bar",
                 "baz": 123
@@ -484,8 +491,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `Contains value tests`() {
+        @Test("Contains value tests")
+        func containsValue() {
             let jsonObject: JSON = ["foo": "bar"]
             let jsonArray: JSON = [1, 2, 3]
 
@@ -509,10 +516,11 @@ struct JSONTests {
 
     }
 
+    @Suite("JSON mutation tests")
     struct MutationTests {
 
-        @Test
-        func `Set value for key tests`() throws {
+        @Test("Set value for key tests")
+        func setValueForKey() throws {
             var json: JSON = ["foo": "bar"]
 
             try json.setValue("baz", forKey: "qux")
@@ -525,8 +533,8 @@ struct JSONTests {
 
         }
 
-        @Test
-        func `Set value at index tests`() throws {
+        @Test("Set value at index tests")
+        func setValueAtIndex() throws {
             var json: JSON = [1, 2, 3]
 
             try json.setValue(4, atIndex: 1)
@@ -542,8 +550,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `Set value for subscript tests`() throws {
+        @Test("Set value for subscript tests")
+        func setValueForSubscript() throws {
             var jsonObject: JSON = ["foo": "bar"]
             var jsonArray: JSON = [1, 2, 3]
 
@@ -558,8 +566,8 @@ struct JSONTests {
             #expect(jsonArray == [1, 5, 3])
         }
 
-        @Test
-        func `Array append and insert`() throws {
+        @Test("Array append and insert")
+        func arrayAppendAndInsert() throws {
             var json: JSON = [1, 2, 3]
 
             enum Indexes: Int {
@@ -588,8 +596,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `Remove value tests`() throws {
+        @Test("Remove value tests")
+        func removeValue() throws {
             var jsonObject: JSON = ["foo": 1, "bar": 2, "qux": 3, "quux": 4]
             var jsonArray: JSON = [1, 2, 3, 4]
 
@@ -626,7 +634,7 @@ struct JSONTests {
     }
 
     #if canImport(Darwin)
-        @Suite(.serialized)
+        @Suite("JSON writing tests", .serialized)
         struct WritingTests {
 
             init() {
@@ -636,8 +644,8 @@ struct JSONTests {
             let testURL = FileManager.default.temporaryDirectory.appending(path: "test.json", directoryHint: .notDirectory)
 
             @available(macOS 13.0, macCatalyst 16.0, *)
-            @Test
-            func `Write to disk without previous content`() async throws {
+            @Test("Write to disk without previous content")
+            func writeToDiskWithoutPreviousContent() async throws {
                 let json: JSON = [
                     "foo": true,
                     "bar": false,
@@ -653,8 +661,8 @@ struct JSONTests {
             }
 
             @available(macOS 13.0, macCatalyst 16.0, *)
-            @Test
-            func `Write to disk with previous content`() async throws {
+            @Test("Write to disk with previous content")
+            func writeToDiskWithPreviousContent() async throws {
                 let junk = try #require("junk".data(using: .utf8))
                 try junk.write(to: testURL)
                 let json: JSON = [
@@ -668,8 +676,8 @@ struct JSONTests {
                 }
             }
 
-            @Test
-            func `Write to disk overwriting previous content`() async throws {
+            @Test("Write to disk overwriting previous content")
+            func writeToDiskOverwritingPreviousContent() async throws {
                 let junk = try #require("junk".data(using: .utf8))
                 try junk.write(to: testURL)
                 let json: JSON = [
@@ -689,10 +697,11 @@ struct JSONTests {
         }
     #endif
 
+    @Suite("Convenience Serialization Tests")
     struct SerializationTests {
 
-        @Test
-        func `Serialize JSON`() throws {
+        @Test("Serialize JSON")
+        func serialize() throws {
             let json: JSON = ["foo": "bar"]
             let data = try json.serialize()
             let expected = Data([
@@ -702,8 +711,8 @@ struct JSONTests {
             #expect(data == expected)
         }
 
-        @Test
-        func `Stringify JSON`() throws {
+        @Test("Stringify JSON")
+        func stringify() throws {
             let json: JSON = ["foo": "bar"]
             let str = try json.stringify()
             let expected = #"""
@@ -714,8 +723,8 @@ struct JSONTests {
 
     }
 
-    @Test
-    func `First and Last Array`() throws {
+    @Test("First and Last Array")
+    func firstAndLast() throws {
         let empty: JSON = []
         let array: JSON = ["foo", "bar"]
         let object: JSON = ["foo": "bar"]
@@ -757,8 +766,8 @@ struct JSONTests {
         }
     }
 
-    @Test
-    func `Count Array`() throws {
+    @Test("Count Array")
+    func count() throws {
         let emptyArray: JSON = []
         let array: JSON = ["foo", "bar"]
         let object: JSON = ["foo": "bar"]
@@ -798,10 +807,11 @@ struct JSONTests {
         }
     }
 
+    @Suite("AllSatisfy Tests")
     struct AllSatisfyTests {
 
         @Test
-        func `all satisfy array`() throws {
+        func allSatisfyArray() throws {
             let array: JSON = ["a", "b", "c", "d"]
             let object: JSON = ["foo": "bar"]
             try #expect(array.allSatisfy { (element: JSON) in element.isString } == true)
@@ -812,7 +822,7 @@ struct JSONTests {
         }
 
         @Test
-        func `all satisfy object`() throws {
+        func allSatisfyObject() throws {
             let object: JSON = ["foo": "bar", "baz": 42]
             let array: JSON = ["a", "b", "c", "d"]
             try #expect(object.allSatisfy { key, _ in key.count == 3 } == true)
@@ -824,8 +834,8 @@ struct JSONTests {
 
     }
 
-    @Test
-    func `Object Keys and Values`() throws {
+    @Test("Object Keys and Values")
+    func objectKeysAndValues() throws {
         let object: JSON = ["foo": "bar", "baz": 42]
         let array: JSON = ["a", "b", "c", "d"]
         let keys = try object.keys
@@ -840,10 +850,11 @@ struct JSONTests {
         }
     }
 
+    @Suite("Map Tests")
     struct MapTests {
 
-        @Test
-        func `Array Map Tests`() throws {
+        @Test("Array Map Tests")
+        func arrayMapTests() throws {
             let array: JSON = ["a", "b", "c", "d"]
             let object: JSON = ["foo": "bar"]
             let mapped = try array.map { try $0.stringValue.uppercased() }
@@ -853,8 +864,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `Object Map Tests`() throws {
+        @Test("Object Map Tests")
+        func objectMapTests() throws {
             let object: JSON = ["foo": "bar", "baz": 42]
             let array: JSON = ["a", "b", "c", "d"]
             let mapped = try object.map { key, _ in key.uppercased() }
@@ -864,8 +875,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `Map Values Tests`() throws {
+        @Test("Map Values Tests")
+        func mapValuesTests() throws {
             let object: JSON = ["foo": "bar", "baz": 42]
             let array: JSON = ["a", "b", "c", "d"]
             let mapped = try object.mapValues(\.isNumber)
@@ -875,8 +886,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `Map Values Into JSON Tests`() throws {
+        @Test("Map Values Into JSON Tests")
+        func mapValuesIntoJSONTests() throws {
             let object: JSON = ["foo": "bar", "baz": 42]
             let array: JSON = ["a", "b", "c", "d"]
             let mapped: JSON = try object.mapValues { value in
@@ -890,10 +901,11 @@ struct JSONTests {
 
     }
 
+    @Suite("Compact Map Tests")
     struct CompactMapTests {
 
-        @Test
-        func `array compact map tests`() throws {
+        @Test("Array Map Tests")
+        func arrayCompactMapTests() throws {
             let array: JSON = ["a", "B", "c", "D"]
             let object: JSON = ["foo": "bar"]
             let mapped = try array.compactMap { value in
@@ -919,8 +931,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `Object Compact Map Tests`() throws {
+        @Test("Object Compact Map Tests")
+        func objectCompactMapTests() throws {
             let object: JSON = ["foo": "bar", "baz": 42]
             let array: JSON = ["a", "b", "c", "d"]
             let mapped = try object.compactMap { key, value in
@@ -934,8 +946,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `compact map values tests`() throws {
+        @Test("Map Values Tests")
+        func compactMapValuesTests() throws {
             let object: JSON = ["foo": "bar", "baz": 42]
             let array: JSON = ["a", "b", "c", "d"]
             let mapped = try object.compactMapValues { value in
@@ -951,10 +963,11 @@ struct JSONTests {
 
     }
 
+    @Suite("Reduce Tests")
     struct ReduceTests {
 
-        @Test
-        func `Array Reduce`() throws {
+        @Test("Array Reduce")
+        func arrayReduce() throws {
             let array: JSON = [1, 2, 3, 4, 5]
             let object: JSON = ["foo": "bar"]
             let total = try array.reduce(0) { total, json in
@@ -968,8 +981,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `Array Reduce Into`() throws {
+        @Test("Array Reduce Into")
+        func arrayReduceInto() throws {
             let array: JSON = [1, 2, 3, 4, 5]
             let object: JSON = ["foo": "bar"]
             let total = try array.reduce(into: 0) { total, json in
@@ -983,8 +996,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `Object Reduce`() throws {
+        @Test("Object Reduce")
+        func objectReduce() throws {
             let object: JSON = ["foo": "bar", "baz": "qux"]
             let array: JSON = [1, 2, 3, 4, 5]
             let list: [String] = try object.reduce([]) { prev, pair in
@@ -1000,8 +1013,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `Object Reduce Into`() throws {
+        @Test("Object Reduce Into")
+        func objectReduceInto() throws {
             let object: JSON = ["foo": "bar", "baz": "qux"]
             let array: JSON = [1, 2, 3, 4, 5]
             let list: [String] = try object.reduce(into: []) { prev, pair in
@@ -1019,10 +1032,11 @@ struct JSONTests {
 
     }
 
+    @Suite("For Each Tests")
     struct ForEachTests {
 
-        @Test
-        func `Array For Each`() throws {
+        @Test("Array For Each")
+        func arrayForEach() throws {
             var result: [Int] = []
             let array: JSON = [1, 2, 3, 4, 5]
             let object: JSON = ["foo": "bar", "baz": "qux"]
@@ -1039,8 +1053,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `Object For Each`() throws {
+        @Test("Object For Each")
+        func objectForEach() throws {
             var result: [String] = []
             let object: JSON = ["foo": "bar", "baz": "qux"]
             let array: JSON = [1, 2, 3, 4, 5]
@@ -1059,8 +1073,8 @@ struct JSONTests {
 
     }
 
-    @Test
-    func `Array Index Swap`() throws {
+    @Test("Array Index Swap")
+    func arrayIndexSwap() throws {
         var array: JSON = [1, 2, 3, 4]
         var object: JSON = ["foo": "bar", "baz": "qux"]
 
@@ -1078,8 +1092,8 @@ struct JSONTests {
         }
     }
 
-    @Test
-    func `Object Merging`() throws {
+    @Test("Object Merging")
+    func objectMerging() throws {
         var object1: JSON = ["foo": "bar"]
         let object2: JSON = ["baz": "qux", "qux": "corge"]
         try object1.merge(object2)
@@ -1089,10 +1103,11 @@ struct JSONTests {
         #expect(object4 == ["foo": "bar", "baz": "qux", "qux": "corge", "pay": "load"])
     }
 
+    @Suite("Filtering Tests")
     struct FilteringTests {
 
-        @Test
-        func `Array Filtering`() throws {
+        @Test("Array Filtering")
+        func arrayFiltering() throws {
             let array: JSON = ["foo", "baz", "qux", "qux"]
             let object: JSON = ["foo": "bar", "baz": "qux", "qux": "corge"]
             let filteredArray = try array.filter { element in try element.stringValue.hasPrefix("q") }
@@ -1102,8 +1117,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `Object Filtering`() throws {
+        @Test("Object Filtering")
+        func objectFiltering() throws {
             let object: JSON = ["foo": "bar", "baz": "qux", "qux": "corge"]
             let array: JSON = ["foo", "baz", "qux", "qux"]
             let filteredObject = try object.filter { key, _ in key != "qux" }
@@ -1113,8 +1128,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `Object Key Filtering`() throws {
+        @Test("Object Key Filtering")
+        func objectKeyFiltering() throws {
             let object: JSON = ["foo": "bar", "baz": "qux", "qux": "corge"]
             let array: JSON = ["foo", "baz", "qux", "qux"]
             let filteredObject = try object.filterKeys { key in key.starts(with: "q") }
@@ -1124,8 +1139,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `Object Value Filtering`() throws {
+        @Test("Object Value Filtering")
+        func objectValueFiltering() throws {
             let object: JSON = ["foo": "bar", "baz": 2.0, "qux": 1]
             let array: JSON = ["foo", "baz", "qux", "qux"]
             let filteredObject = try object.filterValues(\.isString)
@@ -1135,8 +1150,8 @@ struct JSONTests {
             }
         }
 
-        @Test
-        func `Array Filter Nils Filtering`() throws {
+        @Test("Array Filter Nils Filtering")
+        func arrayNilFiltering() throws {
             let array: JSON = ["foo", "bar", nil, "baz", nil]
             let object: JSON = ["foo": "bar", "baz": 2.0, "qux": 1]
             let filteredArray = try array.filterNils()
@@ -1147,8 +1162,8 @@ struct JSONTests {
         }
     }
 
-    @Test
-    func `Null JSON Description`() {
+    @Test("Null JSON Description")
+    func nullDescription() {
         let json = JSON.null
         #expect(json.description == "null")
     }

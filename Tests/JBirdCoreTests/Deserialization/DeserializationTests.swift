@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -27,19 +27,21 @@ import Foundation
 import JBirdCore
 import Testing
 
+@Suite("Deserialization Tests")
 struct DeserializationTests {
 
+    @Suite("Byte Order Mark Tests")
     struct BOMTests {
 
-        @Test
-        func `Byte Order Mark Deserialization`() throws {
+        @Test("Byte Order Mark Deserialization")
+        func bom() throws {
             let data = Data([0xEF, 0xBB, 0xBF, 0x7B, 0x7D])
             let json = try JSON(data)
             #expect(json == [:])
         }
 
-        @Test
-        func `Illegal Byte Order Mark Deserialization`() {
+        @Test("Illegal Byte Order Mark Deserialization")
+        func noBom() {
             let data = Data([0xEF, 0xBB, 0xBF, 0x7B, 0x7D])
             #expect(throws: JSON.DeserializationError.invalidCharacter) {
                 _ = try JSON.value(for: data, options: .default.subtracting(.allowByteOrderMark))
@@ -48,10 +50,11 @@ struct DeserializationTests {
 
     }
 
+    @Suite("Whitespace Tests")
     struct WhitespaceTests {
 
-        @Test
-        func `Without Whitespace`() throws {
+        @Test("Without Whitespace")
+        func withoutWhitespace() throws {
             let raw = #"""
             {"foo":true}
             """#
@@ -60,8 +63,8 @@ struct DeserializationTests {
             #expect(json == ["foo": true])
         }
 
-        @Test
-        func `With Whitespace`() throws {
+        @Test("With Whitespace")
+        func testWithWhitespace() throws {
             let raw = #"""
             {
                 "foo": true
@@ -75,9 +78,10 @@ struct DeserializationTests {
 
     }
 
+    @Suite("Fragment Tests")
     struct FragmentTests {
 
-        @Test
+        @Test("Object")
         func object() throws {
             let raw = #"""
             {"foo":true}
@@ -87,7 +91,7 @@ struct DeserializationTests {
             #expect(json == ["foo": true])
         }
 
-        @Test
+        @Test("Array")
         func array() throws {
             let raw = #"""
             [1,2,3]
@@ -97,7 +101,7 @@ struct DeserializationTests {
             #expect(json == [1, 2, 3])
         }
 
-        @Test
+        @Test("Literal")
         func literal() async throws {
             let raw = #"""
             true
@@ -111,7 +115,7 @@ struct DeserializationTests {
             }
         }
 
-        @Test
+        @Test("Number")
         func number() async throws {
             let raw = #"""
             123
@@ -125,7 +129,7 @@ struct DeserializationTests {
             }
         }
 
-        @Test
+        @Test("String")
         func string() async throws {
             let raw = #"""
             "hello"
@@ -141,10 +145,11 @@ struct DeserializationTests {
 
     }
 
+    @Suite("Literal Value Deserialization Tests")
     struct LiteralTests {
 
-        @Test
-        func `true Deserialization`() async throws {
+        @Test("`true` Deserialization")
+        func deserializeTrue() async throws {
             let raw = #"""
             true    
             """#
@@ -159,8 +164,8 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
         }
 
-        @Test
-        func `false Deserialization`() async throws {
+        @Test("`false` Deserialization")
+        func deserializeFalse() async throws {
             let raw = #"""
             false    
             """#
@@ -175,8 +180,8 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
         }
 
-        @Test
-        func `null Deserialization`() async throws {
+        @Test("`null` Deserialization")
+        func deserializeNull() async throws {
             let raw = #"""
             null  
             """#
@@ -199,12 +204,14 @@ struct DeserializationTests {
 
     }
 
-    enum NumberTests {
+    @Suite("Number Value Deserialization Tests")
+    struct NumberTests {
 
+        @Suite("Integer Deserialization Tests")
         struct IntegerTests {
 
-            @Test
-            func `Normal Integer Deserialization`() async throws {
+            @Test("Normal Integer Deserialization")
+            func normal() async throws {
                 let raw = #"""
                 1231
                 """#
@@ -219,8 +226,8 @@ struct DeserializationTests {
                 #expect(fromAsyncString == json)
             }
 
-            @Test
-            func `Negative Integer Deserialization`() async throws {
+            @Test("Negative Integer Deserialization")
+            func negative() async throws {
                 let raw = #"""
                 -1231
                 """#
@@ -237,10 +244,11 @@ struct DeserializationTests {
 
         }
 
+        @Suite("Floating Point Deserialization Tests")
         struct DoubleTests {
 
-            @Test
-            func `Normal Double Deserialization`() async throws {
+            @Test("Normal Double Deserialization")
+            func normal() async throws {
                 let raw = #"""
                 123.12
                 """#
@@ -255,8 +263,8 @@ struct DeserializationTests {
                 #expect(fromAsyncString == json)
             }
 
-            @Test
-            func `Negative Double Deserialization`() async throws {
+            @Test("Negative Double Deserialization")
+            func negative() async throws {
                 let raw = #"""
                 -123.12
                 """#
@@ -271,8 +279,8 @@ struct DeserializationTests {
                 #expect(fromAsyncString == json)
             }
 
-            @Test
-            func `Scientific Notation Deserialization`() async throws {
+            @Test("Scientific Notation Deserialization")
+            func exponent() async throws {
                 let raw = #"""
                 1.3e4
                 """#
@@ -287,8 +295,8 @@ struct DeserializationTests {
                 #expect(fromAsyncString == json)
             }
 
-            @Test
-            func `Negative Scientific Notation Deserialization`() async throws {
+            @Test("Negative Scientific Notation Deserialization")
+            func negativeExponent() async throws {
                 let raw = #"""
                 1.2e-2
                 """#
@@ -307,10 +315,11 @@ struct DeserializationTests {
 
     }
 
+    @Suite("String Value Deserialization Tests")
     struct StringTests {
 
-        @Test
-        func `Normal String Deserialization`() async throws {
+        @Test("Normal String Deserialization")
+        func normal() async throws {
             let raw = #"""
             "abcdefghijklmnopqrstuvwxyz"
             """#
@@ -325,8 +334,8 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
         }
 
-        @Test
-        func `Escaped Quote Deserialization`() async throws {
+        @Test("Escaped Quote Deserialization")
+        func escapedQuote() async throws {
             let raw = #"""
             "\""
             """#
@@ -341,8 +350,8 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
         }
 
-        @Test
-        func `Escaped Backslash Deserialization`() async throws {
+        @Test("Escaped Backslash Deserialization")
+        func reverseSolidus() async throws {
             let raw = #"""
             "\\"
             """#
@@ -357,8 +366,8 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
         }
 
-        @Test
-        func `Escaped Slash Deserialization`() async throws {
+        @Test("Escaped Slash Deserialization")
+        func solidus() async throws {
             let raw = #"""
             "\/"
             """#
@@ -373,8 +382,8 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
         }
 
-        @Test
-        func `Escaped Backspace Deserialization`() async throws {
+        @Test("Escaped Backspace Deserialization")
+        func backspace() async throws {
             let raw = #"""
             "\b"
             """#
@@ -389,8 +398,8 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
         }
 
-        @Test
-        func `Escaped Tab Deserialization`() async throws {
+        @Test("Escaped Tab Deserialization")
+        func tab() async throws {
             let raw = #"""
             "\t"
             """#
@@ -405,8 +414,8 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
         }
 
-        @Test
-        func `Escaped Formfeed Deserialization`() async throws {
+        @Test("Escaped Formfeed Deserialization")
+        func formfeed() async throws {
             let raw = #"""
             "\f"
             """#
@@ -421,8 +430,8 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
         }
 
-        @Test
-        func `Escaped Newline Deserialization`() async throws {
+        @Test("Escaped Newline Deserialization")
+        func newLine() async throws {
             let raw = #"""
             "\n"
             """#
@@ -437,8 +446,8 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
         }
 
-        @Test
-        func `Escaped Carriage Return Deserialization`() async throws {
+        @Test("Escaped Carriage Return Deserialization")
+        func carriageReturn() async throws {
             let raw = #"""
             "\r"
             """#
@@ -453,8 +462,8 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
         }
 
-        @Test
-        func `Escaped Unicode Scalar Deserialization`() async throws {
+        @Test("Escaped Unicode Scalar Deserialization")
+        func unicodeEscape() async throws {
             let raw = #"""
             "\u00E9"
             """#
@@ -469,8 +478,8 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
         }
 
-        @Test
-        func `Basic Multi-lingual Plane External Escaped Unicode Scalar Deserialization`() async throws {
+        @Test("Basic Multi-lingual Plane External Escaped Unicode Scalar Deserialization")
+        func bmpExternalEscape() async throws {
             let raw = #"""
             "\uD83D\uDE97"
             """#
@@ -485,8 +494,8 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
         }
 
-        @Test
-        func `Ascii External Deserialization`() async throws {
+        @Test("Ascii External Deserialization")
+        func asciiExternalEscape() async throws {
             let raw = #"""
             "café"
             """#
@@ -501,8 +510,8 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
         }
 
-        @Test
-        func `Basic Multi-lingual Plane External Deserialization`() async throws {
+        @Test("Basic Multi-lingual Plane External Deserialization")
+        func specialCharaceter() async throws {
             let raw = #"""
             {"key":"💨"}
             """#
@@ -518,10 +527,11 @@ struct DeserializationTests {
         }
     }
 
+    @Suite("Array Deserialization Tests")
     struct ArrayTests {
 
-        @Test
-        func `Empty Array Deserialization`() async throws {
+        @Test("Empty Array Deserialization")
+        func empty() async throws {
             let raw = #"""
             []
             """#
@@ -536,8 +546,8 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
         }
 
-        @Test
-        func `Single Element Array Deserialization`() async throws {
+        @Test("Single Element Array Deserialization")
+        func single() async throws {
             let raw = #"""
             ["a"]
             """#
@@ -552,8 +562,8 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
         }
 
-        @Test
-        func `Multiple Element Array Deserialization`() async throws {
+        @Test("Multiple Element Array Deserialization")
+        func multiple() async throws {
             let raw = #"""
             ["a","b","c"]
             """#
@@ -568,8 +578,8 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
         }
 
-        @Test
-        func `Array With Whitespace Deserialization`() async throws {
+        @Test("Array With Whitespace Deserialization")
+        func withWhitespace() async throws {
             let raw = #"""
             [
                 "a",
@@ -590,10 +600,11 @@ struct DeserializationTests {
 
     }
 
+    @Suite("Object Deserialization Tests")
     struct ObjectTests {
 
-        @Test
-        func `Empty Object Deserialization`() async throws {
+        @Test("Empty Object Deserialization")
+        func empty() async throws {
             let raw = #"""
             {}
             """#
@@ -608,8 +619,8 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
         }
 
-        @Test
-        func `Single Field Object Deserialization`() async throws {
+        @Test("Single Field Object Deserialization")
+        func single() async throws {
             let raw = #"""
             {"foo":true}
             """#
@@ -624,8 +635,8 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
         }
 
-        @Test
-        func `Multiple Field Object Deserialization`() async throws {
+        @Test("Multiple Field Object Deserialization")
+        func multiple() async throws {
             let raw = #"""
             {"foo":true,"bar":null}
             """#
@@ -640,8 +651,8 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
         }
 
-        @Test
-        func `Object Omit Null Keys`() async throws {
+        @Test("Object Omit Null Keys")
+        func omitNullKeys() async throws {
             let raw = #"""
             {"foo":[1,null,2],"bar":null}
             """#
@@ -656,8 +667,8 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
         }
 
-        @Test
-        func `Object Omit Null Values`() async throws {
+        @Test("Object Omit Null Values")
+        func omitNullValues() async throws {
             let raw = #"""
             {"foo":[1,null,2],"bar":null}
             """#
@@ -672,8 +683,8 @@ struct DeserializationTests {
             #expect(fromAsyncString == json)
         }
 
-        @Test
-        func `Object With Whitespace Deserialization`() async throws {
+        @Test("Object With Whitespace Deserialization")
+        func withWhitespace() async throws {
             let raw = #"""
             {
                 "foo": true,
@@ -693,8 +704,8 @@ struct DeserializationTests {
 
     }
 
-    @Test
-    func `Complex JSON Object Deserialization`() async throws {
+    @Test("Complex JSON Object Deserialization")
+    func complexObject() async throws {
         let raw = #"""
         {
             "foo": true,
@@ -743,18 +754,19 @@ struct DeserializationTests {
         #expect(fromAsyncString == json)
     }
 
+    @Suite("Deserialization Errors")
     struct Errors {
 
-        @Test
-        func `Unsupported byte order mark`() throws {
+        @Test("Unsupported byte order mark")
+        func unsupportedBOM() throws {
             let data = Data([0xEF, 0xBB, 0xBF, 0x7B, 0x7D])
             #expect(throws: JSON.DeserializationError.invalidCharacter) {
                 _ = try JSON.value(for: data, options: [])
             }
         }
 
-        @Test
-        func `Empty JSON`() throws {
+        @Test("Empty JSON")
+        func empty() throws {
             let raw = #"""
 
             """#
@@ -764,8 +776,8 @@ struct DeserializationTests {
             }
         }
 
-        @Test
-        func `Unexpected end of input`() throws {
+        @Test("Unexpected end of input")
+        func endOfInput() throws {
             let raw = #"""
             [1, 2, 3
             """#
@@ -775,8 +787,8 @@ struct DeserializationTests {
             }
         }
 
-        @Test
-        func `Unterminated array`() throws {
+        @Test("Unterminated array")
+        func unterminatedList() throws {
             let raw = #"""
             {
                 "foo": [1,2,3
@@ -788,8 +800,8 @@ struct DeserializationTests {
             }
         }
 
-        @Test
-        func `Malformed array`() throws {
+        @Test("Malformed array")
+        func malformedArray() throws {
             let raw = #"""
             {
                 "foo": [1,2 3]
@@ -801,8 +813,8 @@ struct DeserializationTests {
             }
         }
 
-        @Test
-        func `Leading zero`() throws {
+        @Test("Leading zero")
+        func leadingZero() throws {
             let raw = #"""
             {"foo": 0100}
             """#
@@ -812,8 +824,8 @@ struct DeserializationTests {
             }
         }
 
-        @Test
-        func `Invalid string`() throws {
+        @Test("Invalid string")
+        func invalidString() throws {
             let raw = #"""
             {"key": "Hello
             World"}
@@ -824,8 +836,8 @@ struct DeserializationTests {
             }
         }
 
-        @Test
-        func `Invalid string escape`() throws {
+        @Test("Invalid string escape")
+        func invalidStringEscape() throws {
             let raw = #"""
             {"foo\x": 100}
             """#
@@ -835,8 +847,8 @@ struct DeserializationTests {
             }
         }
 
-        @Test
-        func `Invalid literal`() throws {
+        @Test("Invalid literal")
+        func invalidLiteral() throws {
             let raw = #"""
             {"key": nul}
             """#
@@ -846,8 +858,8 @@ struct DeserializationTests {
             }
         }
 
-        @Test
-        func `Invalid unicode sequence`() throws {
+        @Test("Invalid unicode sequence")
+        func invalidUnicodeSequence() throws {
             let raw = #"""
             {"key": "\uXYZ"}
             """#
@@ -859,8 +871,8 @@ struct DeserializationTests {
 
     }
 
-    @Test
-    func `Deserialization Recursion Depth Limit`() async throws {
+    @Test("Deserialization Recursion Depth Limit")
+    func depthLimit() async throws {
         let raw = #"""
         {
             "foo": [1, 2, 3],
@@ -890,8 +902,8 @@ struct DeserializationTests {
         }
     }
 
-    @Test
-    func `Deserialization Input Size Limit`() async throws {
+    @Test("Deserialization Input Size Limit")
+    func inputSizeLimit() async throws {
         let raw = #"""
         {
             "foo": [1, 2, 3],
@@ -921,10 +933,11 @@ struct DeserializationTests {
         }
     }
 
+    @Suite("Duplicate Key Tests")
     struct DuplicateKeyTests {
 
-        @Test
-        func `Duplicate Keys in Object`() throws {
+        @Test("Duplicate Keys in Object")
+        func duplicateKeys() throws {
             let raw = #"""
             {"foo": true, "foo": false}
             """#
@@ -935,8 +948,8 @@ struct DeserializationTests {
             #expect(fromString == json)
         }
 
-        @Test
-        func `Duplicate Keys Not Allowed`() async throws {
+        @Test("Duplicate Keys Not Allowed")
+        func duplicateKeysNotAllowed() async throws {
             let raw = #"""
             {"foo": true, "foo": false}
             """#

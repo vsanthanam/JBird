@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -28,10 +28,11 @@ import JBirdCodableSupport
 import JBirdCore
 import Testing
 
+@Suite("Object Encoder Tests")
 struct ObjectEncoderTests {
 
-    @Test
-    func `Encode Keyed Scalars`() throws {
+    @Test("Encode Keyed Scalars")
+    func encodeAllScalars() throws {
         let value = AllScalars(
             foo: "foo",
             bar: 1.2,
@@ -59,8 +60,8 @@ struct ObjectEncoderTests {
         #expect(foundation == jbird)
     }
 
-    @Test
-    func `Keyed Subclass`() throws {
+    @Test("Keyed Subclass")
+    func keyedSubClass() throws {
         let value = SomeSub(foo: "bar", bar: "foo", qux: .init(quux: false, grault: 1.2))
         let foundationEncoder = JSONEncoder()
         foundationEncoder.outputFormatting = [.sortedKeys]
@@ -71,8 +72,8 @@ struct ObjectEncoderTests {
         #expect(foundation == jbird)
     }
 
-    @Test
-    func `Keyed Subclass With Key`() throws {
+    @Test("Keyed Subclass With Key")
+    func keyedSubClassWithKey() throws {
         let value = SomeSubWitihKey(foo: "bar", bar: "foo", qux: .init(quux: false, grault: 1.2))
         let foundationEncoder = JSONEncoder()
         foundationEncoder.outputFormatting = [.sortedKeys]
@@ -83,8 +84,8 @@ struct ObjectEncoderTests {
         #expect(foundation == jbird)
     }
 
-    @Test
-    func `Keyed with nested keys`() throws {
+    @Test("Keyed with nested keys")
+    func decodeKeyedWithNestedKeyed() throws {
         let value = KeyedWithNestedKeyed(foo: "foo", baz: "baz", qux: "qux")
         let foundationEncoder = JSONEncoder()
         foundationEncoder.outputFormatting = [.sortedKeys]

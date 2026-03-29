@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -28,130 +28,131 @@ import JBirdCodableSupport
 import JBirdCore
 import Testing
 
+@Suite("Array Encoder Tests")
 struct ArrayEncoderTests {
 
-    @Test
-    func `Encode String Array`() throws {
+    @Test("Encode String Array")
+    func stringArray() throws {
         let value: Strings = ["foo", "bar", "baz"]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test
-    func `Encode Bool Array`() throws {
+    @Test("Encode Bool Array")
+    func boolArray() throws {
         let value: Bools = [true, false, true]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test
-    func `Encode Int Array`() throws {
+    @Test("Encode Int Array")
+    func intArray() throws {
         let value: Ints = [1, 2, 3]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test
-    func `Encode Int8 Array`() throws {
+    @Test("Encode Int8 Array")
+    func int8Array() throws {
         let value: Int8s = [1, 2, 3]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test
-    func `Encode Int16 Array`() throws {
+    @Test("Encode Int16 Array")
+    func int16Array() throws {
         let value: Int16s = [1, 2, 3]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test
-    func `Encode Int32 Array`() throws {
+    @Test("Encode Int32 Array")
+    func int32Array() throws {
         let value: Int32s = [1, 2, 3]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test
-    func `Encode Int64 Array`() throws {
+    @Test("Encode Int64 Array")
+    func int64Array() throws {
         let value: Int64s = [1, 2, 3]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test
-    func `Encode UInt Array`() throws {
+    @Test("Encode UInt Array")
+    func uintArray() throws {
         let value: UInts = [1, 2, 3]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test
-    func `Encode UInt8 Array`() throws {
+    @Test("Encode UInt8 Array")
+    func uint8Array() throws {
         let value: UInt8s = [1, 2, 3]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test
-    func `Encode UInt16 Array`() throws {
+    @Test("Encode UInt16 Array")
+    func uint16Array() throws {
         let value: UInt16s = [1, 2, 3]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test
-    func `Encode UInt32 Array`() throws {
+    @Test("Encode UInt32 Array")
+    func uint32Array() throws {
         let value: UInt32s = [1, 2, 3]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test
-    func `Encode UInt64 Array`() throws {
+    @Test("Encode UInt64 Array")
+    func uint64Array() throws {
         let value: UInt64s = [1, 2, 3]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test
-    func `Encode Float Array`() throws {
+    @Test("Encode Float Array")
+    func floatArray() throws {
         let value: Floats = [1.25, 2.5, 3.75]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test
-    func `Encode Double Array`() throws {
+    @Test("Encode Double Array")
+    func doubleArray() throws {
         let value: Doubles = [1.25, 2.5, 3.75]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test
-    func `Encode Optional Array`() throws {
+    @Test("Encode Optional Array")
+    func optionalArray() throws {
         let value: Optionals<String> = ["foo", nil, "baz"]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test
-    func `Encode Codable Array`() throws {
+    @Test("Encode Codable Array")
+    func codableArray() throws {
         struct Foo: Codable, Equatable, ExpressibleByStringLiteral {
             let bar: String
 
@@ -169,16 +170,16 @@ struct ArrayEncoderTests {
         #expect(foundation == jbird)
     }
 
-    @Test
-    func `Nested Unkeyed`() throws {
+    @Test("Nested Unkeyed")
+    func nestedUnkeyed() throws {
         let value = NestedUnkeyedModel(foo: "foo", int: [1, 2, 3])
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test
-    func `Nested Keyed`() throws {
+    @Test("Nested Keyed")
+    func decodeUnkeyedWithNestedKeyed() throws {
         let value = UnkeyedWithNestedKeyedModel(qux: "qux", foo: "foo", bar: "bar")
         let foundationEncoder = JSONEncoder()
         foundationEncoder.outputFormatting = [.sortedKeys]

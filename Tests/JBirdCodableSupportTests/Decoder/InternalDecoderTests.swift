@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -28,10 +28,11 @@ import JBirdCodableSupport
 import JBirdCore
 import Testing
 
+@Suite("Internal Decoder Tests")
 struct InternalDecoderTests {
 
-    @Test
-    func `Unavailable Keyed Decoder`() throws {
+    @Test("Unavailable Keyed Decoder")
+    func unavailableKeyedDecoder() throws {
         struct Keyed: Codable {
             let foo: String
         }
@@ -41,8 +42,8 @@ struct InternalDecoderTests {
         }
     }
 
-    @Test
-    func `Unavailable Unkeyed Decoder`() throws {
+    @Test("Unavailable Unkeyed Decoder")
+    func unavailableUnkeyedDecoder() throws {
         let data = try JSONEncoder().encode(12)
         #expect(throws: DecodingError.self) {
             _ = try JSON.Decoder().decode([Int].self, from: data)

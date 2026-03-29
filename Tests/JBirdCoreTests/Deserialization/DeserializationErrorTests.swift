@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -27,8 +27,8 @@
 import JBirdParser
 import Testing
 
-@Test
-func `DeserializationError Descriptions`() {
+@Test("DeserializationError Descriptions")
+func deserializationErrorDescriptions() {
     let illegalFragment = JSON.DeserializationError.illegalFragment
     #expect(illegalFragment.description == "JSON fragment cannot be deserialized")
 
@@ -78,8 +78,8 @@ func `DeserializationError Descriptions`() {
     #expect(inputSizeLimitExceeded.description == "Input size limit exceeded")
 }
 
-@Test
-func `Deserialiation error C initializer`() {
+@Test("Deserialiation error C initializer")
+func cInitializer() {
     #expect(JSON.DeserializationError(JSON_UNEXPECTED_END_OF_INPUT) == .unexpectedEndOfInput)
     #expect(JSON.DeserializationError(JSON_INVALID_JSON) == .invalidJSON)
     #expect(JSON.DeserializationError(JSON_INVALID_CHARACTER) == .invalidCharacter)

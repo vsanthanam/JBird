@@ -3,7 +3,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Varun Santhanam
+// Copyright (c) 2026 Varun Santhanam
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the  Software), to deal
 //
@@ -27,19 +27,21 @@ import Foundation
 import JBirdCore
 import Testing
 
-enum JSONRepresentableTests {
+@Suite("JSONRepresentable Tests")
+struct JSONRepresentableTests {
 
+    @Suite("JSON Conformance Tests")
     struct JSONTests {
 
-        @Test
-        func `JSON JSON Value`() {
+        @Test("JSON JSON Value")
+        func jsonJSONValue() {
             let value = JSON.string("Hello, World!")
             let json = value.jsonValue
             #expect(value == json)
         }
 
-        @Test
-        func `JSON Convert`() throws {
+        @Test("JSON Convert")
+        func jsonConvert() throws {
             let json = JSON.string("Hello, World!")
             let value = try json.convert(into: JSON.self)
             #expect(json == value)
@@ -47,31 +49,32 @@ enum JSONRepresentableTests {
 
     }
 
+    @Suite("Bool Conformance Tests")
     struct BoolTests {
 
-        @Test
-        func `True Bool JSON Value`() {
+        @Test("True Bool JSON Value")
+        func trueJSONValue() {
             let bool = true
             let json = bool.jsonValue
             #expect(json == .bool(true))
         }
 
-        @Test
-        func `True Bool Convert`() throws {
+        @Test("True Bool Convert")
+        func trueConvert() throws {
             let json = JSON.bool(true)
             let bool = try json.convert(into: Bool.self)
             #expect(bool == true)
         }
 
-        @Test
-        func `False Bool JSON Value`() {
+        @Test("False Bool JSON Value")
+        func falseJSONValue() {
             let bool = false
             let json = bool.jsonValue
             #expect(json == .bool(false))
         }
 
-        @Test
-        func `False Bool Convert`() throws {
+        @Test("False Bool Convert")
+        func falseConvert() throws {
             let json = JSON.bool(false)
             let bool = try json.convert(into: Bool.self)
             #expect(bool == false)
@@ -126,24 +129,25 @@ enum JSONRepresentableTests {
 //
 //    }
 
+    @Suite("Int Conformance Tests")
     struct IntTests {
 
-        @Test
-        func `Int JSON Value`() {
+        @Test("Int JSON Value")
+        func intJSONValue() {
             let int = 21
             let json = int.jsonValue
             #expect(json == .number(21))
         }
 
-        @Test
-        func `Int Convert`() throws {
+        @Test("Int Convert")
+        func intConvert() throws {
             let json = JSON.number(21)
             let int = try json.convert(into: Int.self)
             #expect(int == 21)
         }
 
-        @Test
-        func `Int As Double Convert`() throws {
+        @Test("Int As Double Convert")
+        func intDecodeAasDouble() throws {
             let json = JSON.number(21)
             let double = try json.convert(into: Double.self)
             #expect(double == 21.0)
@@ -151,31 +155,32 @@ enum JSONRepresentableTests {
 
     }
 
+    @Suite("Double Conformance Tests")
     struct DoubleTests {
 
-        @Test
-        func `Double JSON Value`() {
+        @Test("Double JSON Value")
+        func doubleJSONValue() {
             let double = 2.1
             let json = double.jsonValue
             #expect(json == .number(2.1))
         }
 
-        @Test
-        func `Double Convert`() throws {
+        @Test("Double Convert")
+        func doubleConvert() throws {
             let json = JSON.number(2.1)
             let double = try json.convert(into: Double.self)
             #expect(double == 2.1)
         }
 
-        @Test
-        func `Double Decode As Int`() throws {
+        @Test("Double Decode As Int")
+        func doubleDecodeAsInt() throws {
             let json = JSON.number(4.0)
             let int = try json.convert(into: Int.self)
             #expect(int == 4)
         }
 
-        @Test
-        func `Double Decode As Int Fails For Fractional Values`() {
+        @Test("Double Decode As Int Fails For Fractional Values")
+        func doubleDecodeAsIntFractionalFailure() {
             let json = JSON.number(4.1)
             #expect(throws: JSON.OperationError.illegalIntegerConversion) {
                 _ = try json.convert(into: Int.self)
@@ -184,31 +189,32 @@ enum JSONRepresentableTests {
 
     }
 
+    @Suite("Number Conformance Tests")
     struct NumberTests {
 
-        @Test
-        func `Int Number JSON Value`() {
+        @Test("Int Number JSON Value")
+        func intJSONValue() {
             let number = JSON.Number(21)
             let json = number.jsonValue
             #expect(json == .number(21))
         }
 
-        @Test
-        func `Int Number Convert`() throws {
+        @Test("Int Number Convert")
+        func intConvert() throws {
             let json = JSON.number(21)
             let number = try json.convert(into: JSON.Number.self)
             #expect(number == .init(21))
         }
 
-        @Test
-        func `Double Number JSON Value`() {
+        @Test("Double Number JSON Value")
+        func doubleJSONValue() {
             let number = JSON.Number(2.1)
             let json = number.jsonValue
             #expect(json == .number(2.1))
         }
 
-        @Test
-        func `Double Number Convert`() throws {
+        @Test("Double Number Convert")
+        func doubleConvert() throws {
             let json = JSON.number(2.1)
             let number = try json.convert(into: JSON.Number.self)
             #expect(number == .init(2.1))
@@ -216,17 +222,18 @@ enum JSONRepresentableTests {
 
     }
 
+    @Suite("String Conformance Tests")
     struct StringTests {
 
-        @Test
-        func `String JSON Value`() {
+        @Test("String JSON Value")
+        func stringJSONValue() {
             let string = "foo"
             let json = string.jsonValue
             #expect(json == .string("foo"))
         }
 
-        @Test
-        func `String Convert`() throws {
+        @Test("String Convert")
+        func stringConvert() throws {
             let json = JSON.string("bar")
             let string = try json.convert(into: String.self)
             #expect(string == "bar")
@@ -234,17 +241,18 @@ enum JSONRepresentableTests {
 
     }
 
+    @Suite("Array Conformance Tests")
     struct ArrayTests {
 
-        @Test
-        func `Array JSON Value`() {
+        @Test("Array JSON Value")
+        func arrayJSONValue() {
             let array = ["foo", "bar"]
             let json = array.jsonValue
             #expect(json == .array([.string("foo"), .string("bar")]))
         }
 
-        @Test
-        func `Array Convert`() throws {
+        @Test("Array Convert")
+        func arrayConvert() throws {
             let json = JSON.array([.string("foo"), .string("bar")])
             let array = try json.convert(into: [String].self)
             #expect(array == ["foo", "bar"])
@@ -252,6 +260,7 @@ enum JSONRepresentableTests {
 
     }
 
+    @Suite("Dictionary Conformance Tests")
     struct DictionaryTests {
 
         enum CustomKey: String, JSONKeyRepresentable {
@@ -259,15 +268,15 @@ enum JSONRepresentableTests {
             case bar
         }
 
-        @Test
-        func `Dictionary JSON Value`() {
+        @Test("Dictionary JSON Value")
+        func dictionaryJSONValue() {
             let dictionary = [CustomKey.foo: true, CustomKey.bar: false]
             let json = dictionary.jsonValue
             #expect(json == .object(["foo": .bool(true), "bar": .bool(false)]))
         }
 
-        @Test
-        func `Dictionary Convert`() throws {
+        @Test("Dictionary Convert")
+        func dictionaryConvert() throws {
             let json = JSON.object(["foo": .bool(true), "bar": .bool(false)])
             let dictionary = try json.convert(into: [CustomKey: Bool].self)
             #expect(dictionary == [.foo: true, .bar: false])
@@ -275,6 +284,7 @@ enum JSONRepresentableTests {
 
     }
 
+    @Suite("RawRepresentable Conformance Tests")
     struct RawRepresentableTests {
 
         enum Test: String, JSONRepresentable {
@@ -282,16 +292,16 @@ enum JSONRepresentableTests {
             case bar
         }
 
-        @Test
-        func `RawRepresentable JSON Value`() {
+        @Test("RawRepresentable JSON Value")
+        func rawRepresentableJSONValue() {
             let foo = Test.foo.jsonValue
             let bar = Test.bar.jsonValue
             #expect(foo == .string("foo"))
             #expect(bar == .string("bar"))
         }
 
-        @Test
-        func `RawRepresentable Convert`() throws {
+        @Test("RawRepresentable Convert")
+        func rawRepresentableConvert() throws {
             let fooJson = JSON.string("foo")
             let barJson = JSON.string("bar")
             let foo = try Test(json: fooJson)
@@ -305,31 +315,32 @@ enum JSONRepresentableTests {
 
     }
 
+    @Suite("Optional Conformance Tests")
     struct OptionalTests {
 
-        @Test
-        func `Some JSON Value`() {
+        @Test("Some JSON Value")
+        func someJSONValue() {
             let some: Int? = 42
             let json = some.jsonValue
             #expect(json == 42)
         }
 
-        @Test
-        func `Some Convert`() throws {
+        @Test("Some Convert")
+        func someConvert() throws {
             let json: JSON = 42
             let optional = try json.convert(into: Int?.self)
             #expect(optional == 42)
         }
 
-        @Test
-        func `None JSON Value`() {
+        @Test("None JSON Value")
+        func noneJSONValue() {
             let none: Int? = nil
             let json = none.jsonValue
             #expect(json == .null)
         }
 
-        @Test
-        func `None Convert`() throws {
+        @Test("None Convert")
+        func noneConvert() throws {
             let json: JSON = .null
             let optional = try json.convert(into: Int?.self)
             #expect(optional == nil)
@@ -337,17 +348,18 @@ enum JSONRepresentableTests {
 
     }
 
+    @Suite("Set Conformance Tests")
     struct SetTests {
 
-        @Test
-        func `Set JSON Value`() {
+        @Test("Set JSON Value")
+        func arrayJSONValue() {
             let set: Set = ["foo", "bar"]
             let json = set.jsonValue
             #expect(json == .array([.string("foo"), .string("bar")]) || json == .array([.string("bar"), .string("foo")]))
         }
 
-        @Test
-        func `Set Convert`() throws {
+        @Test("Set Convert")
+        func setConvert() throws {
             let json = JSON.array([.string("foo"), .string("bar")])
             let set = try json.convert(into: Set<String>.self)
             #expect(set == ["foo", "bar"])
@@ -355,25 +367,26 @@ enum JSONRepresentableTests {
 
     }
 
+    @Suite("URL Conformance Tests")
     struct URLConformance {
 
-        @Test
-        func `URL JSON Value`() throws {
+        @Test("URL JSON Value")
+        func urlJSONValue() throws {
             let url = try #require(URL(string: "https://example.com"))
             let json = url.jsonValue
             #expect(json == .string("https://example.com"))
         }
 
-        @Test
-        func `URL Convert`() throws {
+        @Test("URL Convert")
+        func urlConvert() throws {
             let json = JSON.string("https://example.com")
             let url = try json.convert(into: URL.self)
             let expected = try #require(URL(string: "https://example.com"))
             #expect(url == expected)
         }
 
-        @Test
-        func `Illegal URL Convert`() throws {
+        @Test("Illegal URL Convert")
+        func illegalUrlConvert() throws {
             let json = JSON.string("")
             #expect(throws: JSON.OperationError.urlDecodingFailure("")) {
                 _ = try json.convert(into: URL.self)
@@ -382,25 +395,26 @@ enum JSONRepresentableTests {
 
     }
 
+    @Suite("UUID Conformance Tests")
     struct UUIDConformance {
 
-        @Test
-        func `UUID JSON Value`() throws {
+        @Test("UUID JSON Value")
+        func uuidJSONValue() throws {
             let uuid = try #require(UUID(uuidString: "E621E1F8-C36C-495A-93FC-0C247A3E6E5F"))
             let json = uuid.jsonValue
             #expect(json == .string("E621E1F8-C36C-495A-93FC-0C247A3E6E5F"))
         }
 
-        @Test
-        func `UUID Convert`() throws {
+        @Test("UUID Convert")
+        func uuidConvert() throws {
             let json = JSON.string("E621E1F8-C36C-495A-93FC-0C247A3E6E5F")
             let uuid = try json.convert(into: UUID.self)
             let expected = try #require(UUID(uuidString: "E621E1F8-C36C-495A-93FC-0C247A3E6E5F"))
             #expect(uuid == expected)
         }
 
-        @Test
-        func `Illegal UUID Convert`() throws {
+        @Test("Illegal UUID Convert")
+        func illegalUuidConvert() throws {
             let json = JSON.string("E6218-C-4A-C-0C243EF")
             #expect(throws: JSON.OperationError.uuidDecodingFailure("E6218-C-4A-C-0C243EF")) {
                 _ = try json.convert(into: UUID.self)
@@ -409,17 +423,18 @@ enum JSONRepresentableTests {
 
     }
 
+    @Suite("Int8 Conformance Tests")
     struct Int8Tests {
 
-        @Test
-        func `Int8 JSON Value`() {
+        @Test("Int8 JSON Value")
+        func int8JSONValue() {
             let int: Int8 = 21
             let json = int.jsonValue
             #expect(json == .number(21))
         }
 
-        @Test
-        func `Int8 Convert`() throws {
+        @Test("Int8 Convert")
+        func int8Convert() throws {
             let json = JSON.number(21)
             let int = try json.convert(into: Int8.self)
             #expect(int == 21)
@@ -427,17 +442,18 @@ enum JSONRepresentableTests {
 
     }
 
+    @Suite("Int16 Conformance Tests")
     struct Int16Tests {
 
-        @Test
-        func `Int16 JSON Value`() {
+        @Test("Int16 JSON Value")
+        func int16JSONValue() {
             let int: Int16 = 21
             let json = int.jsonValue
             #expect(json == .number(21))
         }
 
-        @Test
-        func `Int16 Convert`() throws {
+        @Test("Int16 Convert")
+        func int16Convert() throws {
             let json = JSON.number(21)
             let int = try json.convert(into: Int16.self)
             #expect(int == 21)
@@ -445,17 +461,18 @@ enum JSONRepresentableTests {
 
     }
 
+    @Suite("Int32 Conformance Tests")
     struct Int32Tests {
 
-        @Test
-        func `Int32 JSON Value`() {
+        @Test("Int32 JSON Value")
+        func int32JSONValue() {
             let int: Int32 = 21
             let json = int.jsonValue
             #expect(json == .number(21))
         }
 
-        @Test
-        func `Int32 Convert`() throws {
+        @Test("Int32 Convert")
+        func int32Convert() throws {
             let json = JSON.number(21)
             let int = try json.convert(into: Int32.self)
             #expect(int == 21)
@@ -463,17 +480,18 @@ enum JSONRepresentableTests {
 
     }
 
+    @Suite("Int64 Conformance Tests")
     struct Int64Tests {
 
-        @Test
-        func `Int64 JSON Value`() {
+        @Test("Int64 JSON Value")
+        func int64JSONValue() {
             let int: Int64 = 21
             let json = int.jsonValue
             #expect(json == .number(21))
         }
 
-        @Test
-        func `Int64 Convert`() throws {
+        @Test("Int64 Convert")
+        func int64Convert() throws {
             let json = JSON.number(21)
             let int = try json.convert(into: Int64.self)
             #expect(int == 21)
@@ -481,17 +499,18 @@ enum JSONRepresentableTests {
 
     }
 
+    @Suite("UInt Conformance Tests")
     struct UIntTests {
 
-        @Test
-        func `UInt JSON Value`() {
+        @Test("UInt JSON Value")
+        func uintJSONValue() {
             let int: UInt = 21
             let json = int.jsonValue
             #expect(json == .number(21))
         }
 
-        @Test
-        func `UInt Convert`() throws {
+        @Test("UInt Convert")
+        func uintConvert() throws {
             let json = JSON.number(21)
             let int = try json.convert(into: UInt.self)
             #expect(int == 21)
@@ -499,17 +518,18 @@ enum JSONRepresentableTests {
 
     }
 
+    @Suite("UInt8 Conformance Tests")
     struct UInt8Tests {
 
-        @Test
-        func `UInt8 JSON Value`() {
+        @Test("UInt8 JSON Value")
+        func uint8JSONValue() {
             let int: UInt8 = 21
             let json = int.jsonValue
             #expect(json == .number(21))
         }
 
-        @Test
-        func `uint9 convert`() throws {
+        @Test("UInt Convert")
+        func uint9Convert() throws {
             let json = JSON.number(21)
             let int = try json.convert(into: UInt8.self)
             #expect(int == 21)
@@ -517,17 +537,18 @@ enum JSONRepresentableTests {
 
     }
 
+    @Suite("UInt16 Conformance Tests")
     struct UInt16Tests {
 
-        @Test
-        func `uint16json value`() {
+        @Test("UInt JSON Value")
+        func uint16JSONValue() {
             let int: UInt16 = 21
             let json = int.jsonValue
             #expect(json == .number(21))
         }
 
-        @Test
-        func `uint16 convert`() throws {
+        @Test("UInt Convert")
+        func uint16Convert() throws {
             let json = JSON.number(21)
             let int = try json.convert(into: UInt16.self)
             #expect(int == 21)
@@ -535,17 +556,18 @@ enum JSONRepresentableTests {
 
     }
 
+    @Suite("UInt32 Conformance Tests")
     struct UInt32Tests {
 
-        @Test
-        func `UInt32 JSON Value`() {
+        @Test("UInt32 JSON Value")
+        func uint32JSONValue() {
             let int: UInt32 = 21
             let json = int.jsonValue
             #expect(json == .number(21))
         }
 
-        @Test
-        func `uint32 convert`() throws {
+        @Test("UInt Convert")
+        func uint32Convert() throws {
             let json = JSON.number(21)
             let int = try json.convert(into: UInt32.self)
             #expect(int == 21)
@@ -553,17 +575,18 @@ enum JSONRepresentableTests {
 
     }
 
+    @Suite("UInt64 Conformance Tests")
     struct UInt64Tests {
 
-        @Test
-        func `uint64json value`() {
+        @Test("UInt JSON Value")
+        func uint64JSONValue() {
             let int: UInt64 = 21
             let json = int.jsonValue
             #expect(json == .number(21))
         }
 
-        @Test
-        func `UInt64 Convert`() throws {
+        @Test("UInt64 Convert")
+        func uint64Convert() throws {
             let json = JSON.number(21)
             let int = try json.convert(into: UInt64.self)
             #expect(int == 21)
@@ -571,17 +594,18 @@ enum JSONRepresentableTests {
 
     }
 
+    @Suite("Float Conformance Tests")
     struct FloatTests {
 
-        @Test
-        func `Float JSON Value`() {
+        @Test("Float JSON Value")
+        func doubleJSONValue() {
             let float: Float = 0.5
             let json = float.jsonValue
             #expect(json == .number(0.5))
         }
 
-        @Test
-        func `Float Convert`() throws {
+        @Test("Float Convert")
+        func floatConvert() throws {
             let json = JSON.number(0.5)
             let float = try json.convert(into: Float.self)
             #expect(float == 0.5)
@@ -589,31 +613,32 @@ enum JSONRepresentableTests {
 
     }
 
+    @Suite("Decimal Conformance Tests")
     struct DecimalTests {
 
-        @Test
-        func `Decimal Whole JSON Value`() {
+        @Test("Decimal Whole JSON Value")
+        func decimalWholeJSONValue() {
             let decimal: Decimal = 21
             let json = decimal.jsonValue
             #expect(json == .number(21))
         }
 
-        @Test
-        func `Decimal Whole Convert`() throws {
+        @Test("Decimal Whole Convert")
+        func decimalWholeConvert() throws {
             let json = JSON.number(21)
             let decimal = try json.convert(into: Decimal.self)
             #expect(decimal == 21)
         }
 
-        @Test
-        func `Decimal Float JSON Value`() {
+        @Test("Decimal Float JSON Value")
+        func decimalFloatJSONValue() {
             let decimal: Decimal = 2.1
             let json = decimal.jsonValue
             #expect(json == .number(2.1))
         }
 
-        @Test
-        func `Decimal Float Convert`() throws {
+        @Test("Decimal Float Convert")
+        func decimalFloatConvert() throws {
             let json = JSON.number(2.1)
             let decimal = try json.convert(into: Decimal.self)
             #expect(decimal == 2.1)
