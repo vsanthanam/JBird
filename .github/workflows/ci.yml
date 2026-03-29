@@ -30,18 +30,6 @@ jobs:
         uses: actions/checkout@v6
       - name: Select Xcode Version
         run: ./.scripts/xcode-select 26.2
-      - name: Configure DerivedData
-        run: |
-          DERIVED_DATA_PATH="${{ runner.temp }}/DerivedData/JBird/${{ github.job }}/xcode-26.2/sdk-${{ matrix.version }}"
-          echo "DERIVED_DATA_PATH=$DERIVED_DATA_PATH" >> "$GITHUB_ENV"
-          mkdir -p "$DERIVED_DATA_PATH"
-      - name: Load Build Cache
-        uses: actions/cache@v5
-        with:
-          path: ${{ env.DERIVED_DATA_PATH }}
-          key: xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.2-sdk-${{ matrix.version }}-${{ hashFiles('**/*.xcodeproj/project.pbxproj', '**/*.xcworkspace/contents.xcworkspacedata', '**/Package.resolved') }}
-          restore-keys: |
-            xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.2-sdk-${{ matrix.version }}-
       - name: Build JBird for iOS ${{ matrix.version }}
         run: ./.scripts/build-ios-xcode JBird ${{ matrix.version }}
 
@@ -57,18 +45,6 @@ jobs:
         uses: actions/checkout@v6
       - name: Select Xcode Version
         run: ./.scripts/xcode-select 26.2
-      - name: Configure DerivedData
-        run: |
-          DERIVED_DATA_PATH="${{ runner.temp }}/DerivedData/JBird/${{ github.job }}/xcode-26.2/sdk-${{ matrix.version }}"
-          echo "DERIVED_DATA_PATH=$DERIVED_DATA_PATH" >> "$GITHUB_ENV"
-          mkdir -p "$DERIVED_DATA_PATH"
-      - name: Load Build Cache
-        uses: actions/cache@v5
-        with:
-          path: ${{ env.DERIVED_DATA_PATH }}
-          key: xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.2-sdk-${{ matrix.version }}-${{ hashFiles('**/*.xcodeproj/project.pbxproj', '**/*.xcworkspace/contents.xcworkspacedata', '**/Package.resolved') }}
-          restore-keys: |
-            xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.2-sdk-${{ matrix.version }}-
       - name: Build JBird for tvOS ${{ matrix.version }}
         run: ./.scripts/build-tvos-xcode JBird ${{ matrix.version }}
 
@@ -84,18 +60,6 @@ jobs:
         uses: actions/checkout@v6
       - name: Select Xcode Version
         run: ./.scripts/xcode-select 26.2
-      - name: Configure DerivedData
-        run: |
-          DERIVED_DATA_PATH="${{ runner.temp }}/DerivedData/JBird/${{ github.job }}/xcode-26.2/sdk-${{ matrix.version }}"
-          echo "DERIVED_DATA_PATH=$DERIVED_DATA_PATH" >> "$GITHUB_ENV"
-          mkdir -p "$DERIVED_DATA_PATH"
-      - name: Load Build Cache
-        uses: actions/cache@v5
-        with:
-          path: ${{ env.DERIVED_DATA_PATH }}
-          key: xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.2-sdk-${{ matrix.version }}-${{ hashFiles('**/*.xcodeproj/project.pbxproj', '**/*.xcworkspace/contents.xcworkspacedata', '**/Package.resolved') }}
-          restore-keys: |
-            xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.2-sdk-${{ matrix.version }}-
       - name: Build JBird for watchOS ${{ matrix.version }}
         run: ./.scripts/build-watchos-xcode JBird ${{ matrix.version }}
 
@@ -118,18 +82,6 @@ jobs:
         uses: actions/checkout@v6
       - name: Select Xcode Version
         run: ./.scripts/xcode-select ${{ matrix.xcode }}
-      - name: Configure DerivedData
-        run: |
-          DERIVED_DATA_PATH="${{ runner.temp }}/DerivedData/JBird/${{ github.job }}/xcode-${{ matrix.xcode }}/sdk-${{ matrix.version }}"
-          echo "DERIVED_DATA_PATH=$DERIVED_DATA_PATH" >> "$GITHUB_ENV"
-          mkdir -p "$DERIVED_DATA_PATH"
-      - name: Load Build Cache
-        uses: actions/cache@v5
-        with:
-          path: ${{ env.DERIVED_DATA_PATH }}
-          key: xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-${{ matrix.xcode }}-sdk-${{ matrix.version }}-${{ hashFiles('**/*.xcodeproj/project.pbxproj', '**/*.xcworkspace/contents.xcworkspacedata', '**/Package.resolved') }}
-          restore-keys: |
-            xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-${{ matrix.xcode }}-sdk-${{ matrix.version }}-
       - name: List SDKs
         run: xcodebuild -showsdks | grep macosx
       - name: Build JBird for macOS ${{ matrix.version }}
@@ -154,18 +106,6 @@ jobs:
         uses: actions/checkout@v6
       - name: Select Xcode Version
         run: ./.scripts/xcode-select ${{ matrix.xcode }}
-      - name: Configure DerivedData
-        run: |
-          DERIVED_DATA_PATH="${{ runner.temp }}/DerivedData/JBird/${{ github.job }}/xcode-${{ matrix.xcode }}/sdk-${{ matrix.version }}"
-          echo "DERIVED_DATA_PATH=$DERIVED_DATA_PATH" >> "$GITHUB_ENV"
-          mkdir -p "$DERIVED_DATA_PATH"
-      - name: Load Build Cache
-        uses: actions/cache@v5
-        with:
-          path: ${{ env.DERIVED_DATA_PATH }}
-          key: xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-${{ matrix.xcode }}-sdk-${{ matrix.version }}-${{ hashFiles('**/*.xcodeproj/project.pbxproj', '**/*.xcworkspace/contents.xcworkspacedata', '**/Package.resolved') }}
-          restore-keys: |
-            xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-${{ matrix.xcode }}-sdk-${{ matrix.version }}-
       - name: List SDKs
         run: xcodebuild -showsdks | grep macosx
       - name: Build JBird for Mac Catalyst ${{ matrix.version }}
@@ -183,18 +123,6 @@ jobs:
         uses: actions/checkout@v6
       - name: Select Xcode Version
         run: ./.scripts/xcode-select 26.2
-      - name: Configure DerivedData
-        run: |
-          DERIVED_DATA_PATH="${{ runner.temp }}/DerivedData/JBird/${{ github.job }}/xcode-26.2/sdk-${{ matrix.version }}"
-          echo "DERIVED_DATA_PATH=$DERIVED_DATA_PATH" >> "$GITHUB_ENV"
-          mkdir -p "$DERIVED_DATA_PATH"
-      - name: Load Build Cache
-        uses: actions/cache@v5
-        with:
-          path: ${{ env.DERIVED_DATA_PATH }}
-          key: xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.2-sdk-${{ matrix.version }}-${{ hashFiles('**/*.xcodeproj/project.pbxproj', '**/*.xcworkspace/contents.xcworkspacedata', '**/Package.resolved') }}
-          restore-keys: |
-            xcode-deriveddata-${{ runner.os }}-${{ github.job }}-xcode-26.2-sdk-${{ matrix.version }}-
       - name: Build JBird for visionOS ${{ matrix.version }}
         run: ./.scripts/build-visionos-xcode JBird ${{ matrix.version }}
 
@@ -233,17 +161,6 @@ jobs:
         uses: actions/checkout@v6
       - name: Select Xcode Version
         run: ./.scripts/xcode-select ${{ matrix.xcode }}
-      - name: Load Build Cache
-        uses: actions/cache@v5
-        with:
-          path: |
-            .build
-            ~/Library/Caches/org.swift.swiftpm
-            ~/Library/org.swift.swiftpm
-            ~/.swiftpm
-          key: spm-macos-${{ matrix.swift }}-debug-${{ hashFiles('**/Package.resolved') }}
-          restore-keys: |
-            spm-macos-${{ matrix.swift }}-debug-
       - name: Build JBird
         run: swift build -v --build-tests --build-path .build
       - name: Compress Build
@@ -301,24 +218,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Compute Package.resolved hash
-        shell: bash
-        run: |
-          if [ -f Package.resolved ]; then
-            echo "PACKAGE_RESOLVED_HASH=$(sha256sum Package.resolved | awk '{print $1}')" >> "$GITHUB_ENV"
-          else
-            echo "PACKAGE_RESOLVED_HASH=no-resolved" >> "$GITHUB_ENV"
-          fi
-      - name: Load Build Cache
-        uses: actions/cache@v5
-        with:
-          path: |
-            .build
-            ~/.cache/org.swift.swiftpm
-            ~/.swiftpm
-          key: spm-ubuntu-${{ matrix.swift }}-debug-${{ env.PACKAGE_RESOLVED_HASH }}
-          restore-keys: |
-            spm-ubuntu-${{ matrix.swift }}-debug-
       - name: Build JBird
         run: swift build -v --build-tests --build-path .build
       - name: Install `zip`
@@ -371,19 +270,6 @@ jobs:
         with:
           swift-version: swift-${{ matrix.swift }}-release
           swift-build: ${{ matrix.swift }}-RELEASE
-      - name: Load Build Cache
-        uses: actions/cache@v5
-        with:
-          path: |
-            .build/checkouts
-            .build/repositories
-            .build/artifacts
-            ~/.swiftpm
-            ${{ env.LOCALAPPDATA }}\org.swift.swiftpm
-            ${{ env.LOCALAPPDATA }}\SwiftPM
-          key: spm-windows-${{ matrix.swift }}-deps-${{ hashFiles('**/Package.resolved') }}
-          restore-keys: |
-            spm-windows-${{ matrix.swift }}-deps-
       - name: Build JBird
         run: swift build -v --build-tests --disable-xctest --build-path .build -c debug -Xlinker /INCREMENTAL:NO
       - name: Compress Build
@@ -436,50 +322,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Compute Package.resolved hash
-        shell: bash
-        run: |
-          if [ -f Package.resolved ]; then
-            echo "PACKAGE_RESOLVED_HASH=$(sha256sum Package.resolved | awk '{print $1}')" >> "$GITHUB_ENV"
-          else
-            echo "PACKAGE_RESOLVED_HASH=no-resolved" >> "$GITHUB_ENV"
-          fi
-
-      - if: ${{ matrix.swift == '6.3' }}
-        name: Load Build Cache (WASM 6.3 upstream SDK)
-        uses: actions/cache@v5
-        with:
-          path: |
-            .build
-            ~/.cache/org.swift.swiftpm
-            ~/.swiftpm
-          key: spm-wasm-${{ matrix.swift }}-debug-swift-6.3-RELEASE_wasm-${{ env.PACKAGE_RESOLVED_HASH }}
-          restore-keys: |
-            spm-wasm-${{ matrix.swift }}-debug-swift-6.3-RELEASE_wasm-
-
-      - if: ${{ matrix.swift == '6.2' }}
-        name: Load Build Cache (WASM 6.2 upstream SDK)
-        uses: actions/cache@v5
-        with:
-          path: |
-            .build
-            ~/.cache/org.swift.swiftpm
-            ~/.swiftpm
-          key: spm-wasm-${{ matrix.swift }}-debug-swift-6.2.3-RELEASE_wasm-${{ env.PACKAGE_RESOLVED_HASH }}
-          restore-keys: |
-            spm-wasm-${{ matrix.swift }}-debug-swift-6.2.3-RELEASE_wasm-
-
-      - if: ${{ matrix.swift == '6.1' }}
-        name: Load Build Cache (WASM SwiftWasm SDK)
-        uses: actions/cache@v5
-        with:
-          path: |
-            .build
-            ~/.cache/org.swift.swiftpm
-            ~/.swiftpm
-          key: spm-wasm-${{ matrix.swift }}-debug-swiftwasm-${{ env.PACKAGE_RESOLVED_HASH }}
-          restore-keys: |
-            spm-wasm-${{ matrix.swift }}-debug-swiftwasm-
 
       - if: ${{ matrix.swift == '6.3' }}
         name: Setup Swift WASM (6.3)
@@ -523,7 +365,7 @@ jobs:
         with:
           name: wasm-build-${{ matrix.swift }}
           path: build.zip
-  
+
   build-android-spm:
     name: Build JBird (Android)
     strategy:
@@ -536,14 +378,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Load Build Cache
-        uses: actions/cache@v5
-        with:
-          path: |
-            .build
-          key: spm-android-${{ matrix.swift }}-debug-${{ hashFiles('**/Package.resolved') }}
-          restore-keys: |
-            spm-android-${{ matrix.swift }}-debug-
       - name: Build JBird
         uses: skiptools/swift-android-action@v2
         with:
