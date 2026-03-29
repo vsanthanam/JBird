@@ -6,4 +6,4 @@ A declarative API for composing typed JSON values directly in Swit
 
 ### Result Builders
 
-- ``/JBirdCore/JSON/Builder``
+- ``JBirdCore/JSON/Builder``
