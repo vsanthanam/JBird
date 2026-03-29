@@ -26,11 +26,10 @@
 @testable import JBirdCore
 import Testing
 
-@Suite("Number Tests")
 struct NumberTests {
 
-    @Test("Convertible Initializers")
-    func convertibleInitializers() {
+    @Test
+    func `Convertible Initializers`() {
         let rawInt = 42
         let int = JSON.Number(rawInt)
         #expect(int == .init(.int(42)))
@@ -40,8 +39,8 @@ struct NumberTests {
         #expect(double == .init(.double(4.2)))
     }
 
-    @Test("Mismatched Equivalence")
-    func mismatchedEquivalence() {
+    @Test
+    func `Mismatched Equivalence`() {
         #expect(JSON.Number(42) == JSON.Number(42.0))
         #expect(JSON.Number(42.0) == JSON.Number(42))
         #expect(JSON.Number(42) != JSON.Number(42.1))
@@ -53,8 +52,8 @@ struct NumberTests {
 
     }
 
-    @Test("Literal Expressions")
-    func literalExpressions() {
+    @Test
+    func `Literal Expressions`() {
         let int: JSON.Number = 42
         #expect(int == .init(.int(42)))
 
@@ -62,8 +61,8 @@ struct NumberTests {
         #expect(double == .init(.double(4.2)))
     }
 
-    @Test("Unboxed Number")
-    func unboxedNumber() throws {
+    @Test
+    func `Unboxed Number`() throws {
         let int: JSON.Number = 12
         let untypedInt = try #require(int.unboxed().base as? Int)
         #expect(untypedInt == 12)
@@ -73,8 +72,8 @@ struct NumberTests {
         #expect(untypedDouble == 12.34)
     }
 
-    @Test("Number Description")
-    func numberDescription() {
+    @Test
+    func `Number Description`() {
         let int: JSON.Number = 12
         let intDescription = 12.description
         #expect(int.description == intDescription)
@@ -84,8 +83,8 @@ struct NumberTests {
         #expect(double.description == doubledescription)
     }
 
-    @Test("Number isInteger")
-    func isInteger() {
+    @Test
+    func `Number isInteger`() {
         let int: JSON.Number = 12
         #expect(int.isInteger)
 
@@ -93,8 +92,8 @@ struct NumberTests {
         #expect(!double.isInteger)
     }
 
-    @Test("Number isFloatingPoint")
-    func isFloatingPoint() {
+    @Test
+    func `Number isFloatingPoint`() {
         let int: JSON.Number = 12
         #expect(!int.isFloatingPoint)
 
@@ -102,8 +101,8 @@ struct NumberTests {
         #expect(double.isFloatingPoint)
     }
 
-    @Test("Number Is Finite")
-    func isFinite() {
+    @Test
+    func `Number Is Finite`() {
         let finite = JSON.Number(1.2)
         let inf = JSON.Number(Double.infinity)
         let negInf = JSON.Number(-Double.infinity)
@@ -112,8 +111,8 @@ struct NumberTests {
         #expect(!negInf.isInteger)
     }
 
-    @Test("Number Is Infinite")
-    func isInfinite() {
+    @Test
+    func `Number Is Infinite`() {
         let finite = JSON.Number(1.2)
         let inf = JSON.Number(Double.infinity)
         let negInf = JSON.Number(-Double.infinity)

@@ -116,14 +116,23 @@ extension JSON {
     ///
     /// - Parameters:
     ///   - limit: The desired recursion depth limit
+    ///   - isolation: The actor used to run the provided operation
     ///   - operation: The operation to perform
     /// - Returns: The return value of the operation
     public static func withRecursionDepthLimit<T>(
         _ limit: size_t,
+        isolation: isolated (any Actor)? = #isolation,
         operation: () async throws -> T
     ) async rethrows -> T {
-        assert(limit >= 0, "Recursion depth limit must be greater than or equal to 0")
-        return try await $recursionDepthLimit.withValue(limit, operation: operation)
+        assert(
+            limit >= 0,
+            "Recursion depth limit must be greater than or equal to 0"
+        )
+        return try await $recursionDepthLimit.withValue(
+            limit,
+            operation: operation,
+            isolation: isolation
+        )
     }
 
     /// Perform the provided operation with a custom input size limit
@@ -151,8 +160,14 @@ extension JSON {
         _ limit: Int,
         operation: () throws -> T
     ) rethrows -> T {
-        assert(limit >= 0, "Input size limit must be greater than or equal to 0")
-        return try $inputSizeLimit.withValue(limit, operation: operation)
+        assert(
+            limit >= 0,
+            "Input size limit must be greater than or equal to 0"
+        )
+        return try $inputSizeLimit.withValue(
+            limit,
+            operation: operation
+        )
     }
 
     /// Perform the provided async operation with a custom input size limit
@@ -174,14 +189,20 @@ extension JSON {
     ///
     /// - Parameters:
     ///   - limit: The desired input size limit, in bytes
+    ///   - isolation: The actor used to execute the provided operation
     ///   - operation: The operation to perform
     /// - Returns: The return value of the operation
     public static func withInputSizeLimit<T>(
         _ limit: Int,
+        isolation: isolated (any Actor)? = #isolation,
         operation: () async throws -> T
     ) async rethrows -> T {
         assert(limit >= 0, "Input size limit must be greater than or equal to 0")
-        return try await $inputSizeLimit.withValue(limit, operation: operation)
+        return try await $inputSizeLimit.withValue(
+            limit,
+            operation: operation,
+            isolation: isolation
+        )
     }
 
     /// Create a typed JSON value from a JSON string

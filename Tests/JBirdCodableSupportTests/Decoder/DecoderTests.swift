@@ -28,14 +28,12 @@ import JBirdCodableSupport
 import JBirdCore
 import Testing
 
-@Suite("Decoder Tests")
-struct DecoderTests {
+enum DecoderTests {
 
-    @Suite("Key Decoding Strategies")
     struct KeyDecodingStrategies {
 
-        @Test("Standard Key Decoding Strategy")
-        func standard() throws {
+        @Test
+        func `Standard Key Decoding Strategy`() throws {
 
             struct Foo: Codable, Equatable {
                 let someKey: String
@@ -59,8 +57,8 @@ struct DecoderTests {
             #expect(jbird == value)
         }
 
-        @Test("Snake Case Key Decoding Strategy")
-        func snake_case() throws {
+        @Test
+        func `Snake Case Key Decoding Strategy`() throws {
 
             struct Foo: Codable, Equatable {
                 let someKey: String
@@ -90,8 +88,8 @@ struct DecoderTests {
             #expect(jbird == value)
         }
 
-        @Test("Custom Key Decoding Strategy")
-        func customKey() throws {
+        @Test
+        func `Custom Key Decoding Strategy`() throws {
 
             struct A: Codable, Equatable {
                 var value: Int
@@ -155,14 +153,12 @@ struct DecoderTests {
 
     }
 
-    @Suite("Decode Non Conforming Float Value")
-    struct NonConformingFloatingPointStrategy {
+    enum NonConformingFloatingPointStrategy {
 
-        @Suite("String Replace Strategy")
         struct StringReplaceStrategy {
 
-            @Test("Decode Conforming")
-            func decodeConforming() throws {
+            @Test
+            func `Decode Conforming`() throws {
                 let foundationDecoder = JSONDecoder()
                 foundationDecoder.nonConformingFloatDecodingStrategy = .convertFromString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
                 let jbirdDecoder = JSON.Decoder()
@@ -179,8 +175,8 @@ struct DecoderTests {
                 #expect(foundationFloat == jbirdFloat)
             }
 
-            @Test("Decode Positive Infinity")
-            func decodePositiveInfinity() throws {
+            @Test
+            func `Decode Positive Infinity`() throws {
                 let foundationDecoder = JSONDecoder()
                 foundationDecoder.nonConformingFloatDecodingStrategy = .convertFromString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
                 let jbirdDecoder = JSON.Decoder()
@@ -197,8 +193,8 @@ struct DecoderTests {
                 #expect(foundationFloat == jbirdFloat)
             }
 
-            @Test("Decode Negative Infinity")
-            func decodeNegativeInfinity() throws {
+            @Test
+            func `Decode Negative Infinity`() throws {
                 let foundationDecoder = JSONDecoder()
                 foundationDecoder.nonConformingFloatDecodingStrategy = .convertFromString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
                 let jbirdDecoder = JSON.Decoder()
@@ -215,8 +211,8 @@ struct DecoderTests {
                 #expect(foundationFloat == jbirdFloat)
             }
 
-            @Test("Decode NaN")
-            func decodeNan() throws {
+            @Test
+            func `Decode NaN`() throws {
                 let foundationDecoder = JSONDecoder()
                 foundationDecoder.nonConformingFloatDecodingStrategy = .convertFromString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
                 let jbirdDecoder = JSON.Decoder()
@@ -235,8 +231,8 @@ struct DecoderTests {
                 #expect(jbirdFloat.isNaN)
             }
 
-            @Test("Decode Infinity Unkeyed")
-            func decodeInfinityUnkeyed() throws {
+            @Test
+            func `Decode Infinity Unkeyed`() throws {
                 let foundationDecoder = JSONDecoder()
                 foundationDecoder.nonConformingFloatDecodingStrategy = .convertFromString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
                 let jbirdDecoder = JSON.Decoder()
@@ -250,8 +246,8 @@ struct DecoderTests {
                 #expect(foundation == jbird)
             }
 
-            @Test("Decode NaN Unkeyed")
-            func decodeNanUnkeyed() throws {
+            @Test
+            func `Decode NaN Unkeyed`() throws {
                 let foundationDecoder = JSONDecoder()
                 foundationDecoder.nonConformingFloatDecodingStrategy = .convertFromString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
                 let jbirdDecoder = JSON.Decoder()
@@ -266,8 +262,8 @@ struct DecoderTests {
                 #expect(jbird[0].isNaN)
             }
 
-            @Test("Decode Infinity Keyed")
-            func decodeInfinityKeyed() throws {
+            @Test
+            func `Decode Infinity Keyed`() throws {
                 let foundationDecoder = JSONDecoder()
                 foundationDecoder.nonConformingFloatDecodingStrategy = .convertFromString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
                 let jbirdDecoder = JSON.Decoder()
@@ -281,8 +277,8 @@ struct DecoderTests {
                 #expect(foundation == jbird)
             }
 
-            @Test("Decode NaN Keyed")
-            func decodeNanKeyed() throws {
+            @Test
+            func `Decode NaN Keyed`() throws {
                 let foundationDecoder = JSONDecoder()
                 foundationDecoder.nonConformingFloatDecodingStrategy = .convertFromString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
                 let jbirdDecoder = JSON.Decoder()
@@ -293,8 +289,8 @@ struct DecoderTests {
                 let serialized = Data(payload.utf8)
                 let foundation = try foundationDecoder.decode([String: Double].self, from: serialized)
                 let jbird = try jbirdDecoder.decode([String: Double].self, from: serialized)
-                #expect(foundation["foo"]!.isNaN)
-                #expect(jbird["foo"]!.isNaN)
+                #expect(try #require(foundation["foo"]?.isNaN))
+                #expect(try #require(jbird["foo"]?.isNaN))
                 #expect(foundation["bar"] == jbird["bar"])
             }
 
@@ -302,11 +298,10 @@ struct DecoderTests {
 
     }
 
-    @Suite("Decode Dates")
     struct DecodeDates {
 
-        @Test("No Date Decoding Strategy")
-        func defaultStrategy() throws {
+        @Test
+        func `No Date Decoding Strategy`() throws {
             let source = Date.now
             let data = try JSONEncoder().encode(source)
             let foundation = try JSONDecoder().decode(Date.self, from: data)
@@ -314,11 +309,10 @@ struct DecoderTests {
             #expect(foundation == jbird)
         }
 
-        @Suite("ISO 8601 Decoding Strategy ")
         struct ISOStrategy {
 
-            @Test("Sucessful ISO 8601 Decoding Strategy")
-            func success() throws {
+            @Test
+            func `Sucessful ISO 8601 Decoding Strategy`() throws {
                 let source = Date.now
                 let formatter = ISO8601DateFormatter()
                 let string = formatter.string(from: source)
@@ -334,8 +328,8 @@ struct DecoderTests {
                 #expect(foundation == jbird)
             }
 
-            @Test("Broken ISO 8601 Decoding Strategy")
-            func failure() throws {
+            @Test
+            func `Broken ISO 8601 Decoding Strategy`() throws {
                 let data = try JSONEncoder().encode("Some JSON String")
 
                 let decoder = JSON.Decoder()
@@ -355,11 +349,10 @@ struct DecoderTests {
 
         }
 
-        @Suite("Date Formatter Decoding Strategy")
         struct FormatterDecodingStrategy {
 
-            @Test("Successful Date Formatter Decoding Strategy")
-            func success() throws {
+            @Test
+            func `Successful Date Formatter Decoding Strategy`() throws {
                 let source = Date.now
                 let formatter = DateFormatter()
                 let string = formatter.string(from: source)
@@ -375,8 +368,8 @@ struct DecoderTests {
                 #expect(foundation == jbird)
             }
 
-            @Test("Broken Formatter Decoding Strategy")
-            func failure() throws {
+            @Test
+            func `Broken Formatter Decoding Strategy`() throws {
                 let data = try JSONEncoder().encode("Some JSON String")
 
                 let decoder = JSON.Decoder()
@@ -396,8 +389,8 @@ struct DecoderTests {
 
         }
 
-        @Test("Milliseconds Since 1970 Decoding Strategy")
-        func millisecondsSince1970() throws {
+        @Test
+        func `Milliseconds Since 1970 Decoding Strategy`() throws {
             let source = Date.now.timeIntervalSince1970 * 1000
             let data = try JSONEncoder().encode(source)
 
@@ -411,8 +404,8 @@ struct DecoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test("Seconds Since 1970 Decoding Strategy")
-        func secondsSince1970() throws {
+        @Test
+        func `Seconds Since 1970 Decoding Strategy`() throws {
             let source = Date.now.timeIntervalSince1970
             let data = try JSONEncoder().encode(source)
 
@@ -426,8 +419,8 @@ struct DecoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test("Custom Date Decoding Strategy")
-        func customDateDecodingStrategy() throws {
+        @Test
+        func `Custom Date Decoding Strategy`() throws {
             let source = Date.now.timeIntervalSince1970 + 2
             let data = try JSONEncoder().encode(source)
 
@@ -447,8 +440,8 @@ struct DecoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test("Custom Date Decoding Strategy That Fails")
-        func customDateDecodingStrategyThatFails() throws {
+        @Test
+        func `Custom Date Decoding Strategy That Fails`() throws {
             let source = Date.now
             let data = try JSONEncoder().encode(source)
             enum MyError: Error, Equatable {
@@ -473,8 +466,8 @@ struct DecoderTests {
             }
         }
 
-        @Test("Unkeyed Date Decoding")
-        func decodeUnkeyedDates() throws {
+        @Test
+        func `Unkeyed Date Decoding`() throws {
             let dates = [Date.now, Date.now, Date.now]
             let data = try JSONEncoder().encode(dates)
             let foundation = try JSONDecoder().decode([Date].self, from: data)
@@ -482,8 +475,8 @@ struct DecoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test("Keyed Date Decoding")
-        func decodeKeyedDates() throws {
+        @Test
+        func `Keyed Date Decoding`() throws {
             let dates = ["foo": Date.now, "bar": Date.now, "baz": Date.now]
             let data = try JSONEncoder().encode(dates)
             let foundation = try JSONDecoder().decode([String: Date].self, from: data)
@@ -493,14 +486,12 @@ struct DecoderTests {
 
     }
 
-    @Suite("Decode Data")
     struct DecodeData {
 
-        @Suite("Base64 Data Decoding Strategy")
         struct Base64 {
 
-            @Test("Successful Base64 Data Decoding Strategy")
-            func success() throws {
+            @Test
+            func `Successful Base64 Data Decoding Strategy`() throws {
                 let source = Data("Hello, World".utf8).base64EncodedString()
                 let data = try JSONEncoder().encode(source)
                 let foundation = try JSONDecoder().decode(Data.self, from: data)
@@ -508,8 +499,8 @@ struct DecoderTests {
                 #expect(foundation == jbird)
             }
 
-            @Test("Broken Base64 Decoding Strategy")
-            func failure() throws {
+            @Test
+            func `Broken Base64 Decoding Strategy`() throws {
                 let data = try JSONEncoder().encode("Some JSON String")
 
                 let decoder = JSON.Decoder()
@@ -528,8 +519,8 @@ struct DecoderTests {
 
         }
 
-        @Test("Deferred Data Decoding Strategy")
-        func deferredStrategy() throws {
+        @Test
+        func `Deferred Data Decoding Strategy`() throws {
             let source = Data("Hello, World".utf8)
             let encoder = JSONEncoder()
             encoder.dataEncodingStrategy = .deferredToData
@@ -545,8 +536,8 @@ struct DecoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test("Custom Data Decoding Strategy")
-        func customDataDecodingStrategy() throws {
+        @Test
+        func `Custom Data Decoding Strategy`() throws {
             let source = Data("Hello, World".utf8)
             let encoder = JSONEncoder()
             encoder.dataEncodingStrategy = .custom { data, encoder in
@@ -570,8 +561,8 @@ struct DecoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test("Custom Data Decoding Strategy That Fails")
-        func customDataDecodingStrategyThatFails() throws {
+        @Test
+        func `Custom Data Decoding Strategy That Fails`() throws {
             let source = Data("Hello, World".utf8)
             let encoder = JSONEncoder()
             encoder.dataEncodingStrategy = .custom { data, encoder in
@@ -602,8 +593,8 @@ struct DecoderTests {
             }
         }
 
-        @Test("Unkeyed Data Decoding")
-        func decodeUnkeyedData() throws {
+        @Test
+        func `Unkeyed Data Decoding`() throws {
             let dates = [
                 Data("foo".utf8).base64EncodedString(),
                 Data("bar".utf8).base64EncodedString(),
@@ -615,8 +606,8 @@ struct DecoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test("Keyed Data Decoding")
-        func decodeKeyedData() throws {
+        @Test
+        func `Keyed Data Decoding`() throws {
             let dataDict = [
                 "foo": Data("foo".utf8).base64EncodedString(),
                 "bar": Data("bar".utf8).base64EncodedString(),

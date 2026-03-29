@@ -132,9 +132,9 @@ struct ValueEncoder: SingleValueEncodingContainer {
         write(JSON(value))
     }
 
-    mutating func encode<T>(
+    mutating func encode<T: Encodable>(
         _ value: T
-    ) throws where T: Encodable {
+    ) throws {
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
             codingPath: codingPath,

@@ -39,10 +39,9 @@ import Testing
     ]
 #endif
 
-@Suite("@JSONRepresentable Tests")
 struct JSONRepresentableMacroTests {
 
-    @Test("Basic")
+    @Test
     func basic() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
@@ -86,8 +85,8 @@ struct JSONRepresentableMacroTests {
         #endif
     }
 
-    @Test("Custom Key")
-    func customKey() {
+    @Test
+    func `Custom Key`() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -132,8 +131,8 @@ struct JSONRepresentableMacroTests {
         #endif
     }
 
-    @Test("Snake Case")
-    func snakeCase() {
+    @Test
+    func `Snake Case`() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -178,8 +177,8 @@ struct JSONRepresentableMacroTests {
         #endif
     }
 
-    @Test("Omit If Nil No Annotation")
-    func omitIfNilNoAnnotation() {
+    @Test
+    func `Omit If Nil No Annotation`() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -228,8 +227,8 @@ struct JSONRepresentableMacroTests {
         #endif
     }
 
-    @Test("Omit If Nil With Annotation")
-    func omitIfNilWithAnnotation() {
+    @Test
+    func `Omit If Nil With Annotation`() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -280,8 +279,8 @@ struct JSONRepresentableMacroTests {
         #endif
     }
 
-    @Test("Omit If Nil With Annotation True")
-    func omitIfNilWithAnnotationTrue() {
+    @Test
+    func `Omit If Nil With Annotation True`() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -332,8 +331,8 @@ struct JSONRepresentableMacroTests {
         #endif
     }
 
-    @Test("Omit If Nil With Annotation False")
-    func omitIfNilWithAnnotationFalse() {
+    @Test
+    func `Omit If Nil With Annotation False`() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -378,7 +377,7 @@ struct JSONRepresentableMacroTests {
         #endif
     }
 
-    @Test("Enums")
+    @Test
     func enums() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
@@ -521,8 +520,8 @@ struct JSONRepresentableMacroTests {
         #endif
     }
 
-    @Test("Non-Final Class")
-    func nonFinalClass() {
+    @Test
+    func `Non-Final Class`() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -565,8 +564,8 @@ struct JSONRepresentableMacroTests {
         #endif
     }
 
-    @Test("Final Class")
-    func finalClass() {
+    @Test
+    func `Final Class`() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """

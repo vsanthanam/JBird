@@ -138,9 +138,9 @@ final class ArrayEncoder: UnkeyedEncodingContainer {
         append(JSON(value))
     }
 
-    func encode<T>(
+    func encode<T: Encodable>(
         _ value: T
-    ) throws where T: Encodable {
+    ) throws {
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
             codingPath: codingPath + [IndexCodingKey(count)],
@@ -159,9 +159,9 @@ final class ArrayEncoder: UnkeyedEncodingContainer {
         append(encoded)
     }
 
-    func nestedContainer<NestedKey>(
+    func nestedContainer<NestedKey: CodingKey>(
         keyedBy keyType: NestedKey.Type
-    ) -> KeyedEncodingContainer<NestedKey> where NestedKey: CodingKey {
+    ) -> KeyedEncodingContainer<NestedKey> {
         let index = append(.object(JSON.Object()))
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,

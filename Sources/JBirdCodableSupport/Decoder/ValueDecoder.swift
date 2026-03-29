@@ -301,9 +301,9 @@ struct ValueDecoder: SingleValueDecodingContainer {
         }
     }
 
-    func decode<T>(
+    func decode<T: Decodable>(
         _ type: T.Type
-    ) throws -> T where T: Decodable {
+    ) throws -> T {
         let nestedDecoder = InternalDecoder(
             storage: decoder.storage,
             value: value,

@@ -26,8 +26,8 @@
 @testable import JBirdCodableSupport
 import Testing
 
-@Test("Test Object CodingKey")
-func objectCodingKey() throws {
+@Test
+func `Object CodingKey`() throws {
     let key = ObjectCodingKey("foo")
     #expect(key.stringValue == "foo")
     #expect(key.intValue == nil)

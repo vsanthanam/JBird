@@ -200,7 +200,7 @@ extension JSON {
 
         // MARK: - Private
 
-        private struct EncodingStrategy: Sendable {
+        private struct EncodingStrategy {
             let keyEncodingStrategy: KeyEncodingStrategy
             let dateEncodingStrategy: DateEncodingStrategy
             let dataEncodingStrategy: DataEncodingStrategy

@@ -26,8 +26,8 @@
 import JBirdCore
 import Testing
 
-@Test("SerializationError Descriptions")
-func serializationErrorDescriptions() {
+@Test
+func `SerializationError Descriptions`() {
 
     let invalidFloat = JSON.SerializationError.invalidFloat
     #expect(invalidFloat.description == "Invalid floating point value")

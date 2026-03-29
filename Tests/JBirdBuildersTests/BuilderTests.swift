@@ -27,28 +27,26 @@ import JBirdBuilders
 import JBirdCore
 import Testing
 
-@Suite("Builder Tests")
 struct BuilderTests {
 
-    @Test("Empty Expression")
-    func emptyExpression() {
+    @Test
+    func `Empty Expression`() {
         let json = JSON {}
         #expect(json == [:])
     }
 
-    @Suite("Array Builder")
     struct ArrayBuilder {
 
-        @Test("JSON Expression")
-        func jsonExpression() {
+        @Test
+        func `JSON Expression`() {
             let json = JSON {
                 .string("foo")
             }
             #expect(json == ["foo"])
         }
 
-        @Test("Multiple JSON Elements")
-        func multipleJSONElementsExpression() {
+        @Test
+        func `Multiple JSON Elements`() {
             let json = JSON {
                 JSON.string("foo")
                 JSON.null
@@ -56,8 +54,8 @@ struct BuilderTests {
             #expect(json == ["foo", nil])
         }
 
-        @Test("Convrtible Expression")
-        func convertibleExpression() {
+        @Test
+        func `Convrtible Expression`() {
             let json = JSON {
                 "foo"
                 true
@@ -65,16 +63,16 @@ struct BuilderTests {
             #expect(json == ["foo", true])
         }
 
-        @Test("Array Expression")
-        func arrayExpression() {
+        @Test
+        func `Array Expression`() {
             let json = JSON {
                 ["foo", true]
             }
             #expect(json == ["foo", true])
         }
 
-        @Test("Inline Builder expression")
-        func inlineBuilderExpression() {
+        @Test
+        func `Inline Builder expression`() {
             let json = JSON {
                 "foo"
                 true
@@ -85,8 +83,8 @@ struct BuilderTests {
             #expect(json == ["foo", true, ["key": "value"]])
         }
 
-        @Test("Conditional Expression", arguments: [(true, JSON(["foo"])), (false, JSON(["bar"]))])
-        func conditionalExpression(useFoo: Bool, result: JSON) {
+        @Test(arguments: [(true, JSON(["foo"])), (false, JSON(["bar"]))])
+        func `Conditional Expression`(useFoo: Bool, result: JSON) {
             let json = JSON {
                 if useFoo {
                     "foo"
@@ -97,8 +95,8 @@ struct BuilderTests {
             #expect(json == result)
         }
 
-        @Test("Optional Expression", arguments: [(true, JSON(["foo", "bar"])), (false, JSON(["bar"]))])
-        func optionalExpression(useFoo: Bool, result: JSON) {
+        @Test(arguments: [(true, JSON(["foo", "bar"])), (false, JSON(["bar"]))])
+        func `Optional Expression`(useFoo: Bool, result: JSON) {
             let json = JSON {
                 if useFoo {
                     "foo"
@@ -108,8 +106,8 @@ struct BuilderTests {
             #expect(json == result)
         }
 
-        @Test("For Expression")
-        func forExpression() {
+        @Test
+        func `For Expression`() {
             let elements = ["a", "b", "c"]
             let json = JSON {
                 for element in elements {
@@ -121,19 +119,18 @@ struct BuilderTests {
 
     }
 
-    @Suite("Object Builders")
     struct ObjectBuilder {
 
-        @Test("Tuple Expression")
-        func tupleExpression() {
+        @Test
+        func `Tuple Expression`() {
             let json = JSON {
                 "key" => "value"
             }
             #expect(json == ["key": "value"])
         }
 
-        @Test("Dictionary Expression")
-        func dictionaryExpression() {
+        @Test
+        func `Dictionary Expression`() {
             let json = JSON {
                 [
                     "foo": JSON.bool(true),
@@ -143,8 +140,8 @@ struct BuilderTests {
             #expect(json == ["foo": true, "bar": false])
         }
 
-        @Test("Conditional Expression", arguments: [(true, JSON(["foo": true])), (false, JSON(["bar": false]))])
-        func conditionalExpression(useFoo: Bool, result: JSON) {
+        @Test(arguments: [(true, JSON(["foo": true])), (false, JSON(["bar": false]))])
+        func `conditional expression`(useFoo: Bool, result: JSON) {
             let json = JSON {
                 if useFoo {
                     "foo" => true
@@ -155,8 +152,8 @@ struct BuilderTests {
             #expect(json == result)
         }
 
-        @Test("Optional Expression", arguments: [(true, JSON(["foo": true, "bar": false])), (false, JSON(["bar": false]))])
-        func optionalExpression(useFoo: Bool, result: JSON) {
+        @Test(arguments: [(true, JSON(["foo": true, "bar": false])), (false, JSON(["bar": false]))])
+        func `optional expression`(useFoo: Bool, result: JSON) {
             let json = JSON {
                 if useFoo {
                     "foo" => true
@@ -166,8 +163,8 @@ struct BuilderTests {
             #expect(json == result)
         }
 
-        @Test("For Expression")
-        func forExpression() {
+        @Test
+        func `for expression`() {
             let keys = ["a", "b", "c"]
             let json = JSON {
                 for key in keys {
@@ -178,7 +175,7 @@ struct BuilderTests {
         }
 
         @Test(
-            "Complex Builder",
+
             arguments: [
                 (
                     true,
@@ -249,7 +246,7 @@ struct BuilderTests {
             ]
         )
 
-        func complexBuilder(darkTheme: Bool, hasNotifications: Bool, tags: [String], json: JSON) {
+        func `Complex Builder`(darkTheme: Bool, hasNotifications: Bool, tags: [String], json: JSON) {
             let user = buildUser(darkTheme: darkTheme, hasNotifications: hasNotifications, tags: tags)
             #expect(user == json)
         }

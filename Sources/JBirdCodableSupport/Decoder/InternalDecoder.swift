@@ -96,9 +96,9 @@ final class InternalDecoder: Decoder {
 
     var userInfo: [CodingUserInfoKey: Any]
 
-    func container<Key>(
+    func container<Key: CodingKey>(
         keyedBy type: Key.Type
-    ) throws -> KeyedDecodingContainer<Key> where Key: CodingKey {
+    ) throws -> KeyedDecodingContainer<Key> {
         do {
             let container = try ObjectDecoder<Key>(
                 decoder: self,

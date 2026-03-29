@@ -27,11 +27,10 @@ import Foundation
 @testable import JBirdCore
 import Testing
 
-@Suite("Serialization Tests")
 struct SerializationTests {
 
-    @Test("Fragment Serialization Rules")
-    func fragmentSerializationRules() throws {
+    @Test
+    func `Fragment Serialization Rules`() throws {
         let fragment: JSON = true
         let data = try fragment.serialize()
         let str = try #require(String(data: data, encoding: .utf8))
@@ -44,8 +43,8 @@ struct SerializationTests {
         }
     }
 
-    @Test("Byte Order Mark Serialzation")
-    func byteOrderMarkSerialization() throws {
+    @Test
+    func `Byte Order Mark Serialzation`() throws {
         let json: JSON = true
         let data = try JSON.data(from: json, options: .default)
         #expect(data == Data([0x74, 0x72, 0x75, 0x65]))
@@ -53,8 +52,8 @@ struct SerializationTests {
         #expect(withBom == Data([0xEF, 0xBB, 0xBF, 0x74, 0x72, 0x75, 0x65]))
     }
 
-    @Test("Omit Single Null Key")
-    func omitSingleNullKey() async throws {
+    @Test
+    func `Omit Single Null Key`() async throws {
         let json: JSON = ["a": nil]
         let data = try JSON.data(from: json, options: .omitNullKeys)
         let str = try #require(String(data: data, encoding: .utf8))
@@ -70,8 +69,8 @@ struct SerializationTests {
         #expect(asyncString == expected)
     }
 
-    @Test("Omit Multiple Null Keys")
-    func omitNullKeys() async throws {
+    @Test
+    func `Omit Multiple Null Keys`() async throws {
         let json: JSON = ["a": nil, "b": 1]
         let data = try JSON.data(from: json, options: .omitNullKeys)
         let str = try #require(String(data: data, encoding: .utf8))
@@ -87,11 +86,10 @@ struct SerializationTests {
         #expect(asyncString == expected)
     }
 
-    @Suite("Literal Value Serialization Tests")
     struct LiteralTests {
 
-        @Test("`true` Serialization")
-        func serializeTrue() async throws {
+        @Test
+        func `true Serialization`() async throws {
             let json: JSON = true
             let data = try json.serialize()
             let str = try #require(String(data: data, encoding: .utf8))
@@ -107,8 +105,8 @@ struct SerializationTests {
             #expect(asyncString == expected)
         }
 
-        @Test("`false` Serialization")
-        func serializeFalse() async throws {
+        @Test
+        func `false Serialization`() async throws {
             let json: JSON = false
             let data = try json.serialize()
             let str = try #require(String(data: data, encoding: .utf8))
@@ -124,8 +122,8 @@ struct SerializationTests {
             #expect(asyncString == expected)
         }
 
-        @Test("`null` Serialization")
-        func serializeNull() async throws {
+        @Test
+        func `null Serialization`() async throws {
             let json: JSON = nil
             let data = try json.serialize()
             let str = try #require(String(data: data, encoding: .utf8))
@@ -146,14 +144,12 @@ struct SerializationTests {
 
     }
 
-    @Suite("Number Value Serialization Tests")
-    struct NumberTests {
+    enum NumberTests {
 
-        @Suite("Integer Serialization Tests")
         struct IntegerTests {
 
-            @Test("Normal Integer Serialization")
-            func normal() async throws {
+            @Test
+            func `Normal Integer Serialization`() async throws {
                 let json: JSON = 1_231_421
                 let data = try json.serialize()
                 let str = try #require(String(data: data, encoding: .utf8))
@@ -169,8 +165,8 @@ struct SerializationTests {
                 #expect(asyncString == expected)
             }
 
-            @Test("Negative Integer Serialization")
-            func negative() async throws {
+            @Test
+            func `Negative Integer Serialization`() async throws {
                 let json: JSON = -1_231_421
                 let data = try json.serialize()
                 let str = try #require(String(data: data, encoding: .utf8))
@@ -188,11 +184,10 @@ struct SerializationTests {
 
         }
 
-        @Suite("Floating Point Serialization Tests")
         struct DoubleTests {
 
-            @Test("Normal Double Serialization")
-            func normal() async throws {
+            @Test
+            func `Normal Double Serialization`() async throws {
                 let json: JSON = 123.12
                 let data = try json.serialize()
                 let str = try #require(String(data: data, encoding: .utf8))
@@ -208,8 +203,8 @@ struct SerializationTests {
                 #expect(asyncString == expected)
             }
 
-            @Test("Negative Double Serialization")
-            func negative() async throws {
+            @Test
+            func `Negative Double Serialization`() async throws {
                 let json: JSON = -123.12
                 let data = try json.serialize()
                 let str = try #require(String(data: data, encoding: .utf8))
@@ -225,8 +220,8 @@ struct SerializationTests {
                 #expect(asyncString == expected)
             }
 
-            @Test("Zero Double Serialization")
-            func zero() async throws {
+            @Test
+            func `Zero Double Serialization`() async throws {
                 let json: JSON = 0.0
                 let data = try json.serialize()
                 let str = try #require(String(data: data, encoding: .utf8))
@@ -242,8 +237,8 @@ struct SerializationTests {
                 #expect(asyncString == expected)
             }
 
-            @Test("Whole Double Serialization")
-            func whole() async throws {
+            @Test
+            func `Whole Double Serialization`() async throws {
                 let json: JSON = 31.0
                 let data = try json.serialize()
                 let str = try #require(String(data: data, encoding: .utf8))
@@ -259,8 +254,8 @@ struct SerializationTests {
                 #expect(asyncString == expected)
             }
 
-            @Test("Scientific Double Small Serialization")
-            func scientificSmall() async throws {
+            @Test
+            func `Scientific Double Small Serialization`() async throws {
                 let json: JSON = 0.00000000123
                 let data = try json.serialize()
                 let str = try #require(String(data: data, encoding: .utf8))
@@ -276,8 +271,8 @@ struct SerializationTests {
                 #expect(asyncString == expected)
             }
 
-            @Test("Scientific Double Large Serialization")
-            func scientificLarge() async throws {
+            @Test
+            func `Scientific Double Large Serialization`() async throws {
                 let json = JSON(Double(90_000_234_123_441_234_123))
                 let data = try json.serialize()
                 let str = try #require(String(data: data, encoding: .utf8))
@@ -293,11 +288,10 @@ struct SerializationTests {
                 #expect(asyncString == expected)
             }
 
-            @Suite("Non Conforming Floating Point Serialization")
             struct NonConforming {
 
-                @Test("Standard Behavior")
-                func standard() async throws {
+                @Test
+                func `Standard Behavior`() async throws {
                     let nan = JSON(Double.nan)
                     let inf = JSON(Double.infinity)
                     let negInf = JSON(-Double.infinity)
@@ -321,11 +315,10 @@ struct SerializationTests {
                     }
                 }
 
-                @Suite("Allow Non Conforming Behavior")
                 struct AllowNonConforming {
 
-                    @Test("Allowed NaN")
-                    func nan() throws {
+                    @Test
+                    func `Allowed NaN`() throws {
                         let json = JSON(Double.nan)
                         let data = try JSON.data(from: json, options: [.fragmentsAllowed, .allowNonConformingFloatingPointValues])
                         let str = try #require(String(data: data, encoding: .utf8))
@@ -335,8 +328,8 @@ struct SerializationTests {
                         #expect(str == expected)
                     }
 
-                    @Test("Allowed Positive Infinity")
-                    func positiveInfinity() throws {
+                    @Test
+                    func `Allowed Positive Infinity`() throws {
                         let json = JSON(Double.infinity)
                         let data = try JSON.data(from: json, options: [.fragmentsAllowed, .allowNonConformingFloatingPointValues])
                         let str = try #require(String(data: data, encoding: .utf8))
@@ -346,8 +339,8 @@ struct SerializationTests {
                         #expect(str == expected)
                     }
 
-                    @Test("Allowed Negative Infinity")
-                    func negativeInfinity() throws {
+                    @Test
+                    func `Allowed Negative Infinity`() throws {
                         let json = JSON(-Double.infinity)
                         let data = try JSON.data(from: json, options: [.fragmentsAllowed, .allowNonConformingFloatingPointValues])
                         let str = try #require(String(data: data, encoding: .utf8))
@@ -359,10 +352,9 @@ struct SerializationTests {
 
                 }
 
-                @Suite("Nullify Non Conforming Behavior")
                 struct NullifyNonConformingStandard {
 
-                    @Test("Allowed NaN")
+                    @Test
                     func nan() throws {
                         let json = JSON(Double.nan)
                         let data = try JSON.data(
@@ -380,8 +372,8 @@ struct SerializationTests {
                         #expect(str == expected)
                     }
 
-                    @Test("Allowed Positive Infinity")
-                    func positiveInfinity() throws {
+                    @Test
+                    func `positive infinity`() throws {
                         let json = JSON(Double.infinity)
                         let data = try JSON.data(
                             from: json,
@@ -398,8 +390,8 @@ struct SerializationTests {
                         #expect(str == expected)
                     }
 
-                    @Test("Allowed Negative Infinity")
-                    func negativeInfinity() throws {
+                    @Test
+                    func `negative infinity`() throws {
                         let json = JSON(-Double.infinity)
                         let data = try JSON.data(
                             from: json,
@@ -420,7 +412,6 @@ struct SerializationTests {
 
             }
 
-            @Suite("Truncating Whole Numbers")
             struct TruncatingWholeNumbers {
 
                 func zero() throws {
@@ -459,11 +450,10 @@ struct SerializationTests {
 
     }
 
-    @Suite("Array Serialization Tests")
     struct ArrayTests {
 
-        @Test("Empty Array")
-        func empty() async throws {
+        @Test
+        func `Empty Array`() async throws {
             let json: JSON = []
             let data = try json.serialize()
             let str = try #require(String(data: data, encoding: .utf8))
@@ -481,11 +471,10 @@ struct SerializationTests {
 
     }
 
-    @Suite("Object Serialization Tests")
     struct ObjectTests {
 
-        @Test("Empty Object Serialization")
-        func empty() async throws {
+        @Test
+        func `Empty Object Serialization`() async throws {
             let json: JSON = [:]
             let data = try json.serialize()
             let str = try #require(String(data: data, encoding: .utf8))
@@ -501,8 +490,8 @@ struct SerializationTests {
             #expect(asyncString == expected)
         }
 
-        @Test("Single Field Object Serialization")
-        func singleField() async throws {
+        @Test
+        func `Single Field Object Serialization`() async throws {
             let json: JSON = ["hello": "world"]
             let data = try json.serialize()
             let str = try #require(String(data: data, encoding: .utf8))
@@ -518,8 +507,8 @@ struct SerializationTests {
             #expect(asyncString == expected)
         }
 
-        @Test("Multiple Field Object Serialization")
-        func multipleFields() async throws {
+        @Test
+        func `Multiple Field Object Serialization`() async throws {
             let json: JSON = [
                 "foo": true,
                 "bar": false,
@@ -539,8 +528,8 @@ struct SerializationTests {
             #expect(asyncString == expected)
         }
 
-        @Test("Pretty Printed Object Serialization")
-        func prettyPrinted() async throws {
+        @Test
+        func `Pretty Printed Object Serialization`() async throws {
             let json: JSON = [
                 "foo": true,
                 "bar": false,
@@ -576,8 +565,8 @@ struct SerializationTests {
             #expect(asyncString == expected)
         }
 
-        @Test("Object Serialization Without Null Keys")
-        func omitNullKeys() async throws {
+        @Test
+        func `Object Serialization Without Null Keys`() async throws {
             let json: JSON = [
                 "foo": true,
                 "bar": false,
@@ -601,8 +590,8 @@ struct SerializationTests {
             #expect(asyncString == expected)
         }
 
-        @Test("Object Serialization Without Null Values")
-        func omitNullValues() async throws {
+        @Test
+        func `Object Serialization Without Null Values`() async throws {
             let json: JSON = [
                 "foo": true,
                 "bar": false,
@@ -628,11 +617,10 @@ struct SerializationTests {
 
     }
 
-    @Suite("String Serialization Tests")
     struct StringTests {
 
-        @Test("Normal String Serialization")
-        func normal() async throws {
+        @Test
+        func `Normal String Serialization`() async throws {
             let json: JSON = "abcdefghijklmnopqrstuvwxyz"
             let data = try json.serialize()
             let str = try #require(String(data: data, encoding: .utf8))
@@ -646,8 +634,8 @@ struct SerializationTests {
             #expect(asyncString == expected)
         }
 
-        @Test("Escaped Quite Serialization")
-        func escapedQuote() async throws {
+        @Test
+        func `Escaped Quite Serialization`() async throws {
             let json: JSON = "\""
             let data = try json.serialize()
             let str = try #require(String(data: data, encoding: .utf8))
@@ -661,8 +649,8 @@ struct SerializationTests {
             #expect(asyncString == expected)
         }
 
-        @Test("Escaped Backslash Serialization")
-        func reverseSolidus() async throws {
+        @Test
+        func `Escaped Backslash Serialization`() async throws {
             let json: JSON = "\\"
             let data = try json.serialize()
             let str = try #require(String(data: data, encoding: .utf8))
@@ -676,7 +664,7 @@ struct SerializationTests {
             #expect(asyncString == expected)
         }
 
-        @Test("Escaped Backslash Serialization")
+        @Test
         func backslash() async throws {
             let json: JSON = "\u{0008}"
             let data = try json.serialize()
@@ -691,8 +679,8 @@ struct SerializationTests {
             #expect(asyncString == expected)
         }
 
-        @Test("Escaped Slash Serialization")
-        func escapedSlash() async throws {
+        @Test
+        func `Escaped Slash Serialization`() async throws {
             let json: JSON = "/"
             let data = try JSON.data(from: json, options: [.escapeForwardSlash, .fragmentsAllowed])
             let str = try #require(String(data: data, encoding: .utf8))
@@ -706,8 +694,8 @@ struct SerializationTests {
             #expect(asyncString == expected)
         }
 
-        @Test("Regular Slash Serialization")
-        func slash() async throws {
+        @Test
+        func `Regular Slash Serialization`() async throws {
             let json: JSON = "/"
             let data = try json.serialize()
             let str = try #require(String(data: data, encoding: .utf8))
@@ -721,8 +709,8 @@ struct SerializationTests {
             #expect(asyncString == expected)
         }
 
-        @Test("Escaped Tab Serialization")
-        func tab() async throws {
+        @Test
+        func `Escaped Tab Serialization`() async throws {
             let json: JSON = "\u{0009}"
             let data = try json.serialize()
             let str = try #require(String(data: data, encoding: .utf8))
@@ -736,8 +724,8 @@ struct SerializationTests {
             #expect(asyncString == expected)
         }
 
-        @Test("Escaped Formfeed Serialization")
-        func formfeed() async throws {
+        @Test
+        func `Escaped Formfeed Serialization`() async throws {
             let json: JSON = "\u{000C}"
             let data = try json.serialize()
             let str = try #require(String(data: data, encoding: .utf8))
@@ -751,8 +739,8 @@ struct SerializationTests {
             #expect(asyncString == expected)
         }
 
-        @Test("Escaped Newline Serialization")
-        func newLine() async throws {
+        @Test
+        func `Escaped Newline Serialization`() async throws {
             let json: JSON = "\n"
             let data = try json.serialize()
             let str = try #require(String(data: data, encoding: .utf8))
@@ -766,8 +754,8 @@ struct SerializationTests {
             #expect(asyncString == expected)
         }
 
-        @Test("Escaped Carriage Return Serialization")
-        func carriageReturn() async throws {
+        @Test
+        func `Escaped Carriage Return Serialization`() async throws {
             let json: JSON = "\u{000D}"
             let data = try json.serialize()
             let str = try #require(String(data: data, encoding: .utf8))
@@ -781,8 +769,8 @@ struct SerializationTests {
             #expect(asyncString == expected)
         }
 
-        @Test("Escaped Control Character Serialization")
-        func controlCharacter() async throws {
+        @Test
+        func `Escaped Control Character Serialization`() async throws {
             let json: JSON = "\u{001F}"
             let data = try json.serialize()
             let str = try #require(String(data: data, encoding: .utf8))
@@ -796,8 +784,8 @@ struct SerializationTests {
             #expect(asyncString == expected)
         }
 
-        @Test("Escaped Non-ASCII Character Serialization")
-        func escapedNonASCII() async throws {
+        @Test
+        func `Escaped Non-ASCII Character Serialization`() async throws {
             let json: JSON = "é"
             let data = try JSON.data(from: json, options: [.escapeNonASCII, .fragmentsAllowed])
             let str = try #require(String(data: data, encoding: .utf8))
@@ -811,8 +799,8 @@ struct SerializationTests {
             #expect(asyncString == expected)
         }
 
-        @Test("Regular Non-ASCII Character Serialization")
-        func nonASCII() async throws {
+        @Test
+        func `Regular Non-ASCII Character Serialization`() async throws {
             let json: JSON = "é"
             let data = try json.serialize()
             let str = try #require(String(data: data, encoding: .utf8))
@@ -826,8 +814,8 @@ struct SerializationTests {
             #expect(asyncString == expected)
         }
 
-        @Test("Escaped Basic Multilingual Plane External Character Serialization")
-        func escapedBMP() async throws {
+        @Test
+        func `Escaped Basic Multilingual Plane External Character Serialization`() async throws {
             let json: JSON = "😀"
             let data = try JSON.data(from: json, options: [.escapeSpecialCharacters, .fragmentsAllowed])
             let str = try #require(String(data: data, encoding: .utf8))
@@ -841,8 +829,8 @@ struct SerializationTests {
             #expect(asyncString == expected)
         }
 
-        @Test("Escaped Basic Multilingual Plane External Character Serialization due to ASCII")
-        func escapedBMPFromASCII() async throws {
+        @Test
+        func `Escaped Basic Multilingual Plane External Character Serialization due to ASCII`() async throws {
             let json: JSON = "😀"
             let data = try JSON.data(from: json, options: [.escapeNonASCII, .fragmentsAllowed])
             let str = try #require(String(data: data, encoding: .utf8))
@@ -856,8 +844,8 @@ struct SerializationTests {
             #expect(asyncString == expected)
         }
 
-        @Test("Regular Basic Multilingual Plane External Character Serialization")
-        func bmp() async throws {
+        @Test
+        func `Regular Basic Multilingual Plane External Character Serialization`() async throws {
             let json: JSON = "😀"
             let data = try JSON.data(from: json, options: [.fragmentsAllowed])
             let str = try #require(String(data: data, encoding: .utf8))

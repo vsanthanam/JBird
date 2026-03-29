@@ -106,9 +106,9 @@ extension JSON {
         /// - Parameter type: The type to convert into
         /// - Returns: The converted value
         /// - Throws: An error, if the JSON number cannot be converted into the provided type
-        public func convert<T>(
+        public func convert<T: JSONNumberInitializable>(
             into type: T.Type = T.self
-        ) throws -> T where T: JSONNumberInitializable {
+        ) throws -> T {
             try T(jsonNumber: self)
         }
 

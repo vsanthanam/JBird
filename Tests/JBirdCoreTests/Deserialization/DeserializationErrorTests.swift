@@ -27,8 +27,8 @@
 import JBirdParser
 import Testing
 
-@Test("DeserializationError Descriptions")
-func deserializationErrorDescriptions() {
+@Test
+func `DeserializationError Descriptions`() {
     let illegalFragment = JSON.DeserializationError.illegalFragment
     #expect(illegalFragment.description == "JSON fragment cannot be deserialized")
 
@@ -78,8 +78,8 @@ func deserializationErrorDescriptions() {
     #expect(inputSizeLimitExceeded.description == "Input size limit exceeded")
 }
 
-@Test("Deserialiation error C initializer")
-func cInitializer() {
+@Test
+func `Deserialiation error C initializer`() {
     #expect(JSON.DeserializationError(JSON_UNEXPECTED_END_OF_INPUT) == .unexpectedEndOfInput)
     #expect(JSON.DeserializationError(JSON_INVALID_JSON) == .invalidJSON)
     #expect(JSON.DeserializationError(JSON_INVALID_CHARACTER) == .invalidCharacter)

@@ -26,17 +26,16 @@
 import JBirdMacros
 import Testing
 
-@Suite("Macro Decoding Error Tests")
 struct JSONMacroDecodingErrorTests {
 
-    @Test("Macro error message")
-    func errorMessage() {
+    @Test
+    func `Macro error message`() {
         let error = JSONMacroDecodingError("foo")
         #expect(error.message == "foo")
     }
 
-    @Test("Macro description tests")
-    func errorDescription() {
+    @Test
+    func `Macro description tests`() {
         let error = JSONMacroDecodingError("bar")
         #expect(error.description == "bar")
     }

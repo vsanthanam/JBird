@@ -28,131 +28,130 @@ import JBirdCodableSupport
 import JBirdCore
 import Testing
 
-@Suite("Array Encoder Tests")
 struct ArrayEncoderTests {
 
-    @Test("Encode String Array")
-    func stringArray() throws {
+    @Test
+    func `Encode String Array`() throws {
         let value: Strings = ["foo", "bar", "baz"]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test("Encode Bool Array")
-    func boolArray() throws {
+    @Test
+    func `Encode Bool Array`() throws {
         let value: Bools = [true, false, true]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test("Encode Int Array")
-    func intArray() throws {
+    @Test
+    func `Encode Int Array`() throws {
         let value: Ints = [1, 2, 3]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test("Encode Int8 Array")
-    func int8Array() throws {
+    @Test
+    func `Encode Int8 Array`() throws {
         let value: Int8s = [1, 2, 3]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test("Encode Int16 Array")
-    func int16Array() throws {
+    @Test
+    func `Encode Int16 Array`() throws {
         let value: Int16s = [1, 2, 3]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test("Encode Int32 Array")
-    func int32Array() throws {
+    @Test
+    func `Encode Int32 Array`() throws {
         let value: Int32s = [1, 2, 3]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test("Encode Int64 Array")
-    func int64Array() throws {
+    @Test
+    func `Encode Int64 Array`() throws {
         let value: Int64s = [1, 2, 3]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test("Encode UInt Array")
-    func uintArray() throws {
+    @Test
+    func `Encode UInt Array`() throws {
         let value: UInts = [1, 2, 3]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test("Encode UInt8 Array")
-    func uint8Array() throws {
+    @Test
+    func `Encode UInt8 Array`() throws {
         let value: UInt8s = [1, 2, 3]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test("Encode UInt16 Array")
-    func uint16Array() throws {
+    @Test
+    func `Encode UInt16 Array`() throws {
         let value: UInt16s = [1, 2, 3]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test("Encode UInt32 Array")
-    func uint32Array() throws {
+    @Test
+    func `Encode UInt32 Array`() throws {
         let value: UInt32s = [1, 2, 3]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test("Encode UInt64 Array")
-    func uint64Array() throws {
+    @Test
+    func `Encode UInt64 Array`() throws {
         let value: UInt64s = [1, 2, 3]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test("Encode Float Array")
-    func floatArray() throws {
+    @Test
+    func `Encode Float Array`() throws {
         let value: Floats = [1.25, 2.5, 3.75]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test("Encode Double Array")
-    func doubleArray() throws {
+    @Test
+    func `Encode Double Array`() throws {
         let value: Doubles = [1.25, 2.5, 3.75]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test("Encode Optional Array")
-    func optionalArray() throws {
+    @Test
+    func `Encode Optional Array`() throws {
         let value: Optionals<String> = ["foo", nil, "baz"]
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test("Encode Codable Array")
-    func codableArray() throws {
+    @Test
+    func `Encode Codable Array`() throws {
         struct Foo: Codable, Equatable, ExpressibleByStringLiteral {
             let bar: String
 
@@ -170,16 +169,16 @@ struct ArrayEncoderTests {
         #expect(foundation == jbird)
     }
 
-    @Test("Nested Unkeyed")
-    func nestedUnkeyed() throws {
+    @Test
+    func `Nested Unkeyed`() throws {
         let value = NestedUnkeyedModel(foo: "foo", int: [1, 2, 3])
         let foundation = try JSONEncoder().encode(value)
         let jbird = try JSON.Encoder().encode(value)
         #expect(foundation == jbird)
     }
 
-    @Test("Nested Keyed")
-    func decodeUnkeyedWithNestedKeyed() throws {
+    @Test
+    func `Nested Keyed`() throws {
         let value = UnkeyedWithNestedKeyedModel(qux: "qux", foo: "foo", bar: "bar")
         let foundationEncoder = JSONEncoder()
         foundationEncoder.outputFormatting = [.sortedKeys]

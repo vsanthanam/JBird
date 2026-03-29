@@ -30,8 +30,8 @@ import Testing
     @testable import JBirdMacrosCompilerPlugin
 #endif
 
-@Test("Compiler plugin tests")
-func JBirdMacrosCompilerPluginTests() {
+@Test
+func `Compiler plugin tests`() {
     #if canImport(JBirdMacrosCompilerPlugin)
         let plugin = JBirdMacrosCompilerPlugin()
         #expect(plugin.providingMacros.count == 3)

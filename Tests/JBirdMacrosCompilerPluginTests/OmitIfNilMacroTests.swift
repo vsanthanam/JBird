@@ -39,11 +39,10 @@ import Testing
     ]
 #endif
 
-@Suite("@OmitIfNull Tests")
 struct OmitIfNullMacroTestsV2 {
 
-    @Test("Annotated Optional Type With Question Mark")
-    func optionalTypeWithQuestionMark() throws {
+    @Test
+    func `Annotated Optional Type With Question Mark`() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -67,8 +66,8 @@ struct OmitIfNullMacroTestsV2 {
         #endif
     }
 
-    @Test("Annotated Explicit Optional")
-    func optionalTypeWithOptionalKeyword() {
+    @Test
+    func `Annotated Explicit Optional`() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -92,8 +91,8 @@ struct OmitIfNullMacroTestsV2 {
         #endif
     }
 
-    @Test("Annotated IUO")
-    func implicitlyUnwrappedOptional() {
+    @Test
+    func `Annotated IUO`() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -117,8 +116,8 @@ struct OmitIfNullMacroTestsV2 {
         #endif
     }
 
-    @Test("Annotated non-optional")
-    func nonOptionalType() throws {
+    @Test
+    func `Annotated non-optional`() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -145,8 +144,8 @@ struct OmitIfNullMacroTestsV2 {
         #endif
     }
 
-    @Test("Annotated computed property")
-    func computedProperty() {
+    @Test
+    func `Annotated computed property`() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -177,8 +176,8 @@ struct OmitIfNullMacroTestsV2 {
         #endif
     }
 
-    @Test("Annotated multiple bindings at once")
-    func multipleBindings() {
+    @Test
+    func `Annotated multiple bindings at once`() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -205,8 +204,8 @@ struct OmitIfNullMacroTestsV2 {
         #endif
     }
 
-    @Test("Annotated without type annotation")
-    func noTypeAnnotation() {
+    @Test
+    func `Annotated without type annotation`() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -233,8 +232,8 @@ struct OmitIfNullMacroTestsV2 {
         #endif
     }
 
-    @Test("Annotated on function")
-    func appliedToFunction() {
+    @Test
+    func `Annotated on function`() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """
@@ -265,8 +264,8 @@ struct OmitIfNullMacroTestsV2 {
         #endif
     }
 
-    @Test("Annotated nested optional type")
-    func nestedOptionalType() {
+    @Test
+    func `Annotated nested optional type`() {
         #if canImport(JBirdMacrosCompilerPlugin)
             assertMacroExpansion(
                 """

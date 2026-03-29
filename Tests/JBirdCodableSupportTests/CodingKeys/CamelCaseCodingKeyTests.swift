@@ -26,23 +26,22 @@
 @testable import JBirdCodableSupport
 import Testing
 
-@Suite("Camel Case CodingKey Tests")
 struct CamelCaseCodingKeyTests {
 
-    @Test("String Init")
-    func stringInit() {
+    @Test
+    func `String Init`() {
         let key = CamelCaseCodingKey(stringValue: "foo")
         #expect(key == nil)
     }
 
-    @Test("Int Init")
-    func intInit() {
+    @Test
+    func `Int Init`() {
         let key = CamelCaseCodingKey(intValue: 12)
         #expect(key == nil)
     }
 
     @Test(
-        "String Conversion",
+
         arguments: [
             ("some_key", "someKey"),
             ("some_url_value", "someUrlValue"),
@@ -52,10 +51,10 @@ struct CamelCaseCodingKeyTests {
             ("1_foo", "1Foo")
         ]
     )
-    func stringConversion(
+    func `String Conversion`(
         key: String,
         newKey: String
-    ) throws {
+    ) {
         let snakeKey = CamelCaseCodingKey(key)
         #expect(snakeKey.stringValue == newKey)
         #expect(snakeKey.intValue == nil)

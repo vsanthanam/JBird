@@ -28,7 +28,6 @@ import JBirdCodableSupport
 import JBirdCore
 import Testing
 
-@Suite("Array Decoder Tests")
 struct ArrayDecoderTests {
 
     struct SomeCodable: Codable, Equatable {
@@ -37,8 +36,8 @@ struct ArrayDecoderTests {
 
     static let someCodableData = try! JSONEncoder().encode(Values([SomeCodable(foo: "foo"), SomeCodable(foo: "bar"), SomeCodable(foo: "baz")]))
 
-    @Test("Decode Strings")
-    func decodeStrings() throws {
+    @Test
+    func `Decode Strings`() throws {
         let value: Strings = ["foo", "bar"]
         let data = try JSONEncoder().encode(value)
         let foundation = try JSONDecoder().decode(Strings.self, from: data)
@@ -52,8 +51,8 @@ struct ArrayDecoderTests {
         }
     }
 
-    @Test("Decode Bools")
-    func decodeBools() throws {
+    @Test
+    func `Decode Bools`() throws {
         let value: Bools = [true, false]
         let data = try JSONEncoder().encode(value)
         let foundation = try JSONDecoder().decode(Bools.self, from: data)
@@ -67,8 +66,8 @@ struct ArrayDecoderTests {
         }
     }
 
-    @Test("Decode Floats")
-    func decodeFloats() throws {
+    @Test
+    func `Decode Floats`() throws {
         let value: Floats = [1.5, -2.25]
         let data = try JSONEncoder().encode(value)
         let foundation = try JSONDecoder().decode(Floats.self, from: data)
@@ -82,8 +81,8 @@ struct ArrayDecoderTests {
         }
     }
 
-    @Test("Decode Doubles")
-    func decodeDoubles() throws {
+    @Test
+    func `Decode Doubles`() throws {
 //        let value: Doubles = [3.14159, -0.1234]
         let values: Doubles = [1.2, -2.1]
         let data = try JSONEncoder().encode(values)
@@ -98,11 +97,10 @@ struct ArrayDecoderTests {
         }
     }
 
-    @Suite("Decode Signed Integer Arrays")
     struct SignedIntegers {
 
-        @Test("Decode Ints")
-        func decodeInts() throws {
+        @Test
+        func `Decode Ints`() throws {
             let value: Ints = [24, -12]
             let data = try JSONEncoder().encode(value)
             let foundation = try JSONDecoder().decode(Ints.self, from: data)
@@ -116,8 +114,8 @@ struct ArrayDecoderTests {
             }
         }
 
-        @Test("Decode Int8s")
-        func decodeInt8s() throws {
+        @Test
+        func `Decode Int8s`() throws {
             let value: Int8s = [-1, 1]
             let data = try JSONEncoder().encode(value)
             let foundation = try JSONDecoder().decode(Int8s.self, from: data)
@@ -131,8 +129,8 @@ struct ArrayDecoderTests {
             }
         }
 
-        @Test("Decode Int16s")
-        func decodeInt16s() throws {
+        @Test
+        func `Decode Int16s`() throws {
             let value: Int16s = [-3, 7]
             let data = try JSONEncoder().encode(value)
             let foundation = try JSONDecoder().decode(Int16s.self, from: data)
@@ -146,8 +144,8 @@ struct ArrayDecoderTests {
             }
         }
 
-        @Test("Decode Int32s")
-        func decodeInt32s() throws {
+        @Test
+        func `Decode Int32s`() throws {
             let value: Int32s = [-1000, 1000]
             let data = try JSONEncoder().encode(value)
             let foundation = try JSONDecoder().decode(Int32s.self, from: data)
@@ -161,8 +159,8 @@ struct ArrayDecoderTests {
             }
         }
 
-        @Test("Decode Int64s")
-        func decodeInt64s() throws {
+        @Test
+        func `Decode Int64s`() throws {
             let value: Int64s = [-9000, 9000]
             let data = try JSONEncoder().encode(value)
             let foundation = try JSONDecoder().decode(Int64s.self, from: data)
@@ -178,11 +176,10 @@ struct ArrayDecoderTests {
 
     }
 
-    @Suite("Decode Unsigned Integer Arrays")
     struct UnsignedIntegers {
 
-        @Test("Decode UInts")
-        func decodeUInts() throws {
+        @Test
+        func `Decode UInts`() throws {
             let value: UInts = [0, 42]
             let data = try JSONEncoder().encode(value)
             let foundation = try JSONDecoder().decode(UInts.self, from: data)
@@ -196,8 +193,8 @@ struct ArrayDecoderTests {
             }
         }
 
-        @Test("Decode UInt8s")
-        func decodeUInt8s() throws {
+        @Test
+        func `Decode UInt8s`() throws {
             let value: UInt8s = [0, 200]
             let data = try JSONEncoder().encode(value)
             let foundation = try JSONDecoder().decode(UInt8s.self, from: data)
@@ -211,8 +208,8 @@ struct ArrayDecoderTests {
             }
         }
 
-        @Test("Decode UInt16s")
-        func decodeUInt16s() throws {
+        @Test
+        func `Decode UInt16s`() throws {
             let value: UInt16s = [0, 65000]
             let data = try JSONEncoder().encode(value)
             let foundation = try JSONDecoder().decode(UInt16s.self, from: data)
@@ -226,8 +223,8 @@ struct ArrayDecoderTests {
             }
         }
 
-        @Test("Decode UInt32s")
-        func decodeUInt32s() throws {
+        @Test
+        func `Decode UInt32s`() throws {
             let value: UInt32s = [1, 1_000_000]
             let data = try JSONEncoder().encode(value)
             let foundation = try JSONDecoder().decode(UInt32s.self, from: data)
@@ -241,8 +238,8 @@ struct ArrayDecoderTests {
             }
         }
 
-        @Test("Decode UInt64s")
-        func decodeUInt64s() throws {
+        @Test
+        func `Decode UInt64s`() throws {
             let value: UInt64s = [1, 1_000_000_000]
             let data = try JSONEncoder().encode(value)
             let foundation = try JSONDecoder().decode(UInt64s.self, from: data)
@@ -258,8 +255,8 @@ struct ArrayDecoderTests {
 
     }
 
-    @Test("Decode Optionals")
-    func decodeOptionals() throws {
+    @Test
+    func `Decode Optionals`() throws {
         let value: Optionals<String> = ["foo", nil, "bar"]
         let data = try JSONEncoder().encode(value)
         let foundation = try JSONDecoder().decode(Optionals<String>.self, from: data)
@@ -273,8 +270,8 @@ struct ArrayDecoderTests {
         }
     }
 
-    @Test("Decode Codables")
-    func decodeCodables() throws {
+    @Test
+    func `Decode Codables`() throws {
         let value: Values<SomeCodable> = [.init(foo: "foo"), .init(foo: "bar"), .init(foo: "baz")]
         let data = try JSONEncoder().encode(value)
         let foundation = try JSONDecoder().decode(Values<SomeCodable>.self, from: data)
@@ -288,8 +285,8 @@ struct ArrayDecoderTests {
         }
     }
 
-    @Test("Decode Array")
-    func decodeArray() throws {
+    @Test
+    func `Decode Array`() throws {
         let value = [1, 2, 3]
         let data = try JSONEncoder().encode(value)
         let foundation = try JSONDecoder().decode([Int].self, from: data)
@@ -303,8 +300,8 @@ struct ArrayDecoderTests {
         }
     }
 
-    @Test("Nested Unkeyed")
-    func decodeNestedUnkeyed() throws {
+    @Test
+    func `Nested Unkeyed`() throws {
         let value = NestedUnkeyedModel(foo: "foo", int: [1, 2, 3])
         let data = try JSONEncoder().encode(value)
         let foundation = try JSONDecoder().decode(NestedUnkeyedModel.self, from: data)
@@ -318,8 +315,8 @@ struct ArrayDecoderTests {
         }
     }
 
-    @Test("Nested Keyed")
-    func decodeUnkeyedWithNestedKeyed() throws {
+    @Test
+    func `Nested Keyed`() throws {
         let value = UnkeyedWithNestedKeyedModel(qux: "qux", foo: "foo", bar: "bar")
         let data = try JSONEncoder().encode(value)
         let foundation = try JSONDecoder().decode(UnkeyedWithNestedKeyedModel.self, from: data)
@@ -333,8 +330,8 @@ struct ArrayDecoderTests {
         }
     }
 
-    @Test("Unkeyed Super Decoder")
-    func decodedUnkeyedSuper() throws {
+    @Test
+    func `Unkeyed Super Decoder`() throws {
         let value = UnkeyedSub(foo: "bar", bar: "foo")
         let data = try JSONEncoder().encode(value)
         let foundation = try JSONDecoder().decode(UnkeyedSub.self, from: data)

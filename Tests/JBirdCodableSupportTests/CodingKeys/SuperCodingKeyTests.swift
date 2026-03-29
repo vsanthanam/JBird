@@ -26,8 +26,8 @@
 @testable import JBirdCodableSupport
 import Testing
 
-@Test("Test Super CodingKey")
-func superCodingKey() throws {
+@Test
+func `Super CodingKey`() throws {
     let key = SuperCodingKey()
     #expect(key.stringValue == "super")
     #expect(key.intValue == nil)

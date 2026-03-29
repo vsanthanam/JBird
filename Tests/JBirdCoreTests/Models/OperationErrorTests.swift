@@ -26,8 +26,8 @@
 import JBirdCore
 import Testing
 
-@Test("OperationError Description Tests")
-func operationErrorDescriptionTests() {
+@Test
+func `OperationError Description Tests`() {
 
     let invalidIndex = JSON.OperationError.invalidSubscript(.index(1))
     #expect(invalidIndex.description == "Invalid JSON subscript '1'")

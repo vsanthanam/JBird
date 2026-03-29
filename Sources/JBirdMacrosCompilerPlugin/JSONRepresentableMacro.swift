@@ -499,7 +499,7 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
             return candidate.isEmpty ? "value" : candidate
         }
 
-        // Build a deterministic base name from a type by removing optional wrappers and flattening generics.
+        /// Build a deterministic base name from a type by removing optional wrappers and flattening generics.
         func typeBaseName(_ type: TypeSyntax) -> String {
             if let opt = type.as(OptionalTypeSyntax.self) {
                 return typeBaseName(opt.wrappedType)
@@ -567,15 +567,12 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
         }
 
         for (i, param) in clause.parameters.enumerated() {
-            let base: String = {
-                if let firstName = param.firstName?.text,
-                   !firstName.isEmpty {
-                    return firstName
-                } else {
-                    let baseFromType = typeBaseName(param.type)
-                    return baseFromType
-                }
-            }()
+            let base: String = if let firstName = param.firstName?.text,
+                                  !firstName.isEmpty {
+                firstName
+            } else {
+                typeBaseName(param.type)
+            }
             let varName = uniqueName(for: base)
             vars.append(varName)
             keys[varName] = param.firstName?.text ?? String(i)

@@ -55,7 +55,7 @@ struct NestedUnkeyedModel: Codable, Equatable {
     }
 }
 
-struct Values<Element>: Codable, Equatable, ExpressibleByArrayLiteral where Element: Equatable & Codable {
+struct Values<Element: Equatable & Codable>: Codable, Equatable, ExpressibleByArrayLiteral {
 
     typealias ArrayLiteralElement = Element
 
@@ -492,7 +492,7 @@ struct UInt64s: Codable, Equatable, ExpressibleByArrayLiteral {
 
 }
 
-struct Optionals<T>: Codable, Equatable, ExpressibleByArrayLiteral where T: Codable & Equatable {
+struct Optionals<T: Codable & Equatable>: Codable, Equatable, ExpressibleByArrayLiteral {
 
     init(arrayLiteral elements: T?...) {
         value = elements
@@ -527,7 +527,7 @@ struct Optionals<T>: Codable, Equatable, ExpressibleByArrayLiteral where T: Coda
 
 }
 
-struct KeyedValue<T>: Equatable, Codable where T: Codable & Equatable {
+struct KeyedValue<T: Codable & Equatable>: Equatable, Codable {
     let value: T
 
     init(value: T) {

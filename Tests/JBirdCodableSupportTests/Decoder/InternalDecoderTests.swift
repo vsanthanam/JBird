@@ -28,11 +28,10 @@ import JBirdCodableSupport
 import JBirdCore
 import Testing
 
-@Suite("Internal Decoder Tests")
 struct InternalDecoderTests {
 
-    @Test("Unavailable Keyed Decoder")
-    func unavailableKeyedDecoder() throws {
+    @Test
+    func `Unavailable Keyed Decoder`() throws {
         struct Keyed: Codable {
             let foo: String
         }
@@ -42,8 +41,8 @@ struct InternalDecoderTests {
         }
     }
 
-    @Test("Unavailable Unkeyed Decoder")
-    func unavailableUnkeyedDecoder() throws {
+    @Test
+    func `Unavailable Unkeyed Decoder`() throws {
         let data = try JSONEncoder().encode(12)
         #expect(throws: DecodingError.self) {
             _ = try JSON.Decoder().decode([Int].self, from: data)

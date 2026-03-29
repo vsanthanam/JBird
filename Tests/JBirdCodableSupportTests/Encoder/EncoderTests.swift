@@ -28,10 +28,8 @@ import JBirdCodableSupport
 import JBirdCore
 import Testing
 
-@Suite("Encoder Tests")
-struct EncoderTests {
+enum EncoderTests {
 
-    @Suite("Encoder Formatting Tests")
     struct EnocoderFormattingTests {
 
         struct Model: Codable {
@@ -54,8 +52,8 @@ struct EncoderTests {
             )
         )
 
-        @Test("Default Formatting")
-        func defaultFormatting() throws {
+        @Test
+        func `Default Formatting`() throws {
             let foundationEncoder = JSONEncoder()
             foundationEncoder.outputFormatting = [.sortedKeys]
             let foundation = try foundationEncoder.encode(model)
@@ -65,8 +63,8 @@ struct EncoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test("Pretty Printed")
-        func prettyPrinted() throws {
+        @Test
+        func `Pretty Printed`() throws {
             let foundationEncoder = JSONEncoder()
             foundationEncoder.outputFormatting = [.prettyPrinted, .sortedKeys]
             let foundation = try foundationEncoder.encode(model)
@@ -76,8 +74,8 @@ struct EncoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test("Without Escaping Slashes")
-        func withoutEscapingSlashes() throws {
+        @Test
+        func `Without Escaping Slashes`() throws {
             let foundationEncoder = JSONEncoder()
             foundationEncoder.outputFormatting = [.withoutEscapingSlashes, .sortedKeys]
             let foundation = try foundationEncoder.encode(model)
@@ -85,8 +83,8 @@ struct EncoderTests {
             jbirdEncoder.outputFormatting = [.withoutEscapingSlashes, .sortedKeys]
             let jbird = try jbirdEncoder.encode(model)
             #expect(foundation == jbird)
-            let foundationString = String(data: foundation, encoding: .utf8)!
-            let jbirdString = String(data: jbird, encoding: .utf8)!
+            let foundationString = try #require(String(data: foundation, encoding: .utf8))
+            let jbirdString = try #require(String(data: jbird, encoding: .utf8))
             print(foundationString)
             print(jbirdString)
             #expect(foundationString == jbirdString)
@@ -94,19 +92,18 @@ struct EncoderTests {
 
     }
 
-    @Suite("Encode Root Dates")
     struct DateTests {
 
-        @Test("Encode Date No Strategy")
-        func encodeDate() throws {
+        @Test
+        func `Encode Date No Strategy`() throws {
             let value = Date.now
             let foundation = try JSONEncoder().encode(value)
             let jbird = try JSON.Encoder().encode(value)
             #expect(foundation == jbird)
         }
 
-        @Test("Encode Date with ISO8601 Strategy")
-        func encodeDate8601Strategy() throws {
+        @Test
+        func `Encode Date with ISO8601 Strategy`() throws {
             let value = Date.now
 
             let foundationEncoder = JSONEncoder()
@@ -120,8 +117,8 @@ struct EncoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test("Encode Date with Formatter Strategy")
-        func encodeDateFormatterStrategy() throws {
+        @Test
+        func `Encode Date with Formatter Strategy`() throws {
             let value = Date.now
             let formatter = DateFormatter()
 
@@ -136,8 +133,8 @@ struct EncoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test("Encode Date with Custom Stratetgy")
-        func encodeDateCustomStrateg() throws {
+        @Test
+        func `Encode Date with Custom Stratetgy`() throws {
             let value = Date.now
 
             let foundationEncoder = JSONEncoder()
@@ -155,8 +152,8 @@ struct EncoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test("Encode Date with Custom Stratetgy That Fails")
-        func encodeDateFormatterThatFails() throws {
+        @Test
+        func `Encode Date with Custom Stratetgy That Fails`() throws {
             let value = Date.now
 
             enum MyError: Error, Equatable {
@@ -184,8 +181,8 @@ struct EncoderTests {
             }
         }
 
-        @Test("Encode Date with Custom Stratetgy That Fails With Encoding Error")
-        func encodeDateFormatterThatFailsWithEncodingError() throws {
+        @Test
+        func `Encode Date with Custom Stratetgy That Fails With Encoding Error`() throws {
             let value = Date.now
 
             let encoder = JSON.Encoder()
@@ -208,8 +205,8 @@ struct EncoderTests {
             }
         }
 
-        @Test("Encode Date with Seconds Since 1970 Strategy")
-        func encodeDateSecondsSince1970strategy() throws {
+        @Test
+        func `Encode Date with Seconds Since 1970 Strategy`() throws {
             let value = Date.now
 
             let foundationEncoder = JSONEncoder()
@@ -223,8 +220,8 @@ struct EncoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test("Encode Date with Milliseconds Since 1970 Strategy")
-        func encodeDateMillisecondsSince1970strategy() throws {
+        @Test
+        func `Encode Date with Milliseconds Since 1970 Strategy`() throws {
             let value = Date.now
 
             let foundationEncoder = JSONEncoder()
@@ -238,16 +235,16 @@ struct EncoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test("Encode Unkeyed Dates")
-        func encodeUnkeyedDates() throws {
+        @Test
+        func `Encode Unkeyed Dates`() throws {
             let dates = [Date.now, Date.now, Date.now]
             let foundation = try JSONEncoder().encode(dates)
             let jbird = try JSON.Encoder().encode(dates)
             #expect(foundation == jbird)
         }
 
-        @Test("Encode Keyed Dates")
-        func encodeKeyedDates() throws {
+        @Test
+        func `Encode Keyed Dates`() throws {
             let dates = ["Foo": Date.now, "Baz": Date.now, "Bar": Date.now]
             let foundationEncoder = JSONEncoder()
             foundationEncoder.outputFormatting = .sortedKeys
@@ -260,11 +257,10 @@ struct EncoderTests {
 
     }
 
-    @Suite("Encode Root Data")
     struct DataTests {
 
-        @Test("Encode Data No Strategy")
-        func noStrategy() throws {
+        @Test
+        func `Encode Data No Strategy`() throws {
             let data = Data("FooBarBaz".utf8)
 
             let foundationEncoder = JSONEncoder()
@@ -278,8 +274,8 @@ struct EncoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test("Encode Data Base64")
-        func base64() throws {
+        @Test
+        func `Encode Data Base64`() throws {
             let data = Data("FooBarBaz".utf8)
 
             let foundationEncoder = JSONEncoder()
@@ -293,8 +289,8 @@ struct EncoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test("Encode Data Custom Strategy")
-        func custom() async throws {
+        @Test
+        func `Encode Data Custom Strategy`() throws {
             let data = Data("FooBarBaz".utf8)
 
             let foundationEncoder = JSONEncoder()
@@ -308,8 +304,8 @@ struct EncoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test("Encode Data with Custom Stratetgy That Fails")
-        func encodeDateFormatterThatFails() throws {
+        @Test
+        func `Encode Data with Custom Stratetgy That Fails`() throws {
             let value = Data("FooBarBaz".utf8)
 
             enum MyError: Error, Equatable {
@@ -337,8 +333,8 @@ struct EncoderTests {
             }
         }
 
-        @Test("Encode Data with Custom Stratetgy That Fails With Encoding Error")
-        func encodeDateFormatterThatFailsWithEncodingError() throws {
+        @Test
+        func `Encode Data with Custom Stratetgy That Fails With Encoding Error`() throws {
             let value = Data("FooBarBaz".utf8)
 
             let encoder = JSON.Encoder()
@@ -361,16 +357,16 @@ struct EncoderTests {
             }
         }
 
-        @Test("Encode Unkeyed Data")
-        func encodeUnkeyedDates() throws {
+        @Test
+        func `Encode Unkeyed Data`() throws {
             let data = [Data("foo".utf8), Data("bar".utf8), Data("baz".utf8)]
             let foundation = try JSONEncoder().encode(data)
             let jbird = try JSON.Encoder().encode(data)
             #expect(foundation == jbird)
         }
 
-        @Test("Encode Keyed Data")
-        func encodeKeyedDates() throws {
+        @Test
+        func `Encode Keyed Data`() throws {
             let data = ["Foo": Data("Foo".utf8), "Bar": Data("Bar".utf8), "Baz": Data("Baz".utf8)]
             let foundationEncoder = JSONEncoder()
             foundationEncoder.outputFormatting = .sortedKeys
@@ -383,11 +379,10 @@ struct EncoderTests {
 
     }
 
-    @Suite("Key Encoding Strategies")
     struct KeyEncodingStrategies {
 
-        @Test("Snake Case Key Strategy")
-        func snakeCaseKeyStrategy() throws {
+        @Test
+        func `Snake Case Key Strategy`() throws {
             struct Foo: Codable {
                 let someKey: String
                 let someOtherKey: Int
@@ -405,14 +400,14 @@ struct EncoderTests {
             jbirdEncoder.keyEncodingStrategy = .convertToSnakeCase
             jbirdEncoder.outputFormatting = .sortedKeys
             let jbird = try jbirdEncoder.encode(value)
-            let foundationStr = String(data: foundation, encoding: .utf8)!
-            let jbirdStr = String(data: jbird, encoding: .utf8)!
+            let foundationStr = try #require(String(data: foundation, encoding: .utf8))
+            let jbirdStr = try #require(String(data: jbird, encoding: .utf8))
             #expect(foundation == jbird)
             #expect(foundationStr == jbirdStr)
         }
 
-        @Test("Default Key Strategy")
-        func defaultKeyStrategy() throws {
+        @Test
+        func `Default Key Strategy`() throws {
             struct Foo: Codable {
                 let someKey: String
                 let someOtherKey: Int
@@ -434,8 +429,8 @@ struct EncoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test("Custom Key Strategy")
-        func customKeyStrategy() throws {
+        @Test
+        func `Custom Key Strategy`() throws {
             struct A: Codable {
                 var value: Int
                 var b: B
@@ -496,8 +491,8 @@ struct EncoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test("Custom Key Strategy Nested Encodables")
-        func customKeyStrategyNestedEncodables() throws {
+        @Test
+        func `Custom Key Strategy Nested Encodables`() throws {
             struct Container: Codable {
                 let foo: String
                 let nested: Nested
@@ -541,8 +536,8 @@ struct EncoderTests {
             #expect(foundation == jbird)
         }
 
-        @Test("Custom Key Strategy Nested Containers")
-        func customKeyStrategyNestedContainers() throws {
+        @Test
+        func `Custom Key Strategy Nested Containers`() throws {
             struct Manual: Encodable {
                 let value: Int
 
@@ -597,11 +592,10 @@ struct EncoderTests {
 
     }
 
-    @Suite("Non Conforming Float Strategies")
     struct NonConformingFloatStrategies {
 
-        @Test("No Strategy")
-        func noStrategy() throws {
+        @Test
+        func `No Strategy`() throws {
             let conformingDouble = 3.14
             let conformingFloat: Float = -102_094.1239
             let nanDouble = Double.nan
@@ -776,8 +770,8 @@ struct EncoderTests {
             }
         }
 
-        @Test("String Replace Strategy")
-        func stringReplaceStrategy() throws {
+        @Test
+        func `String Replace Strategy`() throws {
             let conformingDouble = 3.14
             let conformingFloat: Float = -102_094.1239
 
@@ -828,8 +822,8 @@ struct EncoderTests {
             #expect(negativeInfinityFloatFoundation == negativeInfinityFloatJBird)
         }
 
-        @Test("Use Null Strategy")
-        func useNullStrategy() throws {
+        @Test
+        func `Use Null Strategy`() throws {
             let nanDouble = Double.nan
             let positiveInfinityDouble = Double.infinity
             let negativeInfinityDouble = -Double.infinity

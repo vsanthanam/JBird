@@ -28,11 +28,10 @@ import JBirdCodableSupport
 import JBirdCore
 import Testing
 
-@Suite("Object Encoder Tests")
 struct ObjectEncoderTests {
 
-    @Test("Encode Keyed Scalars")
-    func encodeAllScalars() throws {
+    @Test
+    func `Encode Keyed Scalars`() throws {
         let value = AllScalars(
             foo: "foo",
             bar: 1.2,
@@ -60,8 +59,8 @@ struct ObjectEncoderTests {
         #expect(foundation == jbird)
     }
 
-    @Test("Keyed Subclass")
-    func keyedSubClass() throws {
+    @Test
+    func `Keyed Subclass`() throws {
         let value = SomeSub(foo: "bar", bar: "foo", qux: .init(quux: false, grault: 1.2))
         let foundationEncoder = JSONEncoder()
         foundationEncoder.outputFormatting = [.sortedKeys]
@@ -72,8 +71,8 @@ struct ObjectEncoderTests {
         #expect(foundation == jbird)
     }
 
-    @Test("Keyed Subclass With Key")
-    func keyedSubClassWithKey() throws {
+    @Test
+    func `Keyed Subclass With Key`() throws {
         let value = SomeSubWitihKey(foo: "bar", bar: "foo", qux: .init(quux: false, grault: 1.2))
         let foundationEncoder = JSONEncoder()
         foundationEncoder.outputFormatting = [.sortedKeys]
@@ -84,8 +83,8 @@ struct ObjectEncoderTests {
         #expect(foundation == jbird)
     }
 
-    @Test("Keyed with nested keys")
-    func decodeKeyedWithNestedKeyed() throws {
+    @Test
+    func `Keyed with nested keys`() throws {
         let value = KeyedWithNestedKeyed(foo: "foo", baz: "baz", qux: "qux")
         let foundationEncoder = JSONEncoder()
         foundationEncoder.outputFormatting = [.sortedKeys]

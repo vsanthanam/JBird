@@ -27,13 +27,12 @@ import Foundation
 import JBirdParser
 import Testing
 
-@Suite("JBird Parser Tests")
 struct JBirdParserTests {
 
     // MARK: - Basic Parsing Tests
 
-    @Test("Parse null value")
-    func parseNull() throws {
+    @Test
+    func `Parse null value`() throws {
         let raw = "null"
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
@@ -52,8 +51,8 @@ struct JBirdParserTests {
 
     }
 
-    @Test("Parse true value")
-    func parseTrue() throws {
+    @Test
+    func `Parse true value`() throws {
         let raw = "true"
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
@@ -72,8 +71,8 @@ struct JBirdParserTests {
         #expect(json_get_boolean(value) == true)
     }
 
-    @Test("Parse false value")
-    func parseFalse() throws {
+    @Test
+    func `Parse false value`() throws {
         let raw = "false"
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
@@ -92,8 +91,8 @@ struct JBirdParserTests {
 
     }
 
-    @Test("Parse integer")
-    func parseInteger() throws {
+    @Test
+    func `Parse integer`() throws {
         let raw = "42"
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
@@ -114,8 +113,8 @@ struct JBirdParserTests {
 
     }
 
-    @Test("Parse negative integer")
-    func parseNegativeInteger() throws {
+    @Test
+    func `Parse negative integer`() throws {
         let raw = "-123"
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
@@ -135,8 +134,8 @@ struct JBirdParserTests {
 
     }
 
-    @Test("Parse zero")
-    func parseZero() throws {
+    @Test
+    func `Parse zero`() throws {
         let raw = "0"
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
@@ -155,8 +154,8 @@ struct JBirdParserTests {
         #expect(json_get_int(value) == 0)
     }
 
-    @Test("Parse double")
-    func parseDouble() throws {
+    @Test
+    func `Parse double`() throws {
         let raw = "3.14159"
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
@@ -176,8 +175,8 @@ struct JBirdParserTests {
         #expect(json_get_int(value) == 3)
     }
 
-    @Test("Parse scientific notation")
-    func parseScientificNotation() throws {
+    @Test
+    func `Parse scientific notation`() throws {
         let raw = "1.23e10"
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
@@ -196,8 +195,8 @@ struct JBirdParserTests {
         #expect(abs(json_get_double(value) - 1.23e10) < 1e6)
     }
 
-    @Test("Parse negative scientific notation")
-    func parseNegativeScientificNotation() throws {
+    @Test
+    func `Parse negative scientific notation`() throws {
         let raw = "-1.5e-3"
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
@@ -217,8 +216,8 @@ struct JBirdParserTests {
 
     }
 
-    @Test("Parse simple string")
-    func parseSimpleString() throws {
+    @Test
+    func `Parse simple string`() throws {
         let raw = #"""
         "hello"
         """#
@@ -239,12 +238,12 @@ struct JBirdParserTests {
 
         let str = json_get_string(value)
         #expect(str != nil)
-        #expect(String(cString: str!) == "hello")
+        #expect(try String(cString: #require(str)) == "hello")
 
     }
 
-    @Test("Parse empty string")
-    func parseEmptyString() throws {
+    @Test
+    func `Parse empty string`() throws {
         let raw = #"""
         ""
         """#
@@ -265,12 +264,12 @@ struct JBirdParserTests {
 
         let str = json_get_string(value)
         #expect(str != nil)
-        #expect(String(cString: str!) == "")
+        #expect(try String(cString: #require(str)) == "")
 
     }
 
-    @Test("Parse string with escapes")
-    func parseStringWithEscapes() throws {
+    @Test
+    func `Parse string with escapes`() throws {
         let raw = #"""
         "hello\nworld\t!"    
         """#
@@ -291,11 +290,11 @@ struct JBirdParserTests {
 
         let str = json_get_string(value)
         #expect(str != nil)
-        #expect(String(cString: str!) == "hello\nworld\t!")
+        #expect(try String(cString: #require(str)) == "hello\nworld\t!")
     }
 
-    @Test("Parse string with unicode")
-    func parseStringWithUnicode() throws {
+    @Test
+    func `Parse string with unicode`() throws {
         let raw = #"""
         "\u0048\u0065\u006C\u006C\u006F"
         """#
@@ -316,11 +315,11 @@ struct JBirdParserTests {
 
         let str = json_get_string(value)
         #expect(str != nil)
-        #expect(String(cString: str!) == "Hello")
+        #expect(try String(cString: #require(str)) == "Hello")
     }
 
-    @Test("Parse string with surrogate pairs")
-    func parseStringWithSurrogatePairs() throws {
+    @Test
+    func `Parse string with surrogate pairs`() throws {
         let raw = #"""
         "\uD83D\uDE00"    
         """#
@@ -341,11 +340,11 @@ struct JBirdParserTests {
 
         let str = json_get_string(value)
         #expect(str != nil)
-        #expect(String(cString: str!) == "😀")
+        #expect(try String(cString: #require(str)) == "😀")
     }
 
-    @Test("Parse empty array")
-    func parseEmptyArray() throws {
+    @Test
+    func `Parse empty array`() throws {
         let raw = #"""
         []
         """#
@@ -366,8 +365,8 @@ struct JBirdParserTests {
         #expect(json_get_array_size(value) == 0)
     }
 
-    @Test("Parse array with elements")
-    func parseArrayWithElements() throws {
+    @Test
+    func `Parse array with elements`() throws {
         let raw = #"""
         [1, 2, 3]
         """#
@@ -406,8 +405,8 @@ struct JBirdParserTests {
         #expect(elemOOB == nil)
     }
 
-    @Test("Parse nested array")
-    func parseNestedArray() throws {
+    @Test
+    func `Parse nested array`() throws {
         let raw = #"""
         [[1, 2], [3, 4]]
         """#
@@ -433,8 +432,8 @@ struct JBirdParserTests {
         #expect(json_get_array_size(subArray0) == 2)
     }
 
-    @Test("Parse empty object")
-    func parseEmptyObject() throws {
+    @Test
+    func `Parse empty object`() throws {
         let raw = #"""
         {}
         """#
@@ -455,8 +454,8 @@ struct JBirdParserTests {
         #expect(json_get_object_size(value) == 0)
     }
 
-    @Test("Parse object with properties")
-    func parseObjectWithProperties() throws {
+    @Test
+    func `Parse object with properties`() throws {
         let raw = #"""
         {"name": "John", "age": 30}    
         """#
@@ -478,16 +477,16 @@ struct JBirdParserTests {
 
         let key0 = json_get_object_key(value, 0)
         #expect(key0 != nil)
-        #expect(String(cString: key0!) == "name")
+        #expect(try String(cString: #require(key0)) == "name")
 
         let val0 = json_get_object_value(value, 0)
         #expect(val0 != nil)
         #expect(json_get_type(val0) == JSON_STRING)
-        #expect(String(cString: json_get_string(val0)!) == "John")
+        #expect(try String(cString: #require(json_get_string(val0))) == "John")
 
         let key1 = json_get_object_key(value, 1)
         #expect(key1 != nil)
-        #expect(String(cString: key1!) == "age")
+        #expect(try String(cString: #require(key1)) == "age")
 
         let val1 = json_get_object_value(value, 1)
         #expect(val1 != nil)
@@ -503,8 +502,8 @@ struct JBirdParserTests {
 
     }
 
-    @Test("Parse complex nested structure")
-    func parseComplexNestedStructure() throws {
+    @Test
+    func `Parse complex nested structure`() throws {
         let raw = #"""
         {
             "users": [
@@ -534,8 +533,8 @@ struct JBirdParserTests {
 
     // MARK: - BOM Tests
 
-    @Test("Parse with BOM allowed")
-    func parseWithBOMAllowed() throws {
+    @Test
+    func `Parse with BOM allowed`() {
         let bom: [UInt8] = [0xEF, 0xBB, 0xBF]
         let jsonString = "true"
         let jsonData = Data(bom + jsonString.utf8)
@@ -556,8 +555,8 @@ struct JBirdParserTests {
         #expect(json_get_boolean(value) == true)
     }
 
-    @Test("Parse with BOM not allowed")
-    func parseWithBOMNotAllowed() throws {
+    @Test
+    func `Parse with BOM not allowed`() {
         let bom: [UInt8] = [0xEF, 0xBB, 0xBF]
         let jsonString = "true"
         let jsonData = Data(bom + jsonString.utf8)
@@ -576,8 +575,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse with whitespace allowed")
-    func parseWithWhitespaceAllowed() throws {
+    @Test
+    func `Parse with whitespace allowed`() throws {
         let raw = "  \t\n  true  \r\n  "
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
@@ -596,8 +595,8 @@ struct JBirdParserTests {
         #expect(json_get_boolean(value) == true)
     }
 
-    @Test("Parse with whitespace not allowed")
-    func parseWithWhitespaceNotAllowed() throws {
+    @Test
+    func `Parse with whitespace not allowed`() throws {
         let raw = #"""
          true 
         """#
@@ -616,8 +615,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse with depth limit exceeded")
-    func parseWithDepthLimitExceeded() throws {
+    @Test
+    func `Parse with depth limit exceeded`() throws {
         let raw = #"""
         [[[[[true]]]]]
         """#
@@ -636,8 +635,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse within depth limit")
-    func parseWithinDepthLimit() throws {
+    @Test
+    func `Parse within depth limit`() throws {
         let raw = #"""
         [[true]]
         """#
@@ -656,8 +655,8 @@ struct JBirdParserTests {
         #expect(value != nil)
     }
 
-    @Test("Parse null input")
-    func parseNullInput() throws {
+    @Test
+    func `Parse null input`() {
         var value: OpaquePointer?
         let result = json_parse(nil, 0, &value, true, false, false, 0)
 
@@ -665,8 +664,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse empty input")
-    func parseEmptyInput() throws {
+    @Test
+    func `Parse empty input`() throws {
         let jsonData = try #require("".data(using: .utf8))
         var value: OpaquePointer?
 
@@ -682,8 +681,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse invalid character")
-    func parseInvalidCharacter() throws {
+    @Test
+    func `Parse invalid character`() throws {
         let raw = #"""
         xyz
         """#
@@ -702,8 +701,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse incomplete true")
-    func parseIncompleteTrue() throws {
+    @Test
+    func `Parse incomplete true`() throws {
         let raw = #"""
         tr
         """#
@@ -722,8 +721,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse incomplete false")
-    func parseIncompleteFalse() throws {
+    @Test
+    func `Parse incomplete false`() throws {
         let raw = #"""
         fal
         """#
@@ -742,8 +741,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse incomplete null")
-    func parseIncompleteNull() throws {
+    @Test
+    func `Parse incomplete null`() throws {
         let raw = #"""
         nul
         """#
@@ -762,8 +761,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse invalid leading zero")
-    func parseInvalidNumber() throws {
+    @Test
+    func `Parse invalid leading zero`() throws {
         let raw = #"""
         01
         """#
@@ -782,8 +781,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse invalid just minus")
-    func parseInvalidNumberJustMinus() throws {
+    @Test
+    func `Parse invalid just minus`() throws {
         let raw = #"""
         -
         """#
@@ -802,8 +801,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse unterminated string")
-    func parseUnterminatedString() throws {
+    @Test
+    func `Parse unterminated string`() throws {
         let raw = #"""
         "hello
         """#
@@ -822,8 +821,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse string with invalid escape")
-    func parseStringWithInvalidEscape() throws {
+    @Test
+    func `Parse string with invalid escape`() throws {
         let raw = #"""
         "hello\x\"
         """#
@@ -842,8 +841,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse string with control character")
-    func parseStringWithControlCharacter() throws {
+    @Test
+    func `Parse string with control character`() {
         let jsonData = Data([0x22, 0x01, 0x22])
         var value: OpaquePointer?
 
@@ -859,8 +858,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse string with invalid unicode")
-    func parseStringWithInvalidUnicode() throws {
+    @Test
+    func `Parse string with invalid unicode`() throws {
         let raw = #"""
         "\uXXXX"
         """#
@@ -879,8 +878,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse string with invalid surrogate pair")
-    func parseStringWithInvalidSurrogatePair() throws {
+    @Test
+    func `Parse string with invalid surrogate pair`() throws {
         let raw = #"""
         "\uD800"
         """#
@@ -899,8 +898,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse string with lone low surrogate")
-    func parseStringWithLoneLowSurrogate() throws {
+    @Test
+    func `Parse string with lone low surrogate`() throws {
         let raw = #"""
         "\uDC00"
         """#
@@ -919,8 +918,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse unterminated array")
-    func parseUnterminatedArray() throws {
+    @Test
+    func `Parse unterminated array`() throws {
         let raw = #"""
         [1, 2
         """#
@@ -939,8 +938,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse array with invalid separator")
-    func parseArrayWithInvalidSeparator() throws {
+    @Test
+    func `Parse array with invalid separator`() throws {
         let raw = #"""
         [1; 2]
         """#
@@ -959,8 +958,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse object missing key")
-    func parseObjectMissingKey() throws {
+    @Test
+    func `Parse object missing key`() throws {
         let raw = #"""
         {123: "value"}
         """#
@@ -979,8 +978,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse object missing colon")
-    func parseObjectMissingColon() throws {
+    @Test
+    func `Parse object missing colon`() throws {
         let raw = #"""
         {"key" "value}    
         """#
@@ -999,8 +998,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse object with invalid separator")
-    func parseObjectWithInvalidSeparator() throws {
+    @Test
+    func `Parse object with invalid separator`() throws {
         let raw = #"""
         {"key1": "value1"; "key2": "value2"}    
         """#
@@ -1019,8 +1018,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse unterminated object")
-    func parseUnterminatedObject() throws {
+    @Test
+    func `Parse unterminated object`() throws {
         let raw = #"""
         {"key": "value"
         """#
@@ -1039,8 +1038,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse with trailing content")
-    func parseWithTrailingContent() throws {
+    @Test
+    func `Parse with trailing content`() throws {
         let raw = #"""
         true false
         """#
@@ -1059,8 +1058,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Get boolean from non-boolean")
-    func getBooleanFromNonBoolean() throws {
+    @Test
+    func `Get boolean from non-boolean`() throws {
         let raw = "42"
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
@@ -1079,8 +1078,8 @@ struct JBirdParserTests {
         #expect(json_get_boolean(value) == false)
     }
 
-    @Test("Get int from null")
-    func getIntFromNull() throws {
+    @Test
+    func `Get int from null`() throws {
         let raw = "null"
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
@@ -1100,8 +1099,8 @@ struct JBirdParserTests {
         #expect(json_get_double(value) == 0.0)
     }
 
-    @Test("Get string from non-string")
-    func getStringFromNonString() throws {
+    @Test
+    func `Get string from non-string`() throws {
         let raw = "42"
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
@@ -1120,8 +1119,8 @@ struct JBirdParserTests {
         #expect(json_get_string(value) == nil)
     }
 
-    @Test("Get array size from non-array")
-    func getArraySizeFromNonArray() throws {
+    @Test
+    func `Get array size from non-array`() throws {
         let raw = "42"
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
@@ -1140,8 +1139,8 @@ struct JBirdParserTests {
         #expect(json_get_array_size(value) == 0)
     }
 
-    @Test("Get object size from non-object")
-    func getObjectSizeFromNonObject() throws {
+    @Test
+    func `Get object size from non-object`() throws {
         let raw = "42"
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
@@ -1160,43 +1159,43 @@ struct JBirdParserTests {
         #expect(json_get_object_size(value) == 0)
     }
 
-    @Test("Get type from null pointer")
-    func getTypeFromNullPointer() throws {
+    @Test
+    func `Get type from null pointer`() {
         #expect(json_get_type(nil) == JSON_NULL)
     }
 
-    @Test("Get boolean from null pointer")
-    func getBooleanFromNullPointer() throws {
+    @Test
+    func `Get boolean from null pointer`() {
         #expect(json_get_boolean(nil) == false)
     }
 
-    @Test("Get int from null pointer")
-    func getIntFromNullPointer() throws {
+    @Test
+    func `Get int from null pointer`() {
         #expect(json_get_int(nil) == 0)
     }
 
-    @Test("Get double from null pointer")
-    func getDoubleFromNullPointer() throws {
+    @Test
+    func `Get double from null pointer`() {
         #expect(json_get_double(nil) == 0.0)
     }
 
-    @Test("Get string from null pointer")
-    func getStringFromNullPointer() throws {
+    @Test
+    func `Get string from null pointer`() {
         #expect(json_get_string(nil) == nil)
     }
 
-    @Test("Get array size from null pointer")
-    func getArraySizeFromNullPointer() throws {
+    @Test
+    func `Get array size from null pointer`() {
         #expect(json_get_array_size(nil) == 0)
     }
 
-    @Test("Get object size from null pointer")
-    func getObjectSizeFromNullPointer() throws {
+    @Test
+    func `Get object size from null pointer`() {
         #expect(json_get_object_size(nil) == 0)
     }
 
-    @Test("Parse large integer")
-    func parseLargeInteger() throws {
+    @Test
+    func `Parse large integer`() throws {
         let raw = "9223372036854775807"
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
@@ -1215,8 +1214,8 @@ struct JBirdParserTests {
         #expect(json_get_int(value) == 9_223_372_036_854_775_807)
     }
 
-    @Test("Parse negative large integer")
-    func parseNegativeLargeInteger() throws {
+    @Test
+    func `Parse negative large integer`() throws {
         let raw = "-9223372036854775808"
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
@@ -1237,8 +1236,8 @@ struct JBirdParserTests {
         #expect(json_get_int(value) == -9_223_372_036_854_775_808)
     }
 
-    @Test("Parse number with positive exponent")
-    func parseNumberWithPositiveExponent() throws {
+    @Test
+    func `Parse number with positive exponent`() throws {
         let raw = #"""
         1e+10
         """#
@@ -1262,8 +1261,8 @@ struct JBirdParserTests {
         #expect(doubleValue == 1e10)
     }
 
-    @Test("Parse number with capital E")
-    func parseNumberWithCapitalE() throws {
+    @Test
+    func `Parse number with capital E`() throws {
         let jsonData = try #require("1.5E-2".data(using: .utf8))
         var value: OpaquePointer?
 
@@ -1283,8 +1282,8 @@ struct JBirdParserTests {
 
     // MARK: - Boundary Value Tests
 
-    @Test("Parse INT64_MAX as integer")
-    func parseInt64MaxAsInteger() throws {
+    @Test
+    func `Parse INT64_MAX as integer`() throws {
         let raw = "9223372036854775807" // INT64_MAX
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
@@ -1303,8 +1302,8 @@ struct JBirdParserTests {
         #expect(json_get_int(value) == Int64.max)
     }
 
-    @Test("Parse INT64_MIN as integer")
-    func parseInt64MinAsInteger() throws {
+    @Test
+    func `Parse INT64_MIN as integer`() throws {
         let raw = "-9223372036854775808" // INT64_MIN
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
@@ -1323,8 +1322,8 @@ struct JBirdParserTests {
         #expect(json_get_int(value) == Int64.min)
     }
 
-    @Test("Parse INT64_MAX + 1 as double")
-    func parseInt64MaxPlusOneAsDouble() throws {
+    @Test
+    func `Parse INT64_MAX + 1 as double`() throws {
         let raw = "9223372036854775808" // INT64_MAX + 1
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
@@ -1343,8 +1342,8 @@ struct JBirdParserTests {
         #expect(json_get_double(value) == 9_223_372_036_854_775_808.0)
     }
 
-    @Test("Parse INT64_MIN - 1 as double")
-    func parseInt64MinMinusOneAsDouble() throws {
+    @Test
+    func `Parse INT64_MIN - 1 as double`() throws {
         let raw = "-9223372036854775809" // INT64_MIN - 1
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
@@ -1363,8 +1362,8 @@ struct JBirdParserTests {
         #expect(json_get_double(value) == -9_223_372_036_854_775_809.0)
     }
 
-    @Test("Parse short number to test fallback path")
-    func parseShortNumberFallbackPath() throws {
+    @Test
+    func `Parse short number to test fallback path`() throws {
         // This tests the fallback path (< 16 bytes remaining)
         let raw = "123"
         let jsonData = try #require(raw.data(using: .utf8))
@@ -1384,8 +1383,8 @@ struct JBirdParserTests {
         #expect(json_get_int(value) == 123)
     }
 
-    @Test("Parse long number to test SIMD path")
-    func parseLongNumberSIMDPath() throws {
+    @Test
+    func `Parse long number to test SIMD path`() throws {
         // This tests the SIMD-optimized path (>= 16 bytes remaining)
         let raw = "12345678901234567890" // 20 digits, should overflow to double
         let jsonData = try #require(raw.data(using: .utf8))
@@ -1405,8 +1404,8 @@ struct JBirdParserTests {
         #expect(json_get_double(value) == 12_345_678_901_234_567_890.0)
     }
 
-    @Test("Parse negative long number to test SIMD path")
-    func parseNegativeLongNumberSIMDPath() throws {
+    @Test
+    func `Parse negative long number to test SIMD path`() throws {
         // This tests the SIMD-optimized path with negative overflow
         let raw = "-12345678901234567890" // 20 digits, should overflow to double
         let jsonData = try #require(raw.data(using: .utf8))
@@ -1426,8 +1425,8 @@ struct JBirdParserTests {
         #expect(json_get_double(value) == -12_345_678_901_234_567_890.0)
     }
 
-    @Test("Parse 18-digit number as integer")
-    func parse18DigitNumberAsInteger() throws {
+    @Test
+    func `Parse 18-digit number as integer`() throws {
         // 18 digits should still fit in int64 (within safe processing range)
         let raw = "123456789012345678" // 18 digits
         let jsonData = try #require(raw.data(using: .utf8))
@@ -1447,8 +1446,8 @@ struct JBirdParserTests {
         #expect(json_get_int(value) == 123_456_789_012_345_678)
     }
 
-    @Test("Parse negative 18-digit number as integer")
-    func parseNegative18DigitNumberAsInteger() throws {
+    @Test
+    func `Parse negative 18-digit number as integer`() throws {
         // 18 digits should still fit in int64 (within safe processing range)
         let raw = "-123456789012345678" // 18 digits
         let jsonData = try #require(raw.data(using: .utf8))
@@ -1468,8 +1467,8 @@ struct JBirdParserTests {
         #expect(json_get_int(value) == -123_456_789_012_345_678)
     }
 
-    @Test("Parse INT64_MAX - 1 as integer")
-    func parseInt64MaxMinusOneAsInteger() throws {
+    @Test
+    func `Parse INT64_MAX - 1 as integer`() throws {
         let raw = "9223372036854775806" // INT64_MAX - 1
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
@@ -1488,8 +1487,8 @@ struct JBirdParserTests {
         #expect(json_get_int(value) == Int64.max - 1)
     }
 
-    @Test("Parse INT64_MIN + 1 as integer")
-    func parseInt64MinPlusOneAsInteger() throws {
+    @Test
+    func `Parse INT64_MIN + 1 as integer`() throws {
         let raw = "-9223372036854775807" // INT64_MIN + 1
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
@@ -1508,8 +1507,8 @@ struct JBirdParserTests {
         #expect(json_get_int(value) == Int64.min + 1)
     }
 
-    @Test("Parse extremely large positive number")
-    func parseExtremelyLargePositiveNumber() throws {
+    @Test
+    func `Parse extremely large positive number`() throws {
         let raw = "999999999999999999999999999999"
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
@@ -1529,8 +1528,8 @@ struct JBirdParserTests {
         #expect(json_get_double(value) > 0)
     }
 
-    @Test("Parse extremely large negative number")
-    func parseExtremelyLargeNegativeNumber() throws {
+    @Test
+    func `Parse extremely large negative number`() throws {
         let raw = "-999999999999999999999999999999"
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
@@ -1550,8 +1549,8 @@ struct JBirdParserTests {
         #expect(json_get_double(value) < 0)
     }
 
-    @Test("Parse long string")
-    func parseLongString() throws {
+    @Test
+    func `Parse long string`() throws {
         let longString = String(repeating: "a", count: 1000)
         let raw = "\"" + longString + "\""
         let jsonData = try #require(raw.data(using: .utf8))
@@ -1571,11 +1570,11 @@ struct JBirdParserTests {
 
         let str = json_get_string(value)
         #expect(str != nil)
-        #expect(String(cString: str!) == longString)
+        #expect(try String(cString: #require(str)) == longString)
     }
 
-    @Test("Parse string with all escape sequences")
-    func parseStringWithAllEscapeSequences() throws {
+    @Test
+    func `Parse string with all escape sequences`() throws {
         let raw = #"""
         "\"\/\b\f\n\r\t"
         """#
@@ -1593,13 +1592,13 @@ struct JBirdParserTests {
         let str = json_get_string(value)
         #expect(str != nil)
         let expectedString = "\"" + "/" + "\u{08}\u{0C}\n\r\t"
-        #expect(String(cString: str!) == expectedString)
+        #expect(try String(cString: #require(str)) == expectedString)
 
         json_free(value)
     }
 
-    @Test("Parse large array")
-    func parseLargeArray() throws {
+    @Test
+    func `Parse large array`() throws {
         let elements = Array(1...100).map(String.init).joined(separator: ", ")
         let raw = "[" + elements + "]"
         let jsonData = try #require(raw.data(using: .utf8))
@@ -1627,8 +1626,8 @@ struct JBirdParserTests {
         #expect(json_get_int(last) == 100)
     }
 
-    @Test("Parse large object")
-    func parseLargeObject() throws {
+    @Test
+    func `Parse large object`() throws {
         let properties = (1...50).map { "\"key\($0)\": \($0)" }.joined(separator: ", ")
         let raw = "{" + properties + "}"
         let jsonData = try #require(raw.data(using: .utf8))
@@ -1649,20 +1648,20 @@ struct JBirdParserTests {
 
         let firstKey = json_get_object_key(value, 0)
         #expect(firstKey != nil)
-        #expect(String(cString: firstKey!) == "key1")
+        #expect(try String(cString: #require(firstKey)) == "key1")
 
         let firstValue = json_get_object_value(value, 0)
         #expect(firstValue != nil)
         #expect(json_get_int(firstValue) == 1)
     }
 
-    @Test("Free null value")
-    func freeNullValue() throws {
+    @Test
+    func `Free null value`() {
         json_free(nil)
     }
 
-    @Test("Parse mixed array types")
-    func parseMixedArrayTypes() throws {
+    @Test
+    func `Parse mixed array types`() throws {
         let raw = #"""
         [null, true, false, 42, 3.14, "hello", [], {}]
         """#
@@ -1692,8 +1691,8 @@ struct JBirdParserTests {
         #expect(json_get_type(json_get_array_element(value, 7)) == JSON_OBJECT)
     }
 
-    @Test("Parse object with complex keys")
-    func parseObjectWithComplexKeys() throws {
+    @Test
+    func `Parse object with complex keys`() throws {
         let raw = #"""
         {"key with spaces": 1, "key\nwith\tescapes": 2, "key\u0041": 3}    
         """#
@@ -1715,22 +1714,22 @@ struct JBirdParserTests {
 
         let key0 = json_get_object_key(value, 0)
         #expect(key0 != nil)
-        #expect(String(cString: key0!) == "key with spaces")
+        #expect(try String(cString: #require(key0)) == "key with spaces")
 
         let key1 = json_get_object_key(value, 1)
         #expect(key1 != nil)
-        #expect(String(cString: key1!) == "key\nwith\tescapes")
+        #expect(try String(cString: #require(key1)) == "key\nwith\tescapes")
 
         let key2 = json_get_object_key(value, 2)
         #expect(key2 != nil)
-        #expect(String(cString: key2!) == "keyA")
+        #expect(try String(cString: #require(key2)) == "keyA")
     }
 
     @Test(
-        "Parse number edge cases",
+
         arguments: [("0", 0), ("-0", 0), ("123", 123), ("-456", -456)]
     )
-    func parseNumberEdgeCases(jsonString: String, expected: Int) throws {
+    func `Parse number edge cases`(jsonString: String, expected: Int) throws {
         let jsonData = try #require(jsonString.data(using: .utf8))
         var value: OpaquePointer?
 
@@ -1748,8 +1747,8 @@ struct JBirdParserTests {
         #expect(json_get_int(value) == expected)
     }
 
-    @Test("Parse incomplete unicode escape")
-    func parseIncompleteUnicodeEscape() throws {
+    @Test
+    func `Parse incomplete unicode escape`() throws {
         let raw = #"""
         "\u12"
         """#
@@ -1768,8 +1767,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse high surrogate without low surrogate")
-    func parseHighSurrogateWithoutLowSurrogate() throws {
+    @Test
+    func `Parse high surrogate without low surrogate`() throws {
         let raw = #"""
         "\uD800\u0041
         """#
@@ -1788,8 +1787,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse high surrogate with invalid low surrogate")
-    func parseHighSurrogateWithInvalidLowSurrogate() throws {
+    @Test
+    func `Parse high surrogate with invalid low surrogate`() throws {
         let raw = #"""
         "\uD800\uD801
         """#
@@ -1808,8 +1807,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse object with duplicate keys")
-    func parseObjectWithDuplicateKeys() throws {
+    @Test
+    func `Parse object with duplicate keys`() throws {
         let raw = #"""
         {"foo":true,"foo":true}
         """#
@@ -1827,8 +1826,8 @@ struct JBirdParserTests {
         #expect(value == nil)
     }
 
-    @Test("Parse object with duplicate keys allowed")
-    func parseObjectWithDuplicateKeysAllowed() throws {
+    @Test
+    func `Parse object with duplicate keys allowed`() throws {
         let raw = #"""
         {"foo":true,"foo":false}
         """#

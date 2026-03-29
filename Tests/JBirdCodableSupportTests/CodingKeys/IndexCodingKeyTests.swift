@@ -26,17 +26,16 @@
 @testable import JBirdCodableSupport
 import Testing
 
-@Suite("Index CodingKey Tests")
 struct IndexCodingKeyTests {
 
-    @Test("String Init")
-    func stringInit() async {
+    @Test
+    func `String Init`() {
         let key = IndexCodingKey(stringValue: "foo")
         #expect(key == nil)
     }
 
-    @Test("Int Init")
-    func intInit() async throws {
+    @Test
+    func `Int Init`() throws {
         let key = try #require(IndexCodingKey(intValue: 12))
         #expect(key.intValue == 12)
         #expect(key.stringValue == "12")

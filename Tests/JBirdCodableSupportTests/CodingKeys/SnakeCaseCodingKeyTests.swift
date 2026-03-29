@@ -26,7 +26,6 @@
 @testable import JBirdCodableSupport
 import Testing
 
-@Suite("Snake Case CodingKey Tests")
 struct SnakeCaseCodingKeyTests {
 
     private struct TestKey: CodingKey {
@@ -52,20 +51,20 @@ struct SnakeCaseCodingKeyTests {
         }
     }
 
-    @Test("String Init")
-    func stringInit() {
+    @Test
+    func `String Init`() {
         let key = SnakeCaseCodingKey(stringValue: "foo")
         #expect(key == nil)
     }
 
-    @Test("Int Init")
-    func intInit() {
+    @Test
+    func `Int Init`() {
         let key = SnakeCaseCodingKey(intValue: 12)
         #expect(key == nil)
     }
 
     @Test(
-        "String Conversion",
+
         arguments: [
             ("someKey", "some_key"),
             ("someURLValue", "some_url_value"),
@@ -75,10 +74,10 @@ struct SnakeCaseCodingKeyTests {
             ("1Foo", "1_foo"),
         ]
     )
-    func stringConversion(
+    func `String Conversion`(
         key: String,
         newKey: String
-    ) throws {
+    ) {
         let key = TestKey(key)
         let snakeKey = SnakeCaseCodingKey(key)
         #expect(snakeKey.stringValue == newKey)

@@ -31,8 +31,8 @@ enum RawRepKey: String, JSONKeyInitializable, Equatable {
     case bar
 }
 
-@Test("Test Raw Representable Key")
-func rawRepKey() throws {
+@Test
+func `Raw Representable Key`() throws {
     let foo = try RawRepKey(jsonKey: "foo")
     #expect(foo == .foo)
     let bar = try RawRepKey(jsonKey: "bar")

@@ -38,16 +38,16 @@ struct User: Equatable {
         self.age = age
         self.tags = tags
     }
-
+    
     let username: String
     let age: Int
     let tags: [String]
 
 }
 
-// Ensures the API surface of `JBirdCore`, `JBirdBuilders` and `JBirdMacros` is available through the single `JBird` import
-@Test("Test user convert")
-func userEncode() throws {
+/// Ensures the API surface of `JBirdCore`, `JBirdBuilders` and `JBirdMacros` is available through the single `JBird` import
+@Test
+func `user convert`() throws {
     let json = JSON {
         "username" => "sjobs"
         "age" => 50

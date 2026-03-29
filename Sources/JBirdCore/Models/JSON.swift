@@ -332,9 +332,9 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameter type: The type to convert into
     /// - Returns: The converted value
     /// - Throws: An error, if the JSON value cannot be converted into the provided type
-    public func convert<T>(
+    public func convert<T: JSONInitializable>(
         into type: T.Type = T.self
-    ) throws -> T where T: JSONInitializable {
+    ) throws -> T {
         try T(json: self)
     }
 

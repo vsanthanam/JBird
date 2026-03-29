@@ -340,9 +340,9 @@ final class ArrayDecoder: UnkeyedDecodingContainer {
         }
     }
 
-    func decode<T>(
+    func decode<T: Decodable>(
         _ type: T.Type
-    ) throws -> T where T: Decodable {
+    ) throws -> T {
         let (value, index) = try next(type)
         let nestedDecoder = InternalDecoder(
             storage: decoder.storage,
@@ -363,9 +363,9 @@ final class ArrayDecoder: UnkeyedDecodingContainer {
 
     }
 
-    func nestedContainer<NestedKey>(
+    func nestedContainer<NestedKey: CodingKey>(
         keyedBy type: NestedKey.Type
-    ) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
+    ) throws -> KeyedDecodingContainer<NestedKey> {
         let (value, index) = try next(JSON.self)
         let nestedDecoder = InternalDecoder(
             storage: decoder.storage,

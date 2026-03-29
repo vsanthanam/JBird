@@ -26,11 +26,10 @@
 import JBirdCore
 import Testing
 
-@Suite("Subscript Tests")
 struct SubscriptTests {
 
-    @Test("SubscriptConvertibleInit")
-    func subscriptConvertibleInit() {
+    @Test
+    func `subscript convertible init`() {
         let key = JSON.Subscript("foo")
         #expect(key == .key("foo"))
 
@@ -60,14 +59,14 @@ struct SubscriptTests {
         #expect(two == .index(2))
     }
 
-    @Test("Key Description")
-    func keyDescription() {
+    @Test
+    func `Key Description`() {
         let key = JSON.Subscript("foo")
         #expect(key.description == "foo")
     }
 
-    @Test("Index Description")
-    func indexDescription() {
+    @Test
+    func `Index Description`() {
         let index = JSON.Subscript(12)
         #expect(index.description == "12")
     }

@@ -27,47 +27,46 @@
 import JBirdCore
 import Testing
 
-@Suite("Backing Type Description Tests")
 struct BackingTypeDescriptionTests {
 
-    @Test("Null Type Description")
-    func testNull() {
+    @Test
+    func `Null Type Description`() {
         let json = JSON.null
         #expect(json.backingTypeDescription == .null)
     }
 
-    @Test("True Type Description")
-    func testTrue() {
+    @Test
+    func `True Type Description`() {
         let json = JSON.bool(true)
         #expect(json.backingTypeDescription == .bool)
     }
 
-    @Test("False Type Description")
-    func testFalse() {
+    @Test
+    func `False Type Description`() {
         let json = JSON.bool(false)
         #expect(json.backingTypeDescription == .bool)
     }
 
-    @Test("Number Type Description")
-    func int() {
+    @Test
+    func `Number Type Description`() {
         let json = JSON.number(12)
         #expect(json.backingTypeDescription == .number)
     }
 
-    @Test("String Type Description")
-    func testString() {
+    @Test
+    func `String Type Description`() {
         let json = JSON.string("foo")
         #expect(json.backingTypeDescription == .string)
     }
 
-    @Test("Array Type Description")
-    func testArray() {
+    @Test
+    func `Array Type Description`() {
         let json = JSON.array([.string("foo"), .string("bar")])
         #expect(json.backingTypeDescription == .array)
     }
 
-    @Test("Object Type Description")
-    func testObject() {
+    @Test
+    func `Object Type Description`() {
         let json = JSON.object(["foo": .string("bar"), "bar": .string("foo")])
         #expect(json.backingTypeDescription == .object)
     }
