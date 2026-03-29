@@ -259,7 +259,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.1", "6.2"]
+        swift: ["6.1", "6.2", "6.3"]
         include:
           - swift: "6.1"
             runner: "macos-15"
@@ -397,7 +397,7 @@ jobs:
           path: build.zip
 
   test-windows-spm:
-    name: Test (Windows)
+    name: Test JBird (Windows)
     strategy:
       fail-fast: false
       matrix:
@@ -469,7 +469,7 @@ jobs:
           restore-keys: |
             spm-wasm-${{ matrix.swift }}-debug-swift-6.2.3-RELEASE_wasm-
 
-      - if: ${{ matrix.swift != '6.2' }}
+      - if: ${{ matrix.swift == '6.1' }}
         name: Load Build Cache (WASM SwiftWasm SDK)
         uses: actions/cache@v5
         with:
@@ -495,7 +495,7 @@ jobs:
             --checksum 394040ecd5260e68bb02f6c20aeede733b9b90702c2204e178f3e42413edad2a
           swift sdk list
 
-      - if: ${{ matrix.swift != '6.2' }}
+      - if: ${{ matrix.swift == '6.1' }}
         name: Setup Swift WASM
         id: swiftwasm
         uses: swiftwasm/setup-swiftwasm@v2
@@ -510,7 +510,7 @@ jobs:
         name: Build JBird (6.2)
         run: swift build -v --swift-sdk swift-6.2.3-RELEASE_wasm --build-path .build
 
-      - if: ${{ matrix.swift != '6.2' }}
+      - if: ${{ matrix.swift == '6.1' }}
         name: Build JBird
         run: swift build -v --swift-sdk ${{ steps.swiftwasm.outputs.swift-sdk-id }} --build-path .build
 
@@ -523,6 +523,39 @@ jobs:
         with:
           name: wasm-build-${{ matrix.swift }}
           path: build.zip
+  
+  test-wasm-spm:
+    name: Test JBird (WebAssembly)
+    strategy:
+      fail-fast: false
+      matrix:
+        swift: ["6.3"]
+    runs-on: ubuntu-latest
+    container:
+      image: swift:${{ matrix.swift }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - if: ${{ matrix.swift == '6.3' }}
+        name: Setup Swift WASM (6.3)
+        run: |
+          swift sdk install https://download.swift.org/swift-6.3-release/wasm-sdk/swift-6.3-RELEASE/swift-6.3-RELEASE_wasm.artifactbundle.tar.gz --checksum 9fa4016ee632c7e9e906608ec3b55cf13dfc4dff44e47574c5af58064dc33fd9
+          swift sdk list
+
+      - name: Download Build
+        uses: actions/download-artifact@v7
+        with:
+          name: wasm-build-${{ matrix.swift }}
+          path: .
+      - name: Install `unzip`
+        run: apt-get update && apt-get install -y unzip
+      - name: Decompress Build
+        run: unzip build.zip
+        
+      - if: ${{ matrix.swift == '6.3' }}
+        name: Test JBird
+        run: swift test --skip-build --swift-sdk swift-6.2.3-RELEASE_wasm
 
   build-android-spm:
     name: Build JBird (Android)

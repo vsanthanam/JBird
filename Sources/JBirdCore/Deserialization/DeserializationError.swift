@@ -87,13 +87,13 @@ extension JSON {
         /// Thrown when the JSON structure exceeds the maximum allowed nesting depth.
         /// By default, the depth limit is set for you automatically based a hueristic applied to the system profile
         ///
-        /// See ``JSON/withRecursionDepthLimit(_:operation:)-8riei`` or ``JSON/withRecursionDepthLimit(_:operation:)-9u6jf`` for more information
+        /// See ``JSON/withRecursionDepthLimit(_:operation:)`` or ``JSON/withRecursionDepthLimit(_:isolation:operation:)`` for more information
         case depthLimitExceeded
 
         /// Thrown when the size of the input exceeds the configured maximum input size limit.
         /// By defaullt, the input size limit is set for you automatically based a hueristic applied to the system profile
         ///
-        /// See ``JSON/withInputSizeLimit(_:operation:)-2sm2h`` or ``JSON/withInputSizeLimit(_:operation:)-7cgom``
+        /// See ``JSON/withInputSizeLimit(_:operation:)`` or ``JSON/withInputSizeLimit(_:isolation:operation:)-7cgom``
         case inputSizeLimitExceeded
 
         /// Thrown when a JSON object contains duplicate keys.
