@@ -36,14 +36,31 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         self = .object([:])
     }
 
-    /// Create a `JSON` value from a ``JSONConvertible`` type
-    ///
-    /// - Parameter convertible: An instance of the type to convert to JSON
-    public init(
-        _ convertible: some JSONConvertible
-    ) {
-        self = convertible.jsonValue
-    }
+    #if compiler(>=6.3)
+        /// Create a `JSON` value from a ``JSONConvertible`` type
+        ///
+        /// - Parameter convertible: An instance of the type to convert to JSON
+        @specialized(where T == Bool)
+        @specialized(where T == Int)
+        @specialized(where T == Double)
+        @specialized(where T == String)
+        @specialized(where T == Array)
+        @specialized(where T == Object)
+        public init<T>(
+            _ convertible: T
+        ) where T: JSONConvertible {
+            self = convertible.jsonValue
+        }
+    #else
+        /// Create a `JSON` value from a ``JSONConvertible`` type
+        ///
+        /// - Parameter convertible: An instance of the type to convert to JSON
+        public init(
+            _ convertible: some JSONConvertible
+        ) {
+            self = convertible.jsonValue
+        }
+    #endif
 
     /// Create a `JSON` value by deserializing a byte buffer containing UTF-8 encoded JSON string
     ///
@@ -328,15 +345,33 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         }
     }
 
-    /// Convert the JSON value into a ``JSONInitializable`` type
-    /// - Parameter type: The type to convert into
-    /// - Returns: The converted value
-    /// - Throws: An error, if the JSON value cannot be converted into the provided type
-    public func convert<T: JSONInitializable>(
-        into type: T.Type = T.self
-    ) throws -> T {
-        try T(json: self)
-    }
+    #if compiler(>=6.3)
+        /// Convert the JSON value into a ``JSONInitializable`` type
+        /// - Parameter type: The type to convert into
+        /// - Returns: The converted value
+        /// - Throws: An error, if the JSON value cannot be converted into the provided type
+        @specialized(where T == Bool)
+        @specialized(where T == Int)
+        @specialized(where T == Double)
+        @specialized(where T == String)
+        @specialized(where T == Array)
+        @specialized(where T == Object)
+        public func convert<T: JSONInitializable>(
+            into type: T.Type = T.self
+        ) throws -> T {
+            try T(json: self)
+        }
+    #else
+        /// Convert the JSON value into a ``JSONInitializable`` type
+        /// - Parameter type: The type to convert into
+        /// - Returns: The converted value
+        /// - Throws: An error, if the JSON value cannot be converted into the provided type
+        public func convert<T: JSONInitializable>(
+            into type: T.Type = T.self
+        ) throws -> T {
+            try T(json: self)
+        }
+    #endif
 
     /// Retrieve a value from the JSON object using a specified key
     /// - Parameter key: A string key to use for lookup
@@ -385,16 +420,31 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         }
     }
 
-    /// Retrieve a value from the JSON object using a specified subscript
-    /// - Parameter subscript: A subscript to use for lookup
-    /// - Returns: The JSON value at the specified subscript
-    /// - Throws: An error if the JSON value does not contain a value for the provided subscript, or if the JSON value is incompatible with the provided subscript (e.g. the subscript is a  `String` but the JSON value is an array)
-    public func value(
-        forSubscript subscript: some JSONSubscriptConvertible
-    ) throws -> JSON {
-        let `subscript` = Subscript(`subscript`)
-        return try value(forSubscript: `subscript`)
-    }
+    #if compiler(>=6.3)
+        /// Retrieve a value from the JSON object using a specified subscript
+        /// - Parameter subscript: A subscript to use for lookup
+        /// - Returns: The JSON value at the specified subscript
+        /// - Throws: An error if the JSON value does not contain a value for the provided subscript, or if the JSON value is incompatible with the provided subscript (e.g. the subscript is a  `String` but the JSON value is an array)
+        @specialized(where T == Int)
+        @specialized(where T == String)
+        public func value<T: JSONSubscriptConvertible>(
+            forSubscript subscript: T
+        ) throws -> JSON {
+            let `subscript` = Subscript(`subscript`)
+            return try value(forSubscript: `subscript`)
+        }
+    #else
+        /// Retrieve a value from the JSON object using a specified subscript
+        /// - Parameter subscript: A subscript to use for lookup
+        /// - Returns: The JSON value at the specified subscript
+        /// - Throws: An error if the JSON value does not contain a value for the provided subscript, or if the JSON value is incompatible with the provided subscript (e.g. the subscript is a  `String` but the JSON value is an array)
+        public func value(
+            forSubscript subscript: some JSONSubscriptConvertible
+        ) throws -> JSON {
+            let `subscript` = Subscript(`subscript`)
+            return try value(forSubscript: `subscript`)
+        }
+    #endif
 
     /// Retrieve a value from the JSON object using a specified path
     /// - Parameter path: The path to use for lookup
