@@ -2,71 +2,49 @@
 
 ## Supported Versions
 
-JBird is currently in active development, and security updates are applied only to the most recent version:
-
-| Version | Supported          |
-| ------- | ------------------ |
-| Latest  | :white_check_mark: |
-| Older   | :x:                |
-
-As JBird is maintained by a single developer, only the most recent version receives security fixes. Users are strongly encouraged to always update to the latest version when available.
+Only the latest release of JBird receives security fixes. There are no long-term support branches. Users should always update to the most recent version.
 
 ## Reporting a Vulnerability
 
-The security of JBird is taken seriously. As a library handling JSON parsing (which often involves processing untrusted data), security vulnerabilities are treated with high priority.
+JBird handles JSON parsing, which often involves processing untrusted input. Security vulnerabilities are treated with high priority.
 
-### How to Report
+**Preferred:** Report vulnerabilities through [GitHub Security Advisories](https://github.com/vsanthanam/JBird/security/advisories/new). This provides a private channel for disclosure and allows coordinated fixes before public announcement.
 
-If you discover a security vulnerability in JBird, please report it by:
+**Alternatively:** Email [talkto@vsanthanam.com](mailto:talkto@vsanthanam.com) with "JBird Security Vulnerability" in the subject line.
 
-1. **Email**: Send details of the vulnerability to [vsanthanam@vsanthanam.com](mailto:vsanthanam@vsanthanam.com) with "JBird Security Vulnerability" in the subject line.
+**Do not report security vulnerabilities through public issues or pull requests.**
 
-2. **Do not report vulnerabilities in public issues**: Please do not disclose the vulnerability in the public issue tracker, as this could put users at risk.
+When reporting, please include:
 
-### What to Include
-
-When reporting a vulnerability, please include:
-
-- A clear description of the vulnerability
+- A description of the vulnerability and its potential impact
 - Steps to reproduce the issue
-- Potential impact of the vulnerability
-- Any potential solutions you may have identified
+- Any suggested fixes, if applicable
 
-### Response Process
+## Response Process
 
-After receiving a security vulnerability report:
+1. The maintainer will acknowledge receipt of the report.
+2. An initial assessment will confirm the vulnerability and determine its severity.
+3. A fix will be developed and released as a new version as quickly as possible.
+4. The reporter will be credited in the release notes unless they request anonymity.
 
-1. Wait for the maintainer to acknowledge receipt of the report.
-2. An initial assessment will be conducted to confirm the vulnerability and determine its severity.
-3. The maintainer will work on a fix and aim to release a patch as quickly as possible, depending on the complexity of the issue.
-4. Once a fix is ready, it will be released as a new version, and credit will be given to the reporter (unless anonymity is requested).
+## Security Architecture
 
-## Security Considerations for Users
+### Design Principles
 
-As JBird is a library for parsing JSON (which may come from untrusted sources), users should be aware of the following:
+JBird's C11 core parser is built with the following security principles:
 
-1. **Input Validation**: While JBird performs input validations of its own, always perform additional payload validation, potentially on the server, whenever possible.
+- **Memory safety**: Careful manual memory management to prevent buffer overflows, use-after-free, and other memory corruption vulnerabilities.
+- **Strict RFC compliance**: The parser strictly follows [RFC 8259](https://datatracker.ietf.org/doc/html/rfc8259), rejecting any payload that does not conform. JBird prefers correctness over permissiveness and does not attempt to self-heal malformed input.
+- **Explicit error handling**: Malformed JSON is always rejected with clear, actionable error information. Errors are never silently ignored.
 
-2. **Memory Usage**: Be aware that parsing very large JSON documents can consume significant memory. Consider implementing size limits for JSON input in your application.
+### Automated Tooling
 
-3. **Keep Updated**: Always use the latest version of JBird to benefit from security improvements and bug fixes.
+JBird uses several layers of automated security analysis:
 
-4. **Reporting Issues**: If you encounter any behavior that might indicate a security vulnerability, please report it according to the process outlined above.
-
-## Security Design Principles
-
-JBird is designed with the following security principles in mind:
-
-1. **Memory Safety**: The C core implementation uses careful memory management to prevent buffer overflows, memory corruption, and other memory-related vulnerabilities.
-
-2. **RFC Compliance**: JBird aims to strictly follow the JSON RFC 8259 specification, rejecting invalid JSON that might be used in attacks. JBird prefers correctness over self-healing, and rejects any payload that does not strictly adhere.
-
-3. **Error Handling**: Robust error handling is implemented to ensure that malformed JSON is rejected explicitly with clear error messages to avoid undefined behavior in client applications. Errors are never swallowed.
+- **CodeQL**: Static analysis for C/C++, Swift, and GitHub Actions runs on every push to `main` and on a weekly schedule via [GitHub Code Scanning](https://github.com/vsanthanam/JBird/security/code-scanning).
+- **Clang static analyzer**: The C parser core is analyzed on every pull request as part of CI.
+- **Fuzz testing**: An [AFL++](https://aflplus.plus/) fuzzing harness with AddressSanitizer and UndefinedBehaviorSanitizer support is available in the [`Fuzzer`](https://github.com/vsanthanam/JBird/tree/main/Fuzzer) directory for testing the parser against adversarial inputs.
 
 ## Acknowledgements
 
-Security researchers who responsibly disclose vulnerabilities will be acknowledged (with permission) for their contributions to improving the security of JBird.
-
----
-
-This security policy may be updated as the project evolves.
+Security researchers who responsibly disclose vulnerabilities will be acknowledged in release notes with their permission.
