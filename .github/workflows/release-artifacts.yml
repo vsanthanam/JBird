@@ -21,7 +21,7 @@ jobs:
       - name: Build XCFramework
         run: ./.scripts/build-xcframework ${{ matrix.target }}
       - name: Upload XCFramework
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.target }}.xcframework.zip
           path: Products/${{ matrix.target }}.xcframework.zip
@@ -36,7 +36,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Download XCFramework
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: ${{ matrix.target }}.xcframework.zip
           path: .
@@ -63,7 +63,7 @@ jobs:
           cd .build/plugins/Swift-DocC/outputs
           zip -r JBird.doccarchive.zip JBird.doccarchive
       - name: Upload Documentation
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: archive
           path: .build/plugins/Swift-DocC/outputs/JBird.doccarchive.zip
@@ -75,7 +75,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Download DocC Archive
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: archive
           path: .

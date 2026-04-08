@@ -26,7 +26,7 @@ jobs:
       - name: Compress Documentation
         run: zip -r docs.zip docs
       - name: Upload Documentation
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: docs
           path: docs.zip
@@ -38,7 +38,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Download Documentation
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: docs
           path: .
@@ -52,14 +52,14 @@ jobs:
           mv .web/* .
         shell: bash
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
           source: ./
           destination: ./_site
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
   deploy:
     name: Deploy Website
     environment:
@@ -70,4 +70,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

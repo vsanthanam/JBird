@@ -166,7 +166,7 @@ jobs:
       - name: Compress Build
         run: zip -r build.zip .build
       - name: Upload Build
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: macos-build-${{ matrix.swift }}
           path: build.zip
@@ -195,7 +195,7 @@ jobs:
       - name: Xcode Version
         run: ./.scripts/xcode-select ${{ matrix.xcode }}
       - name: Download Build
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: macos-build-${{ matrix.swift }}
           path: .
@@ -225,7 +225,7 @@ jobs:
       - name: Compress Build
         run: zip -r build.zip .build
       - name: Upload Build
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ubuntu-build-${{ matrix.swift }}
           path: build.zip
@@ -244,7 +244,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Download Build
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: ubuntu-build-${{ matrix.swift }}
           path: .
@@ -277,7 +277,7 @@ jobs:
         run: |
           Compress-Archive -Path ".build" -DestinationPath "build.zip" -Force
       - name: Upload Build
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: windows-build-${{ matrix.swift }}
           path: build.zip
@@ -299,7 +299,7 @@ jobs:
           swift-version: swift-${{ matrix.swift }}-release
           swift-build: ${{ matrix.swift }}-RELEASE
       - name: Download Build
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: windows-build-${{ matrix.swift }}
           path: .
@@ -361,7 +361,7 @@ jobs:
       - name: Compress Build
         run: zip -r build.zip .build
       - name: Upload Build
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: wasm-build-${{ matrix.swift }}
           path: build.zip
@@ -390,7 +390,7 @@ jobs:
       - name: Compress Build
         run: zip -r build.zip .build
       - name: Upload Build
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: android-build-${{ matrix.swift }}
           path: build.zip
@@ -449,7 +449,7 @@ jobs:
           REPORT_DIR: "coverage"
         run: .scripts/coverage
       - name: Upload Coverage Report
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-${{ github.sha }}
           path: |
@@ -458,7 +458,7 @@ jobs:
           retention-days: 7
       - name: Upload to codecov.io
         if: ${{ always() }}
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v6
         with:
           files: coverage/coverage.lcov
           flags: swiftpm,llvm-cov

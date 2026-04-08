@@ -206,11 +206,19 @@ let package = Package(
             name: "JBirdMacrosCompilerPlugin",
             dependencies: [
                 .product(
-                    name: "SwiftSyntaxMacros",
+                    name: "SwiftCompilerPlugin",
                     package: "swift-syntax"
                 ),
                 .product(
-                    name: "SwiftCompilerPlugin",
+                    name: "SwiftSyntax",
+                    package: "swift-syntax"
+                ),
+                .product(
+                    name: "SwiftSyntaxBuilder",
+                    package: "swift-syntax"
+                ),
+                .product(
+                    name: "SwiftSyntaxMacros",
                     package: "swift-syntax"
                 )
             ],
