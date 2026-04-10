@@ -887,236 +887,496 @@ extension JSON {
 
     }
 
-    @inline(__always)
-    private static func serializeByteOrderMark(
-        into bytes: inout [UInt8]
-    ) {
-        bytes += [0xEF, 0xBB, 0xBF]
-    }
-
-    @inline(__always)
-    private static func serializeOpenBracket(
-        into bytes: inout [UInt8]
-    ) {
-        bytes.append(0x5B)
-    }
-
-    @inline(__always)
-    private static func serializeCloseBracket(
-        into bytes: inout [UInt8]
-    ) {
-        bytes.append(0x5D)
-    }
-
-    @inline(__always)
-    private static func serializeNewLine(
-        into bytes: inout [UInt8]
-    ) {
-        bytes.append(0x0A)
-    }
-
-    @inline(__always)
-    private static func serializeComma(
-        into bytes: inout [UInt8]
-    ) {
-        bytes.append(0x2C)
-    }
-
-    @inline(__always)
-    private static func serializeOpenBrace(
-        into bytes: inout [UInt8]
-    ) {
-        bytes.append(0x7B)
-    }
-
-    @inline(__always)
-    private static func serializeCloseBrace(
-        into bytes: inout [UInt8]
-    ) {
-        bytes.append(0x7D)
-    }
-
-    @inline(__always)
-    private static func serializeSpace(
-        into bytes: inout [UInt8]
-    ) {
-        bytes.append(0x20)
-    }
-
-    @inline(__always)
-    private static func serializeColon(
-        into bytes: inout [UInt8]
-    ) {
-        bytes.append(0x3A)
-    }
-
-    @inline(__always)
-    private static func serializeBool(
-        _ bool: Bool,
-        into bytes: inout [UInt8]
-    ) {
-
-        func serializeTrue(into bytes: inout [UInt8]) {
-            bytes += [0x74, 0x72, 0x75, 0x65]
-        }
-
-        func serializeFalse(into bytes: inout [UInt8]) {
-            bytes += [0x66, 0x61, 0x6C, 0x73, 0x65]
-        }
-
-        switch bool {
-        case true:
-            serializeTrue(into: &bytes)
-        case false:
-            serializeFalse(into: &bytes)
-        }
-    }
-
-    @inline(__always)
-    private static func serializeNull(
-        into bytes: inout [UInt8]
-    ) {
-        bytes += [0x6E, 0x75, 0x6C, 0x6C]
-    }
-
-    @inline(__always)
-    private static func serializeNumber(
-        _ number: Number,
-        options: SerializationOptions,
-        into bytes: inout [UInt8]
-    ) throws {
-
-        func serializeInteger(
-            _ integer: Int,
+    #if compiler(>=6.3)
+        @inline(always)
+        private static func serializeByteOrderMark(
             into bytes: inout [UInt8]
         ) {
-            let str = String(integer)
-            bytes += Swift.Array(str.utf8)
+            bytes += [0xEF, 0xBB, 0xBF]
         }
+    #else
+        @inline(__always)
+        private static func serializeByteOrderMark(
+            into bytes: inout [UInt8]
+        ) {
+            bytes += [0xEF, 0xBB, 0xBF]
+        }
+    #endif
 
-        func serializeDouble(
-            _ double: Double,
+    #if compiler(>=6.3)
+        @inline(always)
+        private static func serializeOpenBracket(
+            into bytes: inout [UInt8]
+        ) {
+            bytes.append(0x5B)
+        }
+    #else
+        @inline(__always)
+        private static func serializeOpenBracket(
+            into bytes: inout [UInt8]
+        ) {
+            bytes.append(0x5B)
+        }
+    #endif
+
+    #if compiler(>=6.3)
+        @inline(always)
+        private static func serializeCloseBracket(
+            into bytes: inout [UInt8]
+        ) {
+            bytes.append(0x5D)
+        }
+    #else
+        @inline(__always)
+        private static func serializeCloseBracket(
+            into bytes: inout [UInt8]
+        ) {
+            bytes.append(0x5D)
+        }
+    #endif
+
+    #if compiler(>=6.3)
+        @inline(always)
+        private static func serializeNewLine(
+            into bytes: inout [UInt8]
+        ) {
+            bytes.append(0x0A)
+        }
+    #else
+        @inline(__always)
+        private static func serializeNewLine(
+            into bytes: inout [UInt8]
+        ) {
+            bytes.append(0x0A)
+        }
+    #endif
+
+    #if compiler(>=6.3)
+        @inline(always)
+        private static func serializeComma(
+            into bytes: inout [UInt8]
+        ) {
+            bytes.append(0x2C)
+        }
+    #else
+        @inline(__always)
+        private static func serializeComma(
+            into bytes: inout [UInt8]
+        ) {
+            bytes.append(0x2C)
+        }
+    #endif
+
+    #if compiler(>=6.3)
+        @inline(always)
+        private static func serializeOpenBrace(
+            into bytes: inout [UInt8]
+        ) {
+            bytes.append(0x7B)
+        }
+    #else
+        @inline(__always)
+        private static func serializeOpenBrace(
+            into bytes: inout [UInt8]
+        ) {
+            bytes.append(0x7B)
+        }
+    #endif
+
+    #if compiler(>=6.3)
+        @inline(always)
+        private static func serializeCloseBrace(
+            into bytes: inout [UInt8]
+        ) {
+            bytes.append(0x7D)
+        }
+    #else
+        @inline(__always)
+        private static func serializeCloseBrace(
+            into bytes: inout [UInt8]
+        ) {
+            bytes.append(0x7D)
+        }
+    #endif
+
+    #if compiler(>=6.3)
+        @inline(always)
+        private static func serializeSpace(
+            into bytes: inout [UInt8]
+        ) {
+            bytes.append(0x20)
+        }
+    #else
+        @inline(__always)
+        private static func serializeSpace(
+            into bytes: inout [UInt8]
+        ) {
+            bytes.append(0x20)
+        }
+    #endif
+
+    #if compiler(>=6.3)
+        @inline(always)
+        private static func serializeColon(
+            into bytes: inout [UInt8]
+        ) {
+            bytes.append(0x3A)
+        }
+    #else
+        @inline(__always)
+        private static func serializeColon(
+            into bytes: inout [UInt8]
+        ) {
+            bytes.append(0x3A)
+        }
+    #endif
+
+    #if compiler(>=6.3)
+        @inline(always)
+        private static func serializeBool(
+            _ bool: Bool,
+            into bytes: inout [UInt8]
+        ) {
+
+            func serializeTrue(into bytes: inout [UInt8]) {
+                bytes += [0x74, 0x72, 0x75, 0x65]
+            }
+
+            func serializeFalse(into bytes: inout [UInt8]) {
+                bytes += [0x66, 0x61, 0x6C, 0x73, 0x65]
+            }
+
+            switch bool {
+            case true:
+                serializeTrue(into: &bytes)
+            case false:
+                serializeFalse(into: &bytes)
+            }
+        }
+    #else
+        @inline(__always)
+        private static func serializeBool(
+            _ bool: Bool,
+            into bytes: inout [UInt8]
+        ) {
+
+            func serializeTrue(into bytes: inout [UInt8]) {
+                bytes += [0x74, 0x72, 0x75, 0x65]
+            }
+
+            func serializeFalse(into bytes: inout [UInt8]) {
+                bytes += [0x66, 0x61, 0x6C, 0x73, 0x65]
+            }
+
+            switch bool {
+            case true:
+                serializeTrue(into: &bytes)
+            case false:
+                serializeFalse(into: &bytes)
+            }
+        }
+    #endif
+
+    #if compiler(>=6.3)
+        @inline(always)
+        private static func serializeNull(
+            into bytes: inout [UInt8]
+        ) {
+            bytes += [0x6E, 0x75, 0x6C, 0x6C]
+        }
+    #else
+        @inline(__always)
+        private static func serializeNull(
+            into bytes: inout [UInt8]
+        ) {
+            bytes += [0x6E, 0x75, 0x6C, 0x6C]
+        }
+    #endif
+
+    #if compiler(>=6.3)
+        @inline(always)
+        private static func serializeNumber(
+            _ number: Number,
             options: SerializationOptions,
             into bytes: inout [UInt8]
         ) throws {
-            if double.isNaN {
-                if options.contains(.allowNonConformingFloatingPointValues) {
-                    if options.contains(.nullifyNonConformingFloatingPointValues) {
-                        serializeNull(into: &bytes)
-                        return
-                    } else {
-                        serializeString("NaN", options: options, into: &bytes)
-                        return
-                    }
-                } else {
-                    throw SerializationError.invalidFloat
-                }
-            } else if double.isInfinite {
-                if options.contains(.allowNonConformingFloatingPointValues) {
-                    if options.contains(.nullifyNonConformingFloatingPointValues) {
-                        serializeNull(into: &bytes)
-                        return
-                    } else {
-                        switch double.sign {
-                        case .plus:
-                            serializeString("Infinity", options: options, into: &bytes)
-                        case .minus:
-                            serializeString("-Infinity", options: options, into: &bytes)
+
+            func serializeInteger(
+                _ integer: Int,
+                into bytes: inout [UInt8]
+            ) {
+                let str = String(integer)
+                bytes += Swift.Array(str.utf8)
+            }
+
+            func serializeDouble(
+                _ double: Double,
+                options: SerializationOptions,
+                into bytes: inout [UInt8]
+            ) throws {
+                if double.isNaN {
+                    if options.contains(.allowNonConformingFloatingPointValues) {
+                        if options.contains(.nullifyNonConformingFloatingPointValues) {
+                            serializeNull(into: &bytes)
+                            return
+                        } else {
+                            serializeString("NaN", options: options, into: &bytes)
+                            return
                         }
-                        return
+                    } else {
+                        throw SerializationError.invalidFloat
                     }
-                } else {
-                    throw SerializationError.invalidFloat
+                } else if double.isInfinite {
+                    if options.contains(.allowNonConformingFloatingPointValues) {
+                        if options.contains(.nullifyNonConformingFloatingPointValues) {
+                            serializeNull(into: &bytes)
+                            return
+                        } else {
+                            switch double.sign {
+                            case .plus:
+                                serializeString("Infinity", options: options, into: &bytes)
+                            case .minus:
+                                serializeString("-Infinity", options: options, into: &bytes)
+                            }
+                            return
+                        }
+                    } else {
+                        throw SerializationError.invalidFloat
+                    }
                 }
+
+                var string = String(double)
+                if options.contains(.truncateWholeFloatingPointValues),
+                   !string.contains("e"),
+                   !string.contains("E"),
+                   string.hasSuffix(".0") {
+                    string.removeLast(2)
+                }
+                bytes += string.utf8
             }
 
-            var string = String(double)
-            if options.contains(.truncateWholeFloatingPointValues),
-               !string.contains("e"),
-               !string.contains("E"),
-               string.hasSuffix(".0") {
-                string.removeLast(2)
+            switch number.storage {
+            case let .int(value):
+                serializeInteger(value, into: &bytes)
+            case let .double(value):
+                try serializeDouble(value, options: options, into: &bytes)
             }
-            bytes += string.utf8
         }
+    #else
+        @inline(__always)
+        private static func serializeNumber(
+            _ number: Number,
+            options: SerializationOptions,
+            into bytes: inout [UInt8]
+        ) throws {
 
-        switch number.storage {
-        case let .int(value):
-            serializeInteger(value, into: &bytes)
-        case let .double(value):
-            try serializeDouble(value, options: options, into: &bytes)
-        }
-    }
+            func serializeInteger(
+                _ integer: Int,
+                into bytes: inout [UInt8]
+            ) {
+                let str = String(integer)
+                bytes += Swift.Array(str.utf8)
+            }
 
-    @inline(__always)
-    private static func serializeString(
-        _ string: String,
-        options: SerializationOptions,
-        into bytes: inout [UInt8]
-    ) {
-        bytes.append(UInt8(ascii: "\""))
-        for scalar in string.unicodeScalars {
-            switch scalar.value {
-            case 0x08:
-                bytes.append(contentsOf: "\\b".utf8)
-            case 0x0C:
-                bytes.append(contentsOf: "\\f".utf8)
-            case 0x0A:
-                bytes.append(contentsOf: "\\n".utf8)
-            case 0x0D:
-                bytes.append(contentsOf: "\\r".utf8)
-            case 0x09:
-                bytes.append(contentsOf: "\\t".utf8)
-            case 0x00...0x1F:
-                let hex = String(format: "\\u%04X", scalar.value)
-                bytes.append(contentsOf: hex.utf8)
-            case 0x22:
-                bytes.append(contentsOf: "\\\"".utf8)
-            case 0x2F:
-                if options.contains(.escapeForwardSlash) {
-                    bytes.append(contentsOf: "\\/".utf8)
-                } else {
-                    bytes.append(UInt8(scalar.value))
+            func serializeDouble(
+                _ double: Double,
+                options: SerializationOptions,
+                into bytes: inout [UInt8]
+            ) throws {
+                if double.isNaN {
+                    if options.contains(.allowNonConformingFloatingPointValues) {
+                        if options.contains(.nullifyNonConformingFloatingPointValues) {
+                            serializeNull(into: &bytes)
+                            return
+                        } else {
+                            serializeString("NaN", options: options, into: &bytes)
+                            return
+                        }
+                    } else {
+                        throw SerializationError.invalidFloat
+                    }
+                } else if double.isInfinite {
+                    if options.contains(.allowNonConformingFloatingPointValues) {
+                        if options.contains(.nullifyNonConformingFloatingPointValues) {
+                            serializeNull(into: &bytes)
+                            return
+                        } else {
+                            switch double.sign {
+                            case .plus:
+                                serializeString("Infinity", options: options, into: &bytes)
+                            case .minus:
+                                serializeString("-Infinity", options: options, into: &bytes)
+                            }
+                            return
+                        }
+                    } else {
+                        throw SerializationError.invalidFloat
+                    }
                 }
-            case 0x5C:
-                bytes.append(contentsOf: "\\\\".utf8)
-            case 0x20...0x7F:
-                bytes.append(UInt8(scalar.value))
-            case 0x80...0xFFFF:
-                if options.contains(.escapeNonASCII) {
+
+                var string = String(double)
+                if options.contains(.truncateWholeFloatingPointValues),
+                   !string.contains("e"),
+                   !string.contains("E"),
+                   string.hasSuffix(".0") {
+                    string.removeLast(2)
+                }
+                bytes += string.utf8
+            }
+
+            switch number.storage {
+            case let .int(value):
+                serializeInteger(value, into: &bytes)
+            case let .double(value):
+                try serializeDouble(value, options: options, into: &bytes)
+            }
+        }
+    #endif
+
+    #if compiler(>=6.3)
+        @inline(always)
+        private static func serializeString(
+            _ string: String,
+            options: SerializationOptions,
+            into bytes: inout [UInt8]
+        ) {
+            bytes.append(UInt8(ascii: "\""))
+            for scalar in string.unicodeScalars {
+                switch scalar.value {
+                case 0x08:
+                    bytes.append(contentsOf: "\\b".utf8)
+                case 0x0C:
+                    bytes.append(contentsOf: "\\f".utf8)
+                case 0x0A:
+                    bytes.append(contentsOf: "\\n".utf8)
+                case 0x0D:
+                    bytes.append(contentsOf: "\\r".utf8)
+                case 0x09:
+                    bytes.append(contentsOf: "\\t".utf8)
+                case 0x00...0x1F:
                     let hex = String(format: "\\u%04X", scalar.value)
                     bytes.append(contentsOf: hex.utf8)
-                } else {
-                    bytes.append(contentsOf: String(scalar).utf8)
-                }
-            default:
-                if options.contains(.escapeSpecialCharacters) || options.contains(.escapeNonASCII) {
-                    let codepoint = scalar.value - 0x10000
-                    let high = 0xD800 + (codepoint >> 10)
-                    let low = 0xDC00 + (codepoint & 0x3FF)
-                    bytes.append(contentsOf: String(format: "\\u%04X\\u%04X", high, low).utf8)
-                } else {
-                    bytes.append(contentsOf: String(scalar).utf8)
+                case 0x22:
+                    bytes.append(contentsOf: "\\\"".utf8)
+                case 0x2F:
+                    if options.contains(.escapeForwardSlash) {
+                        bytes.append(contentsOf: "\\/".utf8)
+                    } else {
+                        bytes.append(UInt8(scalar.value))
+                    }
+                case 0x5C:
+                    bytes.append(contentsOf: "\\\\".utf8)
+                case 0x20...0x7F:
+                    bytes.append(UInt8(scalar.value))
+                case 0x80...0xFFFF:
+                    if options.contains(.escapeNonASCII) {
+                        let hex = String(format: "\\u%04X", scalar.value)
+                        bytes.append(contentsOf: hex.utf8)
+                    } else {
+                        bytes.append(contentsOf: String(scalar).utf8)
+                    }
+                default:
+                    if options.contains(.escapeSpecialCharacters) || options.contains(.escapeNonASCII) {
+                        let codepoint = scalar.value - 0x10000
+                        let high = 0xD800 + (codepoint >> 10)
+                        let low = 0xDC00 + (codepoint & 0x3FF)
+                        bytes.append(contentsOf: String(format: "\\u%04X\\u%04X", high, low).utf8)
+                    } else {
+                        bytes.append(contentsOf: String(scalar).utf8)
+                    }
                 }
             }
+            bytes.append(UInt8(ascii: "\""))
         }
-        bytes.append(UInt8(ascii: "\""))
-    }
-
-    @inline(__always)
-    private static func serializeIndentation(
-        level: Int,
-        into bytes: inout [UInt8]
-    ) {
-
-        func indent(into bytes: inout [UInt8]) {
-            serializeSpace(into: &bytes)
-            serializeSpace(into: &bytes)
+    #else
+        @inline(__always)
+        private static func serializeString(
+            _ string: String,
+            options: SerializationOptions,
+            into bytes: inout [UInt8]
+        ) {
+            bytes.append(UInt8(ascii: "\""))
+            for scalar in string.unicodeScalars {
+                switch scalar.value {
+                case 0x08:
+                    bytes.append(contentsOf: "\\b".utf8)
+                case 0x0C:
+                    bytes.append(contentsOf: "\\f".utf8)
+                case 0x0A:
+                    bytes.append(contentsOf: "\\n".utf8)
+                case 0x0D:
+                    bytes.append(contentsOf: "\\r".utf8)
+                case 0x09:
+                    bytes.append(contentsOf: "\\t".utf8)
+                case 0x00...0x1F:
+                    let hex = String(format: "\\u%04X", scalar.value)
+                    bytes.append(contentsOf: hex.utf8)
+                case 0x22:
+                    bytes.append(contentsOf: "\\\"".utf8)
+                case 0x2F:
+                    if options.contains(.escapeForwardSlash) {
+                        bytes.append(contentsOf: "\\/".utf8)
+                    } else {
+                        bytes.append(UInt8(scalar.value))
+                    }
+                case 0x5C:
+                    bytes.append(contentsOf: "\\\\".utf8)
+                case 0x20...0x7F:
+                    bytes.append(UInt8(scalar.value))
+                case 0x80...0xFFFF:
+                    if options.contains(.escapeNonASCII) {
+                        let hex = String(format: "\\u%04X", scalar.value)
+                        bytes.append(contentsOf: hex.utf8)
+                    } else {
+                        bytes.append(contentsOf: String(scalar).utf8)
+                    }
+                default:
+                    if options.contains(.escapeSpecialCharacters) || options.contains(.escapeNonASCII) {
+                        let codepoint = scalar.value - 0x10000
+                        let high = 0xD800 + (codepoint >> 10)
+                        let low = 0xDC00 + (codepoint & 0x3FF)
+                        bytes.append(contentsOf: String(format: "\\u%04X\\u%04X", high, low).utf8)
+                    } else {
+                        bytes.append(contentsOf: String(scalar).utf8)
+                    }
+                }
+            }
+            bytes.append(UInt8(ascii: "\""))
         }
+    #endif
 
-        for _ in 0..<level {
-            indent(into: &bytes)
+    #if compiler(>=6.3)
+        @inline(always)
+        private static func serializeIndentation(
+            level: Int,
+            into bytes: inout [UInt8]
+        ) {
+
+            func indent(into bytes: inout [UInt8]) {
+                serializeSpace(into: &bytes)
+                serializeSpace(into: &bytes)
+            }
+
+            for _ in 0..<level {
+                indent(into: &bytes)
+            }
         }
-    }
+    #else
+        @inline(__always)
+        private static func serializeIndentation(
+            level: Int,
+            into bytes: inout [UInt8]
+        ) {
+
+            func indent(into bytes: inout [UInt8]) {
+                serializeSpace(into: &bytes)
+                serializeSpace(into: &bytes)
+            }
+
+            for _ in 0..<level {
+                indent(into: &bytes)
+            }
+        }
+    #endif
 
 }

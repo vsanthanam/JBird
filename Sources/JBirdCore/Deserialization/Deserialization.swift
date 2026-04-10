@@ -736,33 +736,65 @@ extension JSON {
     #endif
 
     #if os(Windows)
-        @inline(__always)
-        private static func calculateMaxDepth() -> size_t {
-            var low: ULONG_PTR = 0
-            var high: ULONG_PTR = 0
-            GetCurrentThreadStackLimits(&low, &high)
+        #if compiler(>=6.3)
+            @inline(always)
+            private static func calculateMaxDepth() -> size_t {
+                var low: ULONG_PTR = 0
+                var high: ULONG_PTR = 0
+                GetCurrentThreadStackLimits(&low, &high)
 
-            let stackBytes = size_t(high &- low)
-            return min(1024, max(16, stackBytes / 512))
-        }
+                let stackBytes = size_t(high &- low)
+                return min(1024, max(16, stackBytes / 512))
+            }
+        #else
+            @inline(__always)
+            private static func calculateMaxDepth() -> size_t {
+                var low: ULONG_PTR = 0
+                var high: ULONG_PTR = 0
+                GetCurrentThreadStackLimits(&low, &high)
 
+                let stackBytes = size_t(high &- low)
+                return min(1024, max(16, stackBytes / 512))
+            }
+        #endif
     #elseif os(WASI) || arch(wasm32)
-        @inline(__always)
-        private static func calculateMaxDepth() -> size_t {
-            // There is no way to do this on Web Assembly. Makes sense.
-            256
-        }
+        #if compiler(>=6.3)
+            @inline(always)
+            private static func calculateMaxDepth() -> size_t {
+                // There is no way to do this on Web Assembly. Makes sense.
+                256
+            }
+        #else
+            @inline(__always)
+            private static func calculateMaxDepth() -> size_t {
+                // There is no way to do this on Web Assembly. Makes sense.
+                256
+            }
+        #endif
     #else
-        @inline(__always)
-        private static func calculateMaxDepth() -> size_t {
-            var attr = pthread_attr_t()
-            pthread_attr_init(&attr)
-            defer { pthread_attr_destroy(&attr) }
+        #if compiler(>=6.3)
+            @inline(always)
+            private static func calculateMaxDepth() -> size_t {
+                var attr = pthread_attr_t()
+                pthread_attr_init(&attr)
+                defer { pthread_attr_destroy(&attr) }
 
-            var size: size_t = 0
-            pthread_attr_getstacksize(&attr, &size)
-            return min(1024, max(16, size / 512))
-        }
+                var size: size_t = 0
+                pthread_attr_getstacksize(&attr, &size)
+                return min(1024, max(16, size / 512))
+            }
+        #else
+            @inline(__always)
+            private static func calculateMaxDepth() -> size_t {
+                var attr = pthread_attr_t()
+                pthread_attr_init(&attr)
+                defer { pthread_attr_destroy(&attr) }
+
+                var size: size_t = 0
+                pthread_attr_getstacksize(&attr, &size)
+                return min(1024, max(16, size / 512))
+            }
+        #endif
     #endif
 
     private static func calculateMaxInputSize() -> size_t {

@@ -47,14 +47,25 @@ struct SnakeCaseCodingKey: CodingKey {
             var out = String()
             out.reserveCapacity(bytes.count + bytes.count / 4)
 
-            @inline(__always)
-            func appendLowercasedASCII(_ b: UInt8) {
-                if isUpper(b) {
-                    out.append(Character(UnicodeScalar(b + 32)))
-                } else {
-                    out.append(Character(UnicodeScalar(b)))
+            #if compiler(>=6.3)
+                @inline(always)
+                func appendLowercasedASCII(_ b: UInt8) {
+                    if isUpper(b) {
+                        out.append(Character(UnicodeScalar(b + 32)))
+                    } else {
+                        out.append(Character(UnicodeScalar(b)))
+                    }
                 }
-            }
+            #else
+                @inline(__always)
+                func appendLowercasedASCII(_ b: UInt8) {
+                    if isUpper(b) {
+                        out.append(Character(UnicodeScalar(b + 32)))
+                    } else {
+                        out.append(Character(UnicodeScalar(b)))
+                    }
+                }
+            #endif
 
             for i in bytes.indices {
                 let b = bytes[i]
