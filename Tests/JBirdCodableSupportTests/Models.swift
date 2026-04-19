@@ -492,7 +492,7 @@ struct UInt64s: Codable, Equatable, ExpressibleByArrayLiteral {
 
 }
 
-struct Optionals<T: Codable & Equatable>: Codable, Equatable, ExpressibleByArrayLiteral {
+struct Optionals<T>: Codable, Equatable, ExpressibleByArrayLiteral where T: Codable & Equatable {
 
     init(arrayLiteral elements: T?...) {
         value = elements
@@ -527,7 +527,7 @@ struct Optionals<T: Codable & Equatable>: Codable, Equatable, ExpressibleByArray
 
 }
 
-struct KeyedValue<T: Codable & Equatable>: Equatable, Codable {
+struct KeyedValue<T>: Equatable, Codable where T: Codable & Equatable {
     let value: T
 
     init(value: T) {
