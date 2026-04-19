@@ -165,10 +165,10 @@ final class ObjectEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
         set(JSON(value), forKey: encodedKey)
     }
 
-    func encode<T: Encodable>(
+    func encode<T>(
         _ value: T,
         forKey key: Key
-    ) throws {
+    ) throws where T: Encodable {
         let encodedKey = JSON.Encoder.encodeKey(path: codingPath, key: key)
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
@@ -188,10 +188,10 @@ final class ObjectEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
         set(encoded, forKey: encodedKey)
     }
 
-    func nestedContainer<NestedKey: CodingKey>(
+    func nestedContainer<NestedKey>(
         keyedBy keyType: NestedKey.Type,
         forKey key: Key
-    ) -> KeyedEncodingContainer<NestedKey> {
+    ) -> KeyedEncodingContainer<NestedKey> where NestedKey: CodingKey {
         let encodedKey = JSON.Encoder.encodeKey(path: codingPath, key: key)
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,

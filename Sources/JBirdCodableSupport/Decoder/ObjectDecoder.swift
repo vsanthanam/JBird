@@ -27,7 +27,7 @@ import Foundation
 import JBirdCore
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-final class ObjectDecoder<Key: CodingKey>: KeyedDecodingContainerProtocol {
+final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: CodingKey {
 
     // MARK: - Initializer
 
@@ -348,10 +348,10 @@ final class ObjectDecoder<Key: CodingKey>: KeyedDecodingContainerProtocol {
         }
     }
 
-    func decode<T: Decodable>(
+    func decode<T>(
         _ type: T.Type,
         forKey key: Key
-    ) throws -> T {
+    ) throws -> T where T: Decodable {
         let value = try value(forKey: key)
         let nestedDecoder = InternalDecoder(
             storage: decoder.storage,
@@ -371,10 +371,10 @@ final class ObjectDecoder<Key: CodingKey>: KeyedDecodingContainerProtocol {
         }
     }
 
-    func nestedContainer<NestedKey: CodingKey>(
+    func nestedContainer<NestedKey>(
         keyedBy type: NestedKey.Type,
         forKey key: Key
-    ) throws -> KeyedDecodingContainer<NestedKey> {
+    ) throws -> KeyedDecodingContainer<NestedKey> where NestedKey: CodingKey {
         let value = try value(forKey: key)
         let nestedDecoder = InternalDecoder(
             storage: decoder.storage,

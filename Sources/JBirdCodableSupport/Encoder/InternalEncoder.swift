@@ -163,7 +163,9 @@ final class InternalEncoder: Encoder {
 
     var userInfo: [CodingUserInfoKey: Any]
 
-    func container<Key: CodingKey>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> {
+    func container<Key>(
+        keyedBy type: Key.Type
+    ) -> KeyedEncodingContainer<Key> where Key: CodingKey {
         precondition(containerType == nil, "Attempted to create multiple containers at coding path \(codingPath)")
         containerType = .keyed
         let container = ObjectEncoder<Key>(encoder: self, autoPopContainers: autoPopContainers)

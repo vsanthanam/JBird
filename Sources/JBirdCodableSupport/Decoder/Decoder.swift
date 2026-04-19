@@ -129,10 +129,10 @@ extension JSON {
         ///   - type: The type to decode into
         ///   - data: The payload to decode
         /// - Returns: An instance of the decoded type, based on the provided payload
-        public func decode<T: Decodable>(
+        public func decode<T>(
             _ type: T.Type = T.self,
             from data: Data,
-        ) throws -> T {
+        ) throws -> T where T: Decodable {
             let json = try JSON.value(
                 for: data,
                 options: [.fragmentsAllowed, .allowByteOrderMark]
