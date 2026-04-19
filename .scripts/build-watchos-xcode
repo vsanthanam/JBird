@@ -6,7 +6,7 @@ xcodebuild \
   -sdk watchsimulator \
   -destination "generic/platform=watchOS Simulator,OS=$2" \
   BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
-  WATCHOS_DEPLOYMENT_TARGET=8.0 \
+  WATCHOS_DEPLOYMENT_TARGET=9.0 \
   SKIP_INSTALL=NO \
   CODE_SIGN_IDENTITY="" \
   CODE_SIGNING_REQUIRED=NO \

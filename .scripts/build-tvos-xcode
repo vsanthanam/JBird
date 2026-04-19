@@ -6,7 +6,7 @@ xcodebuild \
   -sdk appletvsimulator \
   -destination "generic/platform=tvOS Simulator,OS=$2" \
   BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
-  TVOS_DEPLOYMENT_TARGET=15.0 \
+  TVOS_DEPLOYMENT_TARGET=16.0 \
   SKIP_INSTALL=NO \
   CODE_SIGN_IDENTITY="" \
   CODE_SIGNING_REQUIRED=NO \
