@@ -29,72 +29,74 @@ struct SnakeCaseCodingKey: CodingKey {
     // MARK: - Initializers
 
     init(_ key: any CodingKey) {
-
-        func camelCaseToSnakeCase(_ input: String) -> String {
-            let bytes = Array(input.utf8)
-            if bytes.isEmpty { return input }
-
-            func isUpper(_ b: UInt8) -> Bool {
-                (65...90).contains(b)
-            }
-            func isLower(_ b: UInt8) -> Bool {
-                (97...122).contains(b)
-            }
-            func isDigit(_ b: UInt8) -> Bool {
-                (48...57).contains(b)
-            }
-
-            var out = String()
-            out.reserveCapacity(bytes.count + bytes.count / 4)
-
-            @inline(__always)
-            func appendLowercasedASCII(_ b: UInt8) {
-                if isUpper(b) {
-                    out.append(Character(UnicodeScalar(b + 32)))
-                } else {
-                    out.append(Character(UnicodeScalar(b)))
-                }
-            }
-
-            for i in bytes.indices {
-                let b = bytes[i]
-
-                let prev: UInt8? = (i > 0) ? bytes[i - 1] : nil
-                let next: UInt8? = (i + 1 < bytes.count) ? bytes[i + 1] : nil
-
-                if isUpper(b) {
-                    if let p = prev, (isLower(p) || isDigit(p)) {
-                        out.append("_")
-                    } else if let p = prev, isUpper(p) {
-                        if let n = next, isLower(n) {
-                            out.append("_")
-                        }
-
-                        if i == 1 {
-                            if out.last != "_" {
-                                out.append("_")
-                            }
-                        }
-                    }
-
-                    appendLowercasedASCII(b)
-                } else if isLower(b) {
-                    out.append(Character(UnicodeScalar(b)))
-                } else if isDigit(b) {
-                    if let p = prev, isLower(p) {
-                        out.append("_")
-                    }
-                    out.append(Character(UnicodeScalar(b)))
-                } else {
-                    // Preserve punctuation/underscore/etc.
-                    out.append(Character(UnicodeScalar(b)))
-                }
-            }
-
-            return out
+        let input = key.stringValue
+        let bytes = Array(input.utf8)
+        if bytes.isEmpty {
+            self.stringValue = input
+            return
         }
 
-        self.stringValue = camelCaseToSnakeCase(key.stringValue)
+        @_transparent
+        func isUpper(_ byte: UInt8) -> Bool {
+            (65...90).contains(byte)
+        }
+
+        @_transparent
+        func isLower(_ byte: UInt8) -> Bool {
+            (97...122).contains(byte)
+        }
+
+        @_transparent
+        func isDigit(_ byte: UInt8) -> Bool {
+            (48...57).contains(byte)
+        }
+
+        var out = String()
+        out.reserveCapacity(bytes.count + bytes.count / 4)
+
+        @_transparent
+        func appendLowercasedASCII(_ byte: UInt8) {
+            if isUpper(byte) {
+                out.append(Character(UnicodeScalar(byte + 32)))
+            } else {
+                out.append(Character(UnicodeScalar(byte)))
+            }
+        }
+
+        for index in bytes.indices {
+            let byte = bytes[index]
+
+            let prev: UInt8? = (index > 0) ? bytes[index - 1] : nil
+            let next: UInt8? = (index + 1 < bytes.count) ? bytes[index + 1] : nil
+
+            if isUpper(byte) {
+                if let p = prev, (isLower(p) || isDigit(p)) {
+                    out.append("_")
+                } else if let p = prev, isUpper(p) {
+                    if let n = next, isLower(n) {
+                        out.append("_")
+                    }
+
+                    if index == 1 {
+                        if out.last != "_" {
+                            out.append("_")
+                        }
+                    }
+                }
+
+                appendLowercasedASCII(byte)
+            } else if isLower(byte) {
+                out.append(Character(UnicodeScalar(byte)))
+            } else if isDigit(byte) {
+                if let p = prev, isLower(p) {
+                    out.append("_")
+                }
+                out.append(Character(UnicodeScalar(byte)))
+            } else {
+                out.append(Character(UnicodeScalar(byte)))
+            }
+        }
+        self.stringValue = out
     }
 
     // MARK: - CodingKey
