@@ -29,7 +29,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Select Xcode Version
-        run: ./.scripts/xcode-select 26.4
+        run: ./.scripts/xcode-select 26.4.1
       - name: Build JBird for iOS ${{ matrix.version }}
         run: ./.scripts/build-ios-xcode JBird ${{ matrix.version }}
 
@@ -44,7 +44,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Select Xcode Version
-        run: ./.scripts/xcode-select 26.4
+        run: ./.scripts/xcode-select 26.4.1
       - name: Build JBird for tvOS ${{ matrix.version }}
         run: ./.scripts/build-tvos-xcode JBird ${{ matrix.version }}
 
@@ -59,7 +59,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Select Xcode Version
-        run: ./.scripts/xcode-select 26.4
+        run: ./.scripts/xcode-select 26.4.1
       - name: Build JBird for watchOS ${{ matrix.version }}
         run: ./.scripts/build-watchos-xcode JBird ${{ matrix.version }}
 
@@ -72,7 +72,7 @@ jobs:
         include:
           - version: "26.4"
             runner: macos-26
-            xcode: "26.4"
+            xcode: "26.4.1"
           - version: "15.5"
             runner: macos-15
             xcode: "16.4"
@@ -96,7 +96,7 @@ jobs:
         include:
           - version: "26.4"
             runner: macos-26
-            xcode: "26.4"
+            xcode: "26.4.1"
           - version: "15.5"
             runner: macos-15
             xcode: "16.4"
@@ -122,7 +122,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Select Xcode Version
-        run: ./.scripts/xcode-select 26.4
+        run: ./.scripts/xcode-select 26.4.1
       - name: Build JBird for visionOS ${{ matrix.version }}
         run: ./.scripts/build-visionos-xcode JBird ${{ matrix.version }}
 
@@ -149,10 +149,10 @@ jobs:
             xcode: "16.4"
           - swift: "6.2"
             runner: "macos-26"
-            xcode: "26.4"
+            xcode: "26.4.1"
           - swift: "6.3"
             runner: "macos-26"
-            xcode: "26.4"
+            xcode: "26.4.1"
     runs-on: ${{ matrix.runner }}
     outputs:
       artifact-name: macos-build
@@ -183,10 +183,10 @@ jobs:
             xcode: "16.4"
           - swift: "6.2"
             runner: "macos-26"
-            xcode: "26.4"
+            xcode: "26.4.1"
           - swift: "6.3"
             runner: "macos-26"
-            xcode: "26.4"
+            xcode: "26.4.1"
     needs: build-macos-spm
     runs-on: ${{ matrix.runner }}
     steps:
@@ -326,8 +326,8 @@ jobs:
       - if: ${{ matrix.swift == '6.3' }}
         name: Setup Swift WASM (6.3)
         run: |
-          swift sdk install https://download.swift.org/swift-6.3-release/wasm-sdk/swift-6.3-RELEASE/swift-6.3-RELEASE_wasm.artifactbundle.tar.gz \
-            --checksum 9fa4016ee632c7e9e906608ec3b55cf13dfc4dff44e47574c5af58064dc33fd9
+          swift sdk install https://download.swift.org/swift-6.3.1-release/wasm-sdk/swift-6.3.1-RELEASE/swift-6.3.1-RELEASE_wasm.artifactbundle.tar.gz \
+            --checksum bd47baa20771f366d8beed7970afaa30742b2210097afd15f85427226d8f4cf2
           swift sdk list
 
       - if: ${{ matrix.swift == '6.2' }}
@@ -346,7 +346,7 @@ jobs:
 
       - if: ${{ matrix.swift == '6.3' }}
         name: Build JBird (6.3)
-        run: swift build -v --swift-sdk swift-6.3-RELEASE_wasm --build-path .build
+        run: swift build -v --swift-sdk swift-6.3.1-RELEASE_wasm --build-path .build
 
       - if: ${{ matrix.swift == '6.2' }}
         name: Build JBird (6.2)
@@ -430,7 +430,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Select Xcode Version
-        run: ./.scripts/xcode-select 26.4
+        run: ./.scripts/xcode-select 26.4.1
       - name: Build XCFramework
         run: ./.scripts/build-xcframework ${{ matrix.target }}
 
