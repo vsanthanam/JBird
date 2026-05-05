@@ -57,11 +57,10 @@ struct OmitIfNullMacroTestsV2 {
                     var age: Int?
                 }
                 """,
-                macroSpecs: macroSpecs,
-                failureHandler: { failures in
-                    Issue.record("An unexpected failure occured")
-                }
-            )
+                macroSpecs: macroSpecs
+            ) { failures in
+                Issue.record("An unexpected failure occured")
+            }
         #else
             Issue.record("macros are only supported when running tests for the host platform")
         #endif
@@ -83,10 +82,9 @@ struct OmitIfNullMacroTestsV2 {
                 }
                 """,
                 macroSpecs: macroSpecs,
-                failureHandler: { failures in
-                    Issue.record("An unexpected failure occured")
-                }
-            )
+            ) { failures in
+                Issue.record("An unexpected failure occured")
+            }
         #else
             Issue.record("macros are only supported when running tests for the host platform")
         #endif
@@ -107,11 +105,10 @@ struct OmitIfNullMacroTestsV2 {
                     let value: String!
                 }
                 """,
-                macroSpecs: macroSpecs,
-                failureHandler: { failures in
-                    Issue.record("An unexpected failure occured")
-                }
-            )
+                macroSpecs: macroSpecs
+            ) { failures in
+                Issue.record("An unexpected failure occured")
+            }
         #else
             Issue.record("macros are only supported when running tests for the host platform")
         #endif
@@ -135,11 +132,10 @@ struct OmitIfNullMacroTestsV2 {
                 diagnostics: [
                     DiagnosticSpec(message: "@OmitIfNil can only be applied to properties with optional types", line: 2, column: 5)
                 ],
-                macroSpecs: macroSpecs,
-                failureHandler: { failures in
-                    Issue.record("An unexpected failure occured")
-                }
-            )
+                macroSpecs: macroSpecs
+            ) { failures in
+                Issue.record("An unexpected failure occured")
+            }
         #else
             Issue.record("macros are only supported when running tests for the host platform")
         #endif
@@ -167,11 +163,10 @@ struct OmitIfNullMacroTestsV2 {
                 diagnostics: [
                     DiagnosticSpec(message: "@OmitIfNil can only be applied to stored properties, not computed properties", line: 2, column: 5)
                 ],
-                macroSpecs: macroSpecs,
-                failureHandler: { failures in
-                    Issue.record("An unexpected failure occured")
-                }
-            )
+                macroSpecs: macroSpecs
+            ) { failures in
+                Issue.record("An unexpected failure occured")
+            }
         #else
             Issue.record("macros are only supported when running tests for the host platform")
         #endif
@@ -195,11 +190,10 @@ struct OmitIfNullMacroTestsV2 {
                 diagnostics: [
                     DiagnosticSpec(message: "peer macro can only be applied to a single variable", line: 2, column: 5)
                 ],
-                macroSpecs: macroSpecs,
-                failureHandler: { failures in
-                    Issue.record("An unexpected failure occured")
-                }
-            )
+                macroSpecs: macroSpecs
+            ) { failures in
+                Issue.record("An unexpected failure occured")
+            }
         #else
             Issue.record("macros are only supported when running tests for the host platform")
         #endif
@@ -223,11 +217,10 @@ struct OmitIfNullMacroTestsV2 {
                 diagnostics: [
                     DiagnosticSpec(message: "@OmitIfNil can only be applied to properties with explicit type annotations", line: 2, column: 5)
                 ],
-                macroSpecs: macroSpecs,
-                failureHandler: { failures in
-                    Issue.record("An unexpected failure occured")
-                }
-            )
+                macroSpecs: macroSpecs
+            ) { failures in
+                Issue.record("An unexpected failure occured")
+            }
         #else
             Issue.record("macros are only supported when running tests for the host platform")
         #endif
@@ -255,11 +248,10 @@ struct OmitIfNullMacroTestsV2 {
                 diagnostics: [
                     DiagnosticSpec(message: "@OmitIfNil can only be applied to stored properties", line: 2, column: 5)
                 ],
-                macroSpecs: macroSpecs,
-                failureHandler: { failures in
-                    Issue.record("An unexpected failure occured")
-                }
-            )
+                macroSpecs: macroSpecs
+            ) { failures in
+                Issue.record("An unexpected failure occured")
+            }
         #else
             Issue.record("macros are only supported when running tests for the host platform")
         #endif
@@ -280,11 +272,10 @@ struct OmitIfNullMacroTestsV2 {
                     let value: [String?]?
                 }
                 """,
-                macroSpecs: macroSpecs,
-                failureHandler: { failures in
-                    Issue.record("An unexpected failure occured")
-                }
-            )
+                macroSpecs: macroSpecs
+            ) { failures in
+                Issue.record("An unexpected failure occured")
+            }
         #else
             Issue.record("macros are only supported when running tests for the host platform")
         #endif
