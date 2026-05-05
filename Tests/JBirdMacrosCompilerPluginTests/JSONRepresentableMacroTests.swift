@@ -122,11 +122,10 @@ struct JSONRepresentableMacroTests {
                 extension Foo: JBirdCore.JSONInitializable {
                 }
                 """,
-                macroSpecs: macroSpecs,
-                failureHandler: { failures in
-                    Issue.record("An unexpected failure occured")
-                }
-            )
+                macroSpecs: macroSpecs
+            ) { failures in
+                Issue.record("An unexpected failure occured")
+            }
         #else
             Issue.record("macros are only supported when running tests for the host platform")
         #endif
@@ -168,11 +167,10 @@ struct JSONRepresentableMacroTests {
                 extension Foo: JBirdCore.JSONInitializable {
                 }
                 """,
-                macroSpecs: macroSpecs,
-                failureHandler: { failures in
-                    Issue.record("An unexpected failure occured")
-                }
-            )
+                macroSpecs: macroSpecs
+            ) { failures in
+                Issue.record("An unexpected failure occured")
+            }
         #else
             Issue.record("macros are only supported when running tests for the host platform")
         #endif
@@ -218,11 +216,10 @@ struct JSONRepresentableMacroTests {
                 extension Foo: JBirdCore.JSONInitializable {
                 }
                 """,
-                macroSpecs: macroSpecs,
-                failureHandler: { failures in
-                    Issue.record("An unexpected failure occured")
-                }
-            )
+                macroSpecs: macroSpecs
+            ) { failure in
+                Issue.record("An unexpected failure occured")
+            }
         #else
             Issue.record("macros are only supported when running tests for the host platform")
         #endif
@@ -270,11 +267,10 @@ struct JSONRepresentableMacroTests {
                 extension Foo: JBirdCore.JSONInitializable {
                 }
                 """,
-                macroSpecs: macroSpecs,
-                failureHandler: { failures in
-                    Issue.record("An unexpected failure occured")
-                }
-            )
+                macroSpecs: macroSpecs
+            ) { failures in
+                Issue.record("An unexpected failure occured")
+            }
         #else
             Issue.record("macros are only supported when running tests for the host platform")
         #endif
@@ -322,11 +318,10 @@ struct JSONRepresentableMacroTests {
                 extension Foo: JBirdCore.JSONInitializable {
                 }
                 """,
-                macroSpecs: macroSpecs,
-                failureHandler: { failures in
-                    Issue.record("An unexpected failure occured")
-                }
-            )
+                macroSpecs: macroSpecs
+            ) { failure in
+                Issue.record("An unexpected failure occured")
+            }
         #else
             Issue.record("macros are only supported when running tests for the host platform")
         #endif
@@ -368,11 +363,10 @@ struct JSONRepresentableMacroTests {
                 extension Foo: JBirdCore.JSONInitializable {
                 }
                 """,
-                macroSpecs: macroSpecs,
-                failureHandler: { failures in
-                    Issue.record("An unexpected failure occured")
-                }
-            )
+                macroSpecs: macroSpecs
+            ) { failure in
+                Issue.record("An unexpected failure occured")
+            }
         #else
             Issue.record("macros are only supported when running tests for the host platform")
         #endif
@@ -511,11 +505,10 @@ struct JSONRepresentableMacroTests {
                 extension Foo: JBirdCore.JSONInitializable {
                 }
                 """,
-                macroSpecs: macroSpecs,
-                failureHandler: { failures in
-                    Issue.record("An unexpected failure occured")
-                }
-            )
+                macroSpecs: macroSpecs
+            ) { failure in
+                Issue.record("An unexpected failure occured")
+            }
         #else
             Issue.record("macros are only supported when running tests for the host platform")
         #endif
@@ -555,11 +548,10 @@ struct JSONRepresentableMacroTests {
                 extension Foo: JBirdCore.JSONInitializable {
                 }
                 """,
-                macroSpecs: macroSpecs,
-                failureHandler: { failures in
-                    Issue.record("An unexpected failure occured")
-                }
-            )
+                macroSpecs: macroSpecs
+            ) { failure in
+                Issue.record("An unexpected failure occured")
+            }
         #else
             Issue.record("macros are only supported when running tests for the host platform")
         #endif
@@ -599,11 +591,10 @@ struct JSONRepresentableMacroTests {
                 extension Foo: JBirdCore.JSONInitializable {
                 }
                 """,
-                macroSpecs: macroSpecs,
-                failureHandler: { failures in
-                    Issue.record("An unexpected failure occured")
-                }
-            )
+                macroSpecs: macroSpecs
+            ) { failure in
+                Issue.record("An unexpected failure occured")
+            }
         #else
             Issue.record("macros are only supported when running tests for the host platform")
         #endif
