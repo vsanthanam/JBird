@@ -862,4 +862,203 @@ struct EncoderTests {
 
     }
 
+    @Suite("Encode Root URLs")
+    struct URLTests {
+
+        @Test("Encode Root URL As Plain String")
+        func encodeRootURL() throws {
+            let url = try #require(URL(string: "https://example.com/path?q=1"))
+            let foundation = try JSONEncoder().encode(url)
+            let jbird = try JSON.Encoder().encode(url)
+            #expect(foundation == jbird)
+            // Parity contract: URL serializes as a single JSON string, not as a
+            // keyed `relative`/`base` container.
+            let jsonString = String(decoding: jbird, as: UTF8.self)
+            #expect(jsonString == #""https:\/\/example.com\/path?q=1""#
+                || jsonString == #""https://example.com/path?q=1""#)
+        }
+
+        @Test("Encode URL Inside A Struct")
+        func encodeURLInsideStruct() throws {
+            struct Wrapper: Codable, Equatable {
+                let url: URL
+            }
+            let value = try Wrapper(url: #require(URL(string: "https://upload.wikimedia.org/foo/bar.jpg")))
+            let foundation = try JSONEncoder().encode(value)
+            let jbird = try JSON.Encoder().encode(value)
+            #expect(foundation == jbird)
+        }
+
+        @Test("Encode Optional URL Present And Missing")
+        func encodeOptionalURL() throws {
+            struct Wrapper: Codable, Equatable {
+                let url: URL?
+            }
+            let foundationEncoder = JSONEncoder()
+            foundationEncoder.outputFormatting = .sortedKeys
+            let jbirdEncoder = JSON.Encoder()
+            jbirdEncoder.outputFormatting = .sortedKeys
+
+            let present = Wrapper(url: URL(string: "https://example.com"))
+            #expect(try foundationEncoder.encode(present) == jbirdEncoder.encode(present))
+
+            let missing = Wrapper(url: nil)
+            #expect(try foundationEncoder.encode(missing) == jbirdEncoder.encode(missing))
+        }
+
+        @Test("Encode Unkeyed URLs")
+        func encodeUnkeyedURLs() throws {
+            let urls = try [
+                #require(URL(string: "https://a.example.com")),
+                #require(URL(string: "https://b.example.com/path")),
+                #require(URL(string: "https://c.example.com/x?y=z"))
+            ]
+            let foundation = try JSONEncoder().encode(urls)
+            let jbird = try JSON.Encoder().encode(urls)
+            #expect(foundation == jbird)
+        }
+
+        @Test("Encode Keyed URLs")
+        func encodeKeyedURLs() throws {
+            let urls = try [
+                "Foo": #require(URL(string: "https://foo.example.com")),
+                "Bar": #require(URL(string: "https://bar.example.com")),
+                "Baz": #require(URL(string: "https://baz.example.com"))
+            ]
+            let foundationEncoder = JSONEncoder()
+            foundationEncoder.outputFormatting = .sortedKeys
+            let foundation = try foundationEncoder.encode(urls)
+            let jbirdEncoder = JSON.Encoder()
+            jbirdEncoder.outputFormatting = .sortedKeys
+            let jbird = try jbirdEncoder.encode(urls)
+            #expect(foundation == jbird)
+        }
+
+        @Test("JBird-Encoded URL Round-Trips Through Foundation Decoder")
+        func jbirdToFoundationRoundTrip() throws {
+            let url = try #require(URL(string: "https://en.wikipedia.org/wiki/Albert_Einstein"))
+            let jbird = try JSON.Encoder().encode(url)
+            let decoded = try JSONDecoder().decode(URL.self, from: jbird)
+            #expect(decoded == url)
+        }
+
+        @Test("Full URL Round-Trip Through JBird Coder")
+        func jbirdRoundTrip() throws {
+            struct Wrapper: Codable, Equatable {
+                let canonical: URL
+                let mobile: URL?
+            }
+            let original = try Wrapper(
+                canonical: #require(URL(string: "https://en.wikipedia.org/wiki/Bill_Clinton")),
+                mobile: #require(URL(string: "https://en.m.wikipedia.org/wiki/Bill_Clinton"))
+            )
+            let encoded = try JSON.Encoder().encode(original)
+            let decoded = try JSON.Decoder().decode(Wrapper.self, from: encoded)
+            #expect(decoded == original)
+        }
+
+    }
+
+    @Suite("Encode Root Decimals")
+    struct DecimalTests {
+
+        @Test("Encode Integer Decimal As JSON Number")
+        func encodeIntegerDecimal() throws {
+            let value = Decimal(42)
+            let foundation = try JSONEncoder().encode(value)
+            let jbird = try JSON.Encoder().encode(value)
+            #expect(foundation == jbird)
+            // Parity contract: Decimal serializes as a JSON number, not as a
+            // keyed `exponent`/`mantissa` object (which is what
+            // `Decimal.encode(to:)` would produce on its own).
+            #expect(String(decoding: jbird, as: UTF8.self) == "42")
+        }
+
+        @Test("Encode Fractional Decimal As JSON Number")
+        func encodeFractionalDecimal() throws {
+            let value = try #require(Decimal(string: "3.5"))
+            let foundation = try JSONEncoder().encode(value)
+            let jbird = try JSON.Encoder().encode(value)
+            // 3.5 is exact in both Decimal and Double, so byte output matches.
+            #expect(foundation == jbird)
+            #expect(String(decoding: jbird, as: UTF8.self) == "3.5")
+        }
+
+        @Test("Encode Decimal Inside A Struct")
+        func encodeDecimalInsideStruct() throws {
+            struct Wrapper: Codable, Equatable {
+                let amount: Decimal
+            }
+            let value = Wrapper(amount: Decimal(123))
+            let foundation = try JSONEncoder().encode(value)
+            let jbird = try JSON.Encoder().encode(value)
+            #expect(foundation == jbird)
+        }
+
+        @Test("Encode Optional Decimal Present And Missing")
+        func encodeOptionalDecimal() throws {
+            struct Wrapper: Codable, Equatable {
+                let amount: Decimal?
+            }
+            let foundationEncoder = JSONEncoder()
+            foundationEncoder.outputFormatting = .sortedKeys
+            let jbirdEncoder = JSON.Encoder()
+            jbirdEncoder.outputFormatting = .sortedKeys
+
+            let present = Wrapper(amount: Decimal(7))
+            #expect(try foundationEncoder.encode(present) == jbirdEncoder.encode(present))
+
+            let missing = Wrapper(amount: nil)
+            #expect(try foundationEncoder.encode(missing) == jbirdEncoder.encode(missing))
+        }
+
+        @Test("Encode Unkeyed Decimals")
+        func encodeUnkeyedDecimals() throws {
+            let decimals: [Decimal] = [Decimal(1), Decimal(2), Decimal(3)]
+            let foundation = try JSONEncoder().encode(decimals)
+            let jbird = try JSON.Encoder().encode(decimals)
+            #expect(foundation == jbird)
+        }
+
+        @Test("Encode Keyed Decimals")
+        func encodeKeyedDecimals() throws {
+            let decimals: [String: Decimal] = [
+                "Foo": Decimal(10),
+                "Bar": Decimal(20),
+                "Baz": Decimal(30)
+            ]
+            let foundationEncoder = JSONEncoder()
+            foundationEncoder.outputFormatting = .sortedKeys
+            let foundation = try foundationEncoder.encode(decimals)
+            let jbirdEncoder = JSON.Encoder()
+            jbirdEncoder.outputFormatting = .sortedKeys
+            let jbird = try jbirdEncoder.encode(decimals)
+            #expect(foundation == jbird)
+        }
+
+        @Test("JBird-Encoded Decimal Round-Trips Through Foundation Decoder")
+        func jbirdToFoundationRoundTrip() throws {
+            let decimal = try #require(Decimal(string: "1234.5"))
+            let jbird = try JSON.Encoder().encode(decimal)
+            let decoded = try JSONDecoder().decode(Decimal.self, from: jbird)
+            #expect(decoded == decimal)
+        }
+
+        @Test("Full Decimal Round-Trip Through JBird Coder")
+        func jbirdRoundTrip() throws {
+            struct Wrapper: Codable, Equatable {
+                let principal: Decimal
+                let interest: Decimal?
+            }
+            let original = try Wrapper(
+                principal: Decimal(1000),
+                interest: #require(Decimal(string: "12.5"))
+            )
+            let encoded = try JSON.Encoder().encode(original)
+            let decoded = try JSON.Decoder().decode(Wrapper.self, from: encoded)
+            #expect(decoded == original)
+        }
+
+    }
+
 }

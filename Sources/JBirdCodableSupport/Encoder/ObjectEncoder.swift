@@ -181,6 +181,10 @@ final class ObjectEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
             try JSON.Encoder.encodeData(data, to: nestedEncoder)
         } else if let date = value as? Date {
             try JSON.Encoder.encodeDate(date, to: nestedEncoder)
+        } else if let url = value as? URL {
+            try JSON.Encoder.encodeURL(url, to: nestedEncoder)
+        } else if let decimal = value as? Decimal {
+            try JSON.Encoder.encodeDecimal(decimal, to: nestedEncoder)
         } else {
             try value.encode(to: nestedEncoder)
         }

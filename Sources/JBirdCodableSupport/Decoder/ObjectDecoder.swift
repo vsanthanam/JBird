@@ -366,6 +366,12 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
         } else if type == Data.self {
             let data = try JSON.Decoder.decodeData(decoder: nestedDecoder)
             return unsafeBitCast(data, to: type)
+        } else if type == URL.self {
+            let url = try JSON.Decoder.decodeURL(decoder: nestedDecoder)
+            return unsafeBitCast(url, to: type)
+        } else if type == Decimal.self {
+            let decimal = try JSON.Decoder.decodeDecimal(decoder: nestedDecoder)
+            return unsafeBitCast(decimal, to: type)
         } else {
             return try T(from: nestedDecoder)
         }
