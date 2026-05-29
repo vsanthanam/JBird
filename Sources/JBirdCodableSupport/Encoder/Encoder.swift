@@ -174,6 +174,10 @@ extension JSON {
                     try Encoder.encodeDate(date, to: encoder)
                 } else if let data = value as? Data {
                     try Encoder.encodeData(data, to: encoder)
+                } else if let url = value as? URL {
+                    try Encoder.encodeURL(url, to: encoder)
+                } else if let decimal = value as? Decimal {
+                    try Encoder.encodeDecimal(decimal, to: encoder)
                 } else {
                     try value.encode(to: encoder)
                 }
@@ -273,6 +277,51 @@ extension JSON {
             case .secondsSince1970:
                 let val = date.timeIntervalSince1970
                 try val.encode(to: encoder)
+            }
+        }
+
+        static func encodeURL(
+            _ url: URL,
+            to encoder: any Swift.Encoder
+        ) throws {
+            // Parity carve-out: Apple's `JSONEncoder` special-cases `URL`
+            // alongside `Date`, `Data`, and `Decimal` — encode the URL as a
+            // single JSON string (its `absoluteString`), bypassing
+            // `URL.encode(to:)` (which writes a keyed `relative`/`base`
+            // container).
+            //
+            // swift-foundation reference (pinned to commit
+            // 8a3e5c98e4673c28c5ce63d010b1a0ee91a9edf2):
+            // https://github.com/swiftlang/swift-foundation/blob/8a3e5c98e4673c28c5ce63d010b1a0ee91a9edf2/Sources/FoundationEssentials/JSON/JSONEncoder.swift#L1271-L1273
+            try url.absoluteString.encode(to: encoder)
+        }
+
+        static func encodeDecimal(
+            _ decimal: Decimal,
+            to encoder: any Swift.Encoder
+        ) throws {
+            // Parity carve-out: Apple's `JSONEncoder` special-cases `Decimal`
+            // alongside `Date`, `Data`, and `URL` — it writes the value as a
+            // JSON number literal using `Decimal.description`, preserving full
+            // decimal precision in the output bytes.
+            //
+            // JBird's `JSON.Number` is backed by Int or Double, so we encode
+            // via the closest matching form: integer-valued Decimals go
+            // through Int64 (full fidelity up to Int64.max); fractional or
+            // out-of-Int-range values go through Double. This means the byte
+            // output matches Apple for values that round-trip cleanly through
+            // Int64/Double, and diverges only at precision beyond Double's
+            // 15–17 significant digits — an existing limit of `JSON.Number`'s
+            // storage.
+            //
+            // swift-foundation reference (pinned to commit
+            // 8a3e5c98e4673c28c5ce63d010b1a0ee91a9edf2):
+            // https://github.com/swiftlang/swift-foundation/blob/8a3e5c98e4673c28c5ce63d010b1a0ee91a9edf2/Sources/FoundationEssentials/JSON/JSONEncoder.swift#L1274-L1275
+            let nsDecimal = decimal as NSDecimalNumber
+            if let int = Int64(exactly: nsDecimal) {
+                try int.encode(to: encoder)
+            } else {
+                try nsDecimal.doubleValue.encode(to: encoder)
             }
         }
 

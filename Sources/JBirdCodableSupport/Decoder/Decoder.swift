@@ -151,6 +151,12 @@ extension JSON {
                 } else if type == Data.self {
                     let data = try Decoder.decodeData(decoder: decoder)
                     return unsafeBitCast(data, to: type)
+                } else if type == URL.self {
+                    let url = try Decoder.decodeURL(decoder: decoder)
+                    return unsafeBitCast(url, to: type)
+                } else if type == Decimal.self {
+                    let decimal = try Decoder.decodeDecimal(decoder: decoder)
+                    return unsafeBitCast(decimal, to: type)
                 } else {
                     return try T(from: decoder)
                 }
@@ -267,6 +273,56 @@ extension JSON {
             case .deferredToData:
                 return try Data(from: decoder)
             }
+        }
+
+        static func decodeURL(decoder: any Swift.Decoder) throws -> URL {
+            // Parity carve-out: Apple's `JSONDecoder` special-cases `URL.self`
+            // alongside `Date`, `Data`, and `Decimal` — read a single JSON
+            // string and construct the URL via `URL(string:)`, bypassing
+            // `URL.init(from:)` (which expects a keyed `relative`/`base`
+            // container).
+            //
+            // swift-foundation reference (pinned to commit
+            // 8a3e5c98e4673c28c5ce63d010b1a0ee91a9edf2):
+            // https://github.com/swiftlang/swift-foundation/blob/8a3e5c98e4673c28c5ce63d010b1a0ee91a9edf2/Sources/FoundationEssentials/JSON/JSONDecoder.swift#L666-L668
+            // https://github.com/swiftlang/swift-foundation/blob/8a3e5c98e4673c28c5ce63d010b1a0ee91a9edf2/Sources/FoundationEssentials/JSON/JSONDecoder.swift#L766-L775
+            let str = try String(from: decoder)
+            guard let url = URL(string: str) else {
+                throw DecodingError.dataCorrupted(
+                    .init(
+                        codingPath: decoder.codingPath,
+                        debugDescription: "Invalid URL string."
+                    )
+                )
+            }
+            return url
+        }
+
+        static func decodeDecimal(decoder: any Swift.Decoder) throws -> Decimal {
+            // Parity carve-out: Apple's `JSONDecoder` special-cases
+            // `Decimal.self` alongside `Date`, `Data`, and `URL` — read the
+            // JSON number and construct a `Decimal`, bypassing
+            // `Decimal.init(from:)` (which would otherwise decode the keyed
+            // exponent/mantissa form `Decimal` writes via its own
+            // `encode(to:)`).
+            //
+            // Apple reads the raw JSON number region (digits + exponent) and
+            // converts to `Decimal` directly, preserving full precision. JBird
+            // already parsed the number into `JSON.Number` (Int or Double), so
+            // precision here is bounded by Int64 for integer-valued numbers
+            // and by Double for fractional ones. This is an existing limit of
+            // `JSON.Number`'s storage, not specific to the Decimal path.
+            //
+            // swift-foundation reference (pinned to commit
+            // 8a3e5c98e4673c28c5ce63d010b1a0ee91a9edf2):
+            // https://github.com/swiftlang/swift-foundation/blob/8a3e5c98e4673c28c5ce63d010b1a0ee91a9edf2/Sources/FoundationEssentials/JSON/JSONDecoder.swift#L669-L671
+            // https://github.com/swiftlang/swift-foundation/blob/8a3e5c98e4673c28c5ce63d010b1a0ee91a9edf2/Sources/FoundationEssentials/JSON/JSONDecoder.swift#L777-L820
+            let container = try decoder.singleValueContainer()
+            if let int = try? container.decode(Int64.self) {
+                return Decimal(int)
+            }
+            let double = try container.decode(Double.self)
+            return Decimal(double)
         }
 
     }
