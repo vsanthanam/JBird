@@ -950,7 +950,7 @@ struct EncoderTests {
             }
             let original = try Wrapper(
                 canonical: #require(URL(string: "https://en.wikipedia.org/wiki/Bill_Clinton")),
-                mobile: #require(URL(string: "https://en.m.wikipedia.org/wiki/Bill_Clinton"))
+                mobile: URL(string: "https://en.m.wikipedia.org/wiki/Bill_Clinton")
             )
             let encoded = try JSON.Encoder().encode(original)
             let decoded = try JSON.Decoder().decode(Wrapper.self, from: encoded)
@@ -1050,9 +1050,9 @@ struct EncoderTests {
                 let principal: Decimal
                 let interest: Decimal?
             }
-            let original = try Wrapper(
+            let original = Wrapper(
                 principal: Decimal(1000),
-                interest: #require(Decimal(string: "12.5"))
+                interest: Decimal(string: "12.5")
             )
             let encoded = try JSON.Encoder().encode(original)
             let decoded = try JSON.Decoder().decode(Wrapper.self, from: encoded)

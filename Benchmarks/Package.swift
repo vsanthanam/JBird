@@ -50,8 +50,8 @@ let package = Package(
     ],
     dependencies: [
         .package(
-            url: "https://github.com/ordo-one/package-benchmark",
-            exact: "1.29.6"
+            url: "https://github.com/ordo-one/benchmark",
+            exact: "1.33.0"
         ),
         jbird,
         .package(
@@ -67,8 +67,14 @@ let package = Package(
         .executableTarget(
             name: "JBirdBenchmark",
             dependencies: [
-                .product(name: "Benchmark", package: "package-benchmark"),
-                .product(name: "JBird", package: "JBird"),
+                .product(
+                    name: "Benchmark",
+                    package: "benchmark"
+                ),
+                .product(
+                    name: "JBird",
+                    package: "JBird"
+                ),
                 "Freddy",
                 "SwiftyJSON"
             ],
@@ -93,7 +99,10 @@ let package = Package(
                 .copy("benchmark-twitter.json")
             ],
             plugins: [
-                .plugin(name: "BenchmarkPlugin", package: "package-benchmark")
+                .plugin(
+                    name: "BenchmarkPlugin",
+                    package: "benchmark"
+                )
             ]
         )
     ]
