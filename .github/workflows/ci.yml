@@ -261,6 +261,13 @@ jobs:
       fail-fast: false
       matrix:
         swift: ["6.1", "6.2", "6.3"]
+        include:
+          - swift: "6.1"
+            toolchain: "6.1"
+          - swift: "6.2"
+            toolchain: "6.2.3"
+          - swift: "6.3"
+            toolchain: "6.3.2"
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -268,8 +275,8 @@ jobs:
       - name: Setup Swift
         uses: compnerd/gha-setup-swift@main
         with:
-          swift-version: swift-${{ matrix.swift }}-release
-          swift-build: ${{ matrix.swift }}-RELEASE
+          swift-version: swift-${{ matrix.toolchain }}-release
+          swift-build: ${{ matrix.toolchain }}-RELEASE
       - name: Build JBird
         run: swift build -v --build-tests --disable-xctest --build-path .build -c debug -Xlinker /INCREMENTAL:NO
       - name: Compress Build
@@ -288,6 +295,13 @@ jobs:
       fail-fast: false
       matrix:
         swift: ["6.1", "6.2", "6.3"]
+        include:
+          - swift: "6.1"
+            toolchain: "6.1"
+          - swift: "6.2"
+            toolchain: "6.2.3"
+          - swift: "6.3"
+            toolchain: "6.3.2"
     needs: build-windows-spm
     runs-on: windows-latest
     steps:
@@ -296,8 +310,8 @@ jobs:
       - name: Setup Swift
         uses: compnerd/gha-setup-swift@main
         with:
-          swift-version: swift-${{ matrix.swift }}-release
-          swift-build: ${{ matrix.swift }}-RELEASE
+          swift-version: swift-${{ matrix.toolchain }}-release
+          swift-build: ${{ matrix.toolchain }}-RELEASE
       - name: Download Build
         uses: actions/download-artifact@v8
         with:
@@ -326,8 +340,8 @@ jobs:
       - if: ${{ matrix.swift == '6.3' }}
         name: Setup Swift WASM (6.3)
         run: |
-          swift sdk install https://download.swift.org/swift-6.3.1-release/wasm-sdk/swift-6.3.1-RELEASE/swift-6.3.1-RELEASE_wasm.artifactbundle.tar.gz \
-            --checksum bd47baa20771f366d8beed7970afaa30742b2210097afd15f85427226d8f4cf2
+          swift sdk install https://download.swift.org/swift-6.3.2-release/wasm-sdk/swift-6.3.2-RELEASE/swift-6.3.2-RELEASE_wasm.artifactbundle.tar.gz \
+            --checksum a61f0584c93283589f8b2f42db05c1f9a182b506c2957271402992655591dd7c
           swift sdk list
 
       - if: ${{ matrix.swift == '6.2' }}
@@ -346,7 +360,7 @@ jobs:
 
       - if: ${{ matrix.swift == '6.3' }}
         name: Build JBird (6.3)
-        run: swift build -v --swift-sdk swift-6.3.1-RELEASE_wasm --build-path .build
+        run: swift build -v --swift-sdk swift-6.3.2-RELEASE_wasm --build-path .build
 
       - if: ${{ matrix.swift == '6.2' }}
         name: Build JBird (6.2)
