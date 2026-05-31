@@ -107,9 +107,11 @@ struct NumberTests {
         let finite = JSON.Number(1.2)
         let inf = JSON.Number(Double.infinity)
         let negInf = JSON.Number(-Double.infinity)
+        let int = JSON.Number(42)
         #expect(finite.isFinite)
         #expect(!inf.isFinite)
         #expect(!negInf.isInteger)
+        #expect(int.isFinite)
     }
 
     @Test("Number Is Infinite")
@@ -117,8 +119,20 @@ struct NumberTests {
         let finite = JSON.Number(1.2)
         let inf = JSON.Number(Double.infinity)
         let negInf = JSON.Number(-Double.infinity)
+        let int = JSON.Number(42)
         #expect(!finite.isInfinite)
         #expect(inf.isInfinite)
         #expect(negInf.isInfinite)
+        #expect(!int.isInfinite)
+    }
+
+    @Test("Number Is NaN")
+    func isNaN() {
+        let nan = JSON.Number(Double.nan)
+        let finite = JSON.Number(1.2)
+        let int = JSON.Number(42)
+        #expect(nan.isNaN)
+        #expect(!finite.isNaN)
+        #expect(!int.isNaN)
     }
 }

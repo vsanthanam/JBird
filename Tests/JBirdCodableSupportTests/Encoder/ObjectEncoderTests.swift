@@ -96,4 +96,28 @@ struct ObjectEncoderTests {
         #expect(foundation == jbird)
     }
 
+    @Test("Encode Keyed Nil")
+    func encodeKeyedNil() throws {
+        let value = ExplicitNilKeyed(value: nil)
+        let foundationEncoder = JSONEncoder()
+        foundationEncoder.outputFormatting = [.sortedKeys]
+        let foundation = try foundationEncoder.encode(value)
+        let jbirdEncoder = JSON.Encoder()
+        jbirdEncoder.outputFormatting = [.sortedKeys]
+        let jbird = try jbirdEncoder.encode(value)
+        #expect(foundation == jbird)
+    }
+
+    @Test("Keyed nested unkeyed container")
+    func encodeKeyedNestedUnkeyed() throws {
+        let value = KeyedNestedUnkeyed(name: "foo", numbers: [1, 2, 3])
+        let foundationEncoder = JSONEncoder()
+        foundationEncoder.outputFormatting = [.sortedKeys]
+        let foundation = try foundationEncoder.encode(value)
+        let jbirdEncoder = JSON.Encoder()
+        jbirdEncoder.outputFormatting = [.sortedKeys]
+        let jbird = try jbirdEncoder.encode(value)
+        #expect(foundation == jbird)
+    }
+
 }

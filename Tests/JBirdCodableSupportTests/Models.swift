@@ -23,6 +23,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import Foundation
+
 struct NestedUnkeyedModel: Codable, Equatable {
 
     init(foo: String, int: [Int]) {
@@ -1140,5 +1142,191 @@ struct KeyedWithNestedKeyed: Codable, Equatable {
         var barContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .bar)
         try barContainer.encode(bar.baz, forKey: .baz)
         try barContainer.encode(bar.qux, forKey: .qux)
+    }
+}
+
+struct KeyedNestedUnkeyed: Codable, Equatable {
+
+    init(name: String, numbers: [Int]) {
+        self.name = name
+        self.numbers = numbers
+    }
+
+    let name: String
+    let numbers: [Int]
+
+    enum CodingKeys: CodingKey {
+        case name
+        case numbers
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.name = try container.decode(String.self, forKey: .name)
+        var numbersContainer = try container.nestedUnkeyedContainer(forKey: .numbers)
+        var numbers = [Int]()
+        while !numbersContainer.isAtEnd {
+            try numbers.append(numbersContainer.decode(Int.self))
+        }
+        self.numbers = numbers
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(name, forKey: .name)
+        var numbersContainer = container.nestedUnkeyedContainer(forKey: .numbers)
+        for number in numbers {
+            try numbersContainer.encode(number)
+        }
+    }
+}
+
+struct ExplicitNilKeyed: Codable, Equatable {
+
+    init(value: String?) {
+        self.value = value
+    }
+
+    let value: String?
+
+    enum CodingKeys: CodingKey {
+        case value
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        if try container.decodeNil(forKey: .value) {
+            self.value = nil
+        } else {
+            self.value = try container.decode(String.self, forKey: .value)
+        }
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if let value {
+            try container.encode(value, forKey: .value)
+        } else {
+            try container.encodeNil(forKey: .value)
+        }
+    }
+}
+
+struct ReadsTwoInts: Codable, Equatable {
+
+    init(first: Int, second: Int) {
+        self.first = first
+        self.second = second
+    }
+
+    let first: Int
+    let second: Int
+
+    init(from decoder: any Decoder) throws {
+        var container = try decoder.unkeyedContainer()
+        self.first = try container.decode(Int.self)
+        self.second = try container.decode(Int.self)
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.unkeyedContainer()
+        try container.encode(first)
+        try container.encode(second)
+    }
+}
+
+struct DecodeNilPastEnd: Codable, Equatable {
+
+    init(first: Int) {
+        self.first = first
+    }
+
+    let first: Int
+
+    init(from decoder: any Decoder) throws {
+        var container = try decoder.unkeyedContainer()
+        self.first = try container.decode(Int.self)
+        _ = try container.decodeNil()
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.unkeyedContainer()
+        try container.encode(first)
+    }
+}
+
+struct SingleValueDate: Codable, Equatable {
+
+    init(value: Date) {
+        self.value = value
+    }
+
+    let value: Date
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        self.value = try container.decode(Date.self)
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(value)
+    }
+}
+
+struct SingleValueData: Codable, Equatable {
+
+    init(value: Data) {
+        self.value = value
+    }
+
+    let value: Data
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        self.value = try container.decode(Data.self)
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(value)
+    }
+}
+
+struct SingleValueURL: Codable, Equatable {
+
+    init(value: URL) {
+        self.value = value
+    }
+
+    let value: URL
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        self.value = try container.decode(URL.self)
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(value)
+    }
+}
+
+struct SingleValueDecimal: Codable, Equatable {
+
+    init(value: Decimal) {
+        self.value = value
+    }
+
+    let value: Decimal
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        self.value = try container.decode(Decimal.self)
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(value)
     }
 }

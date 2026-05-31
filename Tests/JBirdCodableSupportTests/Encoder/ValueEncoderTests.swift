@@ -219,4 +219,36 @@ struct ValueEncoderTests {
         #expect(foundation == jbird)
     }
 
+    @Test("Encode Single Value Date")
+    func encodeSingleValueDate() throws {
+        let value = SingleValueDate(value: Date(timeIntervalSinceReferenceDate: 1234.5))
+        let jbird = try JSON.Encoder().encode(value)
+        let decoded = try JSONDecoder().decode(SingleValueDate.self, from: jbird)
+        #expect(decoded == value)
+    }
+
+    @Test("Encode Single Value Data")
+    func encodeSingleValueData() throws {
+        let value = SingleValueData(value: Data([0x01, 0x02, 0x03, 0x04]))
+        let jbird = try JSON.Encoder().encode(value)
+        let decoded = try JSONDecoder().decode(SingleValueData.self, from: jbird)
+        #expect(decoded == value)
+    }
+
+    @Test("Encode Single Value URL")
+    func encodeSingleValueURL() throws {
+        let value = try SingleValueURL(value: #require(URL(string: "https://example.com/path")))
+        let jbird = try JSON.Encoder().encode(value)
+        let decoded = try JSONDecoder().decode(SingleValueURL.self, from: jbird)
+        #expect(decoded == value)
+    }
+
+    @Test("Encode Single Value Decimal")
+    func encodeSingleValueDecimal() throws {
+        let value = try SingleValueDecimal(value: #require(Decimal(string: "2.5")))
+        let jbird = try JSON.Encoder().encode(value)
+        let decoded = try JSONDecoder().decode(SingleValueDecimal.self, from: jbird)
+        #expect(decoded == value)
+    }
+
 }
