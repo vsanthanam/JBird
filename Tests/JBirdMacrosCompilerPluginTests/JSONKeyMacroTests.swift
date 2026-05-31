@@ -155,4 +155,37 @@ struct JSONKeyMacroTests {
         #endif
     }
 
+    /// The `bindings.count == 1` guard cannot be reached via `assertMacroExpansion`: the macro
+    /// expansion framework rejects a peer macro on a multi-binding variable with its own
+    /// "peer macro can only be applied to a single variable" diagnostic before the macro body
+    /// runs. To exercise the guard, invoke the expansion directly with a two-binding declaration.
+    @Test("Multiple bindings throws single stored property error")
+    func multipleBindingsThrowsError() throws {
+        #if canImport(JBirdMacrosCompilerPlugin)
+            let variable = DeclSyntax(
+                """
+                @JSONKey("custom")
+                let name: String, nickname: String
+                """
+            ).cast(VariableDeclSyntax.self)
+            let attribute = try #require(variable.attributes.first?.cast(AttributeSyntax.self))
+            let context = BasicMacroExpansionContext()
+
+            var thrownMessage: String?
+            do {
+                _ = try JSONKeyMacro.expansion(
+                    of: attribute,
+                    providingPeersOf: variable,
+                    in: context
+                )
+            } catch let error as MacroExpansionErrorMessage {
+                thrownMessage = error.message
+            }
+
+            #expect(thrownMessage == "@JSONKey can only be applied to a single stored property")
+        #else
+            Issue.record("macros are only supported when running tests for the host platform")
+        #endif
+    }
+
 }
