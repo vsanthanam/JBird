@@ -348,4 +348,20 @@ struct ArrayDecoderTests {
         }
     }
 
+    @Test("Decode Past End")
+    func decodePastEnd() throws {
+        let data = try JSONEncoder().encode([5])
+        #expect(throws: DecodingError.self) {
+            try JSON.Decoder().decode(ReadsTwoInts.self, from: data)
+        }
+    }
+
+    @Test("Decode Nil Past End")
+    func decodeNilPastEnd() throws {
+        let data = try JSONEncoder().encode([5])
+        #expect(throws: DecodingError.self) {
+            try JSON.Decoder().decode(DecodeNilPastEnd.self, from: data)
+        }
+    }
+
 }

@@ -287,4 +287,40 @@ struct ValueDecoderTests {
         }
     }
 
+    @Test("Decode Single Value Date")
+    func decodeSingleValueDate() throws {
+        let value = SingleValueDate(value: Date(timeIntervalSinceReferenceDate: 1234.5))
+        let data = try JSONEncoder().encode(value)
+        let foundation = try JSONDecoder().decode(SingleValueDate.self, from: data)
+        let jbird = try JSON.Decoder().decode(SingleValueDate.self, from: data)
+        #expect(foundation == jbird)
+    }
+
+    @Test("Decode Single Value Data")
+    func decodeSingleValueData() throws {
+        let value = SingleValueData(value: Data([0x01, 0x02, 0x03, 0x04]))
+        let data = try JSONEncoder().encode(value)
+        let foundation = try JSONDecoder().decode(SingleValueData.self, from: data)
+        let jbird = try JSON.Decoder().decode(SingleValueData.self, from: data)
+        #expect(foundation == jbird)
+    }
+
+    @Test("Decode Single Value URL")
+    func decodeSingleValueURL() throws {
+        let value = try SingleValueURL(value: #require(URL(string: "https://example.com/path")))
+        let data = try JSONEncoder().encode(value)
+        let foundation = try JSONDecoder().decode(SingleValueURL.self, from: data)
+        let jbird = try JSON.Decoder().decode(SingleValueURL.self, from: data)
+        #expect(foundation == jbird)
+    }
+
+    @Test("Decode Single Value Decimal")
+    func decodeSingleValueDecimal() throws {
+        let value = try SingleValueDecimal(value: #require(Decimal(string: "2.5")))
+        let data = try JSONEncoder().encode(value)
+        let foundation = try JSONDecoder().decode(SingleValueDecimal.self, from: data)
+        let jbird = try JSON.Decoder().decode(SingleValueDecimal.self, from: data)
+        #expect(foundation == jbird)
+    }
+
 }

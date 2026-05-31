@@ -299,4 +299,19 @@ struct ObjectDecoderTests {
         #expect(foundation == jbird)
     }
 
+    @Test("Decode Keyed nested unkeyed container")
+    func decodeKeyedNestedUnkeyed() throws {
+        let value = KeyedNestedUnkeyed(name: "foo", numbers: [1, 2, 3])
+        let data = try JSONEncoder().encode(value)
+        let foundation = try JSONDecoder().decode(KeyedNestedUnkeyed.self, from: data)
+        let jbird = try JSON.Decoder().decode(KeyedNestedUnkeyed.self, from: data)
+        #expect(foundation == jbird)
+        #expect(throws: DecodingError.self) {
+            try JSON.Decoder().decode(
+                KeyedNestedUnkeyed.self,
+                from: ObjectDecoderTests.someCodableData
+            )
+        }
+    }
+
 }
