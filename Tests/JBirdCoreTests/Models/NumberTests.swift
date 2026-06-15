@@ -135,4 +135,67 @@ struct NumberTests {
         #expect(!finite.isNaN)
         #expect(!int.isNaN)
     }
+
+    @Test("Number Zero")
+    func zero() {
+        let zero = JSON.Number.zero
+        #expect(zero == JSON.Number(0))
+        #expect(zero.isInteger)
+        #expect(!zero.isNaN)
+        #expect(zero.isFinite)
+        #expect(!zero.isInfinite)
+        #expect(!zero.isNonConformingFloatingPointValue)
+    }
+
+    @Test("Number NaN Constant")
+    func nanConstant() {
+        let nan = JSON.Number.nan
+        #expect(nan.isNaN)
+        #expect(nan.isFloatingPoint)
+        #expect(!nan.isFinite)
+        #expect(!nan.isInfinite)
+        #expect(nan.isNonConformingFloatingPointValue)
+    }
+
+    @Test("Number Infinity Constant")
+    func infinityConstant() {
+        let inf = JSON.Number.infinity
+        #expect(inf.isInfinite)
+        #expect(inf.isFloatingPoint)
+        #expect(!inf.isFinite)
+        #expect(!inf.isNaN)
+        #expect(inf.isNonConformingFloatingPointValue)
+    }
+
+    @Test("Is Non-Conforming Floating Point Value")
+    func isNonConformingFloatingPointValue() {
+        #expect(JSON.Number(Double.nan).isNonConformingFloatingPointValue)
+        #expect(JSON.Number(Double.infinity).isNonConformingFloatingPointValue)
+        #expect(JSON.Number(-Double.infinity).isNonConformingFloatingPointValue)
+        #expect(!JSON.Number(1.5).isNonConformingFloatingPointValue)
+        #expect(!JSON.Number(0).isNonConformingFloatingPointValue)
+        #expect(!JSON.Number(42).isNonConformingFloatingPointValue)
+    }
+
+    @Test("Prefix Negation Operator")
+    func prefixNegation() {
+        let int: JSON.Number = 42
+        let negatedInt = -int
+        #expect(negatedInt == JSON.Number(-42))
+        #expect(negatedInt.isInteger)
+
+        let double: JSON.Number = 3.14
+        let negatedDouble = -double
+        #expect(negatedDouble == JSON.Number(-3.14))
+        #expect(negatedDouble.isFloatingPoint)
+
+        let zero: JSON.Number = 0
+        let negatedZero = -zero
+        #expect(negatedZero == JSON.Number(0))
+
+        let inf = JSON.Number.infinity
+        let negatedInf = -inf
+        #expect(negatedInf == JSON.Number(-Double.infinity))
+        #expect(negatedInf.isInfinite)
+    }
 }

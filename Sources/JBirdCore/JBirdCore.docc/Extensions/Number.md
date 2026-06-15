@@ -59,6 +59,7 @@ if number.isFloatingPoint {
 
 - ``isInteger``
 - ``isFloatingPoint``
+- ``isNonConformingFloatingPointValue``
 
 ### Literal Expression Support
 

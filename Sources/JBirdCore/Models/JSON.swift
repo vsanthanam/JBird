@@ -94,9 +94,9 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// A JSON string
     case string(String)
 
-    /// A zero JSON value
+    /// A JSON value representing zero (`0`)
     ///
-    /// This is sugar for `JSON.number(.int(0))`
+    /// This is sugar for `JSON.number(.zero)`
     public static let zero: JSON = 0
 
     /// The number of objects in the JSON array or JSON dictionary.
@@ -300,6 +300,25 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             true
         case .bool, .null, .object, .array, .number:
             false
+        }
+    }
+
+    /// Wheter or not the JSON value contains any non-conforming floating point values, such as `NaN`
+    ///
+    /// JSON values cannot legally contain non-conforming floating point values.
+    /// When serialized these values need to be removed or altered.
+    ///
+    /// For more information, see ``JSON/SerializationOptions/allowNonConformingFloatingPointValues``.
+    public var containsNonConformingFloatingPointValues: Bool {
+        switch self {
+        case .string, .bool, .null:
+            false
+        case let .number(number):
+            number.isNonConformingFloatingPointValue
+        case let .array(array):
+            array.contains(where: \.containsNonConformingFloatingPointValues)
+        case let .object(object):
+            object.values.contains(where: \.containsNonConformingFloatingPointValues)
         }
     }
 
@@ -994,7 +1013,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameter isIncluded: A closure that takes a JSON key as its argument and returns a Boolean value indicating whether the key should be included in the returned JSON object.
     /// - Returns: The filtered JSON object
     public func filterKeys(
-        _ isIncluded: (String) throws -> Bool
+        _ isIncluded: (Key) throws -> Bool
     ) throws -> JSON {
         try filter { key, _ in
             try isIncluded(key)

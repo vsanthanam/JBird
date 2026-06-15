@@ -1162,6 +1162,74 @@ struct JSONTests {
         }
     }
 
+    @Test("JSON Zero")
+    func jsonZero() {
+        let zero = JSON.zero
+        #expect(zero == JSON.number(.zero))
+        #expect(zero == JSON.number(0))
+        #expect(zero.isNumber)
+    }
+
+    @Suite("Contains Non-Conforming Floating Point Values Tests")
+    struct ContainsNonConformingFloatingPointValuesTests {
+
+        @Test("Scalar values")
+        func scalarValues() {
+            #expect(!JSON.null.containsNonConformingFloatingPointValues)
+            #expect(!JSON.bool(true).containsNonConformingFloatingPointValues)
+            #expect(!JSON.string("hello").containsNonConformingFloatingPointValues)
+            #expect(!JSON.number(42).containsNonConformingFloatingPointValues)
+            #expect(!JSON.number(3.14).containsNonConformingFloatingPointValues)
+            #expect(JSON.number(.nan).containsNonConformingFloatingPointValues)
+            #expect(JSON.number(.infinity).containsNonConformingFloatingPointValues)
+            #expect(JSON.number(.init(-Double.infinity)).containsNonConformingFloatingPointValues)
+        }
+
+        @Test("Array values")
+        func arrayValues() {
+            let clean: JSON = [1, 2, 3]
+            #expect(!clean.containsNonConformingFloatingPointValues)
+
+            let withNaN: JSON = .array([1, .number(.nan), 3])
+            #expect(withNaN.containsNonConformingFloatingPointValues)
+
+            let withInfinity: JSON = .array([1, .number(.infinity), 3])
+            #expect(withInfinity.containsNonConformingFloatingPointValues)
+
+            let empty: JSON = []
+            #expect(!empty.containsNonConformingFloatingPointValues)
+        }
+
+        @Test("Object values")
+        func objectValues() {
+            let clean: JSON = ["foo": 1, "bar": "baz"]
+            #expect(!clean.containsNonConformingFloatingPointValues)
+
+            let withNaN: JSON = .object(["foo": .number(.nan)])
+            #expect(withNaN.containsNonConformingFloatingPointValues)
+
+            let withInfinity: JSON = .object(["foo": .number(.infinity)])
+            #expect(withInfinity.containsNonConformingFloatingPointValues)
+
+            let empty: JSON = [:]
+            #expect(!empty.containsNonConformingFloatingPointValues)
+        }
+
+        @Test("Nested values")
+        func nestedValues() {
+            let deepClean: JSON = [
+                "a": [1, 2, 3],
+                "b": ["c": "d"]
+            ]
+            #expect(!deepClean.containsNonConformingFloatingPointValues)
+
+            let deepNaN: JSON = .object([
+                "a": .array([1, .object(["nested": .number(.nan)])])
+            ])
+            #expect(deepNaN.containsNonConformingFloatingPointValues)
+        }
+    }
+
     @Test("Null JSON Description")
     func nullDescription() {
         let json = JSON.null
