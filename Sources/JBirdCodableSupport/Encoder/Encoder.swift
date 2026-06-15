@@ -30,7 +30,7 @@ import JBirdCore
 extension JSON {
 
     /// An object that encode an`Encodable`-conforming type into JSON.
-    public final class Encoder {
+    public final class Encoder: Sendable {
 
         // MARK: - Initializers
 
@@ -131,28 +131,70 @@ extension JSON {
         }
 
         /// A dictionary you use to customize the encoding process by providing contextual information.
-        public var userInfo: [CodingUserInfoKey : any Sendable] = [:]
+        public var userInfo: [CodingUserInfoKey : any Sendable] {
+            get {
+                _userInfo.strategy
+            }
+            set {
+                _userInfo.strategy = newValue
+            }
+        }
 
         /// A value that determines the readability, size, and element order of the encoded JSON object.
-        public var outputFormatting: OutputFormatting = []
+        public var outputFormatting: OutputFormatting {
+            get {
+                _outputFormatting.strategy
+            }
+            set {
+                _outputFormatting.strategy = newValue
+            }
+        }
 
         /// A value that determines how to encode a type’s coding keys as JSON keys.
-        public var keyEncodingStrategy = KeyEncodingStrategy.useDefaultKeys
+        public var keyEncodingStrategy: KeyEncodingStrategy {
+            get {
+                _keyEncodingStrategy.strategy
+            }
+            set {
+                _keyEncodingStrategy.strategy = newValue
+            }
+        }
 
         /// The strategy used when encoding dates as part of a JSON object.
         ///
         /// The default strategy is the ``JSON/Encoder/DateEncodingStrategy/deferredToDate`` strategy.
-        public var dateEncodingStrategy = DateEncodingStrategy.deferredToDate
+        public var dateEncodingStrategy: DateEncodingStrategy {
+            get {
+                _dateEncodingStrategy.strategy
+            }
+            set {
+                _dateEncodingStrategy.strategy = newValue
+            }
+        }
 
         /// The strategy that an encoder uses to encode raw data.
         ///
         /// The default strategy is the ``JSON/Encoder/DataEncodingStrategy/base64`` strategy.
-        public var dataEncodingStrategy = DataEncodingStrategy.base64
+        public var dataEncodingStrategy: DataEncodingStrategy {
+            get {
+                _dataEncodigStrategy.strategy
+            }
+            set {
+                _dataEncodigStrategy.strategy = newValue
+            }
+        }
 
         /// The strategy used by an encoder when it encounters exceptional floating-point values.
         ///
         /// The default strategy is the ``JSON/Encoder/NonConformingFloatEncodingStrategy/throw`` strategy.
-        public var nonConformingFloatEncodingStrategy = NonConformingFloatEncodingStrategy.throw
+        public var nonConformingFloatEncodingStrategy: NonConformingFloatEncodingStrategy {
+            get {
+                _nonConformingFloatEncodingStrategy.strategy
+            }
+            set {
+                _nonConformingFloatEncodingStrategy.strategy = newValue
+            }
+        }
 
         /// Create a JSON payload based on an `Encodable` type
         ///
@@ -213,6 +255,13 @@ extension JSON {
 
         @TaskLocal
         private static var encodingStrategy: EncodingStrategy? = nil
+
+        private let _userInfo = CodingStrategy<[CodingUserInfoKey: any Sendable]>([:])
+        private let _outputFormatting = CodingStrategy<OutputFormatting>([])
+        private let _keyEncodingStrategy = CodingStrategy<KeyEncodingStrategy>(.useDefaultKeys)
+        private let _dateEncodingStrategy = CodingStrategy<DateEncodingStrategy>(.deferredToDate)
+        private let _dataEncodigStrategy = CodingStrategy<DataEncodingStrategy>(.base64)
+        private let _nonConformingFloatEncodingStrategy = CodingStrategy<NonConformingFloatEncodingStrategy>(.throw)
 
         static func encodeData(
             _ data: Data,
