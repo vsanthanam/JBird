@@ -30,7 +30,7 @@ import JBirdCore
 extension JSON {
 
     /// An object that decodes JSON into a `Decodable`-conforming type
-    public final class Decoder {
+    public final class Decoder: Sendable {
 
         // MARK: - Initializers
 
@@ -103,26 +103,61 @@ extension JSON {
             case `throw`
         }
 
+        /// A dictionary you use to customize the decoding process by providing contextual information.
+        public var userInfo: [CodingUserInfoKey: any Sendable] {
+            get {
+                _userInfo.strategy
+            }
+            set {
+                _userInfo.strategy = newValue
+            }
+        }
+
         /// A value that determines how to decode a type’s coding keys from JSON keys.
-        public var keyDecodingStrategy = KeyDecodingStrategy.useDefaultKeys
+        public var keyDecodingStrategy: KeyDecodingStrategy {
+            get {
+                _keyDecodingStrategy.strategy
+            }
+            set {
+                _keyDecodingStrategy.strategy = newValue
+            }
+        }
 
         /// The strategy used when decoding dates from part of a JSON object.
         ///
         /// The default strategy is ``JSON/Decoder/DateDecodingStrategy/deferredToDate``.
-        public var dateDecodingStrategy = DateDecodingStrategy.deferredToDate
+        public var dateDecodingStrategy: DateDecodingStrategy {
+            get {
+                _dateDecodingStrategy.strategy
+            }
+            set {
+                _dateDecodingStrategy.strategy = newValue
+            }
+        }
 
         /// The strategy that a decoder uses to decode raw data.
         ///
         /// The default strategy is ``JSON/Decoder/DataDecodingStrategy/base64``.
-        public var dataDecodingStrategy = DataDecodingStrategy.base64
+        public var dataDecodingStrategy: DataDecodingStrategy {
+            get {
+                _dataDecodingStrategy.strategy
+            }
+            set {
+                _dataDecodingStrategy.strategy = newValue
+            }
+        }
 
         /// The strategy used by a decoder when it encounters exceptional floating-point values.
         ///
         /// The default strategy is ``JSON/Decoder/NonConformingFloatDecodingStrategy/throw``.
-        public var nonConformingFloatDecodingStrategy = NonConformingFloatDecodingStrategy.throw
-
-        /// A dictionary you use to customize the decoding process by providing contextual information.
-        public var userInfo: [CodingUserInfoKey: any Sendable] = [:]
+        public var nonConformingFloatDecodingStrategy: NonConformingFloatDecodingStrategy {
+            get {
+                _nonConformingFloatDecodingStrategy.strategy
+            }
+            set {
+                _nonConformingFloatDecodingStrategy.strategy = newValue
+            }
+        }
 
         /// Decode a JSON payload into a `Decodable` type
         /// - Parameters:
@@ -174,6 +209,12 @@ extension JSON {
 
         @TaskLocal
         static var decodingStrategy: DecodingStrategy? = nil
+
+        private let _userInfo = CodingStrategy<[CodingUserInfoKey: any Sendable]>([:])
+        private let _keyDecodingStrategy = CodingStrategy<KeyDecodingStrategy>(.useDefaultKeys)
+        private let _dateDecodingStrategy = CodingStrategy<DateDecodingStrategy>(.deferredToDate)
+        private let _dataDecodingStrategy = CodingStrategy<DataDecodingStrategy>(.base64)
+        private let _nonConformingFloatDecodingStrategy = CodingStrategy<NonConformingFloatDecodingStrategy>(.throw)
 
         static func decodeKey(
             path: [any CodingKey],
