@@ -1061,4 +1061,81 @@ struct EncoderTests {
 
     }
 
+    @Suite("User Info")
+    struct UserInfoTests {
+
+        @Test("Encoder User Info Is Empty By Default")
+        func defaultUserInfo() {
+            let encoder = JSON.Encoder()
+            #expect(encoder.userInfo.isEmpty)
+        }
+
+        @Test("Encoder User Info Round Trip")
+        func userInfoRoundTrip() throws {
+            let key = try #require(CodingUserInfoKey(rawValue: "testKey"))
+            let encoder = JSON.Encoder()
+            encoder.userInfo[key] = "testValue"
+            #expect(encoder.userInfo[key] as? String == "testValue")
+        }
+
+        @Test("Encoder User Info Is Accessible During Encoding")
+        func userInfoAccessibleDuringEncoding() throws {
+            let key = try #require(CodingUserInfoKey(rawValue: "greeting"))
+
+            struct Greeter: Encodable {
+                let name: String
+                func encode(to encoder: any Swift.Encoder) throws {
+                    var container = encoder.singleValueContainer()
+                    let greeting = try encoder.userInfo[#require(CodingUserInfoKey(rawValue: "greeting"))] as? String ?? ""
+                    try container.encode("\(greeting) \(name)")
+                }
+            }
+
+            let encoder = JSON.Encoder()
+            encoder.userInfo[key] = "Hello"
+            let data = try encoder.encode(Greeter(name: "World"))
+            let result = try JSON.Decoder().decode(String.self, from: data)
+            #expect(result == "Hello World")
+        }
+    }
+
+    @Suite("Sendable")
+    struct SendableTests {
+
+        @Test("Concurrent Encoding")
+        func concurrentEncoding() async throws {
+            let encoder = JSON.Encoder()
+            try await withThrowingTaskGroup(of: Data.self) { group in
+                for i in 0..<100 {
+                    group.addTask {
+                        try encoder.encode(["value": i])
+                    }
+                }
+                var results = [Data]()
+                for try await result in group {
+                    results.append(result)
+                }
+                #expect(results.count == 100)
+            }
+        }
+
+        @Test("Concurrent Strategy Mutation")
+        func concurrentStrategyMutation() async {
+            let encoder = JSON.Encoder()
+            await withTaskGroup(of: Void.self) { group in
+                for _ in 0..<50 {
+                    group.addTask {
+                        encoder.dateEncodingStrategy = .deferredToDate
+                    }
+                    group.addTask {
+                        encoder.dataEncodingStrategy = .base64
+                    }
+                    group.addTask {
+                        _ = encoder.keyEncodingStrategy
+                    }
+                }
+            }
+        }
+    }
+
 }

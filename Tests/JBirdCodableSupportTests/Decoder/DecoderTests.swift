@@ -824,4 +824,86 @@ struct DecoderTests {
 
     }
 
+    @Suite("User Info")
+    struct UserInfoTests {
+
+        @Test("Decoder User Info Is Empty By Default")
+        func defaultUserInfo() {
+            let decoder = JSON.Decoder()
+            #expect(decoder.userInfo.isEmpty)
+        }
+
+        @Test("Decoder User Info Round Trip")
+        func userInfoRoundTrip() throws {
+            let key = try #require(CodingUserInfoKey(rawValue: "testKey"))
+            let decoder = JSON.Decoder()
+            decoder.userInfo[key] = "testValue"
+            #expect(decoder.userInfo[key] as? String == "testValue")
+        }
+
+        @Test("Decoder User Info Is Accessible During Decoding")
+        func userInfoAccessibleDuringDecoding() throws {
+            let key = try #require(CodingUserInfoKey(rawValue: "defaultName"))
+
+            struct NameReader: Decodable {
+                let name: String
+                init(from decoder: any Swift.Decoder) throws {
+                    let container = try decoder.singleValueContainer()
+                    let decoded = try container.decode(String.self)
+                    let fallback = try decoder.userInfo[#require(CodingUserInfoKey(rawValue: "defaultName"))] as? String ?? ""
+                    self.name = decoded.isEmpty ? fallback : decoded
+                }
+            }
+
+            let data = try JSON.Encoder().encode("")
+            let decoder = JSON.Decoder()
+            decoder.userInfo[key] = "Fallback"
+            let result = try decoder.decode(NameReader.self, from: data)
+            #expect(result.name == "Fallback")
+        }
+    }
+
+    @Suite("Sendable")
+    struct SendableTests {
+
+        @Test("Concurrent Decoding")
+        func concurrentDecoding() async throws {
+            let payload = try JSON.Encoder().encode(["value": 42])
+            let decoder = JSON.Decoder()
+            try await withThrowingTaskGroup(of: [String: Int].self) { group in
+                for _ in 0..<100 {
+                    group.addTask {
+                        try decoder.decode([String: Int].self, from: payload)
+                    }
+                }
+                var results = [[String: Int]]()
+                for try await result in group {
+                    results.append(result)
+                }
+                #expect(results.count == 100)
+                for result in results {
+                    #expect(result == ["value": 42])
+                }
+            }
+        }
+
+        @Test("Concurrent Strategy Mutation")
+        func concurrentStrategyMutation() async {
+            let decoder = JSON.Decoder()
+            await withTaskGroup(of: Void.self) { group in
+                for _ in 0..<50 {
+                    group.addTask {
+                        decoder.dateDecodingStrategy = .deferredToDate
+                    }
+                    group.addTask {
+                        decoder.dataDecodingStrategy = .base64
+                    }
+                    group.addTask {
+                        _ = decoder.keyDecodingStrategy
+                    }
+                }
+            }
+        }
+    }
+
 }
