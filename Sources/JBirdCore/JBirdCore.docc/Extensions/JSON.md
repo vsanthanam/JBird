@@ -100,6 +100,7 @@ let steve: JSON = [
 - ``isNull``
 - ``count``
 - ``isEmpty``
+- ``containsNonConformingFloatingPointValues``
 
 ### Subscripting
 

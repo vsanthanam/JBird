@@ -91,6 +91,25 @@ extension JSON {
             }
         }
 
+        /// A number representing zero (`0`)
+        public static let zero: Number = 0
+
+        /// A NaN ("not a number") floating point value
+        public static let nan: Number = .init(Double.nan)
+
+        /// An infinite floating point value
+        public static let infinity: Number = .init(Double.infinity)
+
+        /// Wheter or not the number is a non-conforming floating point values, such as `NaN`
+        ///
+        /// JSON numbers cannot legally be non-conforming floating point values.
+        /// When serialized these values need to be removed or altered.
+        ///
+        /// For more information, see ``JSON/SerializationOptions/allowNonConformingFloatingPointValues``.
+        public var isNonConformingFloatingPointValue: Bool {
+            isInfinite || isNaN
+        }
+
         /// The untyped representation of the JSON literal
         /// - Returns: An `AnyHashable` containing an `Int` or a `Double` representing the JSON number.
         public func unboxed() -> AnyHashable {
@@ -181,4 +200,14 @@ extension JSON {
 
     }
 
+}
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+public prefix func - (_ number: JSON.Number) -> JSON.Number {
+    switch number.storage {
+    case let .double(double):
+        JSON.Number(-double)
+    case let .int(integer):
+        JSON.Number(-integer)
+    }
 }
