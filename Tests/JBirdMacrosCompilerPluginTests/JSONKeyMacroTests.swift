@@ -178,7 +178,7 @@ struct JSONKeyMacroTests {
                     providingPeersOf: variable,
                     in: context
                 )
-            } catch let error as MacroExpansionErrorMessage {
+            } catch let error as SwiftSyntaxMacros.MacroExpansionErrorMessage {
                 thrownMessage = error.message
             }
 
