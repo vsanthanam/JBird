@@ -5,6 +5,8 @@
     @CallToAction(url: "https://www.github.com/vsanthanam/JBird", purpose: link, label: "View on GitHub")
 }
 
+Add JBird to an existing Swift project
+
 ## Basic Setup
 
 ### Add to an Xcode Project via Swift Package Manager
@@ -59,6 +61,7 @@ let package = Package(
             traits: [
                 .defaults // Enables `DeclarativeAPI`, `ConformanceMacros` and `CodableSupport`.
                           // Alternatively, you could explicit opt into `DeclarativeAPI`, `ConformanceMacros`, `CodableSupport`, or any combination of the three.
+            ]
         )
     ],
     targets: [

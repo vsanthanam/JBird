@@ -29,7 +29,7 @@ import JBirdCore
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON {
 
-    /// An object that encode an`Encodable`-conforming type into JSON.
+    /// An object that encodes an `Encodable`-conforming type into a JSON payload.
     public final class Encoder: Sendable {
 
         // MARK: - Initializers
@@ -196,52 +196,81 @@ extension JSON {
             }
         }
 
-        /// Create a JSON payload based on an `Encodable` type
+        /// Create a JSON payload based on an `Encodable` value.
         ///
-        /// - Parameter value: The type to encode
-        /// - Returns: A serialized JSON payload, based on the provided `Encodable` type.
+        /// - Parameter value: The value to encode
+        /// - Returns: A serialized JSON payload, based on the provided `Encodable` value.
         public func encode(
             _ value: some Encodable
         ) throws -> Data {
-            let encodingStrategy = EncodingStrategy(
-                keyEncodingStrategy: keyEncodingStrategy,
-                dateEncodingStrategy: dateEncodingStrategy,
-                dataEncodingStrategy: dataEncodingStrategy,
-                nonConformingFloatEncodingStrategy: nonConformingFloatEncodingStrategy
-            )
-
-            let json = try Encoder.$encodingStrategy.withValue(encodingStrategy) {
+            try snapshotStrategy {
                 let encoder = InternalEncoder.root(userInfo: userInfo)
                 if let date = value as? Date {
-                    try Encoder.encodeDate(date, to: encoder)
+                    try Encoder.encodeDate(
+                        date,
+                        to: encoder
+                    )
                 } else if let data = value as? Data {
-                    try Encoder.encodeData(data, to: encoder)
+                    try Encoder.encodeData(
+                        data,
+                        to: encoder
+                    )
                 } else if let url = value as? URL {
-                    try Encoder.encodeURL(url, to: encoder)
+                    try Encoder.encodeURL(
+                        url,
+                        to: encoder
+                    )
                 } else if let decimal = value as? Decimal {
-                    try Encoder.encodeDecimal(decimal, to: encoder)
+                    try Encoder.encodeDecimal(
+                        decimal,
+                        to: encoder
+                    )
                 } else {
                     try value.encode(to: encoder)
                 }
-                return encoder.finalize()
+                let json = encoder.finalize()
+                return try Encoder.serialize(json)
             }
+        }
 
-            var options: JSON.SerializationOptions = [.fragmentsAllowed, .truncateWholeFloatingPointValues, .escapeForwardSlash]
+        /// Create a JSON payload based on an `EncodableWithConfiguration` value and an encoding configuration provider.
+        /// - Parameters:
+        ///   - value: The value to encode
+        ///   - configuration: An encoding configuration
+        /// - Returns: A serialized JSON payload, based on the provided `EncodableWithConfiguration` value
+        public func encode<T, C>(
+            _ value: T,
+            configuration: C.Type
+        ) throws -> Data where T: EncodableWithConfiguration, C: EncodingConfigurationProviding, T.EncodingConfiguration == C.EncodingConfiguration {
+            try snapshotStrategy {
+                let encoder = InternalEncoder.root(userInfo: userInfo)
+                try value.encode(
+                    to: encoder,
+                    configuration: configuration.encodingConfiguration
+                )
+                let json = encoder.finalize()
+                return try Encoder.serialize(json)
+            }
+        }
 
-            if outputFormatting.contains(.prettyPrinted) {
-                options.insert(.prettyPrinted)
+        /// Create a JSON payload based on an `EncodableWithConfiguration` value and an encoding configuration.
+        /// - Parameters:
+        ///   - value: The value to encode
+        ///   - configuration: An encoding configuration provider
+        /// - Returns: A serialized JSON payload, based on the provided `EncodableWithConfiguration` value
+        public func encode<T>(
+            _ value: T,
+            configuration: T.EncodingConfiguration
+        ) throws -> Data where T: EncodableWithConfiguration {
+            try snapshotStrategy {
+                let encoder = InternalEncoder.root(userInfo: userInfo)
+                try value.encode(
+                    to: encoder,
+                    configuration: configuration
+                )
+                let json = encoder.finalize()
+                return try Encoder.serialize(json)
             }
-            if outputFormatting.contains(.sortedKeys) {
-                options.insert(.sortedKeys)
-            }
-            if outputFormatting.contains(.withoutEscapingSlashes) {
-                options.remove(.escapeForwardSlash)
-            }
-
-            return try JSON.data(
-                from: json,
-                options: options
-            )
         }
 
         // MARK: - Private
@@ -251,10 +280,47 @@ extension JSON {
             let dateEncodingStrategy: DateEncodingStrategy
             let dataEncodingStrategy: DataEncodingStrategy
             let nonConformingFloatEncodingStrategy: NonConformingFloatEncodingStrategy
+            let outputFormatting: OutputFormatting
         }
 
         @TaskLocal
         private static var encodingStrategy: EncodingStrategy? = nil
+
+        private func snapshotStrategy<T>(
+            _ fn: () throws -> T
+        ) rethrows -> T {
+            let encodingStrategy = EncodingStrategy(
+                keyEncodingStrategy: keyEncodingStrategy,
+                dateEncodingStrategy: dateEncodingStrategy,
+                dataEncodingStrategy: dataEncodingStrategy,
+                nonConformingFloatEncodingStrategy: nonConformingFloatEncodingStrategy,
+                outputFormatting: outputFormatting
+            )
+            return try Encoder.$encodingStrategy.withValue(encodingStrategy) {
+                try fn()
+            }
+        }
+
+        private static func serialize(
+            _ json: JSON
+        ) throws -> Data {
+            var options: JSON.SerializationOptions = [.fragmentsAllowed, .truncateWholeFloatingPointValues, .escapeForwardSlash]
+
+            if Self.encodingStrategy.unsafelyUnwrapped.outputFormatting.contains(.prettyPrinted) {
+                options.insert(.prettyPrinted)
+            }
+            if Self.encodingStrategy.unsafelyUnwrapped.outputFormatting.contains(.sortedKeys) {
+                options.insert(.sortedKeys)
+            }
+            if Self.encodingStrategy.unsafelyUnwrapped.outputFormatting.contains(.withoutEscapingSlashes) {
+                options.remove(.escapeForwardSlash)
+            }
+
+            return try JSON.data(
+                from: json,
+                options: options
+            )
+        }
 
         private let _userInfo = CodingStrategy<[CodingUserInfoKey: any Sendable]>([:])
         private let _outputFormatting = CodingStrategy<OutputFormatting>([])
@@ -333,7 +399,7 @@ extension JSON {
             _ url: URL,
             to encoder: any Swift.Encoder
         ) throws {
-            // Parity carve-out: Apple's `JSONEncoder` special-cases `URL`
+            // Apple's `JSONEncoder` special-cases `URL`
             // alongside `Date`, `Data`, and `Decimal` — encode the URL as a
             // single JSON string (its `absoluteString`), bypassing
             // `URL.encode(to:)` (which writes a keyed `relative`/`base`
@@ -349,7 +415,7 @@ extension JSON {
             _ decimal: Decimal,
             to encoder: any Swift.Encoder
         ) throws {
-            // Parity carve-out: Apple's `JSONEncoder` special-cases `Decimal`
+            // Apple's `JSONEncoder` special-cases `Decimal`
             // alongside `Date`, `Data`, and `URL` — it writes the value as a
             // JSON number literal using `Decimal.description`, preserving full
             // decimal precision in the output bytes.

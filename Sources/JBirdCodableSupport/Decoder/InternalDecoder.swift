@@ -46,7 +46,10 @@ final class InternalDecoder: Decoder {
 
     // MARK: - API
 
-    static func root(for json: JSON, userInfo: [CodingUserInfoKey: Any]) -> InternalDecoder {
+    static func root(
+        for json: JSON,
+        userInfo: [CodingUserInfoKey: Any]
+    ) -> InternalDecoder {
         .init(
             storage: Storage(),
             value: json,

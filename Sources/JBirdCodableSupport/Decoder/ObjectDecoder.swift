@@ -40,7 +40,10 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
         var mapping: [String: JSON.Key] = [:]
         mapping.reserveCapacity(object.count)
         for key in object.keys {
-            let decodedKey = JSON.Decoder.decodeKey(path: decoder.codingPath, key: key)
+            let decodedKey = JSON.Decoder.decodeKey(
+                path: decoder.codingPath,
+                key: key
+            )
             mapping[decodedKey.stringValue] = key
         }
         keyMapping = mapping
@@ -362,16 +365,28 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
         )
         if type == Date.self {
             let date = try JSON.Decoder.decodeDate(decoder: nestedDecoder)
-            return unsafeBitCast(date, to: type)
+            return unsafeBitCast(
+                date,
+                to: type
+            )
         } else if type == Data.self {
             let data = try JSON.Decoder.decodeData(decoder: nestedDecoder)
-            return unsafeBitCast(data, to: type)
+            return unsafeBitCast(
+                data,
+                to: type
+            )
         } else if type == URL.self {
             let url = try JSON.Decoder.decodeURL(decoder: nestedDecoder)
-            return unsafeBitCast(url, to: type)
+            return unsafeBitCast(
+                url,
+                to: type
+            )
         } else if type == Decimal.self {
             let decimal = try JSON.Decoder.decodeDecimal(decoder: nestedDecoder)
-            return unsafeBitCast(decimal, to: type)
+            return unsafeBitCast(
+                decimal,
+                to: type
+            )
         } else {
             return try T(from: nestedDecoder)
         }
@@ -440,7 +455,13 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
         guard let objectKey = keyMapping[key.stringValue],
               let value = object[objectKey]
         else {
-            throw DecodingError.keyNotFound(key, .init(codingPath: codingPath + [key], debugDescription: "Couldn't find value for key '\(key.stringValue)'"))
+            throw DecodingError.keyNotFound(
+                key,
+                .init(
+                    codingPath: codingPath + [key],
+                    debugDescription: "Couldn't find value for key '\(key.stringValue)'"
+                )
+            )
         }
         return value
     }

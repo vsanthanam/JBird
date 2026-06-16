@@ -100,7 +100,7 @@ extension JSON {
         /// An infinite floating point value
         public static let infinity: Number = .init(Double.infinity)
 
-        /// Wheter or not the number is a non-conforming floating point values, such as `NaN`
+        /// Whether or not the number is a non-conforming floating point values, such as `NaN`
         ///
         /// JSON numbers cannot legally be non-conforming floating point values.
         /// When serialized these values need to be removed or altered.
@@ -121,7 +121,7 @@ extension JSON {
             }
         }
 
-        /// Convert the JSON numver into a ``JSONNumberInitializable`` type
+        /// Convert the JSON number into a ``JSONNumberInitializable`` type
         /// - Parameter type: The type to convert into
         /// - Returns: The converted value
         /// - Throws: An error, if the JSON number cannot be converted into the provided type

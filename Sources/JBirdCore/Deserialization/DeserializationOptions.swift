@@ -77,20 +77,20 @@ extension JSON {
         /// #expect(json == [
         ///     "foo": "bar",
         ///     "qux": [true, false]
-        /// ]) // Key "baz" is omitted because it has a null value, null values striped from array in key "qux".
+        /// ]) // Key "baz" is omitted because it has a null value, null values stripped from array in key "qux".
         /// ```
         public static let omitNullValues = DeserializationOptions(rawValue: 1 << 1)
 
         /// Whether or not the root value is allowed to be a fragment
         ///
         /// When this option is enabled, the deserialized JSON can be a fragment, rather than a complete JSON object or array.
-        /// If you attempt to deserialize JSON who's root element is not a complete JSON object or JSON array, an error is thrown.
+        /// If you attempt to deserialize JSON whose root element is not a complete JSON object or JSON array, an error is thrown.
         public static let fragmentsAllowed = DeserializationOptions(rawValue: 1 << 2)
 
         /// Whether or not the the deserialized JSON is allowed to contain a UTF-8 byte order mark
         ///
         /// When this option is enabled, the deserialized JSON can start with a UTF-8 byte order mark (BOM).
-        /// If you attempt to JSON that contains a UTF-8 byte order mark without this option enabled, an error is throw
+        /// If you attempt to deserialize JSON that contains a UTF-8 byte order mark without this option enabled, an error is thrown.
         public static let allowByteOrderMark = DeserializationOptions(rawValue: 1 << 3)
 
         /// Whether or not the deserialized JSON is allowed to contain insignificant whitespace

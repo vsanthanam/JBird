@@ -37,7 +37,7 @@ public enum JSONKeyComputationRule {
 ///
 /// You can only apply this macro to types that meet the following conditions:
 /// - The type must be a `struct`, `class`, or `enum`
-/// - If the type must only have stored properties that conform  `JSONRepresentable`.
+/// - If the type must only have stored properties that conform to `JSONRepresentable`.
 /// - If the type is an enum, it must only have associated values that conform to `JSONRepresentable`.
 ///
 /// - Note: The macro may not work correctly when applied to a class with a superclass, depending on its initializer requirements.

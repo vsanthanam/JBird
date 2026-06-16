@@ -63,13 +63,23 @@ struct ValueEncoder: SingleValueEncodingContainer {
     mutating func encode(
         _ value: Double
     ) throws {
-        try write(JSON.Encoder.encodeDouble(value, codingPath: codingPath))
+        try write(
+            JSON.Encoder.encodeDouble(
+                value,
+                codingPath: codingPath
+            )
+        )
     }
 
     mutating func encode(
         _ value: Float
     ) throws {
-        try write(JSON.Encoder.encodeFloat(value, codingPath: codingPath))
+        try write(
+            JSON.Encoder.encodeFloat(
+                value,
+                codingPath: codingPath
+            )
+        )
     }
 
     mutating func encode(
@@ -143,13 +153,25 @@ struct ValueEncoder: SingleValueEncodingContainer {
             onValueChange: nil
         )
         if let data = value as? Data {
-            try JSON.Encoder.encodeData(data, to: nestedEncoder)
+            try JSON.Encoder.encodeData(
+                data,
+                to: nestedEncoder
+            )
         } else if let date = value as? Date {
-            try JSON.Encoder.encodeDate(date, to: nestedEncoder)
+            try JSON.Encoder.encodeDate(
+                date,
+                to: nestedEncoder
+            )
         } else if let url = value as? URL {
-            try JSON.Encoder.encodeURL(url, to: nestedEncoder)
+            try JSON.Encoder.encodeURL(
+                url,
+                to: nestedEncoder
+            )
         } else if let decimal = value as? Decimal {
-            try JSON.Encoder.encodeDecimal(decimal, to: nestedEncoder)
+            try JSON.Encoder.encodeDecimal(
+                decimal,
+                to: nestedEncoder
+            )
         } else {
             try value.encode(to: nestedEncoder)
         }
@@ -162,8 +184,14 @@ struct ValueEncoder: SingleValueEncodingContainer {
     private mutating func write(
         _ json: JSON
     ) {
-        precondition(!hasWritten, "Attempted to encode multiple values into a single value container at coding path \(codingPath)")
-        encoder.store(container: json, at: containerIndex)
+        precondition(
+            !hasWritten,
+            "Attempted to encode multiple values into a single value container at coding path \(codingPath)"
+        )
+        encoder.store(
+            container: json,
+            at: containerIndex
+        )
         hasWritten = true
     }
 

@@ -39,7 +39,7 @@ extension JSON {
 
     // MARK: - API
 
-    /// Precalculate the default recurstion and depth limits
+    /// Precalculate the default recursion and depth limits
     ///
     /// Calling this method ahead of your first deserialization operation will marginally improve performance
     /// - Note: If you have already performed on deserialization operation, or if you have already called this method once before, this method is a no-op

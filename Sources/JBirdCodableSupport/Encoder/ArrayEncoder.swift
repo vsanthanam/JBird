@@ -69,13 +69,23 @@ final class ArrayEncoder: UnkeyedEncodingContainer {
     func encode(
         _ value: Double
     ) throws {
-        try append(JSON.Encoder.encodeDouble(value, codingPath: codingPath))
+        try append(
+            JSON.Encoder.encodeDouble(
+                value,
+                codingPath: codingPath
+            )
+        )
     }
 
     func encode(
         _ value: Float
     ) throws {
-        try append(JSON.Encoder.encodeFloat(value, codingPath: codingPath))
+        try append(
+            JSON.Encoder.encodeFloat(
+                value,
+                codingPath: codingPath
+            )
+        )
     }
 
     func encode(
@@ -149,13 +159,25 @@ final class ArrayEncoder: UnkeyedEncodingContainer {
             onValueChange: nil
         )
         if let data = value as? Data {
-            try JSON.Encoder.encodeData(data, to: nestedEncoder)
+            try JSON.Encoder.encodeData(
+                data,
+                to: nestedEncoder
+            )
         } else if let date = value as? Date {
-            try JSON.Encoder.encodeDate(date, to: nestedEncoder)
+            try JSON.Encoder.encodeDate(
+                date,
+                to: nestedEncoder
+            )
         } else if let url = value as? URL {
-            try JSON.Encoder.encodeURL(url, to: nestedEncoder)
+            try JSON.Encoder.encodeURL(
+                url,
+                to: nestedEncoder
+            )
         } else if let decimal = value as? Decimal {
-            try JSON.Encoder.encodeDecimal(decimal, to: nestedEncoder)
+            try JSON.Encoder.encodeDecimal(
+                decimal,
+                to: nestedEncoder
+            )
         } else {
             try value.encode(to: nestedEncoder)
         }
@@ -175,9 +197,15 @@ final class ArrayEncoder: UnkeyedEncodingContainer {
         ) { [encoder, containerIndex] json in
             var array = encoder.array(at: containerIndex)
             array[index] = json
-            encoder.store(container: .array(array), at: containerIndex)
+            encoder.store(
+                container: .array(array),
+                at: containerIndex
+            )
         }
-        let container = ObjectEncoder<NestedKey>(encoder: nestedEncoder, autoPopContainers: true)
+        let container = ObjectEncoder<NestedKey>(
+            encoder: nestedEncoder,
+            autoPopContainers: true
+        )
         return KeyedEncodingContainer(container)
     }
 
@@ -191,9 +219,15 @@ final class ArrayEncoder: UnkeyedEncodingContainer {
         ) { [encoder, containerIndex] json in
             var array = encoder.array(at: containerIndex)
             array[index] = json
-            encoder.store(container: .array(array), at: containerIndex)
+            encoder.store(
+                container: .array(array),
+                at: containerIndex
+            )
         }
-        return ArrayEncoder(encoder: nestedEncoder, autoPopContainers: true)
+        return ArrayEncoder(
+            encoder: nestedEncoder,
+            autoPopContainers: true
+        )
     }
 
     func superEncoder() -> any Encoder {
@@ -206,7 +240,10 @@ final class ArrayEncoder: UnkeyedEncodingContainer {
         ) { [encoder, containerIndex] json in
             var array = encoder.array(at: containerIndex)
             array[index] = json
-            encoder.store(container: .array(array), at: containerIndex)
+            encoder.store(
+                container: .array(array),
+                at: containerIndex
+            )
         }
     }
 
@@ -218,7 +255,10 @@ final class ArrayEncoder: UnkeyedEncodingContainer {
     ) -> Int {
         var array = encoder.array(at: containerIndex)
         array.append(json)
-        encoder.store(container: .array(array), at: containerIndex)
+        encoder.store(
+            container: .array(array),
+            at: containerIndex
+        )
         return array.index(before: array.endIndex)
     }
 
