@@ -47,7 +47,9 @@ final class InternalEncoder: Encoder {
 
     // MARK: - API
 
-    static func root(userInfo: [CodingUserInfoKey: any Sendable]) -> InternalEncoder {
+    static func root(
+        userInfo: [CodingUserInfoKey: any Sendable]
+    ) -> InternalEncoder {
         .init(
             storage: Storage(),
             codingPath: [],
@@ -141,7 +143,10 @@ final class InternalEncoder: Encoder {
         container: JSON,
         at index: Int
     ) {
-        storage.replace(container: container, at: index)
+        storage.replace(
+            container: container,
+            at: index
+        )
         onValueChange?(container)
     }
 
@@ -168,14 +173,20 @@ final class InternalEncoder: Encoder {
     ) -> KeyedEncodingContainer<Key> where Key: CodingKey {
         precondition(containerType == nil, "Attempted to create multiple containers at coding path \(codingPath)")
         containerType = .keyed
-        let container = ObjectEncoder<Key>(encoder: self, autoPopContainers: autoPopContainers)
+        let container = ObjectEncoder<Key>(
+            encoder: self,
+            autoPopContainers: autoPopContainers
+        )
         return KeyedEncodingContainer(container)
     }
 
     func unkeyedContainer() -> any UnkeyedEncodingContainer {
         precondition(containerType == nil, "Attempted to create multiple containers at coding path \(codingPath)")
         containerType = .unkeyed
-        return ArrayEncoder(encoder: self, autoPopContainers: autoPopContainers)
+        return ArrayEncoder(
+            encoder: self,
+            autoPopContainers: autoPopContainers
+        )
     }
 
     func singleValueContainer() -> any SingleValueEncodingContainer {
@@ -196,5 +207,15 @@ final class InternalEncoder: Encoder {
     private let depth: Int
     private let onValueChange: ((JSON) -> Void)?
     private var containerType: ContainerType?
+
+    // MARK: - Deinit
+
+    deinit {
+        if autoPopContainers {
+            while storage.count > depth {
+                _ = storage.popContainer()
+            }
+        }
+    }
 
 }

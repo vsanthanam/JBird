@@ -29,7 +29,7 @@ import JBirdCore
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON {
 
-    /// An object that decodes JSON into a `Decodable`-conforming type
+    /// An object that decodes JSON into a `Decodable`-conforming type.
     public final class Decoder: Sendable {
 
         // MARK: - Initializers
@@ -168,33 +168,96 @@ extension JSON {
             _ type: T.Type = T.self,
             from data: Data,
         ) throws -> T where T: Decodable {
-            let json = try JSON.value(
-                for: data,
-                options: [.fragmentsAllowed, .allowByteOrderMark]
-            )
-            let decodingStrategy = DecodingStrategy(
-                keyDecodingStrategy: keyDecodingStrategy,
-                dateDecodingStrategy: dateDecodingStrategy,
-                dataDecodingStrategy: dataDecodingStrategy,
-                nonConformingFloatDecodingStrategy: nonConformingFloatDecodingStrategy
-            )
-            return try Decoder.$decodingStrategy.withValue(decodingStrategy) {
-                let decoder = InternalDecoder.root(for: json, userInfo: userInfo)
+            try snapshotStrategy {
+                let json = try JSON.value(
+                    for: data,
+                    options: [.fragmentsAllowed, .allowByteOrderMark]
+                )
+                let decoder = InternalDecoder.root(
+                    for: json,
+                    userInfo: userInfo
+                )
                 if type == Date.self {
                     let date = try Decoder.decodeDate(decoder: decoder)
-                    return unsafeBitCast(date, to: type)
+                    return unsafeBitCast(
+                        date,
+                        to: type
+                    )
                 } else if type == Data.self {
                     let data = try Decoder.decodeData(decoder: decoder)
-                    return unsafeBitCast(data, to: type)
+                    return unsafeBitCast(
+                        data,
+                        to: type
+                    )
                 } else if type == URL.self {
                     let url = try Decoder.decodeURL(decoder: decoder)
-                    return unsafeBitCast(url, to: type)
+                    return unsafeBitCast(
+                        url,
+                        to: type
+                    )
                 } else if type == Decimal.self {
                     let decimal = try Decoder.decodeDecimal(decoder: decoder)
-                    return unsafeBitCast(decimal, to: type)
+                    return unsafeBitCast(
+                        decimal,
+                        to: type
+                    )
                 } else {
                     return try T(from: decoder)
                 }
+            }
+        }
+
+        /// Decode a JSON payload into a `DecodableWithConfiguration` type with a decoding configuration
+        /// - Parameters:
+        ///   - type: The type to decode into
+        ///   - data: The payload to decode
+        ///   - configuration: A decoding configuration provider
+        /// - Returns: An instance of the decoded type, based on the provided payload
+        public func decode<T>(
+            _ type: T.Type,
+            from data: Data,
+            configuration: T.DecodingConfiguration
+        ) throws -> T where T: DecodableWithConfiguration {
+            try snapshotStrategy {
+                let json = try JSON.value(
+                    for: data,
+                    options: [.fragmentsAllowed, .allowByteOrderMark]
+                )
+                let decoder = InternalDecoder.root(
+                    for: json,
+                    userInfo: userInfo
+                )
+                return try T(
+                    from: decoder,
+                    configuration: configuration
+                )
+            }
+        }
+
+        /// Decode a JSON payload into a `DecodableWithConfiguration` type with a decoding configuration provider.
+        /// - Parameters:
+        ///   - type: The type to decode into
+        ///   - data: The payload to decode
+        ///   - configuration: A decoding configuration provider
+        /// - Returns: An instance of the decoded type, based on the provided payload
+        public func decode<T, C>(
+            _ type: T.Type,
+            from data: Data,
+            configuration: C.Type
+        ) throws -> T where T: DecodableWithConfiguration, C: DecodingConfigurationProviding, T.DecodingConfiguration == C.DecodingConfiguration {
+            try snapshotStrategy {
+                let json = try JSON.value(
+                    for: data,
+                    options: [.fragmentsAllowed, .allowByteOrderMark]
+                )
+                let decoder = InternalDecoder.root(
+                    for: json,
+                    userInfo: userInfo
+                )
+                return try T(
+                    from: decoder,
+                    configuration: configuration.decodingConfiguration
+                )
             }
         }
 
@@ -209,6 +272,20 @@ extension JSON {
 
         @TaskLocal
         static var decodingStrategy: DecodingStrategy? = nil
+
+        private func snapshotStrategy<T>(
+            _ fn: () throws -> T
+        ) rethrows -> T {
+            let decodingStrategy = DecodingStrategy(
+                keyDecodingStrategy: keyDecodingStrategy,
+                dateDecodingStrategy: dateDecodingStrategy,
+                dataDecodingStrategy: dataDecodingStrategy,
+                nonConformingFloatDecodingStrategy: nonConformingFloatDecodingStrategy
+            )
+            return try Decoder.$decodingStrategy.withValue(decodingStrategy) {
+                try fn()
+            }
+        }
 
         private let _userInfo = CodingStrategy<[CodingUserInfoKey: any Sendable]>([:])
         private let _keyDecodingStrategy = CodingStrategy<KeyDecodingStrategy>(.useDefaultKeys)
@@ -317,7 +394,7 @@ extension JSON {
         }
 
         static func decodeURL(decoder: any Swift.Decoder) throws -> URL {
-            // Parity carve-out: Apple's `JSONDecoder` special-cases `URL.self`
+            // Apple's `JSONDecoder` special-cases `URL.self`
             // alongside `Date`, `Data`, and `Decimal` — read a single JSON
             // string and construct the URL via `URL(string:)`, bypassing
             // `URL.init(from:)` (which expects a keyed `relative`/`base`
@@ -340,7 +417,7 @@ extension JSON {
         }
 
         static func decodeDecimal(decoder: any Swift.Decoder) throws -> Decimal {
-            // Parity carve-out: Apple's `JSONDecoder` special-cases
+            // Apple's `JSONDecoder` special-cases
             // `Decimal.self` alongside `Date`, `Data`, and `URL` — read the
             // JSON number and construct a `Decimal`, bypassing
             // `Decimal.init(from:)` (which would otherwise decode the keyed

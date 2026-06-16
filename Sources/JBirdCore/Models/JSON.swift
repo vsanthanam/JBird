@@ -233,7 +233,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
 
     /// Whether or not the JSON value is a Boolean.
     ///
-    /// This propery returns `true` if the JSON value is a boolean. Otherwise, it returns `false`.
+    /// This property returns `true` if the JSON value is a boolean. Otherwise, it returns `false`.
     public var isBool: Bool {
         switch self {
         case .bool:
@@ -303,7 +303,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         }
     }
 
-    /// Wheter or not the JSON value contains any non-conforming floating point values, such as `NaN`
+    /// Whether or not the JSON value contains any non-conforming floating point values, such as `NaN`
     ///
     /// JSON values cannot legally contain non-conforming floating point values.
     /// When serialized these values need to be removed or altered.
@@ -913,7 +913,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameters:
     ///   - i: The index of the first value to swap.
     ///   - j: The index of the second value to swap.
-    /// - Throws: An error, if the JSON value is not an array, or if either of the provided indicies is out of bounds.
+    /// - Throws: An error, if the JSON value is not an array, or if either of the provided indices is out of bounds.
     public mutating func swapAt(
         _ i: some BinaryInteger,
         _ j: some BinaryInteger
@@ -992,7 +992,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameters:
     ///   - other: The JSON object to merge
     ///   - combine: A closure that takes the current and new JSON values for any duplicate keys. The closure returns the desired JSON value for the final JSON object.
-    /// - Returns: A new JSON objectwith the combined keys and values of this JSON object and other.
+    /// - Returns: A new JSON object with the combined keys and values of this JSON object and other.
     public func merging(
         _ other: JSON,
         uniquingKeysWith combine: (JSON, JSON) throws -> JSON = { lhs, rhs in lhs }
@@ -1009,7 +1009,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         try .object(objectValue.filter(isIncluded))
     }
 
-    /// Returns a new JSON object containing the key-value pairs of this object who's keys satisfy the given predicate
+    /// Returns a new JSON object containing the key-value pairs of this object whose keys satisfy the given predicate
     /// - Parameter isIncluded: A closure that takes a JSON key as its argument and returns a Boolean value indicating whether the key should be included in the returned JSON object.
     /// - Returns: The filtered JSON object
     public func filterKeys(
@@ -1020,7 +1020,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         }
     }
 
-    /// Returns a new JSON object containing the key-value pairs of this object who's values satisfy the given predicate
+    /// Returns a new JSON object containing the key-value pairs of this object whose values satisfy the given predicate
     /// - Parameter isIncluded: A closure that takes a JSON object as its argument and returns a Boolean value indicating whether the value should be included in the returned JSON object.
     /// - Returns: The filtered JSON object
     public func filterValues(
@@ -1032,7 +1032,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// Returns a new JSON value containing the elements of the array that satisfy the given predicate
-    /// - Parameter isIncluded: A closure ethat takes an element as its argument and returns a Boolean value indicating whether the element should be included in the returned JSON object.
+    /// - Parameter isIncluded: A closure that takes an element as its argument and returns a Boolean value indicating whether the element should be included in the returned JSON object.
     /// - Returns: The filtered JSON array
     public func filter(
         _ isIncluded: (JSON) throws -> Bool
@@ -1056,7 +1056,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// Serialize the JSON object to a byte buffer
-    /// - Returns: The serialized byte buffe
+    /// - Returns: The serialized byte buffer
     public func serialize() throws -> Data {
         try JSON.data(from: self)
     }

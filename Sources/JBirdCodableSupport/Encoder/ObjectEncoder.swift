@@ -49,127 +49,226 @@ final class ObjectEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
     func encodeNil(
         forKey key: Key
     ) throws {
-        let encodedKey = JSON.Encoder.encodeKey(path: codingPath, key: key)
-        set(.null, forKey: encodedKey)
+        let encodedKey = JSON.Encoder.encodeKey(
+            path: codingPath,
+            key: key
+        )
+        set(
+            .null,
+            forKey: encodedKey
+        )
     }
 
     func encode(
         _ value: Bool,
         forKey key: Key
     ) throws {
-        let encodedKey = JSON.Encoder.encodeKey(path: codingPath, key: key)
-        set(JSON(value), forKey: encodedKey)
+        let encodedKey = JSON.Encoder.encodeKey(
+            path: codingPath,
+            key: key
+        )
+        set(
+            JSON(value),
+            forKey: encodedKey
+        )
     }
 
     func encode(
         _ value: String,
         forKey key: Key
     ) throws {
-        let encodedKey = JSON.Encoder.encodeKey(path: codingPath, key: key)
-        set(JSON(value), forKey: encodedKey)
+        let encodedKey = JSON.Encoder.encodeKey(
+            path: codingPath,
+            key: key
+        )
+        set(
+            JSON(value),
+            forKey: encodedKey
+        )
     }
 
     func encode(
         _ value: Double,
         forKey key: Key
     ) throws {
-        let encodedKey = JSON.Encoder.encodeKey(path: codingPath, key: key)
-        try set(JSON.Encoder.encodeDouble(value, codingPath: codingPath + [key]), forKey: encodedKey)
+        let encodedKey = JSON.Encoder.encodeKey(
+            path: codingPath,
+            key: key
+        )
+        try set(
+            JSON.Encoder.encodeDouble(
+                value,
+                codingPath: codingPath + [key]
+            ),
+            forKey: encodedKey
+        )
     }
 
     func encode(
         _ value: Float,
         forKey key: Key
     ) throws {
-        let encodedKey = JSON.Encoder.encodeKey(path: codingPath, key: key)
-        try set(JSON.Encoder.encodeFloat(value, codingPath: codingPath + [key]), forKey: encodedKey)
+        let encodedKey = JSON.Encoder.encodeKey(
+            path: codingPath,
+            key: key
+        )
+        try set(
+            JSON.Encoder.encodeFloat(
+                value,
+                codingPath: codingPath + [key]
+            ),
+            forKey: encodedKey
+        )
     }
 
     func encode(
         _ value: Int,
         forKey key: Key
     ) throws {
-        let encodedKey = JSON.Encoder.encodeKey(path: codingPath, key: key)
-        set(JSON(value), forKey: encodedKey)
+        let encodedKey = JSON.Encoder.encodeKey(
+            path: codingPath,
+            key: key
+        )
+        set(
+            JSON(value),
+            forKey: encodedKey
+        )
     }
 
     func encode(
         _ value: Int8,
         forKey key: Key
     ) throws {
-        let encodedKey = JSON.Encoder.encodeKey(path: codingPath, key: key)
-        set(JSON(value), forKey: encodedKey)
+        let encodedKey = JSON.Encoder.encodeKey(
+            path: codingPath,
+            key: key
+        )
+        set(
+            JSON(value),
+            forKey: encodedKey
+        )
     }
 
     func encode(
         _ value: Int16,
         forKey key: Key
     ) throws {
-        let encodedKey = JSON.Encoder.encodeKey(path: codingPath, key: key)
-        set(JSON(value), forKey: encodedKey)
+        let encodedKey = JSON.Encoder.encodeKey(
+            path: codingPath,
+            key: key
+        )
+        set(
+            JSON(value),
+            forKey: encodedKey
+        )
     }
 
     func encode(
         _ value: Int32,
         forKey key: Key
     ) throws {
-        let encodedKey = JSON.Encoder.encodeKey(path: codingPath, key: key)
-        set(JSON(value), forKey: encodedKey)
+        let encodedKey = JSON.Encoder.encodeKey(
+            path: codingPath,
+            key: key
+        )
+        set(
+            JSON(value),
+            forKey: encodedKey
+        )
     }
 
     func encode(
         _ value: Int64,
         forKey key: Key
     ) throws {
-        let encodedKey = JSON.Encoder.encodeKey(path: codingPath, key: key)
-        set(JSON(value), forKey: encodedKey)
+        let encodedKey = JSON.Encoder.encodeKey(
+            path: codingPath,
+            key: key
+        )
+        set(
+            JSON(value),
+            forKey: encodedKey
+        )
     }
 
     func encode(
         _ value: UInt,
         forKey key: Key
     ) throws {
-        let encodedKey = JSON.Encoder.encodeKey(path: codingPath, key: key)
-        set(JSON(value), forKey: encodedKey)
+        let encodedKey = JSON.Encoder.encodeKey(
+            path: codingPath,
+            key: key
+        )
+        set(
+            JSON(value),
+            forKey: encodedKey
+        )
     }
 
     func encode(
         _ value: UInt8,
         forKey key: Key
     ) throws {
-        let encodedKey = JSON.Encoder.encodeKey(path: codingPath, key: key)
-        set(JSON(value), forKey: encodedKey)
+        let encodedKey = JSON.Encoder.encodeKey(
+            path: codingPath,
+            key: key
+        )
+        set(
+            JSON(value),
+            forKey: encodedKey
+        )
     }
 
     func encode(
         _ value: UInt16,
         forKey key: Key
     ) throws {
-        let encodedKey = JSON.Encoder.encodeKey(path: codingPath, key: key)
-        set(JSON(value), forKey: encodedKey)
+        let encodedKey = JSON.Encoder.encodeKey(
+            path: codingPath,
+            key: key
+        )
+        set(
+            JSON(value),
+            forKey: encodedKey
+        )
     }
 
     func encode(
         _ value: UInt32,
         forKey key: Key
     ) throws {
-        let encodedKey = JSON.Encoder.encodeKey(path: codingPath, key: key)
-        set(JSON(value), forKey: encodedKey)
+        let encodedKey = JSON.Encoder.encodeKey(
+            path: codingPath,
+            key: key
+        )
+        set(
+            JSON(value),
+            forKey: encodedKey
+        )
     }
 
     func encode(
         _ value: UInt64,
         forKey key: Key
     ) throws {
-        let encodedKey = JSON.Encoder.encodeKey(path: codingPath, key: key)
-        set(JSON(value), forKey: encodedKey)
+        let encodedKey = JSON.Encoder.encodeKey(
+            path: codingPath,
+            key: key
+        )
+        set(
+            JSON(value),
+            forKey: encodedKey
+        )
     }
 
     func encode<T>(
         _ value: T,
         forKey key: Key
     ) throws where T: Encodable {
-        let encodedKey = JSON.Encoder.encodeKey(path: codingPath, key: key)
+        let encodedKey = JSON.Encoder.encodeKey(
+            path: codingPath,
+            key: key
+        )
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
             codingPath: codingPath + [key],
@@ -178,25 +277,43 @@ final class ObjectEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
             onValueChange: nil
         )
         if let data = value as? Data {
-            try JSON.Encoder.encodeData(data, to: nestedEncoder)
+            try JSON.Encoder.encodeData(
+                data,
+                to: nestedEncoder
+            )
         } else if let date = value as? Date {
-            try JSON.Encoder.encodeDate(date, to: nestedEncoder)
+            try JSON.Encoder.encodeDate(
+                date,
+                to: nestedEncoder
+            )
         } else if let url = value as? URL {
-            try JSON.Encoder.encodeURL(url, to: nestedEncoder)
+            try JSON.Encoder.encodeURL(
+                url,
+                to: nestedEncoder
+            )
         } else if let decimal = value as? Decimal {
-            try JSON.Encoder.encodeDecimal(decimal, to: nestedEncoder)
+            try JSON.Encoder.encodeDecimal(
+                decimal,
+                to: nestedEncoder
+            )
         } else {
             try value.encode(to: nestedEncoder)
         }
         let encoded = nestedEncoder.popContainer()
-        set(encoded, forKey: encodedKey)
+        set(
+            encoded,
+            forKey: encodedKey
+        )
     }
 
     func nestedContainer<NestedKey>(
         keyedBy keyType: NestedKey.Type,
         forKey key: Key
     ) -> KeyedEncodingContainer<NestedKey> where NestedKey: CodingKey {
-        let encodedKey = JSON.Encoder.encodeKey(path: codingPath, key: key)
+        let encodedKey = JSON.Encoder.encodeKey(
+            path: codingPath,
+            key: key
+        )
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
             codingPath: codingPath + [key],
@@ -205,16 +322,25 @@ final class ObjectEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
         ) { [encoder, containerIndex] json in
             var object = encoder.object(at: containerIndex)
             object[encodedKey.stringValue] = json
-            encoder.store(container: .object(object), at: containerIndex)
+            encoder.store(
+                container: .object(object),
+                at: containerIndex
+            )
         }
-        let container = ObjectEncoder<NestedKey>(encoder: nestedEncoder, autoPopContainers: true)
+        let container = ObjectEncoder<NestedKey>(
+            encoder: nestedEncoder,
+            autoPopContainers: true
+        )
         return KeyedEncodingContainer(container)
     }
 
     func nestedUnkeyedContainer(
         forKey key: Key
     ) -> any UnkeyedEncodingContainer {
-        let encodedKey = JSON.Encoder.encodeKey(path: codingPath, key: key)
+        let encodedKey = JSON.Encoder.encodeKey(
+            path: codingPath,
+            key: key
+        )
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
             codingPath: codingPath + [key],
@@ -223,14 +349,23 @@ final class ObjectEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
         ) { [encoder, containerIndex] json in
             var object = encoder.object(at: containerIndex)
             object[encodedKey.stringValue] = json
-            encoder.store(container: .object(object), at: containerIndex)
+            encoder.store(
+                container: .object(object),
+                at: containerIndex
+            )
         }
-        return ArrayEncoder(encoder: nestedEncoder, autoPopContainers: true)
+        return ArrayEncoder(
+            encoder: nestedEncoder,
+            autoPopContainers: true
+        )
     }
 
     func superEncoder() -> any Encoder {
         let superKey = SuperCodingKey()
-        let encodedKey = JSON.Encoder.encodeKey(path: codingPath, key: superKey)
+        let encodedKey = JSON.Encoder.encodeKey(
+            path: codingPath,
+            key: superKey
+        )
         return InternalEncoder(
             storage: encoder.storage,
             codingPath: codingPath + [superKey],
@@ -239,14 +374,20 @@ final class ObjectEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
         ) { [encoder, containerIndex] json in
             var object = encoder.object(at: containerIndex)
             object[encodedKey.stringValue] = json
-            encoder.store(container: .object(object), at: containerIndex)
+            encoder.store(
+                container: .object(object),
+                at: containerIndex
+            )
         }
     }
 
     func superEncoder(
         forKey key: Key
     ) -> any Encoder {
-        let encodedKey = JSON.Encoder.encodeKey(path: codingPath, key: key)
+        let encodedKey = JSON.Encoder.encodeKey(
+            path: codingPath,
+            key: key
+        )
         return InternalEncoder(
             storage: encoder.storage,
             codingPath: codingPath + [key],
@@ -255,7 +396,10 @@ final class ObjectEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
         ) { [encoder, containerIndex] json in
             var object = encoder.object(at: containerIndex)
             object[encodedKey.stringValue] = json
-            encoder.store(container: .object(object), at: containerIndex)
+            encoder.store(
+                container: .object(object),
+                at: containerIndex
+            )
         }
     }
 
@@ -267,7 +411,10 @@ final class ObjectEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
     ) {
         var object = encoder.object(at: containerIndex)
         object[key.stringValue] = json
-        encoder.store(container: .object(object), at: containerIndex)
+        encoder.store(
+            container: .object(object),
+            at: containerIndex
+        )
     }
 
     private let encoder: InternalEncoder

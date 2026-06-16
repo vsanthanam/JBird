@@ -313,16 +313,28 @@ struct ValueDecoder: SingleValueDecodingContainer {
         )
         if type == Date.self {
             let date = try JSON.Decoder.decodeDate(decoder: decoder)
-            return unsafeBitCast(date, to: type)
+            return unsafeBitCast(
+                date,
+                to: type
+            )
         } else if type == Data.self {
             let data = try JSON.Decoder.decodeData(decoder: decoder)
-            return unsafeBitCast(data, to: type)
+            return unsafeBitCast(
+                data,
+                to: type
+            )
         } else if type == URL.self {
             let url = try JSON.Decoder.decodeURL(decoder: decoder)
-            return unsafeBitCast(url, to: type)
+            return unsafeBitCast(
+                url,
+                to: type
+            )
         } else if type == Decimal.self {
             let decimal = try JSON.Decoder.decodeDecimal(decoder: decoder)
-            return unsafeBitCast(decimal, to: type)
+            return unsafeBitCast(
+                decimal,
+                to: type
+            )
         } else {
             return try T(from: nestedDecoder)
         }

@@ -26,7 +26,7 @@
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON {
 
-    /// The availabile options when serializing a `JSON` value into a byte buffer or Swift string
+    /// The available options when serializing a `JSON` value into a byte buffer or Swift string
     public struct SerializationOptions: OptionSet, Equatable, Hashable, Sendable {
 
         // MARK: - API
@@ -76,7 +76,7 @@ extension JSON {
         /// Whether or not to escape the forward slash character
         ///
         /// When this option is enabled, the forward slash character (`/`) will be escaped as `\/` in the serialized JSON.
-        /// This can be useful for preventing issues with certain parsers that may misIntegererpret the forward slash.
+        /// This can be useful for preventing issues with certain parsers that may misinterpret the forward slash.
         public static let escapeForwardSlash = SerializationOptions(rawValue: 1 << 8)
 
         /// Whether or not nonconforming floating-point numbers such as `NaN` or `Double.infinity` should be allowed in the serialized output.
@@ -101,7 +101,7 @@ extension JSON {
         /// Whether or not nonconforming floating point values should be replaced with null
         ///
         /// When this option is enabled, nonconforming floating point values will be replaced with a JSON null literal instead of their stringified representations.
-        /// This option also requires the presence of ``allowNonConformingFloatingPointValues``in the bitmask
+        /// This option also requires the presence of ``allowNonConformingFloatingPointValues`` in the bitmask
         /// The default behavior does not allow nonconforming values at all. If you do not also include ``allowNonConformingFloatingPointValues``, this option has no effect on the serialized output.
         public static let nullifyNonConformingFloatingPointValues = SerializationOptions(rawValue: 1 << 11)
 

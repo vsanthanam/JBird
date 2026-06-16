@@ -33,7 +33,7 @@ import Foundation
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON {
 
-    /// An error thrown when deserialzing a Swift string or UTF-8 encoded byte buffer
+    /// An error thrown when deserializing a Swift string or UTF-8 encoded byte buffer
     public enum DeserializationError: Error, Equatable, Sendable, CustomStringConvertible {
 
         // MARK: - API
@@ -85,13 +85,13 @@ extension JSON {
         case outOfMemory
 
         /// Thrown when the JSON structure exceeds the maximum allowed nesting depth.
-        /// By default, the depth limit is set for you automatically based a hueristic applied to the system profile
+        /// By default, the depth limit is set for you automatically based on a heuristic applied to the system profile
         ///
         /// See ``JSON/withRecursionDepthLimit(_:operation:)`` or ``JSON/withRecursionDepthLimit(_:isolation:operation:)`` for more information.
         case depthLimitExceeded
 
         /// Thrown when the size of the input exceeds the configured maximum input size limit.
-        /// By default, the input size limit is set for you automatically based a hueristic applied to the system profile
+        /// By default, the input size limit is set for you automatically based on a heuristic applied to the system profile
         ///
         /// See ``JSON/withInputSizeLimit(_:operation:)`` or ``JSON/withInputSizeLimit(_:isolation:operation:)`` for more information.
         case inputSizeLimitExceeded
