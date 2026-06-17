@@ -12,46 +12,152 @@ A blazing fast, type-safe library for working with JSON in Swift
 
 ## Why JBird?
 
-JBird brings type safety to unstructured JSON with an elegant, ergonomic API that dramatically improves developer experience compared to Foundation's JSONSerialization:
+Working with JSON in Swift usually means choosing between two extremes. Foundation's `JSONSerialization` hands you `Any` and forces you to cast and unwrap at every step. `Codable` is type-safe but rigid: it expects your Swift types to mirror the payload exactly, and reaching into a single field of an arbitrary document is awkward.
+
+JBird closes that gap. It models JSON as a first-class Swift value you can read, traverse, and mutate directly — without ever losing type safety — and pairs that model with a fast, C-backed parsing core. And when you *do* want to work with concrete Swift types, JBird converts cleanly to and from them, including a drop-in `Codable` encoder and decoder.
 
 ```swift
-// With Foundation, you need to cast and unwrap repeatedly
-if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-   let user = json["user"] as? [String: Any],
-   let name = user["name"] as? String,
-   let isActive = user["isActive"] as? Bool {
-   // Finally use the values after multiple casts
+// Foundation: cast and unwrap at every level
+if let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+   let user = root["user"] as? [String: Any],
+   let name = user["name"] as? String {
+    // ...finally usable
 }
 
-// With JBird, you get natural, type-safe accessor syntax
+// JBird: type-safe traversal in a single expression
 let json = try JSON(data)
-let name = try json["user"]["name"].stringValue
-let isActive = try json["user"]["isActive"].boolValue
-let user = try json["user"].convert(into: User.self)
+let name: String = try json["user"]["name"]
 ```
 
-JBird also simplifies mutation, which is cumbersome with Foundation:
-
-```swift
-// With Foundation, you must re-create and re-assign 
-var jsonDict = json as? [String: Any] ?? [:]
-if var user = jsonDict["user"] as? [String: Any] {
-    user["status"] = "active" 
-    jsonDict["user"] = user
-}
-
-// With JBird, you can traverse and mutate in a single expression
-var mutableJSON = try JSON(data)
-try mutableJSON["user"].setValue(true, forKey: "isActive")
-```
-
-JBird eliminates the verbosity of type casting chains and nested optional unwrapping, providing a statically typed interface for efficient JSON traversal and modification. For more information see [the documentation](https://www.usejbird.com/docs/documentation/jbird/whyjbird)
+For more background, see [the documentation](https://www.usejbird.com/docs/documentation/jbird/whyjbird).
 
 ## Features
 
-- **Blazing fast performance**: Built with a [C11](https://en.wikipedia.org/wiki/C11_(C_standard_revision)) core for optimized parsing with SIMD acceleration where appropriate.
-- **Ergonomic, type-safe APIs**: Rich, Swift-first API with proper type checking and error handling. Easily and safely convert between serialized JSON, type-safe JSON, and native Swift types.
-- **Thoroughly tested**: Comprehensive test suite ensures thorough correctness and strict adherence to the [JSON RFC 8259](https://datatracker.ietf.org/doc/html/rfc8259).
+JBird is organized around five capabilities, all built on the same `JSON` value type — so they share a consistent, type-safe API and compose freely.
+
+### A type-safe model for creating and manipulating JSON
+
+`JSON` is a `Sendable`, `Equatable`, `Hashable` enum with one case per JSON type (`null`, `bool`, `number`, `string`, `array`, `object`). It conforms to the standard `ExpressibleBy*Literal` protocols, so you build values using ordinary Swift literals:
+
+```swift
+var user: JSON = [
+    "name": "Alice",
+    "age": 30,
+    "active": true,
+    "roles": ["admin", "editor"],
+]
+```
+
+Read values through throwing, typed accessors and subscripts. Subscripts chain across nested objects and arrays, and can convert to a concrete type inline:
+
+```swift
+let name = try user["name"].stringValue             // String
+let firstRole: String = try user["roles"][0]        // String, via type inference
+let age = try user["age", as: Int.self]             // Int
+
+if user.containsValue(forKey: "email") { /* ... */ }
+```
+
+Mutate in place — set keys, append to arrays, merge, and remove — without rebuilding intermediate containers:
+
+```swift
+try user.setValue(31, forKey: "age")
+try user["roles"].append("reviewer")
+try user.removeValue(forKey: "active")
+try user.merge(["verified": true], uniquingKeysWith: { _, new in new })
+```
+
+### A blazing fast JSON serializer and deserializer
+
+Parsing and serialization are backed by a hand-written C core with SIMD-accelerated scanning (SSE2 on x86-64, NEON on ARM64), an arena allocator, and string interning. It works directly with the `JSON` model, with no intermediate `Any` representation to slow things down.
+
+```swift
+// Deserialize from Data or String
+let json = try JSON(data)
+let fromString = try JSON(jsonString: #"{"ok":true}"#)
+
+// Serialize to Data or String
+let data = try json.serialize()
+let string = try json.stringify()
+```
+
+Both directions accept option sets (`DeserializationOptions`, `SerializationOptions`) for control over things like pretty-printing, key sorting, and duplicate-key handling, and cancellable `async` variants are available for large payloads.
+
+### Conversion between typed JSON and Swift types
+
+JBird defines a small protocol family for bridging typed JSON and other Swift types:
+
+- `JSONConvertible` — a type can produce a `JSON` value (`var jsonValue: JSON`)
+- `JSONInitializable` — a type can be built from a `JSON` value (`init(json:) throws`)
+- `JSONRepresentable` — both of the above
+
+Many standard library types already conform.
+
+```swift
+let json = JSON(["a": 1, "b": 2])        // from a Swift dictionary
+let dict = try json.convert(into: [String: Int].self)
+```
+
+For your own types, the `@JSONRepresentable` macro generates both conformances. `@JSONKey` customizes the key for a property (a literal string or `.snakeCase`), and `@OmitIfNil` drops `nil` optionals from the output:
+
+```swift
+@JSONRepresentable
+struct Article {
+    @JSONKey("article_id") let id: String
+    @JSONKey(.snakeCase)   let publishedAt: Date     // -> "published_at"
+    @OmitIfNil             let summary: String?
+}
+
+let article = try Article(json: json)
+let roundTrip = JSON(article)
+```
+
+### A result builder for declarative JSON
+
+The `JSON { ... }` result builder constructs values declaratively, with the `=>` operator for object keys, nesting via trailing closures, and full support for `if`/`else`/`for` control flow:
+
+```swift
+let payload = JSON {
+    "id" => 123
+    "profile" => {
+        "name" => "Alice"
+        if isAdmin {
+            "role" => "admin"
+        }
+    }
+    "tags" => {
+        for tag in tags {
+            tag
+        }
+    }
+}
+```
+
+### A drop-in replacement for `JSONEncoder` / `JSONDecoder`
+
+`JSON.Encoder` and `JSON.Decoder` mirror Foundation's `Codable` API surface, so existing `Codable` types work unchanged — while encoding and decoding run through JBird's fast core, no migration required.
+
+```swift
+struct Person: Codable {
+    let name: String
+    let age: Int
+}
+
+let encoder = JSON.Encoder()
+encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+encoder.keyEncodingStrategy = .convertToSnakeCase
+let data = try encoder.encode(Person(name: "Bob", age: 25))
+
+let decoder = JSON.Decoder()
+decoder.keyDecodingStrategy = .convertFromSnakeCase
+let person = try decoder.decode(Person.self, from: data)
+```
+
+The familiar configuration strategies are all present, along with support for `EncodableWithConfiguration` / `DecodableWithConfiguration`.
+
+> The declarative builder, conformance macros, and `Codable` support are exposed as package traits — `DeclarativeAPI`, `ConformanceMacros`, and `CodableSupport` — all enabled by default and individually opt-out.
+
+JBird is rigorously validated against [RFC 8259](https://datatracker.ietf.org/doc/html/rfc8259) by a comprehensive test suite and a fuzzer.
 
 ## Installation
 

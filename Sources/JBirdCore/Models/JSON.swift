@@ -1369,6 +1369,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
 
     // MARK: - CustomStringConvertible
 
+    /// A textual representation of the JSON value.
     public var description: String {
         switch self {
         case let .bool(bool):

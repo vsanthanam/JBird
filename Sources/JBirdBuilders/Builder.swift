@@ -36,25 +36,43 @@ extension JSON {
         self = builder()
     }
 
+    /// A [result builder](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/advancedoperators/#Result-Builders) for composing ``JBirdCore/JSON`` values declaratively.
+    ///
+    /// You rarely reference `Builder` directly. Instead, apply it implicitly through ``JSON/init(builder:)``,
+    /// where each statement in the trailing closure becomes an element of an array or a key-value pair of an object.
+    ///
+    /// ```swift
+    /// let json = JSON {
+    ///     "name" => "Alice"
+    ///     "roles" => ["admin", "editor"]
+    /// }
+    /// ```
+    ///
+    /// The builder accepts both `JSON` array elements and `key => value` object entries, along with
+    /// `if`, `if`/`else`, `switch`, optional, and `for` control flow.
     @resultBuilder
     public enum Builder {
 
+        /// Builds an empty array branch from an uninhabited expression, allowing `Never`-typed statements to participate in a build.
         public static func buildExpression(
             _ expression: Never
         ) -> Never {}
 
+        /// Passes an already-built array of elements through unchanged.
         public static func buildExpression(
             _ expression: Array
         ) -> Array {
             expression
         }
 
+        /// Wraps a single ``JBirdCore/JSON`` value as a one-element array of array elements.
         public static func buildExpression(
             _ expression: JSON
         ) -> Array {
             [expression]
         }
 
+        /// Converts a `JSONConvertible` value into a one-element array of array elements.
         @_disfavoredOverload
         public static func buildExpression(
             _ expression: some JSONConvertible
@@ -62,60 +80,70 @@ extension JSON {
             [JSON(expression)]
         }
 
+        /// Evaluates a nested builder closure and wraps its result as a one-element array of array elements.
         public static func buildExpression(
             @Builder _ expression: () -> JSON
         ) -> Array {
             [expression()]
         }
 
+        /// Concatenates the array elements produced by each statement in a block.
         public static func buildBlock(
             _ components: Array...
         ) -> Array {
             components.flatMap(\.self)
         }
 
+        /// Concatenates the array elements produced by each iteration of a `for` loop.
         public static func buildArray(
             _ components: [Array]
         ) -> Array {
             components.flatMap(\.self)
         }
 
+        /// Selects the array elements from the first branch of an `if`/`else` statement.
         public static func buildEither(
             first component: Array
         ) -> Array {
             component
         }
 
+        /// Selects the array elements from the second branch of an `if`/`else` statement.
         public static func buildEither(
             second component: Array
         ) -> Array {
             component
         }
 
+        /// Supplies an empty array of elements when an optional `if` statement has no value.
         public static func buildOptional(
             _ component: Array?
         ) -> Array {
             component ?? []
         }
 
+        /// Produces a ``JBirdCore/JSON`` array from the accumulated array elements.
         public static func buildFinalResult(
             _ component: Array
         ) -> JSON {
             .array(component)
         }
 
+        /// Expands an existing ``JBirdCore/JSON`` object into its constituent key-value pairs.
         public static func buildExpression(
             _ expression: Object
         ) -> [(Key, Value)] {
             expression.map(\.self)
         }
 
+        /// Wraps a single key-value pair as a one-element array of object entries.
         public static func buildExpression(
             _ expression: (Key, Value)
         ) -> [(Key, Value)] {
             [expression]
         }
 
+        /// Converts a convertible key and value into a one-element array of object entries.
         @_disfavoredOverload
         public static func buildExpression(
             _ expression: (some JSONKeyConvertible, some JSONConvertible)
@@ -124,40 +152,47 @@ extension JSON {
             return [(Key(key), Value(value))]
         }
 
+        /// Supplies no object entries for an empty block.
         public static func buildBlock() -> [(Key, Value)] {
             []
         }
 
+        /// Concatenates the object entries produced by each statement in a block.
         public static func buildBlock(
             _ components: [(Key, Value)]...
         ) -> [(Key, Value)] {
             components.flatMap(\.self)
         }
 
+        /// Concatenates the object entries produced by each iteration of a `for` loop.
         public static func buildArray(
             _ components: [[(Key, Value)]]
         ) -> [(Key, Value)] {
             components.flatMap(\.self)
         }
 
+        /// Selects the object entries from the first branch of an `if`/`else` statement.
         public static func buildEither(
             first component: [(Key, Value)]
         ) -> [(Key, Value)] {
             component
         }
 
+        /// Selects the object entries from the second branch of an `if`/`else` statement.
         public static func buildEither(
             second component: [(Key, Value)]
         ) -> [(Key, Value)] {
             component
         }
 
+        /// Supplies no object entries when an optional `if` statement has no value.
         public static func buildOptional(
             _ component: [(Key, Value)]?
         ) -> [(Key, Value)] {
             component ?? []
         }
 
+        /// Produces a ``JBirdCore/JSON`` object from the accumulated key-value pairs.
         public static func buildFinalResult(
             _ component: [(Key, Value)]
         ) -> JSON {
@@ -203,6 +238,7 @@ public func => (
     (lhs, rhs())
 }
 
+/// An infix operator allowing key value assignment, for use with a ``JBirdCore/JSON/Builder``
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 @_disfavoredOverload
 public func => <Key>(

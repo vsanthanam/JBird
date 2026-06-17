@@ -55,10 +55,13 @@ extension JSON {
 
             // MARK: - OptionSet
 
+            /// Creates an output formatting option set from its raw bitmask.
+            /// - Parameter rawValue: The bitmask backing the option set.
             public init(rawValue: Int) {
                 self.rawValue = rawValue
             }
 
+            /// The bitmask backing the option set.
             public let rawValue: Int
 
         }
@@ -200,9 +203,9 @@ extension JSON {
         ///
         /// - Parameter value: The value to encode
         /// - Returns: A serialized JSON payload, based on the provided `Encodable` value.
-        public func encode(
-            _ value: some Encodable
-        ) throws -> Data {
+        public func encode<T>(
+            _ value: T
+        ) throws -> Data where T: Encodable {
             try snapshotStrategy {
                 let encoder = InternalEncoder.root(userInfo: userInfo)
                 if let date = value as? Date {

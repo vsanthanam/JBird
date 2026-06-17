@@ -49,6 +49,7 @@ extension JSON {
 
         // MARK: - CustomStringConvertible
 
+        /// A textual representation of the subscript component.
         public var description: String {
             switch self {
             case let .key(key):

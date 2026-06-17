@@ -28,7 +28,7 @@ For more information, see the ``/JBirdBuilders`` API reference.
 
 JBird provides seamless conversion between `JSON` values and native Swift types through the `JSONRepresentable` protocol system. Built-in conformances cover all standard Swift types, while custom types can easily adopt the protocols for automatic conversion.
 
-For more information, see <doc:/JBirdCore/EncodeDecode>
+For more information, see <doc:/JBirdCore/Conversion>
 
 ##### Using macros to easily implement `JSONRepresentable` conformance
 

@@ -42,6 +42,7 @@ public struct JSONMacroDecodingError: Error, CustomStringConvertible {
 
     // MARK: - CustomStringConvertible
 
+    /// A textual representation of the error, equal to its ``message``.
     public var description: String {
         message
     }
