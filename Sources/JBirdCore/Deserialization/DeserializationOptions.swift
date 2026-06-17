@@ -124,10 +124,13 @@ extension JSON {
 
         // MARK: - OptionSet
 
+        /// Creates a deserialization option set from its raw bitmask.
+        /// - Parameter rawValue: The bitmask backing the option set.
         public init(rawValue: Int) {
             self.rawValue = rawValue
         }
 
+        /// The bitmask backing the option set.
         public let rawValue: Int
 
     }

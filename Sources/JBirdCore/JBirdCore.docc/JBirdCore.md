@@ -16,6 +16,7 @@ APIs to create, deserialize, manipulate, and serialize JSON data in Swift
 
 ### Converting between JSON and other Swift types
 
+- <doc:Conversion>
 - ``JSONConvertible``
 - ``JSONInitializable``
 - ``JSONRepresentable``

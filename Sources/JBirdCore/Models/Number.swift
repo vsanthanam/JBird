@@ -133,8 +133,11 @@ extension JSON {
 
         // MARK: - ExpressibleByIntegerLiteral
 
+        /// The type used to create a number from an integer literal.
         public typealias IntegerLiteralType = Int
 
+        /// Creates a number from an integer literal.
+        /// - Parameter value: The integer literal value.
         public init(
             integerLiteral value: IntegerLiteralType
         ) {
@@ -143,8 +146,11 @@ extension JSON {
 
         // MARK: - ExpressibleByFloatLiteral
 
+        /// The type used to create a number from a floating-point literal.
         public typealias FloatLiteralType = Double
 
+        /// Creates a number from a floating-point literal.
+        /// - Parameter value: The floating-point literal value.
         public init(
             floatLiteral value: FloatLiteralType
         ) {
@@ -176,6 +182,7 @@ extension JSON {
 
         // MARK: - CustomStringConvertible
 
+        /// A textual representation of the number, matching its serialized JSON form.
         public var description: String {
             switch storage {
             case let .int(int):
@@ -202,6 +209,9 @@ extension JSON {
 
 }
 
+/// Returns the additive inverse of a JSON number.
+/// - Parameter number: The number to negate.
+/// - Returns: A number with the same magnitude and the opposite sign.
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 public prefix func - (_ number: JSON.Number) -> JSON.Number {
     switch number.storage {

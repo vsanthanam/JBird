@@ -80,6 +80,7 @@ extension JSON {
 
         // MARK: - CustomStringConvertible
 
+        /// A human-readable description of the error.
         public var description: String {
             switch self {
             case let .invalidSubscript(`subscript`):
@@ -119,6 +120,7 @@ extension JSON {
 
 }
 
+/// A deprecated alias for ``JSON/OperationError``.
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 @available(*, deprecated, renamed: "JSON.OperationError")
 public typealias JSONError = JSON.OperationError
