@@ -1120,3 +1120,49 @@ extension JSON {
     }
 
 }
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension JSON.Pointer {
+
+    enum Serialization {
+
+        static func stringify(
+            pointer: JSON.Pointer
+        ) -> String {
+            guard !pointer.tokens.isEmpty else {
+                return ""
+            }
+            return "/" + pointer.tokens.map(serialize(token:)).joined(separator: "/")
+        }
+
+        static func serialize(
+            pointer: JSON.Pointer
+        ) -> Data {
+            let str = stringify(pointer: pointer)
+            return str.data(using: .utf8)!
+        }
+
+        private static func serialize(
+            token: String
+        ) -> String {
+            guard token.contains("~") || token.contains("/") else {
+                return token
+            }
+            var result = ""
+            result.reserveCapacity(token.count)
+            for character in token {
+                switch character {
+                case "~":
+                    result.append("~0")
+                case "/":
+                    result.append("~1")
+                default:
+                    result.append(character)
+                }
+            }
+            return result
+        }
+
+    }
+
+}

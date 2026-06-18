@@ -230,7 +230,7 @@ extension JSON {
         for data: Data,
         options: DeserializationOptions = .default
     ) throws -> JSON {
-        try parse(data, options)
+        try SynchronousDeserialization.parse(data, options)
     }
 
     #if compiler(>=6.2) && hasFeature(NonisolatedNonsendingByDefault)
@@ -246,7 +246,7 @@ extension JSON {
             _ data: Data,
             options: DeserializationOptions = .default
         ) async throws -> JSON {
-            try await parseAsync(data, options)
+            try await AsynchronousDeserialization.parseAsync(data, options)
         }
     #else
         /// Create a typed JSON value from a JSON string, asynchronously
@@ -260,7 +260,7 @@ extension JSON {
             _ data: Data,
             options: DeserializationOptions = .default
         ) async throws -> JSON {
-            try await parseAsync(data, options)
+            try await AsynchronousDeserialization.parseAsync(data, options)
         }
     #endif
 
@@ -329,111 +329,319 @@ extension JSON {
     @TaskLocal
     private static var inputSizeLimit: size_t = defaultInputSizeLimit
 
-    @inline(__always)
-    private static func parse(
-        _ data: Data,
-        _ options: DeserializationOptions
-    ) throws -> JSON {
-        if inputSizeLimit != 0, !options.contains(.ignoreInputSizeLimit), data.count > inputSizeLimit {
-            throw DeserializationError.inputSizeLimitExceeded
-        }
-
-        var jsonValue: OpaquePointer?
-        let result = data.withUnsafeBytes { buffer in
-            json_parse(
-                buffer.baseAddress?.assumingMemoryBound(to: UInt8.self),
-                buffer.count,
-                &jsonValue,
-                options.contains(.allowByteOrderMark),
-                options.contains(.requireMinified),
-                options.contains(.requireUniqueKeys),
-                options.contains(.ignoreRecursionDepthLimit) ? 0 : recursionDepthLimit
-            )
-        }
-
-        defer {
-            json_free(jsonValue)
-        }
-
-        guard result == JSON_NO_ERROR else {
-            throw DeserializationError(result)
-        }
-
-        guard let jsonValue else {
-            throw DeserializationError.unknown
-        }
+    private enum SynchronousDeserialization {
 
         @inline(__always)
-        func materialize(
-            _ value: OpaquePointer,
+        static func parse(
+            _ data: Data,
             _ options: DeserializationOptions
         ) throws -> JSON {
-            let type = json_get_type(value)
-            switch type {
-            case JSON_NULL:
-                return .null
-            case JSON_BOOLEAN:
-                return .bool(json_get_boolean(value))
-            case JSON_NUMBER_INT:
-                return .number(JSON.Number(json_get_int(value)))
-            case JSON_NUMBER_DOUBLE:
-                return .number(JSON.Number(json_get_double(value)))
-            case JSON_STRING:
-                let str = String(cString: json_get_string(value))
-                return .string(str)
-            case JSON_ARRAY:
-                let count = json_get_array_size(value)
-                var array = Array()
-                array.reserveCapacity(count)
+            if inputSizeLimit != 0, !options.contains(.ignoreInputSizeLimit), data.count > inputSizeLimit {
+                throw DeserializationError.inputSizeLimitExceeded
+            }
 
-                for i in 0..<count {
-                    let element = json_get_array_element(value, i).unsafelyUnwrapped
-                    let value = try materialize(element, options)
-                    if !options.contains(.omitNullValues) || !value.isNull {
-                        array.append(value)
-                    }
-                }
+            var jsonValue: OpaquePointer?
+            let result = data.withUnsafeBytes { buffer in
+                json_parse(
+                    buffer.baseAddress?.assumingMemoryBound(to: UInt8.self),
+                    buffer.count,
+                    &jsonValue,
+                    options.contains(.allowByteOrderMark),
+                    options.contains(.requireMinified),
+                    options.contains(.requireUniqueKeys),
+                    options.contains(.ignoreRecursionDepthLimit) ? 0 : recursionDepthLimit
+                )
+            }
 
-                return .array(array)
-            case JSON_OBJECT:
-                let count = json_get_object_size(value)
-                var object = Object()
-                object.reserveCapacity(count)
+            defer {
+                json_free(jsonValue)
+            }
 
-                for i in 0..<count {
-                    let key = String(cString: json_get_object_key(value, i))
-                    let objValue = json_get_object_value(value, i).unsafelyUnwrapped
-                    let value = try materialize(objValue, options)
-                    if (!options.contains(.omitNullKeys) && !options.contains(.omitNullValues)) || !value.isNull {
-                        object[key] = value
-                    }
-                }
-                return .object(object)
-            default:
+            guard result == JSON_NO_ERROR else {
+                throw DeserializationError(result)
+            }
+
+            guard let jsonValue else {
                 throw DeserializationError.unknown
             }
-        }
 
-        let json = try materialize(jsonValue, options)
-        if !options.contains(.fragmentsAllowed) {
-            switch json {
-            case .array, .object:
-                return json
-            case .bool, .null, .number, .string:
+            @inline(__always)
+            func materialize(
+                _ value: OpaquePointer,
+                _ options: DeserializationOptions
+            ) throws -> JSON {
+                let type = json_get_type(value)
+                switch type {
+                case JSON_NULL:
+                    return .null
+                case JSON_BOOLEAN:
+                    return .bool(json_get_boolean(value))
+                case JSON_NUMBER_INT:
+                    return .number(JSON.Number(json_get_int(value)))
+                case JSON_NUMBER_DOUBLE:
+                    return .number(JSON.Number(json_get_double(value)))
+                case JSON_STRING:
+                    let str = String(cString: json_get_string(value))
+                    return .string(str)
+                case JSON_ARRAY:
+                    let count = json_get_array_size(value)
+                    var array = Array()
+                    array.reserveCapacity(count)
+
+                    for i in 0..<count {
+                        let element = json_get_array_element(value, i).unsafelyUnwrapped
+                        let value = try materialize(element, options)
+                        if !options.contains(.omitNullValues) || !value.isNull {
+                            array.append(value)
+                        }
+                    }
+
+                    return .array(array)
+                case JSON_OBJECT:
+                    let count = json_get_object_size(value)
+                    var object = Object()
+                    object.reserveCapacity(count)
+
+                    for i in 0..<count {
+                        let key = String(cString: json_get_object_key(value, i))
+                        let objValue = json_get_object_value(value, i).unsafelyUnwrapped
+                        let value = try materialize(objValue, options)
+                        if (!options.contains(.omitNullKeys) && !options.contains(.omitNullValues)) || !value.isNull {
+                            object[key] = value
+                        }
+                    }
+                    return .object(object)
+                default:
+                    throw DeserializationError.unknown
+                }
+            }
+
+            let json = try materialize(jsonValue, options)
+            if !options.contains(.fragmentsAllowed) {
+                switch json {
+                case .array, .object:
+                    return json
+                case .bool, .null, .number, .string:
+                    throw DeserializationError.illegalFragment
+                }
+            }
+            if options.contains(.omitNullValues), json.isNull {
                 throw DeserializationError.illegalFragment
             }
+            return json
         }
-        if options.contains(.omitNullValues), json.isNull {
-            throw DeserializationError.illegalFragment
-        }
-        return json
+
     }
 
-    #if compiler(>=6.2)
-        #if hasFeature(NonisolatedNonsendingByDefault)
-            private static func parseAsync(
+    private enum AsynchronousDeserialization {
+
+        #if compiler(>=6.2)
+            #if hasFeature(NonisolatedNonsendingByDefault)
+                static func parseAsync(
+                    _ data: Data,
+                    _ options: DeserializationOptions
+                ) async throws -> JSON {
+                    if inputSizeLimit != 0, !options.contains(.ignoreInputSizeLimit), data.count > inputSizeLimit {
+                        throw DeserializationError.inputSizeLimitExceeded
+                    }
+
+                    var jsonValue: OpaquePointer?
+                    let result = data.withUnsafeBytes { buffer in
+                        json_parse(
+                            buffer.baseAddress?.assumingMemoryBound(to: UInt8.self),
+                            buffer.count,
+                            &jsonValue,
+                            options.contains(.allowByteOrderMark),
+                            options.contains(.requireMinified),
+                            options.contains(.requireUniqueKeys),
+                            options.contains(.ignoreRecursionDepthLimit) ? 0 : recursionDepthLimit
+                        )
+                    }
+
+                    defer {
+                        json_free(jsonValue)
+                    }
+
+                    guard result == JSON_NO_ERROR else {
+                        throw DeserializationError(result)
+                    }
+
+                    guard let jsonValue else {
+                        throw DeserializationError.unknown
+                    }
+
+                    func materialize(
+                        _ value: OpaquePointer,
+                        _ options: DeserializationOptions
+                    ) async throws -> JSON {
+                        try Task.checkCancellation()
+                        let type = json_get_type(value)
+                        switch type {
+                        case JSON_NULL:
+                            return .null
+                        case JSON_BOOLEAN:
+                            return .bool(json_get_boolean(value))
+                        case JSON_NUMBER_INT:
+                            return .number(JSON.Number(json_get_int(value)))
+                        case JSON_NUMBER_DOUBLE:
+                            return .number(JSON.Number(json_get_double(value)))
+                        case JSON_STRING:
+                            let str = String(cString: json_get_string(value))
+                            return .string(str)
+                        case JSON_ARRAY:
+                            let count = json_get_array_size(value)
+                            var array = Array()
+                            array.reserveCapacity(count)
+
+                            for i in 0..<count {
+                                let element = json_get_array_element(value, i).unsafelyUnwrapped
+                                let value = try await materialize(element, options)
+                                if !options.contains(.omitNullValues) || !value.isNull {
+                                    array.append(value)
+                                }
+                            }
+
+                            return .array(array)
+                        case JSON_OBJECT:
+                            let count = json_get_object_size(value)
+                            var object = Object()
+                            object.reserveCapacity(count)
+
+                            for i in 0..<count {
+                                let key = String(cString: json_get_object_key(value, i))
+                                let objValue = json_get_object_value(value, i).unsafelyUnwrapped
+                                let value = try await materialize(objValue, options)
+                                if (!options.contains(.omitNullKeys) && !options.contains(.omitNullValues)) || !value.isNull {
+                                    object[key] = value
+                                }
+                            }
+                            return .object(object)
+                        default:
+                            throw DeserializationError.unknown
+                        }
+                    }
+
+                    let json = try await materialize(jsonValue, options)
+                    if !options.contains(.fragmentsAllowed) {
+                        switch json {
+                        case .array, .object:
+                            return json
+                        case .bool, .null, .number, .string:
+                            throw DeserializationError.illegalFragment
+                        }
+                    }
+                    if options.contains(.omitNullValues), json.isNull {
+                        throw DeserializationError.illegalFragment
+                    }
+                    try Task.checkCancellation()
+                    return json
+                }
+            #else
+                nonisolated(nonsending) static func parseAsync(
+                    _ data: Data,
+                    _ options: DeserializationOptions
+                ) async throws -> JSON {
+                    if inputSizeLimit != 0, !options.contains(.ignoreInputSizeLimit), data.count > inputSizeLimit {
+                        throw DeserializationError.inputSizeLimitExceeded
+                    }
+
+                    var jsonValue: OpaquePointer?
+                    let result = data.withUnsafeBytes { buffer in
+                        json_parse(
+                            buffer.baseAddress?.assumingMemoryBound(to: UInt8.self),
+                            buffer.count,
+                            &jsonValue,
+                            options.contains(.allowByteOrderMark),
+                            options.contains(.requireMinified),
+                            options.contains(.requireUniqueKeys),
+                            options.contains(.ignoreRecursionDepthLimit) ? 0 : recursionDepthLimit
+                        )
+                    }
+
+                    defer {
+                        json_free(jsonValue)
+                    }
+
+                    guard result == JSON_NO_ERROR else {
+                        throw DeserializationError(result)
+                    }
+
+                    guard let jsonValue else {
+                        throw DeserializationError.unknown
+                    }
+
+                    nonisolated(nonsending) func materialize(
+                        _ value: OpaquePointer,
+                        _ options: DeserializationOptions
+                    ) async throws -> JSON {
+                        try Task.checkCancellation()
+                        let type = json_get_type(value)
+                        switch type {
+                        case JSON_NULL:
+                            return .null
+                        case JSON_BOOLEAN:
+                            return .bool(json_get_boolean(value))
+                        case JSON_NUMBER_INT:
+                            return .number(JSON.Number(json_get_int(value)))
+                        case JSON_NUMBER_DOUBLE:
+                            return .number(JSON.Number(json_get_double(value)))
+                        case JSON_STRING:
+                            let str = String(cString: json_get_string(value))
+                            return .string(str)
+                        case JSON_ARRAY:
+                            let count = json_get_array_size(value)
+                            var array = Array()
+                            array.reserveCapacity(count)
+
+                            for i in 0..<count {
+                                let element = json_get_array_element(value, i).unsafelyUnwrapped
+                                let value = try await materialize(element, options)
+                                if !options.contains(.omitNullValues) || !value.isNull {
+                                    array.append(value)
+                                }
+                            }
+
+                            return .array(array)
+                        case JSON_OBJECT:
+                            let count = json_get_object_size(value)
+                            var object = Object()
+                            object.reserveCapacity(count)
+
+                            for i in 0..<count {
+                                let key = String(cString: json_get_object_key(value, i))
+                                let objValue = json_get_object_value(value, i).unsafelyUnwrapped
+                                let value = try await materialize(objValue, options)
+                                if (!options.contains(.omitNullKeys) && !options.contains(.omitNullValues)) || !value.isNull {
+                                    object[key] = value
+                                }
+                            }
+                            return .object(object)
+                        default:
+                            throw DeserializationError.unknown
+                        }
+                    }
+
+                    let json = try await materialize(jsonValue, options)
+                    if !options.contains(.fragmentsAllowed) {
+                        switch json {
+                        case .array, .object:
+                            return json
+                        case .bool, .null, .number, .string:
+                            throw DeserializationError.illegalFragment
+                        }
+                    }
+                    if options.contains(.omitNullValues), json.isNull {
+                        throw DeserializationError.illegalFragment
+                    }
+                    try Task.checkCancellation()
+                    return json
+                }
+            #endif
+        #else
+            static func parseAsync(
                 _ data: Data,
-                _ options: DeserializationOptions
+                _ options: DeserializationOptions,
+                isolation: (any Actor)? = #isolation
             ) async throws -> JSON {
                 if inputSizeLimit != 0, !options.contains(.ignoreInputSizeLimit), data.count > inputSizeLimit {
                     throw DeserializationError.inputSizeLimitExceeded
@@ -466,107 +674,8 @@ extension JSON {
 
                 func materialize(
                     _ value: OpaquePointer,
-                    _ options: DeserializationOptions
-                ) async throws -> JSON {
-                    try Task.checkCancellation()
-                    let type = json_get_type(value)
-                    switch type {
-                    case JSON_NULL:
-                        return .null
-                    case JSON_BOOLEAN:
-                        return .bool(json_get_boolean(value))
-                    case JSON_NUMBER_INT:
-                        return .number(JSON.Number(json_get_int(value)))
-                    case JSON_NUMBER_DOUBLE:
-                        return .number(JSON.Number(json_get_double(value)))
-                    case JSON_STRING:
-                        let str = String(cString: json_get_string(value))
-                        return .string(str)
-                    case JSON_ARRAY:
-                        let count = json_get_array_size(value)
-                        var array = Array()
-                        array.reserveCapacity(count)
-
-                        for i in 0..<count {
-                            let element = json_get_array_element(value, i).unsafelyUnwrapped
-                            let value = try await materialize(element, options)
-                            if !options.contains(.omitNullValues) || !value.isNull {
-                                array.append(value)
-                            }
-                        }
-
-                        return .array(array)
-                    case JSON_OBJECT:
-                        let count = json_get_object_size(value)
-                        var object = Object()
-                        object.reserveCapacity(count)
-
-                        for i in 0..<count {
-                            let key = String(cString: json_get_object_key(value, i))
-                            let objValue = json_get_object_value(value, i).unsafelyUnwrapped
-                            let value = try await materialize(objValue, options)
-                            if (!options.contains(.omitNullKeys) && !options.contains(.omitNullValues)) || !value.isNull {
-                                object[key] = value
-                            }
-                        }
-                        return .object(object)
-                    default:
-                        throw DeserializationError.unknown
-                    }
-                }
-
-                let json = try await materialize(jsonValue, options)
-                if !options.contains(.fragmentsAllowed) {
-                    switch json {
-                    case .array, .object:
-                        return json
-                    case .bool, .null, .number, .string:
-                        throw DeserializationError.illegalFragment
-                    }
-                }
-                if options.contains(.omitNullValues), json.isNull {
-                    throw DeserializationError.illegalFragment
-                }
-                try Task.checkCancellation()
-                return json
-            }
-        #else
-            private nonisolated(nonsending) static func parseAsync(
-                _ data: Data,
-                _ options: DeserializationOptions
-            ) async throws -> JSON {
-                if inputSizeLimit != 0, !options.contains(.ignoreInputSizeLimit), data.count > inputSizeLimit {
-                    throw DeserializationError.inputSizeLimitExceeded
-                }
-
-                var jsonValue: OpaquePointer?
-                let result = data.withUnsafeBytes { buffer in
-                    json_parse(
-                        buffer.baseAddress?.assumingMemoryBound(to: UInt8.self),
-                        buffer.count,
-                        &jsonValue,
-                        options.contains(.allowByteOrderMark),
-                        options.contains(.requireMinified),
-                        options.contains(.requireUniqueKeys),
-                        options.contains(.ignoreRecursionDepthLimit) ? 0 : recursionDepthLimit
-                    )
-                }
-
-                defer {
-                    json_free(jsonValue)
-                }
-
-                guard result == JSON_NO_ERROR else {
-                    throw DeserializationError(result)
-                }
-
-                guard let jsonValue else {
-                    throw DeserializationError.unknown
-                }
-
-                nonisolated(nonsending) func materialize(
-                    _ value: OpaquePointer,
-                    _ options: DeserializationOptions
+                    _ options: DeserializationOptions,
+                    isolation: (any Actor)? = #isolation
                 ) async throws -> JSON {
                     try Task.checkCancellation()
                     let type = json_get_type(value)
@@ -631,109 +740,8 @@ extension JSON {
                 return json
             }
         #endif
-    #else
-        private static func parseAsync(
-            _ data: Data,
-            _ options: DeserializationOptions,
-            isolation: (any Actor)? = #isolation
-        ) async throws -> JSON {
-            if inputSizeLimit != 0, !options.contains(.ignoreInputSizeLimit), data.count > inputSizeLimit {
-                throw DeserializationError.inputSizeLimitExceeded
-            }
 
-            var jsonValue: OpaquePointer?
-            let result = data.withUnsafeBytes { buffer in
-                json_parse(
-                    buffer.baseAddress?.assumingMemoryBound(to: UInt8.self),
-                    buffer.count,
-                    &jsonValue,
-                    options.contains(.allowByteOrderMark),
-                    options.contains(.requireMinified),
-                    options.contains(.requireUniqueKeys),
-                    options.contains(.ignoreRecursionDepthLimit) ? 0 : recursionDepthLimit
-                )
-            }
-
-            defer {
-                json_free(jsonValue)
-            }
-
-            guard result == JSON_NO_ERROR else {
-                throw DeserializationError(result)
-            }
-
-            guard let jsonValue else {
-                throw DeserializationError.unknown
-            }
-
-            func materialize(
-                _ value: OpaquePointer,
-                _ options: DeserializationOptions,
-                isolation: (any Actor)? = #isolation
-            ) async throws -> JSON {
-                try Task.checkCancellation()
-                let type = json_get_type(value)
-                switch type {
-                case JSON_NULL:
-                    return .null
-                case JSON_BOOLEAN:
-                    return .bool(json_get_boolean(value))
-                case JSON_NUMBER_INT:
-                    return .number(JSON.Number(json_get_int(value)))
-                case JSON_NUMBER_DOUBLE:
-                    return .number(JSON.Number(json_get_double(value)))
-                case JSON_STRING:
-                    let str = String(cString: json_get_string(value))
-                    return .string(str)
-                case JSON_ARRAY:
-                    let count = json_get_array_size(value)
-                    var array = Array()
-                    array.reserveCapacity(count)
-
-                    for i in 0..<count {
-                        let element = json_get_array_element(value, i).unsafelyUnwrapped
-                        let value = try await materialize(element, options)
-                        if !options.contains(.omitNullValues) || !value.isNull {
-                            array.append(value)
-                        }
-                    }
-
-                    return .array(array)
-                case JSON_OBJECT:
-                    let count = json_get_object_size(value)
-                    var object = Object()
-                    object.reserveCapacity(count)
-
-                    for i in 0..<count {
-                        let key = String(cString: json_get_object_key(value, i))
-                        let objValue = json_get_object_value(value, i).unsafelyUnwrapped
-                        let value = try await materialize(objValue, options)
-                        if (!options.contains(.omitNullKeys) && !options.contains(.omitNullValues)) || !value.isNull {
-                            object[key] = value
-                        }
-                    }
-                    return .object(object)
-                default:
-                    throw DeserializationError.unknown
-                }
-            }
-
-            let json = try await materialize(jsonValue, options)
-            if !options.contains(.fragmentsAllowed) {
-                switch json {
-                case .array, .object:
-                    return json
-                case .bool, .null, .number, .string:
-                    throw DeserializationError.illegalFragment
-                }
-            }
-            if options.contains(.omitNullValues), json.isNull {
-                throw DeserializationError.illegalFragment
-            }
-            try Task.checkCancellation()
-            return json
-        }
-    #endif
+    }
 
     #if os(Windows)
         @inline(__always)
@@ -757,7 +765,9 @@ extension JSON {
         private static func calculateMaxDepth() -> size_t {
             var attr = pthread_attr_t()
             pthread_attr_init(&attr)
-            defer { pthread_attr_destroy(&attr) }
+            defer {
+                pthread_attr_destroy(&attr)
+            }
 
             var size: size_t = 0
             pthread_attr_getstacksize(&attr, &size)
@@ -769,6 +779,62 @@ extension JSON {
         let physicalMemory = Double(ProcessInfo.processInfo.physicalMemory)
         let cap = size_t(physicalMemory * 0.01)
         return min(max(cap, 1 * 1024 * 1024), 50 * 1024 * 1024)
+    }
+
+}
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension JSON.Pointer {
+
+    enum Deserialization {
+
+        static func pointer(
+            from string: String
+        ) throws -> JSON.Pointer {
+            if string.isEmpty {
+                return .init([])
+            }
+            guard string.hasPrefix("/") else {
+                throw DeserializationError.missingLeadingSlash(string)
+            }
+            let components = try string
+                .split(
+                    separator: "/",
+                    omittingEmptySubsequences: false
+                )
+                .dropFirst()
+                .map { component in
+                    try token(from: String(component))
+                }
+            return .init(components)
+        }
+
+        private static func token(
+            from string: String
+        ) throws -> Token {
+            guard string.contains("~") else {
+                return string
+            }
+            var result = ""
+            result.reserveCapacity(string.count)
+            var iterator = string.makeIterator()
+            while let character = iterator.next() {
+                guard character == "~" else {
+                    result.append(character)
+                    continue
+                }
+                switch iterator.next() {
+                case "0":
+                    result.append("~")
+                case "1":
+                    result.append("/")
+                default:
+                    throw DeserializationError.invalidEscapeSequence(string)
+                }
+            }
+            return result
+        }
+
     }
 
 }
