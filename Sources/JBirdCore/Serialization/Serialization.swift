@@ -137,7 +137,7 @@ extension JSON {
         public static func stringify(
             _ value: JSON,
             options: SerializationOptions = .default,
-            isolation: (any Actor)? = #isolation
+            isolation: isolated (any Actor)? = #isolation
         ) async throws -> String {
             let data = try await serialize(value, options: options)
             guard let string = String(data: data, encoding: .utf8) else {
@@ -395,7 +395,7 @@ extension JSON {
             static func start(
                 from json: JSON,
                 options: SerializationOptions,
-                isolation: (any Actor)? = #isolation
+                isolation: isolated (any Actor)? = #isolation
             ) async throws -> Data {
                 if !options.contains(.fragmentsAllowed) {
                     switch json {
@@ -734,7 +734,7 @@ extension JSON {
                 into bytes: inout [UInt8],
                 level: Int?,
                 options: SerializationOptions,
-                isolation: (any Actor)? = #isolation
+                isolation: isolated (any Actor)? = #isolation
             ) async throws {
 
                 func serializeArray(
@@ -742,7 +742,7 @@ extension JSON {
                     into bytes: inout [UInt8],
                     level: Int?,
                     options: SerializationOptions,
-                    isolation: (any Actor)? = #isolation
+                    isolation: isolated (any Actor)? = #isolation
                 ) async throws {
                     serializeOpenBracket(into: &bytes)
 
@@ -798,7 +798,7 @@ extension JSON {
                     into bytes: inout [UInt8],
                     level: Int?,
                     options: SerializationOptions,
-                    isolation: (any Actor)? = #isolation
+                    isolation: isolated (any Actor)? = #isolation
                 ) async throws {
                     serializeOpenBrace(into: &bytes)
 

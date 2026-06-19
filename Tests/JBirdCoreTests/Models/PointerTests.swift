@@ -99,6 +99,73 @@ struct PointerTests {
         #expect(try JSONDecoder().decode(JSON.Pointer.self, from: data) == pointer)
     }
 
+    @Test(
+        "Parses URI fragments (RFC 6901 §6)",
+        arguments: [
+            ("#", []),
+            ("#/foo", ["foo"]),
+            ("#/foo/0", ["foo", "0"]),
+            ("#/", [""]),
+            ("#/a~1b", ["a/b"]),
+            ("#/c%25d", ["c%d"]),
+            ("#/e%5Ef", ["e^f"]),
+            ("#/g%7Ch", ["g|h"]),
+            ("#/i%5Cj", [#"i\j"#]),
+            ("#/k%22l", [#"k"l"#]),
+            ("#/%20", [" "]),
+            ("#/m~0n", ["m~n"]),
+        ] as [(fragment: String, tokens: [String])]
+    )
+    func parsesURIFragment(fragment: String, tokens: [String]) throws {
+        // The initializer is format-agnostic: a leading "#" selects the URI fragment representation.
+        #expect(try JSON.Pointer(fragment).tokens == tokens)
+    }
+
+    @Test(
+        "Round trips through its URI fragment form",
+        arguments: ["#", "#/foo", "#/foo/0", "#/", "#/a~1b", "#/c%25d", "#/e%5Ef", "#/%20", "#/m~0n", "#/i%5Cj"]
+    )
+    func roundTripsURIFragment(fragment: String) throws {
+        let pointer = try JSON.Pointer(fragment)
+        #expect(JSON.Pointer.string(from: pointer, format: .uriFragment) == fragment)
+    }
+
+    @Test("URI fragment decodes multibyte UTF-8")
+    func uriFragmentMultibyte() throws {
+        // "é" is U+00E9 → UTF-8 0xC3 0xA9 → "%C3%A9"
+        let pointer = try JSON.Pointer("#/caf%C3%A9")
+        #expect(pointer.tokens == ["café"])
+        #expect(JSON.Pointer.string(from: pointer, format: .uriFragment) == "#/caf%C3%A9")
+    }
+
+    @Test(
+        "URI fragment rejects invalid percent-encoding",
+        arguments: [
+            "#/%2", // truncated escape
+            "#/%zz", // non-hex digits
+            "#/%FF", // valid escape, but 0xFF is not valid UTF-8
+        ]
+    )
+    func uriFragmentInvalidEncoding(fragment: String) {
+        #expect(throws: JSON.Pointer.DeserializationError.invalidEncoding) {
+            try JSON.Pointer(fragment)
+        }
+    }
+
+    @Test("URI fragment accepts lowercase percent-encoding")
+    func uriFragmentLowercaseHex() throws {
+        // RFC 3986 percent-encoding is case-insensitive in its hex digits.
+        let pointer = try JSON.Pointer("#/caf%c3%a9")
+        #expect(pointer.tokens == ["café"])
+    }
+
+    @Test("URI fragment leaves sub-delimiters unescaped")
+    func uriFragmentSubDelimiters() {
+        // Sub-delims (! $ & ' ( ) * + , ; =) are permitted unencoded in a fragment.
+        let pointer = JSON.Pointer(tokens: ["a=b!c$d&e"])
+        #expect(JSON.Pointer.string(from: pointer, format: .uriFragment) == "#/a=b!c$d&e")
+    }
+
     @Test("Tokens Initializer")
     func tokensInitializer() {
         let pointer = JSON.Pointer(tokens: ["a/b", "c"])
