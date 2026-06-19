@@ -1,5 +1,5 @@
 // JBird
-// Builder.swift
+// JSONBuilder.swift
 //
 // MIT License
 //
