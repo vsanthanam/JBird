@@ -8,6 +8,7 @@ APIs to create, deserialize, manipulate, and serialize JSON data in Swift
 
 - ``JSON``
 - ``JSON/Number``
+- ``JSON/Pointer``
 
 ### Subscripting
 
@@ -26,10 +27,6 @@ APIs to create, deserialize, manipulate, and serialize JSON data in Swift
 - ``JSONKeyConvertible``
 - ``JSONKeyInitializable``
 - ``JSONKeyRepresentable``
-
-### Working with JSON Pointers
-
-- ``JSON/Pointer``
 
 ### Errors
 

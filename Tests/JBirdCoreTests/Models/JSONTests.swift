@@ -371,11 +371,39 @@ struct JSONTests {
         #expect(try json[.key("foo")][.index(1)] == 2)
     }
 
+    @Test("Typed Subscript Tests")
+    func typedSubscriptAccess() throws {
+        let json: JSON = [
+            "foo": [1, 2, 3]
+        ]
+
+        #expect(try json["foo"][.index(1), as: Int.self] == 2)
+        #expect(try json["foo"][1, as: Int.self] == 2)
+    }
+
+    @Test("Map array to a JSON array")
+    func mapToJSONArray() throws {
+        let array: JSON = [1, 2, 3]
+        let mapped: JSON = try array.map { _ in JSON.string("x") }
+        #expect(mapped == ["x", "x", "x"])
+    }
+
+    @Test("Merge keeps existing values on conflicts by default")
+    func mergeDefaultUniquing() throws {
+        var object: JSON = ["a": 1, "b": 2]
+        try object.merge(["b": 99, "c": 3])
+        #expect(object == ["a": 1, "b": 2, "c": 3])
+
+        let merged = try (["x": 1] as JSON).merging(["x": 99, "y": 2])
+        #expect(merged == ["x": 1, "y": 2])
+    }
+
     @Suite("Introspection Tests")
     struct IntrospectionTests {
 
         @Test("Value at path tests")
-        func valueAtPath() throws {
+        @available(*, deprecated)
+        func valueAtPathVariadic() throws {
             let json: JSON = [
                 "foo": [
                     "bar": [1, 2, 3]
@@ -418,6 +446,7 @@ struct JSONTests {
         }
 
         @Test("Value at path tests (parameter packs)")
+        @available(*, deprecated)
         func valueAtPathWithPacks() throws {
             let json: JSON = [
                 "foo": [
@@ -437,6 +466,31 @@ struct JSONTests {
                 _ = try json.value(atPath: "foo", "bar", 5)
             }
         }
+
+        #if compiler(>=6.2)
+            /// For reasons I do not understand, this test crashes the Swift 6.1 compiler.
+            @Test("Subscript with parameter packs and type conversion")
+            @available(*, deprecated)
+            func subscriptPacksWithType() throws {
+                let json: JSON = [
+                    "foo": [
+                        "bar": [1, 2, 3]
+                    ]
+                ]
+
+                let value = try json["foo", "bar", 1, as: Int.self]
+                #expect(value == 2)
+                #expect(throws: JSON.OperationError.invalidSubscript(.key("qux"))) {
+                    _ = try json["foo", "bar", "qux", as: Int.self]
+                }
+                #expect(throws: JSON.OperationError.keyNotFound("baz")) {
+                    _ = try json["foo", "baz", as: Int.self]
+                }
+                #expect(throws: JSON.OperationError.indexOutOfBounds(5)) {
+                    _ = try json["foo", "bar", 5, as: Int.self]
+                }
+            }
+        #endif
 
         @Test("Value for key tests")
         func valueForKey() throws {
@@ -1234,6 +1288,165 @@ struct JSONTests {
     func nullDescription() {
         let json = JSON.null
         #expect(json.description == "null")
+    }
+
+    @Suite("Pointer Access Tests")
+    struct PointerAccess {
+
+        private static let document: JSON = [
+            "name": "root",
+            "nested": ["values": [1, 2, 3]],
+            "flag": true,
+        ]
+
+        @Test(
+            "Reads the value at a pointer",
+            arguments: [
+                ("/name", "root"),
+                ("/nested/values/0", 1),
+                ("/nested/values/2", 3),
+                ("/flag", true),
+            ] as [(pointer: String, value: JSON)]
+        )
+        func reads(
+            pointer: String,
+            value: JSON
+        ) throws {
+            let resolved = try Self.document.value(atPointer: JSON.Pointer(pointer))
+            #expect(resolved == value)
+        }
+
+        @Test("Reads the whole document")
+        func readsWholeDocument() throws {
+            #expect(try Self.document.value(atPointer: .wholeDocument) == Self.document)
+        }
+
+        @Test("Reads via the pointer subscript")
+        func subscriptReads() throws {
+            let pointer = try JSON.Pointer("/nested/values/2")
+            #expect(try Self.document[pointer] == 3)
+        }
+
+        @Test("Reads a typed value via the pointer subscript")
+        func subscriptReadsTyped() throws {
+            let pointer = try JSON.Pointer("/nested/values/0")
+            let value = try Self.document[pointer, as: Int.self]
+            #expect(value == 1)
+        }
+
+        @Test("Pointer subscript propagates resolution errors")
+        func subscriptThrows() {
+            #expect(throws: JSON.OperationError.keyNotFound("missing")) {
+                try Self.document[JSON.Pointer("/missing")]
+            }
+        }
+
+        @Test(
+            "Tests for a value at a pointer",
+            arguments: [
+                ("/nested/values/2", true),
+                ("/nested/values/3", false),
+                ("/missing", false),
+                ("/name/deeper", false),
+            ] as [(pointer: String, exists: Bool)]
+        )
+        func contains(
+            pointer: String,
+            exists: Bool
+        ) throws {
+            #expect(try Self.document.containsValue(atPointer: JSON.Pointer(pointer)) == exists)
+        }
+
+        @Test(
+            "Rejects unresolvable pointers",
+            arguments: [
+                ("/missing", .keyNotFound("missing")),
+                ("/nested/values/5", .indexOutOfBounds(5)),
+                ("/nested/values/-", .invalidSubscript(.key("-"))),
+                ("/nested/values/01", .invalidSubscript(.key("01"))),
+                ("/nested/values/x", .invalidSubscript(.key("x"))),
+                ("/name/deeper", .invalidSubscript(.key("deeper"))),
+            ] as [(pointer: String, error: JSON.OperationError)]
+        )
+        func rejects(
+            pointer: String,
+            error: JSON.OperationError
+        ) {
+            #expect(throws: error) {
+                try Self.document.value(atPointer: JSON.Pointer(pointer))
+            }
+        }
+
+        // MARK: - Setting
+
+        @Test("Set creates an object key")
+        func setCreatesKey() throws {
+            var document = Self.document
+            try document.setValue("a@b.com", atPointer: JSON.Pointer("/email"))
+            #expect(try document.value(atPointer: JSON.Pointer("/email")) == "a@b.com")
+        }
+
+        @Test("Set overwrites an array element")
+        func setOverwritesArrayElement() throws {
+            var document = Self.document
+            try document.setValue(99, atPointer: JSON.Pointer("/nested/values/1"))
+            #expect(try document.value(atPointer: JSON.Pointer("/nested/values")) == [1, 99, 3])
+        }
+
+        @Test("Set out of bounds throws")
+        func setOutOfBounds() {
+            var document = Self.document
+            #expect(throws: JSON.OperationError.indexOutOfBounds(3)) {
+                try document.setValue(4, atPointer: JSON.Pointer("/nested/values/3"))
+            }
+        }
+
+        @Test("Set whole document replaces the root")
+        func setWholeDocument() throws {
+            var document = Self.document
+            try document.setValue(["replaced": true], atPointer: .wholeDocument)
+            #expect(document == ["replaced": true])
+        }
+
+        @Test("Set through a missing intermediate throws")
+        func setMissingIntermediate() {
+            var document = Self.document
+            #expect(throws: JSON.OperationError.keyNotFound("missing")) {
+                try document.setValue(1, atPointer: JSON.Pointer("/missing/child"))
+            }
+        }
+
+        @Test("Removes an object key")
+        func removesObjectKey() throws {
+            var document = Self.document
+            let pointer = try JSON.Pointer("/flag")
+            try document.removeValue(atPointer: pointer)
+            #expect(!document.containsValue(atPointer: pointer))
+        }
+
+        @Test("Removing an array element shifts the rest")
+        func removesArrayElement() throws {
+            var document = Self.document
+            try document.removeValue(atPointer: JSON.Pointer("/nested/values/0"))
+            #expect(try document.value(atPointer: JSON.Pointer("/nested/values")) == [2, 3])
+        }
+
+        @Test("Removing a missing key throws")
+        func removesMissingKey() {
+            var document = Self.document
+            #expect(throws: JSON.OperationError.keyNotFound("missing")) {
+                try document.removeValue(atPointer: JSON.Pointer("/missing"))
+            }
+        }
+
+        @Test("Removing the whole document throws")
+        func removesWholeDocument() {
+            var document = Self.document
+            #expect(throws: JSON.OperationError.cannotRemoveWholeDocument) {
+                try document.removeValue(atPointer: .wholeDocument)
+            }
+        }
+
     }
 
 }

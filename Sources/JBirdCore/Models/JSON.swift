@@ -419,9 +419,11 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameter path: The path to use for lookup
     /// - Returns: The JSON value at the specified path
     /// - Throws: An error, if the JSON value does not contain a value at the provided path, or of the JSON value is incompatible with the provided JSON subscript.
-    @available(*, deprecated, renamed: "value(atPath:)", message: "Use the variadic method instead. This method will be removed in a future release.")
+    @available(*, deprecated, renamed: "value(atPath:)", message: "Use pointer based access instead. This method will be removed in a future release.")
     @_disfavoredOverload
-    public func value(atPath path: [Subscript]) throws -> JSON {
+    public func value(
+        atPath path: [Subscript]
+    ) throws -> JSON {
         var json = self
         try path.forEach { component in
             json = try json.value(forSubscript: component)
@@ -433,6 +435,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameter path: The path to use for lookup
     /// - Returns: The JSON value at the specified path
     /// - Throws: An error, if the JSON value does not contain a value at the provided path, or of the JSON value is incompatible with the provided JSON subscript.
+    @available(*, deprecated, message: "Use pointer based access instead. This method will be removed in a future release.")
     public func value(
         atPath path: Subscript...
     ) throws -> JSON {
@@ -447,6 +450,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameter path: The path to use for lookup
     /// - Returns: The JSON value at the specified path
     /// - Throws: An error, if the JSON value does not contain a value at the provided path, or if the JSON value is incompatible with the provided JSON subscript.
+    @available(*, deprecated, message: "Use pointer based access instead. This method will be removed in a future release.")
     public func value<each PathComponent>(
         atPath path: repeat each PathComponent
     ) throws -> JSON where repeat each PathComponent: JSONSubscriptConvertible {
@@ -1149,9 +1153,66 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         }
     #endif
 
+    /// Retrieve the value identified by a JSON Pointer.
+    /// - Parameter pointer: The pointer identifying the value. A whole-document pointer returns the receiver itself.
+    /// - Returns: The value at the pointer
+    /// - Throws: An ``OperationError`` if the pointer cannot be resolved
+    public func value(
+        atPointer pointer: Pointer
+    ) throws -> JSON {
+        var current = self
+        for token in pointer.tokens {
+            let `subscript` = try JSON.Pointer.subscript(for: token, in: current)
+            current = try current.value(forSubscript: `subscript`)
+        }
+        return current
+    }
+
+    /// Whether a value exists at the given JSON Pointer.
+    ///
+    /// - Parameter pointer: The pointer to test.
+    /// - Returns: `true` if the pointer resolves to a value, otherwise `false`. Never throws.
+    public func containsValue(
+        atPointer pointer: Pointer
+    ) -> Bool {
+        (try? value(atPointer: pointer)) != nil
+    }
+
+    /// Set the value at the location identified by a JSON Pointer.
+    ///
+    /// Every container along the pointer must already exist; intermediate containers are not created. For an
+    /// object the final token is created if absent or overwritten if present, and for an array the final token
+    /// must be an in-bounds index. A whole-document pointer replaces the entire value.
+    /// - Parameters:
+    ///   - value: The value to set
+    ///   - pointer: The pointer identifying the location to set
+    /// - Throws: An ``OperationError`` if the location cannot be resolved
+    public mutating func setValue(
+        _ value: JSON,
+        atPointer pointer: Pointer
+    ) throws {
+        try setValue(
+            value,
+            tokens: pointer.tokens
+        )
+    }
+
+    /// Remove the value at the location identified by a JSON Pointer.
+    ///
+    /// The value must exist. Removing an array element shifts the remaining elements down.
+    /// - Parameter pointer: The pointer identifying the value to remove
+    /// - Throws: ``OperationError/cannotRemoveWholeDocument`` for a whole-document pointer, or another
+    ///   ``OperationError`` if the value cannot be resolved
+    public mutating func removeValue(
+        atPointer pointer: Pointer
+    ) throws {
+        try removeValue(tokens: pointer.tokens)
+    }
+
     /// Retrieve a value from the JSON object using a specified subscript
     /// - Parameter subscript: A subscript to use for lookup
     /// - Returns: The JSON value at the specified subscript
+    @available(*, deprecated, message: "Use pointer based access instead. This method will be removed in a future release.")
     public subscript(
         _ subscript: Subscript...
     ) -> JSON {
@@ -1166,8 +1227,20 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// Retrieve a value from the JSON object using a specified subscript
+    /// - Parameter subscript: A subscript to use for lookup
+    /// - Returns: The JSON value at the specified subscript
+    public subscript(
+        _ subscript: Subscript
+    ) -> JSON {
+        get throws {
+            try value(forSubscript: `subscript`)
+        }
+    }
+
+    /// Retrieve a value from the JSON object using a specified subscript
     /// - Parameter path: A subscript to use for lookup
     /// - Returns: The JSON value at the specified subscript
+    @available(*, deprecated, message: "Use pointer based access instead. This method will be removed in a future release.")
     public subscript<each PathComponent>(
         _ path: repeat each PathComponent
     ) -> JSON where repeat each PathComponent: JSONSubscriptConvertible {
@@ -1181,11 +1254,23 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     }
 
     /// Retrieve a value from the JSON object using a specified subscript
+    /// - Parameter subscript: A subscript to use for lookup
+    /// - Returns: The JSON value at the specified subscript
+    public subscript<S>(
+        _ subscript: S
+    ) -> JSON where S: JSONSubscriptConvertible {
+        get throws {
+            try value(forSubscript: `subscript`)
+        }
+    }
+
+    /// Retrieve a value from the JSON object using a specified subscript
     /// - Parameters:
     ///   - subscript: A subscript to use for lookup
-    ///   - type: The type to decode into. This type can be inferred from the callsite.
+    ///   - type: The type to convert into. This type can be inferred from the callsite.
     /// - Returns: The JSON value at the specified subscript
     @_disfavoredOverload
+    @available(*, deprecated, message: "Use pointer based access instead. This method will be removed in a future release.")
     public subscript<T>(
         _ subscript: Subscript...,
         as type: T.Type = T.self
@@ -1202,9 +1287,25 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Retrieve a value from the JSON object using a specified subscript
     /// - Parameters:
     ///   - subscript: A subscript to use for lookup
-    ///   - type: The type to decode into. This type can be inferred from the callsite.
+    ///   - type: The type to convert into. This type can be inferred from the callsite.
     /// - Returns: The JSON value at the specified subscript
     @_disfavoredOverload
+    public subscript<T>(
+        _ subscript: Subscript,
+        as type: T.Type = T.self
+    ) -> T where T: JSONInitializable {
+        get throws {
+            try value(forSubscript: `subscript`).convert()
+        }
+    }
+
+    /// Retrieve a value from the JSON object using a specified subscript
+    /// - Parameters:
+    ///   - subscript: A subscript to use for lookup
+    ///   - type: The type to convert into. This type can be inferred from the callsite.
+    /// - Returns: The JSON value at the specified subscript
+    @_disfavoredOverload
+    @available(*, deprecated, message: "Use pointer based access instead. This method will be removed in a future release.")
     public subscript<each PathComponent, T>(
         _ subscript: repeat each PathComponent,
         as type: T.Type = T.self
@@ -1215,6 +1316,49 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
                 json = try json[component]
             }
             return try json.convert(into: type)
+        }
+    }
+
+    /// Retrieve a value from the JSON object using a specified subscript
+    /// - Parameters:
+    ///   - subscript: A subscript to use for lookup
+    ///   - type: The type to convert into. This type can be inferred from the callsite.
+    /// - Returns: The JSON value at the specified subscript
+    @_disfavoredOverload
+    public subscript<S, T>(
+        _ subscript: S,
+        as type: T.Type = T.self
+    ) -> T where S: JSONSubscriptConvertible, T: JSONInitializable {
+        get throws {
+            try self[`subscript`].convert()
+        }
+    }
+
+    /// Retrieve a value from the JSON value using a JSON Pointer
+    /// - Parameter pointer: The pointer identifying the value
+    /// - Returns: The value at the pointer
+    /// - Throws: An ``OperationError`` if the pointer cannot be resolved
+    public subscript(
+        _ pointer: Pointer
+    ) -> JSON {
+        get throws {
+            try value(atPointer: pointer)
+        }
+    }
+
+    /// Retrieve a value from the JSON value using a JSON Pointer, converted into the inferred type
+    /// - Parameters:
+    ///   - pointer: The pointer identifying the value
+    ///   - type: The type to convert into. This type can be inferred from the callsite.
+    /// - Returns: The value at the pointer, converted to the inferred ``JSONInitializable`` type
+    /// - Throws: An ``OperationError`` if the pointer cannot be resolved or the value cannot be converted
+    @_disfavoredOverload
+    public subscript<T>(
+        _ pointer: Pointer,
+        as type: T.Type = T.self
+    ) -> T where T: JSONInitializable {
+        get throws {
+            try self[pointer].convert()
         }
     }
 
@@ -1384,6 +1528,62 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             string.description
         case .null:
             "null"
+        }
+    }
+
+    // MARK: - Private
+
+    private mutating func setValue(
+        _ value: JSON,
+        tokens: some Collection<JSON.Pointer.Token>
+    ) throws {
+        guard let token = tokens.first else {
+            self = value
+            return
+        }
+        let `subscript` = try JSON.Pointer.subscript(
+            for: token,
+            in: self
+        )
+        let rest = tokens.dropFirst()
+        if rest.isEmpty {
+            try setValue(
+                value,
+                forSubscript: `subscript`
+            )
+        } else {
+            var child = try self.value(forSubscript: `subscript`)
+            try child.setValue(
+                value,
+                tokens: rest
+            )
+            try setValue(
+                child,
+                forSubscript: `subscript`
+            )
+        }
+    }
+
+    private mutating func removeValue(
+        tokens: some Collection<JSON.Pointer.Token>
+    ) throws {
+        guard let token = tokens.first else {
+            throw OperationError.cannotRemoveWholeDocument
+        }
+        let `subscript` = try JSON.Pointer.subscript(
+            for: token,
+            in: self
+        )
+        let rest = tokens.dropFirst()
+        if rest.isEmpty {
+            try removeValue(forSubscript: `subscript`)
+        } else {
+            var child = try value(forSubscript: `subscript`)
+            try child.removeValue(tokens: rest)
+            try setValue(
+                child,
+                forSubscript: `subscript`
+            )
         }
     }
 

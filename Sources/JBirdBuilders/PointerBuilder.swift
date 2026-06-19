@@ -129,7 +129,7 @@ extension JSON.Pointer {
         public static func buildFinalResult(
             _ component: [Token]
         ) -> JSON.Pointer {
-            .init(component)
+            .init(tokens: component)
         }
     }
 
