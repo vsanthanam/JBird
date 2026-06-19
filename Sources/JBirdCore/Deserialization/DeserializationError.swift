@@ -192,31 +192,3 @@ extension JSON {
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 @available(*, deprecated, renamed: "JSON.DeserializationError")
 public typealias JSONDeserializationError = JSON.DeserializationError
-
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension JSON.Pointer {
-
-    /// An error encountered while parsing a JSON Pointer.
-    public enum DeserializationError: Error, Equatable, Sendable, CustomStringConvertible {
-
-        /// The string was non-empty but did not begin with a forward slash (`/`).
-        case missingLeadingSlash(String)
-
-        /// A reference token contained a `~` that was not followed by `0` or `1`.
-        case invalidEscapeSequence(String)
-
-        // MARK: - CustomStringConvertible
-
-        /// A human-readable description of the error.
-        public var description: String {
-            switch self {
-            case let .missingLeadingSlash(string):
-                "JSON Pointer '\(string)' must be empty or begin with '/'"
-            case let .invalidEscapeSequence(token):
-                "JSON Pointer reference token '\(token)' contains an invalid escape sequence"
-            }
-        }
-
-    }
-
-}

@@ -44,7 +44,7 @@ struct PointerTests {
         ] as [(string: String, tokens: [String])]
     )
     func parses(string: String, tokens: [String]) throws {
-        let pointer = try JSON.Pointer(string: string)
+        let pointer = try JSON.Pointer(string)
         #expect(pointer.tokens == tokens)
         #expect(pointer.isWholeDocument == tokens.isEmpty)
     }
@@ -59,7 +59,7 @@ struct PointerTests {
     )
     func rejects(string: String, error: JSON.Pointer.DeserializationError) {
         #expect(throws: error) {
-            try JSON.Pointer(string: string)
+            try JSON.Pointer(string)
         }
     }
 
@@ -68,20 +68,40 @@ struct PointerTests {
         arguments: ["", "/", "/foo", "/foo/0", "/foo/", "/a~1b", "/m~0n", "/~01"]
     )
     func roundTrips(string: String) throws {
-        let pointer = try JSON.Pointer(string: string)
+        let pointer = try JSON.Pointer(string)
         #expect(pointer.stringify() == string)
         #expect(pointer.description == string)
     }
 
     @Test("Serialize Produces UTF-8 Data")
     func serializeData() throws {
-        let pointer = try JSON.Pointer(string: "/a~1b")
+        let pointer = try JSON.Pointer("/a~1b")
         #expect(pointer.serialize() == Data("/a~1b".utf8))
+    }
+
+    @Test("Data Initializer Parses UTF-8 Bytes")
+    func dataInitializer() throws {
+        let pointer = try JSON.Pointer(Data("/foo/bar".utf8))
+        #expect(pointer.tokens == ["foo", "bar"])
+    }
+
+    @Test("Data Initializer Rejects Invalid UTF-8")
+    func invalidEncoding() {
+        #expect(throws: JSON.Pointer.DeserializationError.invalidEncoding) {
+            try JSON.Pointer(Data([0xFF, 0xFE]))
+        }
+    }
+
+    @Test("Codable Round Trips")
+    func codableRoundTrip() throws {
+        let pointer = try JSON.Pointer("/a~1b/0/name")
+        let data = try JSONEncoder().encode(pointer)
+        #expect(try JSONDecoder().decode(JSON.Pointer.self, from: data) == pointer)
     }
 
     @Test("Tokens Initializer")
     func tokensInitializer() {
-        let pointer = JSON.Pointer(["a/b", "c"])
+        let pointer = JSON.Pointer(tokens: ["a/b", "c"])
         #expect(pointer.tokens == ["a/b", "c"])
     }
 
@@ -99,7 +119,7 @@ struct PointerTests {
 
     @Test("Equatable And Hashable")
     func equatableHashable() throws {
-        let a = try JSON.Pointer(string: "/foo/0")
+        let a = try JSON.Pointer("/foo/0")
         let b: JSON.Pointer = ["foo", "0"]
         let c: JSON.Pointer = ["foo", "1"]
         #expect(a == b)

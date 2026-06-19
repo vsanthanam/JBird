@@ -106,18 +106,16 @@ let steve: JSON = [
 
 - ``value(forSubscript:)-(JSON.Subscript)``
 - ``value(forSubscript:)-(JSONSubscriptConvertible)``
-- ``value(atPath:)-(JSON.Subscript...)``
-- ``value(atPath:)-(PathComponent)``
 - ``containsValue(forSubscript:)-(JSON.Subscript)``
 - ``containsValue(forSubscript:)-(JSONSubscriptConvertible)``
 - ``setValue(_:forSubscript:)-(_,JSON.Subscript)``
 - ``setValue(_:forSubscript:)-(_,JSONSubscriptConvertible)``
 - ``removeValue(forSubscript:)-(JSON.Subscript)``
 - ``removeValue(forSubscript:)-(JSONSubscriptConvertible)``
-- ``subscript(_:)-(JSON.Subscript...)``
-- ``subscript(_:)-(PathComponent)``
-- ``subscript(_:as:)-(JSON.Subscript...,_)``
-- ``subscript(_:as:)-(PathComponent,_)``
+- ``subscript(_:)-(JSON.Subscript)``
+- ``subscript(_:)-(S)``
+- ``subscript(_:as:)-(JSON.Subscript,_)``
+- ``subscript(_:as:)-(S,_)``
 
 ### Working with JSON objects and arrays
 
@@ -190,6 +188,15 @@ let steve: JSON = [
 - ``serialize(_:options:)``
 - ``stringify(_:options:)``
 - ``SerializationOptions``
+
+### Working with JSON Pointers
+
+- ``value(atPointer:)``
+- ``containsValue(atPointer:)``
+- ``setValue(_:atPointer:)``
+- ``removeValue(atPointer:)``
+- ``subscript(_:)-(JSON.Pointer)``
+- ``subscript(_:as:)-(JSON.Pointer,_)``
 
 ### Literal Expression Support
 
