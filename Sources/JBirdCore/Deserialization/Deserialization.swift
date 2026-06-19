@@ -313,7 +313,7 @@ extension JSON {
         public static func deserialize(
             _ string: String,
             options: DeserializationOptions = .default,
-            isolation: (any Actor)? = #isolation
+            isolation: isolated (any Actor)? = #isolation
         ) async throws -> JSON {
             let data = Data(string.utf8)
             return try await deserialize(
@@ -641,7 +641,7 @@ extension JSON {
             static func parseAsync(
                 _ data: Data,
                 _ options: DeserializationOptions,
-                isolation: (any Actor)? = #isolation
+                isolation: isolated (any Actor)? = #isolation
             ) async throws -> JSON {
                 if inputSizeLimit != 0, !options.contains(.ignoreInputSizeLimit), data.count > inputSizeLimit {
                     throw DeserializationError.inputSizeLimitExceeded
@@ -675,7 +675,7 @@ extension JSON {
                 func materialize(
                     _ value: OpaquePointer,
                     _ options: DeserializationOptions,
-                    isolation: (any Actor)? = #isolation
+                    isolation: isolated (any Actor)? = #isolation
                 ) async throws -> JSON {
                     try Task.checkCancellation()
                     let type = json_get_type(value)
