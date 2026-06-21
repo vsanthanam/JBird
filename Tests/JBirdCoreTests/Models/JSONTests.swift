@@ -1449,4 +1449,236 @@ struct JSONTests {
 
     }
 
+    @Suite("Codable Tests")
+    struct CodableTests {
+
+        private let encoder = JSONEncoder()
+
+        private let decoder = JSONDecoder()
+
+        private func roundTrip(_ json: JSON) throws -> JSON {
+            let data = try encoder.encode(json)
+            return try decoder.decode(JSON.self, from: data)
+        }
+
+        private func encodeString(_ json: JSON) throws -> String {
+            let data = try encoder.encode(json)
+            return try #require(String(data: data, encoding: .utf8))
+        }
+
+        private func decode(_ string: String) throws -> JSON {
+            try decoder.decode(JSON.self, from: Data(string.utf8))
+        }
+
+        // MARK: - Encoding Scalars
+
+        @Test("Encode Null")
+        func encodeNull() throws {
+            #expect(try encodeString(.null) == "null")
+        }
+
+        @Test("Encode Bool")
+        func encodeBool() throws {
+            #expect(try encodeString(.bool(true)) == "true")
+            #expect(try encodeString(.bool(false)) == "false")
+        }
+
+        @Test("Encode Integer Number")
+        func encodeIntegerNumber() throws {
+            #expect(try encodeString(.number(42)) == "42")
+        }
+
+        @Test("Encode Double Number")
+        func encodeDoubleNumber() throws {
+            #expect(try encodeString(.number(4.5)) == "4.5")
+        }
+
+        @Test("Encode String")
+        func encodeStringValue() throws {
+            #expect(try encodeString(.string("hello")) == "\"hello\"")
+        }
+
+        @Test("Encode Empty Array")
+        func encodeEmptyArray() throws {
+            #expect(try encodeString(.array([])) == "[]")
+        }
+
+        @Test("Encode Empty Object")
+        func encodeEmptyObject() throws {
+            #expect(try encodeString(.object([:])) == "{}")
+        }
+
+        @Test("Encode Array")
+        func encodeArray() throws {
+            let json: JSON = [1, "two", true, nil]
+            #expect(try encodeString(json) == "[1,\"two\",true,null]")
+        }
+
+        @Test("Encode Object")
+        func encodeObject() throws {
+            let json: JSON = ["key": "value"]
+            #expect(try encodeString(json) == "{\"key\":\"value\"}")
+        }
+
+        @Test("Encode Nested Structure")
+        func encodeNested() throws {
+            let json: JSON = ["outer": [1, 2, ["inner": true]]]
+            // Re-decode rather than asserting key order, which is not guaranteed.
+            let decoded = try decode(encodeString(json))
+            #expect(decoded == json)
+        }
+
+        // MARK: - Decoding Scalars
+
+        @Test("Decode Null")
+        func decodeNull() throws {
+            #expect(try decode("null") == .null)
+        }
+
+        @Test("Decode Bool")
+        func decodeBool() throws {
+            #expect(try decode("true") == .bool(true))
+            #expect(try decode("false") == .bool(false))
+        }
+
+        @Test("Decode Integer Number")
+        func decodeIntegerNumber() throws {
+            #expect(try decode("42") == .number(42))
+        }
+
+        @Test("Decode Double Number")
+        func decodeDoubleNumber() throws {
+            #expect(try decode("4.5") == .number(4.5))
+        }
+
+        @Test("Decode String")
+        func decodeStringValue() throws {
+            #expect(try decode("\"hello\"") == .string("hello"))
+        }
+
+        @Test("Decode Empty Array")
+        func decodeEmptyArray() throws {
+            #expect(try decode("[]") == .array([]))
+        }
+
+        @Test("Decode Empty Object")
+        func decodeEmptyObject() throws {
+            #expect(try decode("{}") == .object([:]))
+        }
+
+        @Test("Decode Array")
+        func decodeArray() throws {
+            #expect(try decode("[1,\"two\",true,null]") == [1, "two", true, nil])
+        }
+
+        @Test("Decode Object")
+        func decodeObject() throws {
+            let expected: JSON = ["a": 1, "b": "two", "c": false]
+            #expect(try decode("{\"a\":1,\"b\":\"two\",\"c\":false}") == expected)
+        }
+
+        @Test("Decode Nested Structure")
+        func decodeNested() throws {
+            let expected: JSON = ["outer": [1, 2, ["inner": true]]]
+            #expect(try decode("{\"outer\":[1,2,{\"inner\":true}]}") == expected)
+        }
+
+        @Test("Decode Malformed JSON Throws")
+        func decodeMalformedThrows() {
+            #expect(throws: (any Error).self) {
+                _ = try decode("{not valid json")
+            }
+        }
+
+        // MARK: - Round Trips
+
+        @Test("Round Trip Scalars")
+        func roundTripScalars() throws {
+            let values: [JSON] = [.null, true, false, 0, 42, -7, 4.5, -3.14, "", "string with \" quote"]
+            for value in values {
+                #expect(try roundTrip(value) == value)
+            }
+        }
+
+        @Test("Round Trip Collections")
+        func roundTripCollections() throws {
+            let json: JSON = [
+                "null": nil,
+                "bool": true,
+                "int": 42,
+                "double": 4.5,
+                "string": "hello",
+                "array": [1, 2, 3],
+                "object": ["nested": "value"],
+                "empty_array": [],
+                "empty_object": [:],
+            ]
+            #expect(try roundTrip(json) == json)
+        }
+
+        @Test("Round Trip Deeply Nested")
+        func roundTripDeeplyNested() throws {
+            let json: JSON = [
+                [
+                    ["a": [1, [2, [3, ["deep": true]]]]],
+                ],
+            ]
+            #expect(try roundTrip(json) == json)
+        }
+
+        // MARK: - Interoperability
+
+        @Test("Encoded Output Matches JSONSerialization")
+        func encodedMatchesFoundation() throws {
+            let json: JSON = ["a": 1, "b": [2, 3], "c": "four"]
+            let data = try encoder.encode(json)
+            let object = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+            let unwrapped = try #require(object)
+            #expect(unwrapped["a"] as? Int == 1)
+            #expect(unwrapped["b"] as? [Int] == [2, 3])
+            #expect(unwrapped["c"] as? String == "four")
+        }
+
+        @Test("Decodes Foundation Produced JSON")
+        func decodesFoundationProducedJSON() throws {
+            let object: [String: Any] = ["a": 1, "b": [2, 3], "c": "four"]
+            let data = try JSONSerialization.data(withJSONObject: object)
+            let json = try decoder.decode(JSON.self, from: data)
+            #expect(try json.value(forKey: "a") == 1)
+            #expect(try json.value(forKey: "b") == [2, 3])
+            #expect(try json.value(forKey: "c") == "four")
+        }
+
+        @Test("JSON Codable Inside Another Codable Type")
+        func nestedInsideCodableType() throws {
+            struct Wrapper: Codable, Equatable {
+                let name: String
+                let payload: JSON
+            }
+            let wrapper = Wrapper(name: "test", payload: ["count": 3, "tags": ["a", "b"]])
+            let data = try encoder.encode(wrapper)
+            let decoded = try decoder.decode(Wrapper.self, from: data)
+            #expect(decoded == wrapper)
+        }
+
+        // MARK: - Malformed Single Value
+
+        @Test("Decode Unsupported Single Value Throws")
+        func decodeUnsupportedSingleValueThrows() {
+            // A property list can hold a `Date` in a single-value container. A `Date`
+            // is neither bool, number, string, nor null, so decoding it as `JSON`
+            // exercises the type-mismatch path in `JSON.init(from:)`.
+            struct Box: Encodable {
+                let value: Date
+            }
+            let plistEncoder = PropertyListEncoder()
+            let plistDecoder = PropertyListDecoder()
+            #expect(throws: DecodingError.self) {
+                let data = try plistEncoder.encode(Box(value: Date(timeIntervalSince1970: 0)))
+                _ = try plistDecoder.decode(JSON.self, from: data)
+            }
+        }
+
+    }
+
 }

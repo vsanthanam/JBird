@@ -27,7 +27,7 @@ import Foundation
 
 /// A typed API for working with JSON values in Swift.
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral, ExpressibleByStringInterpolation, ExpressibleByArrayLiteral, ExpressibleByDictionaryLiteral, ExpressibleByNilLiteral, CustomStringConvertible {
+public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral, ExpressibleByStringInterpolation, ExpressibleByArrayLiteral, ExpressibleByDictionaryLiteral, ExpressibleByNilLiteral, CustomStringConvertible, Codable {
 
     // MARK: - Initializers
 
@@ -1531,7 +1531,104 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         }
     }
 
+    // MARK: - Encodable
+
+    public func encode(
+        to encoder: any Encoder
+    ) throws {
+        switch self {
+        case let .bool(bool):
+            var container = encoder.singleValueContainer()
+            try container.encode(bool)
+        case let .number(number):
+            var container = encoder.singleValueContainer()
+            try container.encode(number)
+        case let .array(array):
+            var container = encoder.unkeyedContainer()
+            for value in array {
+                try container.encode(value)
+            }
+        case let .object(object):
+            var container = encoder.container(keyedBy: Field.self)
+            for (key, value) in object {
+                let field = Field(key)
+                try container.encode(
+                    value,
+                    forKey: field
+                )
+            }
+        case let .string(string):
+            var container = encoder.singleValueContainer()
+            try container.encode(string)
+        case .null:
+            var container = encoder.singleValueContainer()
+            try container.encodeNil()
+        }
+    }
+
+    // MARK: - Decodable
+
+    public init(
+        from decoder: any Decoder
+    ) throws {
+        if let container = try? decoder.container(keyedBy: Field.self) {
+            let object: Object = try container.allKeys.reduce(into: [:]) { object, key in
+                object[key.stringValue] = try container.decode(
+                    JSON.self,
+                    forKey: key
+                )
+            }
+            self = .object(object)
+        } else if var container = try? decoder.unkeyedContainer() {
+            var array = Array()
+            while !container.isAtEnd {
+                let value = try container.decode(JSON.self)
+                array.append(value)
+            }
+            self = .array(array)
+        } else {
+            let container = try decoder.singleValueContainer()
+            if let bool = try? container.decode(Bool.self) {
+                self = .bool(bool)
+            } else if let number = try? container.decode(Number.self) {
+                self = .number(number)
+            } else if let string = try? container.decode(String.self) {
+                self = .string(string)
+            } else if container.decodeNil() {
+                self = .null
+            } else {
+                throw DecodingError.typeMismatch(
+                    JSON.self,
+                    .init(
+                        codingPath: decoder.codingPath,
+                        debugDescription: "Malformed JSON"
+                    )
+                )
+            }
+        }
+    }
+
     // MARK: - Private
+
+    private struct Field: CodingKey {
+
+        init?(intValue: Int) {
+            nil
+        }
+
+        init?(stringValue: String) {
+            self.init(stringValue)
+        }
+
+        init(_ str: String) {
+            self.stringValue = str
+        }
+
+        let stringValue: String
+
+        let intValue: Int? = nil
+
+    }
 
     private mutating func setValue(
         _ value: JSON,

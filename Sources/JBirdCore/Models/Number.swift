@@ -29,13 +29,15 @@ import Foundation
 extension JSON {
 
     /// A JSON number
-    public struct Number: Equatable, Hashable, Sendable, ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral, CustomStringConvertible {
+    public struct Number: Equatable, Hashable, Sendable, ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral, CustomStringConvertible, Codable {
 
         // MARK: - Initializers
 
         /// Create a JSON number from a ``JSONNumberConvertible`` type
         /// - Parameter convertible: An instance of the type to convert to a JSON number
-        public init(_ convertible: some JSONNumberConvertible) {
+        public init(
+            _ convertible: some JSONNumberConvertible
+        ) {
             self = convertible.jsonNumber
         }
 
@@ -189,6 +191,41 @@ extension JSON {
                 int.description
             case let .double(double):
                 double.description
+            }
+        }
+
+        // MARK: - Encodable
+
+        public func encode(
+            to encoder: any Encoder
+        ) throws {
+            var container = encoder.singleValueContainer()
+            switch storage {
+            case let .int(value):
+                try container.encode(value)
+            case let .double(value):
+                try container.encode(value)
+            }
+        }
+
+        // MARK: - Decodable
+
+        public init(
+            from decoder: any Decoder
+        ) throws {
+            let container = try decoder.singleValueContainer()
+            if let value = try? container.decode(Int.self) {
+                self.init(.int(value))
+            } else if let value = try? container.decode(Double.self) {
+                self.init(.double(value))
+            } else {
+                throw DecodingError.typeMismatch(
+                    Number.self,
+                    .init(
+                        codingPath: decoder.codingPath,
+                        debugDescription: "Malformed JSON Number"
+                    )
+                )
             }
         }
 
