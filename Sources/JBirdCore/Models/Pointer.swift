@@ -29,11 +29,11 @@ import Foundation
 extension JSON {
 
     /// A JSON Pointer
-    public struct Pointer: Equatable, Hashable, Sendable, CustomStringConvertible, ExpressibleByArrayLiteral, Codable {
+    public struct Pointer: Equatable, Hashable, Sendable, CustomStringConvertible, ExpressibleByArrayLiteral, JSONRepresentable {
 
         // MARK: - Initializers
 
-        /// Create a pointer directly from its reference tokens.
+        /// Create a JSON pointer directly from its reference tokens.
         ///
         /// - Parameter tokens: The unescaped reference tokens, in order from the root of the document. An empty
         ///   array refers to the whole document.
@@ -43,8 +43,7 @@ extension JSON {
             self.tokens = tokens
         }
 
-        /// Parse a pointer from its [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) textual
-        /// representation.
+        /// Parse a JSON pointer from its RFC 6901 textual representation.
         ///
         /// The representation is detected automatically: a string beginning with `#` is parsed as the
         /// [URI fragment](https://datatracker.ietf.org/doc/html/rfc6901#section-6) form (percent-decoded);
@@ -57,20 +56,27 @@ extension JSON {
         public init(
             _ string: String
         ) throws {
-            self = try Deserialization.pointer(from: string)
+            self = try Self.pointer(from: string)
         }
 
-        /// Parse a pointer from a buffer of UTF-8 bytes, in either textual representation.
+        /// Parse a pointer from a buffer of UTF-8 bytes.
         ///
-        /// The bytes are decoded as UTF-8 and then parsed the same way as the string initializer — the
+        /// The bytes are decoded as UTF-8 and then parsed the same way as ``init(_:)-(String)`` — the
         /// representation (string or URI fragment) is detected automatically.
         ///
         /// - Parameter data: The UTF-8 encoded pointer bytes.
-        /// - Throws: ``DeserializationError`` if the bytes are not valid UTF-8 or not a valid JSON Pointer.
+        /// - Throws: ``DeserializationError/invalidEncoding`` if the bytes are not valid UTF-8, or any other
+        ///   ``DeserializationError`` if the decoded string is not a valid JSON Pointer.
         public init(
             _ data: Data
         ) throws {
-            self = try Deserialization.pointer(from: data)
+            guard let string = String(
+                data: data,
+                encoding: .utf8
+            ) else {
+                throw DeserializationError.invalidEncoding
+            }
+            try self.init(string)
         }
 
         // MARK: - API
@@ -91,45 +97,39 @@ extension JSON {
             tokens.isEmpty
         }
 
-        /// Serialize the pointer to its [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) string
-        /// representation, with reference tokens escaped.
+        /// The string representation of the pointer.
         ///
-        /// For other representations, use ``string(from:format:)``.
-        ///
-        /// - Returns: The escaped pointer string.
-        public func stringify() -> String {
-            JSON.Pointer.string(from: self)
+        /// This property returns the [RFC 6901 §5](https://datatracker.ietf.org/doc/html/rfc6901#section-5) string representation,
+        /// with reference tokens escaped (`~` as `~0`, `/` as `~1`).
+        public var string: String {
+            Self.stringRepresentation(of: self)
         }
 
-        /// Serialize the pointer to its [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) string
-        /// representation, encoded as UTF-8 data.
+        /// The URL fragment representation of the pointer.
         ///
-        /// For other representations, use ``data(from:format:)``.
-        ///
-        /// - Returns: The escaped pointer string as UTF-8 bytes.
-        public func serialize() -> Data {
-            JSON.Pointer.data(from: self)
+        /// This property returns the [RFC 6901 §6](https://datatracker.ietf.org/doc/html/rfc6901#section-6) URI fragment
+        /// representation, including the leading `#` and percent-encoded for use in a URI.
+        public var uriFragment: String {
+            "#" + Self.percentEncoded(Self.stringRepresentation(of: self))
         }
 
-        // MARK: - Codable
-
-        /// Creates a new instance by decoding from the given decoder.
-        /// - Parameter decoder: The decoder to read data from.
-        public init(
-            from decoder: any Decoder
-        ) throws {
-            let container = try decoder.singleValueContainer()
-            let string = try container.decode(String.self)
-            try self.init(string)
+        /// Return a new pointer with an additional reference token appended.
+        ///
+        /// - Parameter token: The unescaped reference token to append.
+        /// - Returns: A pointer addressing a child of the location this pointer addresses.
+        public func appending(
+            _ token: Token
+        ) -> Pointer {
+            .init(tokens: tokens + [token])
         }
 
-        /// Encodes this value into the given encoder.
-        /// - Parameter encoder: The encoder to write data to.
-        public func encode(
-            to encoder: any Encoder
-        ) throws {
-            var container = encoder.singleValueContainer()
-            try container.encode(description)
+        /// Append a reference token to the pointer in place.
+        ///
+        /// - Parameter token: The unescaped reference token to append.
+        public mutating func append(
+            _ token: Token
+        ) {
+            self = appending(token)
         }
 
         // MARK: - CustomStringConvertible
@@ -137,7 +137,20 @@ extension JSON {
         /// The [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) string representation, with reference
         /// tokens escaped.
         public var description: String {
-            stringify()
+            string
+        }
+
+        // MARK: - JSONConvertible
+
+        public var jsonValue: JSON {
+            JSON(string)
+        }
+
+        // MARK: - JSONInitializable
+
+        public init(json: JSON) throws {
+            let string = try json.convert(into: String.self)
+            try self.init(string)
         }
 
         // MARK: - ExpressibleByArrayLiteral
@@ -148,7 +161,9 @@ extension JSON {
         /// Create a pointer from an array literal of reference tokens.
         ///
         /// - Parameter elements: The unescaped reference tokens, in order from the root of the document.
-        public init(arrayLiteral elements: ArrayLiteralElement...) {
+        public init(
+            arrayLiteral elements: ArrayLiteralElement...
+        ) {
             self.init(tokens: elements)
         }
 
@@ -156,9 +171,9 @@ extension JSON {
 
         static func `subscript`(
             for token: Token,
-            in json: JSON
+            in document: JSON
         ) throws -> JSON.Subscript {
-            switch json {
+            switch document {
             case .object:
                 .key(token)
             case .array:
@@ -172,7 +187,9 @@ extension JSON {
             }
         }
 
-        static func index(for token: Token) -> Int? {
+        static func index(
+            for token: Token
+        ) -> Int? {
             guard !token.isEmpty,
                   token.utf8.allSatisfy({ (0x30 ... 0x39).contains($0) }),
                   token == "0" || token.first != "0" else {
@@ -181,72 +198,7 @@ extension JSON {
             return Int(token)
         }
 
-    }
-
-}
-
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension JSON.Pointer {
-
-    /// A textual representation of a JSON Pointer.
-    public enum Format: Sendable, Hashable, CaseIterable {
-
-        /// The [RFC 6901 §5](https://datatracker.ietf.org/doc/html/rfc6901#section-5) string
-        /// representation, e.g. `/foo/0`.
-        case string
-
-        /// The [RFC 6901 §6](https://datatracker.ietf.org/doc/html/rfc6901#section-6) URI fragment
-        /// representation, e.g. `#/foo/0`.
-        case uriFragment
-    }
-
-    /// Serialize a pointer to a string in the given representation.
-    ///
-    /// - Parameters:
-    ///   - pointer: The pointer to serialize.
-    ///   - format: The textual representation to produce. Defaults to ``Format/string``.
-    /// - Returns: The serialized pointer string.
-    public static func string(
-        from pointer: JSON.Pointer,
-        format: Format = .string
-    ) -> String {
-        Serialization.string(
-            pointer: pointer,
-            format: format
-        )
-    }
-
-    /// Serialize a pointer to UTF-8 data in the given representation.
-    ///
-    /// - Parameters:
-    ///   - pointer: The pointer to serialize.
-    ///   - format: The textual representation to produce. Defaults to ``Format/string``.
-    /// - Returns: The serialized pointer as UTF-8 bytes.
-    public static func data(
-        from pointer: JSON.Pointer,
-        format: Format = .string
-    ) -> Data {
-        Serialization.data(
-            pointer: pointer,
-            format: format
-        )
-    }
-
-    enum Deserialization {
-
-        static func pointer(
-            from data: Data
-        ) throws -> JSON.Pointer {
-            guard let string = String(
-                data: data,
-                encoding: .utf8
-            ) else {
-                throw DeserializationError.invalidEncoding
-            }
-            return try pointer(from: string)
-        }
-
-        static func pointer(
+        private static func pointer(
             from string: String
         ) throws -> JSON.Pointer {
             guard string.hasPrefix("#") else {
@@ -280,7 +232,7 @@ extension JSON.Pointer {
         private static func percentDecoded(
             _ string: String
         ) throws -> String {
-            let utf8 = Array(string.utf8)
+            let utf8 = Swift.Array(string.utf8)
             var bytes = [UInt8]()
             bytes.reserveCapacity(utf8.count)
             var index = 0
@@ -344,39 +296,6 @@ extension JSON.Pointer {
                 }
             }
             return result
-        }
-
-    }
-
-}
-
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension JSON.Pointer {
-
-    enum Serialization {
-
-        static func string(
-            pointer: JSON.Pointer,
-            format: Format
-        ) -> String {
-            switch format {
-            case .string:
-                stringRepresentation(of: pointer)
-            case .uriFragment:
-                "#" + percentEncoded(stringRepresentation(of: pointer))
-            }
-        }
-
-        static func data(
-            pointer: JSON.Pointer,
-            format: Format
-        ) -> Data {
-            Data(
-                string(
-                    pointer: pointer,
-                    format: format
-                ).utf8
-            )
         }
 
         private static func stringRepresentation(
@@ -450,7 +369,6 @@ extension JSON.Pointer {
             }
             return result
         }
-
     }
 
 }

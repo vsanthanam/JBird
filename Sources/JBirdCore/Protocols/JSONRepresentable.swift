@@ -138,9 +138,9 @@ extension UUID: JSONRepresentable {
     }
 
     public init(json: JSON) throws {
-        let str = try json.stringValue
-        guard let uuid = UUID(uuidString: str) else {
-            throw JSON.OperationError.uuidDecodingFailure(str)
+        let string = try json.convert(into: String.self)
+        guard let uuid = UUID(uuidString: string) else {
+            throw JSON.OperationError.uuidDecodingFailure(string)
         }
         self = uuid
     }
