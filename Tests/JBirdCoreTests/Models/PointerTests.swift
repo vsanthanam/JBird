@@ -69,34 +69,54 @@ struct PointerTests {
     )
     func roundTrips(string: String) throws {
         let pointer = try JSON.Pointer(string)
-        #expect(pointer.stringify() == string)
+        #expect(pointer.string == string)
         #expect(pointer.description == string)
-    }
-
-    @Test("Serialize Produces UTF-8 Data")
-    func serializeData() throws {
-        let pointer = try JSON.Pointer("/a~1b")
-        #expect(pointer.serialize() == Data("/a~1b".utf8))
     }
 
     @Test("Data Initializer Parses UTF-8 Bytes")
     func dataInitializer() throws {
-        let pointer = try JSON.Pointer(Data("/foo/bar".utf8))
-        #expect(pointer.tokens == ["foo", "bar"])
+        let pointer = try JSON.Pointer(Data("/foo/0/bar".utf8))
+        #expect(pointer.tokens == ["foo", "0", "bar"])
+
+        // A URI fragment is detected the same way as the string initializer.
+        let fragment = try JSON.Pointer(Data("#/a~1b".utf8))
+        #expect(fragment.tokens == ["a/b"])
     }
 
     @Test("Data Initializer Rejects Invalid UTF-8")
-    func invalidEncoding() {
+    func dataInitializerInvalidUTF8() {
         #expect(throws: JSON.Pointer.DeserializationError.invalidEncoding) {
             try JSON.Pointer(Data([0xFF, 0xFE]))
         }
     }
 
-    @Test("Codable Round Trips")
-    func codableRoundTrip() throws {
-        let pointer = try JSON.Pointer("/a~1b/0/name")
-        let data = try JSONEncoder().encode(pointer)
-        #expect(try JSONDecoder().decode(JSON.Pointer.self, from: data) == pointer)
+    @Test("Data Initializer Rejects A Malformed Pointer")
+    func dataInitializerMalformed() {
+        #expect(throws: JSON.Pointer.DeserializationError.missingLeadingSlash("foo")) {
+            try JSON.Pointer(Data("foo".utf8))
+        }
+    }
+
+    @Test("Appending Returns A New Pointer")
+    func appending() throws {
+        let base = try JSON.Pointer("/users/0")
+        let child = base.appending("name")
+        #expect(child.tokens == ["users", "0", "name"])
+    }
+
+    @Test("Appending Escapes The New Token")
+    func appendingEscapesToken() {
+        let pointer = JSON.Pointer.wholeDocument.appending("a/b").appending("c~d")
+        #expect(pointer.tokens == ["a/b", "c~d"])
+        #expect(pointer.string == "/a~1b/c~0d")
+    }
+
+    @Test("Append Mutates In Place")
+    func appendMutates() throws {
+        var pointer = try JSON.Pointer("/users")
+        pointer.append("0")
+        pointer.append("name")
+        #expect(pointer.tokens == ["users", "0", "name"])
     }
 
     @Test(
@@ -127,7 +147,7 @@ struct PointerTests {
     )
     func roundTripsURIFragment(fragment: String) throws {
         let pointer = try JSON.Pointer(fragment)
-        #expect(JSON.Pointer.string(from: pointer, format: .uriFragment) == fragment)
+        #expect(pointer.uriFragment == fragment)
     }
 
     @Test("URI fragment decodes multibyte UTF-8")
@@ -135,7 +155,7 @@ struct PointerTests {
         // "é" is U+00E9 → UTF-8 0xC3 0xA9 → "%C3%A9"
         let pointer = try JSON.Pointer("#/caf%C3%A9")
         #expect(pointer.tokens == ["café"])
-        #expect(JSON.Pointer.string(from: pointer, format: .uriFragment) == "#/caf%C3%A9")
+        #expect(pointer.uriFragment == "#/caf%C3%A9")
     }
 
     @Test(
@@ -163,7 +183,39 @@ struct PointerTests {
     func uriFragmentSubDelimiters() {
         // Sub-delims (! $ & ' ( ) * + , ; =) are permitted unencoded in a fragment.
         let pointer = JSON.Pointer(tokens: ["a=b!c$d&e"])
-        #expect(JSON.Pointer.string(from: pointer, format: .uriFragment) == "#/a=b!c$d&e")
+        #expect(pointer.uriFragment == "#/a=b!c$d&e")
+    }
+
+    @Test("JSON Value Is The String Representation")
+    func jsonValue() throws {
+        let pointer = try JSON.Pointer("/a~1b/0/name")
+        #expect(pointer.jsonValue == .string("/a~1b/0/name"))
+    }
+
+    @Test("Initializes From A JSON String")
+    func initFromJSON() throws {
+        let pointer = try JSON.Pointer(json: .string("/a~1b/0/name"))
+        #expect(pointer.tokens == ["a/b", "0", "name"])
+    }
+
+    @Test("Round Trips Through JSONRepresentable")
+    func jsonRepresentableRoundTrip() throws {
+        let pointer = try JSON.Pointer("/users/0/name")
+        #expect(try JSON.Pointer(json: pointer.jsonValue) == pointer)
+    }
+
+    @Test("Initializing From A Non-String JSON Throws")
+    func initFromNonStringJSON() {
+        #expect(throws: JSON.OperationError.illegalStringConversion) {
+            try JSON.Pointer(json: 42)
+        }
+    }
+
+    @Test("Initializing From A Malformed Pointer String Throws")
+    func initFromMalformedJSON() {
+        #expect(throws: JSON.Pointer.DeserializationError.missingLeadingSlash("foo")) {
+            try JSON.Pointer(json: .string("foo"))
+        }
     }
 
     @Test("Tokens Initializer")
