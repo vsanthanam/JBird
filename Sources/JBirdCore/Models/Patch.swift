@@ -154,7 +154,7 @@ extension JSON {
         /// - Returns: A new patch containing this patch's operations followed by the new operation.
         /// - Throws: A ``JSON/Pointer/DeserializationError`` if `pointer` is not a valid JSON Pointer string.
         public func remove(
-            at pointer: String
+            at pointer: some StringProtocol
         ) throws -> Patch {
             let path = try JSON.Pointer(pointer)
             return remove(at: path)

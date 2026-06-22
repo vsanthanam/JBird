@@ -42,7 +42,7 @@ try json.apply(patch)
 - ``add(_:to:)-(_,JSON.Pointer)``
 - ``add(_:to:)-(_,StringProtocol)``
 - ``remove(at:)-(JSON.Pointer)``
-- ``remove(at:)-(String)``
+- ``remove(at:)-(StringProtocol)``
 - ``replace(at:with:)-(JSON.Pointer,_)``
 - ``replace(at:with:)-(StringProtocol,_)``
 - ``move(from:to:)-(JSON.Pointer,JSON.Pointer)``
