@@ -29,7 +29,7 @@ import Foundation
 extension JSON {
 
     /// A JSON Pointer
-    public struct Pointer: Equatable, Hashable, Sendable, CustomStringConvertible, ExpressibleByArrayLiteral, JSONRepresentable {
+    public struct Pointer: Equatable, Hashable, Sendable, CustomStringConvertible, ExpressibleByArrayLiteral, Codable, JSONRepresentable {
 
         // MARK: - Initializers
 
@@ -165,6 +165,23 @@ extension JSON {
             arrayLiteral elements: ArrayLiteralElement...
         ) {
             self.init(tokens: elements)
+        }
+
+        // MARK: - Encodable
+
+        public func encode(
+            to encoder: any Encoder
+        ) throws {
+            try jsonValue.encode(to: encoder)
+        }
+
+        // MARK: - Decodable
+
+        public init(
+            from decoder: any Decoder
+        ) throws {
+            let json = try JSON(from: decoder)
+            try self.init(json: json)
         }
 
         // MARK: - Private

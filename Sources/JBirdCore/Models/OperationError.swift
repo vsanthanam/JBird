@@ -81,6 +81,15 @@ extension JSON {
         /// Thrown when attempting to remove the whole document via a JSON Pointer.
         case cannotRemoveWholeDocument
 
+        /// Thrown when a JSON value cannot be decoded into a JSON Patch operation.
+        case invalidPatchOperation(String)
+
+        /// Thrown when a JSON Patch `test` operation does not match the value at its location.
+        case patchTestFailed(JSON.Pointer)
+
+        /// Thrown when a JSON Patch `move` operation targets a descendant of the value being moved.
+        case invalidPatchMove(JSON.Pointer)
+
         // MARK: - CustomStringConvertible
 
         /// A human-readable description of the error.
@@ -118,6 +127,12 @@ extension JSON {
                 "Cannot decode UUID from '\(string)'"
             case .cannotRemoveWholeDocument:
                 "Cannot remove the whole document with a JSON Pointer"
+            case let .invalidPatchOperation(op):
+                "Invalid JSON Patch operation '\(op)'"
+            case let .patchTestFailed(pointer):
+                "JSON Patch test failed at '\(pointer)'"
+            case let .invalidPatchMove(pointer):
+                "Cannot move the value at '\(pointer)' into one of its own descendants"
             }
         }
 

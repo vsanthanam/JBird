@@ -198,6 +198,11 @@ let steve: JSON = [
 - ``subscript(_:)-(JSON.Pointer)``
 - ``subscript(_:as:)-(JSON.Pointer,_)``
 
+### Applying JSON Patches
+
+- ``apply(_:)``
+- ``applying(_:)``
+
 ### Literal Expression Support
 
 - ``BooleanLiteralType``

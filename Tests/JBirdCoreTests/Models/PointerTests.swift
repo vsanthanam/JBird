@@ -189,7 +189,7 @@ struct PointerTests {
     @Test("JSON Value Is The String Representation")
     func jsonValue() throws {
         let pointer = try JSON.Pointer("/a~1b/0/name")
-        #expect(pointer.jsonValue == .string("/a~1b/0/name"))
+        #expect(JSON(pointer) == "/a~1b/0/name")
     }
 
     @Test("Initializes From A JSON String")
@@ -244,6 +244,75 @@ struct PointerTests {
         #expect(a == b)
         #expect(a != c)
         #expect(Set([a, b, c]).count == 2)
+    }
+
+    @Suite("Codable")
+    struct CodableTests {
+
+        /// Canonical RFC 6901 string forms covering the whole document, escaped
+        /// tokens, and an empty trailing token.
+        static let strings = ["", "/", "/foo", "/foo/0", "/foo/", "/a~1b", "/m~0n", "/~01"]
+
+        @Test("Round-trips through Codable", arguments: CodableTests.strings)
+        func roundTrip(string: String) throws {
+            let pointer = try JSON.Pointer(string)
+            let data = try JSONEncoder().encode(pointer)
+            #expect(try JSONDecoder().decode(JSON.Pointer.self, from: data) == pointer)
+        }
+
+        @Test("Encodes as its RFC 6901 string", arguments: CodableTests.strings)
+        func encodesAsString(string: String) throws {
+            let pointer = try JSON.Pointer(string)
+            let data = try JSONEncoder().encode(pointer)
+            // The encoded value is a JSON string holding the pointer's string form.
+            #expect(try JSONDecoder().decode(String.self, from: data) == pointer.string)
+        }
+
+        @Test("Decodes from a JSON string", arguments: CodableTests.strings)
+        func decodesFromString(string: String) throws {
+            let data = try JSONEncoder().encode(string)
+            let pointer = try JSONDecoder().decode(JSON.Pointer.self, from: data)
+            #expect(try pointer == JSON.Pointer(string))
+        }
+
+        @Test("Decodes the URI fragment form")
+        func decodesURIFragment() throws {
+            let data = try JSONEncoder().encode("#/a~1b")
+            let pointer = try JSONDecoder().decode(JSON.Pointer.self, from: data)
+            #expect(pointer.tokens == ["a/b"])
+        }
+
+        @Test("The whole-document pointer round-trips")
+        func wholeDocument() throws {
+            let data = try JSONEncoder().encode(JSON.Pointer.wholeDocument)
+            #expect(try JSONDecoder().decode(String.self, from: data) == "")
+            #expect(try JSONDecoder().decode(JSON.Pointer.self, from: data) == .wholeDocument)
+        }
+
+        @Test("Decoding a malformed pointer string throws")
+        func decodeMalformedThrows() throws {
+            let data = try JSONEncoder().encode("no-leading-slash")
+            #expect(throws: JSON.Pointer.DeserializationError.missingLeadingSlash("no-leading-slash")) {
+                try JSONDecoder().decode(JSON.Pointer.self, from: data)
+            }
+        }
+
+        @Test("Decoding a non-string JSON throws")
+        func decodeNonStringThrows() {
+            #expect(throws: JSON.OperationError.illegalStringConversion) {
+                try JSONDecoder().decode(JSON.Pointer.self, from: Data("42".utf8))
+            }
+        }
+
+        @Test("A pointer round-trips inside another Codable type")
+        func nestedInCodableType() throws {
+            struct Holder: Codable, Equatable {
+                let pointer: JSON.Pointer
+            }
+            let holder = Holder(pointer: ["foo", "0"])
+            let data = try JSONEncoder().encode(holder)
+            #expect(try JSONDecoder().decode(Holder.self, from: data) == holder)
+        }
     }
 
 }

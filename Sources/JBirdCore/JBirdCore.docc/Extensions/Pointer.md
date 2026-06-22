@@ -15,7 +15,7 @@ Every Unicode code point is permitted in a token except `/` and `~`, which are e
 
 A pointer has two textual representations: the [string form](https://datatracker.ietf.org/doc/html/rfc6901#section-5) (`/users/0/name`) and the [URI fragment form](https://datatracker.ietf.org/doc/html/rfc6901#section-6) (`#/users/0/name`). ``init(_:)-(String)`` parses either automatically — a leading `#` selects the URI fragment form — and the ``string`` and ``uriFragment`` properties produce each representation on output.
 
-See [the RFC](https://datatracker.ietf.org/doc/html/rfc6901) for more information.
+See [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) for more information.
 
 ## Topics
 
@@ -28,6 +28,7 @@ See [the RFC](https://datatracker.ietf.org/doc/html/rfc6901) for more informatio
 
 ### Introspection
 
+- ``Token``
 - ``tokens``
 - ``isWholeDocument``
 
