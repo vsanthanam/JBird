@@ -23,6 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import Foundation
 @testable import JBirdCore
 import Testing
 
@@ -197,5 +198,131 @@ struct NumberTests {
         let negatedInf = -inf
         #expect(negatedInf == JSON.Number(-Double.infinity))
         #expect(negatedInf.isInfinite)
+    }
+
+    @Suite("Codable Tests")
+    struct CodableTests {
+
+        private let encoder = JSONEncoder()
+
+        private let decoder = JSONDecoder()
+
+        private func roundTrip(_ number: JSON.Number) throws -> JSON.Number {
+            let data = try encoder.encode(number)
+            return try decoder.decode(JSON.Number.self, from: data)
+        }
+
+        // MARK: - Encoding
+
+        @Test("Encode Integer")
+        func encodeInteger() throws {
+            let data = try encoder.encode(JSON.Number(42))
+            #expect(String(data: data, encoding: .utf8) == "42")
+        }
+
+        @Test("Encode Negative Integer")
+        func encodeNegativeInteger() throws {
+            let data = try encoder.encode(JSON.Number(-42))
+            #expect(String(data: data, encoding: .utf8) == "-42")
+        }
+
+        @Test("Encode Double")
+        func encodeDouble() throws {
+            let data = try encoder.encode(JSON.Number(4.5))
+            #expect(String(data: data, encoding: .utf8) == "4.5")
+        }
+
+        @Test("Encode Zero")
+        func encodeZero() throws {
+            let data = try encoder.encode(JSON.Number.zero)
+            #expect(String(data: data, encoding: .utf8) == "0")
+        }
+
+        // MARK: - Decoding
+
+        @Test("Decode Integer")
+        func decodeInteger() throws {
+            let number = try decoder.decode(JSON.Number.self, from: Data("42".utf8))
+            #expect(number == JSON.Number(42))
+            #expect(number.isInteger)
+        }
+
+        @Test("Decode Negative Integer")
+        func decodeNegativeInteger() throws {
+            let number = try decoder.decode(JSON.Number.self, from: Data("-42".utf8))
+            #expect(number == JSON.Number(-42))
+            #expect(number.isInteger)
+        }
+
+        @Test("Decode Double")
+        func decodeDouble() throws {
+            let number = try decoder.decode(JSON.Number.self, from: Data("4.5".utf8))
+            #expect(number == JSON.Number(4.5))
+            #expect(number.isFloatingPoint)
+        }
+
+        @Test("Decode Double With Exponent")
+        func decodeDoubleWithExponent() throws {
+            // `1.5e3` is the integral value 1500. Because the decoder tries `Int`
+            // first and Foundation happily decodes the integral exponent form as an
+            // `Int`, the result is stored as an integer.
+            let number = try decoder.decode(JSON.Number.self, from: Data("1.5e3".utf8))
+            #expect(number == JSON.Number(1500))
+            #expect(number.isInteger)
+        }
+
+        @Test("Decode Non-Integral Double With Exponent")
+        func decodeNonIntegralDoubleWithExponent() throws {
+            let number = try decoder.decode(JSON.Number.self, from: Data("1.25e2".utf8))
+            #expect(number == JSON.Number(125.0))
+        }
+
+        @Test("Decode Malformed Number Throws")
+        func decodeMalformedThrows() {
+            #expect(throws: DecodingError.self) {
+                _ = try decoder.decode(JSON.Number.self, from: Data("\"not a number\"".utf8))
+            }
+        }
+
+        // MARK: - Round Trips
+
+        @Test("Round Trip Integer")
+        func roundTripInteger() throws {
+            let number = JSON.Number(123_456)
+            #expect(try roundTrip(number) == number)
+            #expect(try roundTrip(number).isInteger)
+        }
+
+        @Test("Round Trip Double")
+        func roundTripDouble() throws {
+            let number = JSON.Number(3.14159)
+            #expect(try roundTrip(number) == number)
+            #expect(try roundTrip(number).isFloatingPoint)
+        }
+
+        @Test("Round Trip Preserves Integer")
+        func roundTripPreservesInteger() throws {
+            // An integer stays an integer through a round trip.
+            let integer = try roundTrip(JSON.Number(42))
+            #expect(integer.isInteger)
+        }
+
+        @Test("Round Trip Preserves Fractional Double")
+        func roundTripPreservesFractionalDouble() throws {
+            // A double with a fractional component stays a double.
+            let double = try roundTrip(JSON.Number(42.5))
+            #expect(double.isFloatingPoint)
+        }
+
+        @Test("Integral Double Round Trips To Integer")
+        func integralDoubleRoundTripsToInteger() throws {
+            // JSON has no notion of "42.0" vs "42"; an integral double serializes
+            // as `42` and therefore decodes back as an integer. The values remain
+            // equal, but the backing storage collapses to the integer form.
+            let double = try roundTrip(JSON.Number(42.0))
+            #expect(double == JSON.Number(42))
+            #expect(double.isInteger)
+        }
+
     }
 }
