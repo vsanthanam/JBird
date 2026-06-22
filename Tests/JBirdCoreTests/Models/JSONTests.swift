@@ -1461,12 +1461,16 @@ struct JSONTests {
             return try decoder.decode(JSON.self, from: data)
         }
 
-        private func encodeString(_ json: JSON) throws -> String {
+        private func encodeString(
+            _ json: JSON
+        ) throws -> String {
             let data = try encoder.encode(json)
             return try #require(String(data: data, encoding: .utf8))
         }
 
-        private func decode(_ string: String) throws -> JSON {
+        private func decode(
+            _ string: String
+        ) throws -> JSON {
             try decoder.decode(JSON.self, from: Data(string.utf8))
         }
 
@@ -1679,6 +1683,240 @@ struct JSONTests {
             }
         }
 
+    }
+
+    @Suite("Patch Application Tests")
+    struct PatchApplicationTests {
+
+        /// Asserts both the non-mutating and mutating forms produce `expected`.
+        private func assertApplies(
+            _ input: JSON,
+            _ patch: JSON.Patch,
+            _ expected: JSON
+        ) throws {
+            #expect(try input.applying(patch) == expected)
+            var copy = input
+            try copy.apply(patch)
+            #expect(copy == expected)
+        }
+
+        @Test(
+            "Applies add operations",
+            arguments: [
+                ("object member", ["foo": "bar"], JSON.Patch().add("qux", to: ["baz"]), ["foo": "bar", "baz": "qux"]),
+                ("replaces an existing member", ["a": 1], JSON.Patch().add(2, to: ["a"]), ["a": 2]),
+                ("inserts into an array", ["a": [1, 2, 3]], JSON.Patch().add(99, to: ["a", "1"]), ["a": [1, 99, 2, 3]]),
+                ("at the first index", [1, 2], JSON.Patch().add(0, to: ["0"]), [0, 1, 2]),
+                ("at the end index", [1, 2], JSON.Patch().add(3, to: ["2"]), [1, 2, 3]),
+                ("appends with a dash", [1, 2], JSON.Patch().add(3, to: ["-"]), [1, 2, 3]),
+                ("replaces the whole document", ["a": 1], JSON.Patch().add("new", to: .wholeDocument), "new"),
+                ("into a nested array", ["a": ["b": [1]]], JSON.Patch().add(2, to: ["a", "b", "-"]), ["a": ["b": [1, 2]]]),
+            ] as [(name: String, input: JSON, patch: JSON.Patch, expected: JSON)]
+        )
+        func addOperations(name: String, input: JSON, patch: JSON.Patch, expected: JSON) throws {
+            try assertApplies(input, patch, expected)
+        }
+
+        @Test(
+            "Applies remove and replace operations",
+            arguments: [
+                ("remove an object member", ["a": 1, "b": 2], JSON.Patch().remove(at: ["a"]), ["b": 2]),
+                ("remove an array element", [1, 2, 3], JSON.Patch().remove(at: ["1"]), [1, 3]),
+                ("remove a nested member", ["a": ["b": 1, "c": 2]], JSON.Patch().remove(at: ["a", "b"]), ["a": ["c": 2]]),
+                ("replace an object member", ["a": 1], JSON.Patch().replace(at: ["a"], with: 2), ["a": 2]),
+                ("replace an array element", [1, 2], JSON.Patch().replace(at: ["0"], with: 9), [9, 2]),
+                ("replace the whole document", ["a": 1], JSON.Patch().replace(at: .wholeDocument, with: "x"), "x"),
+            ] as [(name: String, input: JSON, patch: JSON.Patch, expected: JSON)]
+        )
+        func removeAndReplaceOperations(name: String, input: JSON, patch: JSON.Patch, expected: JSON) throws {
+            try assertApplies(input, patch, expected)
+        }
+
+        @Test(
+            "Applies move, copy, test, and compound patches",
+            arguments: [
+                ("move an object member", ["a": 1], JSON.Patch().move(from: ["a"], to: ["c"]), ["c": 1]),
+                ("move reorders an array", ["f": ["all", "grass", "cows", "eat"]], JSON.Patch().move(from: ["f", "1"], to: ["f", "3"]), ["f": ["all", "cows", "eat", "grass"]]),
+                ("copy duplicates a value", ["a": ["x": 1]], JSON.Patch().copy(from: ["a"], to: ["b"]), ["a": ["x": 1], "b": ["x": 1]]),
+                ("a passing test is a no-op", ["a": 1], JSON.Patch().test(for: 1, at: ["a"]), ["a": 1]),
+                ("an empty patch is the identity", ["a": 1], JSON.Patch(), ["a": 1]),
+                ("operations apply in sequence", ["a": 1], JSON.Patch().add(2, to: ["b"]).replace(at: ["a"], with: 9), ["a": 9, "b": 2]),
+            ] as [(name: String, input: JSON, patch: JSON.Patch, expected: JSON)]
+        )
+        func compoundOperations(name: String, input: JSON, patch: JSON.Patch, expected: JSON) throws {
+            try assertApplies(input, patch, expected)
+        }
+
+        @Test("A failing test operation throws patchTestFailed")
+        func failure() {
+            let document: JSON = ["foo": "bar"]
+            #expect(throws: JSON.OperationError.patchTestFailed(["foo"])) {
+                try document.applying(JSON.Patch().test(for: "qux", at: ["foo"]))
+            }
+        }
+
+        // "é" can be written as a single precomposed scalar (U+00E9) or as "e"
+        // plus a combining acute accent (U+0065 U+0301). The two are canonically
+        // equivalent — Swift's `String ==` treats them as equal — but their code
+        // points differ, so RFC 6902 §4.6 requires `test` to compare them as unequal.
+        static let precomposedE = JSON.string("\u{00E9}")
+        static let decomposedE = JSON.string("\u{0065}\u{0301}")
+
+        @Test("test compares strings by code points, not canonical equivalence")
+        func codePointEquality() {
+            let document: JSON = ["name": PatchApplicationTests.precomposedE]
+            #expect(throws: JSON.OperationError.patchTestFailed(["name"])) {
+                try document.applying(JSON.Patch().test(for: PatchApplicationTests.decomposedE, at: ["name"]))
+            }
+        }
+
+        @Test(
+            "test code-point comparison applies inside arrays and objects",
+            arguments: [
+                ("array element", [PatchApplicationTests.precomposedE], JSON.array([PatchApplicationTests.decomposedE])),
+                ("object value", ["k": PatchApplicationTests.precomposedE], JSON.object(["k": PatchApplicationTests.decomposedE])),
+            ] as [(name: String, document: JSON, tested: JSON)]
+        )
+        func codePointEqualityNested(name: String, document: JSON, tested: JSON) {
+            #expect(throws: JSON.OperationError.patchTestFailed(.wholeDocument)) {
+                try document.applying(JSON.Patch().test(for: tested, at: .wholeDocument))
+            }
+        }
+
+        @Test("test passes for code-point-identical strings nested in collections")
+        func exactMatchPasses() throws {
+            let document: JSON = [
+                "a": [PatchApplicationTests.precomposedE, 1],
+                "b": ["x": true],
+            ]
+            // Comparing the document against itself: identical code points, so the test passes.
+            #expect(try document.applying(JSON.Patch().test(for: document, at: .wholeDocument)) == document)
+        }
+
+        @Test("test keeps numeric equality for numbers")
+        func numericEquality() throws {
+            let document: JSON = ["n": 42]
+            // 42 and 42.0 are numerically equal per RFC 6902, so the test passes.
+            #expect(try document.applying(JSON.Patch().test(for: ["n": 42.0], at: .wholeDocument)) == document)
+        }
+
+        @Test("test fails when objects have the same size but different keys")
+        func objectMismatchedKeys() {
+            let document: JSON = ["a": 1]
+            #expect(throws: JSON.OperationError.patchTestFailed(.wholeDocument)) {
+                try document.applying(JSON.Patch().test(for: ["b": 1], at: .wholeDocument))
+            }
+        }
+
+        @Test("Moving a value into its own descendant throws invalidPatchMove")
+        func moveIntoDescendant() {
+            let document: JSON = ["a": ["b": 1]]
+            #expect(throws: JSON.OperationError.invalidPatchMove(["a"])) {
+                try document.applying(JSON.Patch().move(from: ["a"], to: ["a", "c"]))
+            }
+        }
+
+        @Test("Removing the whole document throws cannotRemoveWholeDocument")
+        func removeWholeDocument() {
+            let document: JSON = ["a": 1]
+            #expect(throws: JSON.OperationError.cannotRemoveWholeDocument) {
+                try document.applying(JSON.Patch().remove(at: .wholeDocument))
+            }
+        }
+
+        @Test(
+            "Operations targeting invalid locations throw",
+            arguments: [
+                ("replace a missing key", ["a": 1], JSON.Patch().replace(at: ["z"], with: 1), JSON.OperationError.keyNotFound("z")),
+                ("remove a missing key", ["a": 1], JSON.Patch().remove(at: ["z"]), .keyNotFound("z")),
+                ("add past the end of an array", [1, 2], JSON.Patch().add(9, to: ["5"]), .indexOutOfBounds(5)),
+                ("add with a non-numeric array token", ["a": [1]], JSON.Patch().add(9, to: ["a", "x"]), .invalidSubscript(.key("x"))),
+                ("add into a scalar", 5, JSON.Patch().add(1, to: ["x"]), .invalidSubscript(.key("x"))),
+            ] as [(name: String, input: JSON, patch: JSON.Patch, error: JSON.OperationError)]
+        )
+        func invalidLocation(name: String, input: JSON, patch: JSON.Patch, error: JSON.OperationError) {
+            #expect(throws: error) {
+                try input.applying(patch)
+            }
+        }
+
+        @Test("A failing operation leaves the value unchanged")
+        func atomicity() {
+            var document: JSON = ["a": 1]
+            let patch = JSON.Patch()
+                .add(2, to: ["b"])
+                .remove(at: ["does-not-exist"])
+            #expect(throws: JSON.OperationError.self) {
+                try document.apply(patch)
+            }
+            #expect(document == ["a": 1])
+        }
+    }
+
+    @Suite("String Interpolation Tests")
+    struct StringInterpolationTests {
+
+        @Test(
+            "Interpolates a value's JSON representation",
+            arguments: [
+                ("integer", 42, "42"),
+                ("double", 4.5, "4.5"),
+                ("bool", true, "true"),
+                ("string is quoted", "hi", "\"hi\""),
+                ("null", JSON.null, "null"),
+                ("array", [1, 2, 3], "[1,2,3]"),
+                ("object", ["a": 1], "{\"a\":1}"),
+            ] as [(name: String, value: JSON, expected: String)]
+        )
+        func interpolates(name: String, value: JSON, expected: String) {
+            #expect(expected == "\(json: value)")
+        }
+
+        @Test("Interpolates within a larger string literal")
+        func embedded() {
+            let value: JSON = ["x": [1, 2]]
+            #expect("the value is \(json: value)!" == "the value is {\"x\":[1,2]}!")
+        }
+
+        @Test("Accepts any JSONConvertible value, not just JSON")
+        func convertible() {
+            // The parameter is `some JSONConvertible`, so Swift values work directly.
+            #expect("\(json: 7)" == "7")
+            #expect("\(json: "raw")" == "\"raw\"")
+            #expect("\(json: [true, false])" == "[true,false]")
+        }
+
+        @Test(
+            "Serializes non-conforming floating-point values as strings",
+            arguments: [
+                (Double.nan, "\"NaN\""),
+                (Double.infinity, "\"Infinity\""),
+                (-Double.infinity, "\"-Infinity\""),
+            ] as [(value: Double, expected: String)]
+        )
+        func nonConformingFloats(value: Double, expected: String) {
+            #expect(expected == "\(json: value)")
+        }
+
+        @Test("The options overload applies serialization options")
+        func withOptions() throws {
+            let value: JSON = ["b": 2, "a": 1]
+            let pretty = try "\(json: value, options: [.prettyPrinted, .sortedKeys, .fragmentsAllowed])"
+            #expect(pretty == "{\n  \"a\" : 1,\n  \"b\" : 2\n}")
+        }
+
+        @Test("The options overload interpolates within a larger literal")
+        func withOptionsEmbedded() throws {
+            let result = try "value: \(json: [1, 2], options: [.fragmentsAllowed])."
+            #expect(result == "value: [1,2].")
+        }
+
+        @Test("The options overload throws on non-conforming floats when not allowed")
+        func withOptionsThrows() {
+            #expect(throws: (any Error).self) {
+                _ = try "\(json: Double.nan, options: [.fragmentsAllowed])"
+            }
+        }
     }
 
 }

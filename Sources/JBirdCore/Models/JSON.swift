@@ -1209,6 +1209,35 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         try removeValue(tokens: pointer.tokens)
     }
 
+    /// Applies the operations in `patch` to this JSON value, in order.
+    ///
+    /// The patch is applied atomically: if any operation fails, an error is thrown and this value is
+    /// left unchanged.
+    /// - Parameter patch: The patch to apply.
+    /// - Throws: An ``OperationError`` if any operation cannot be applied.
+    public mutating func apply(
+        _ patch: Patch
+    ) throws {
+        self = try applying(patch)
+    }
+
+    /// Returns a copy of this JSON value with the operations in `patch` applied, in order.
+    ///
+    /// The patch is applied atomically: if any operation fails, an error is thrown and no value is
+    /// returned.
+    /// - Parameter patch: The patch to apply.
+    /// - Returns: A new JSON value with the patch applied.
+    /// - Throws: An ``OperationError`` if any operation cannot be applied.
+    public func applying(
+        _ patch: Patch
+    ) throws -> JSON {
+        var result = self
+        for operation in patch.operations {
+            try result.apply(operation)
+        }
+        return result
+    }
+
     /// Retrieve a value from the JSON object using a specified subscript
     /// - Parameter subscript: A subscript to use for lookup
     /// - Returns: The JSON value at the specified subscript
@@ -1457,7 +1486,12 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
 
     /// Create an instance initialized with the given elements
     ///
-    /// Do not
+    /// Do not call this initializer directly. It is used by the compiler when you use an array literal. Instead, create a new `JSON` instance by using an array literal. For example:
+    ///
+    /// ```swift
+    /// let myJSON: JSON = ["foo", "bar", "baz"]
+    /// ```
+    ///
     /// - Parameter elements: The elements of the new instance
     public init(
         arrayLiteral elements: ArrayLiteralElement...
@@ -1630,6 +1664,22 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
 
     }
 
+    private mutating func mutatingChild(
+        at token: JSON.Pointer.Token,
+        _ body: (inout JSON) throws -> Void
+    ) throws {
+        let `subscript` = try JSON.Pointer.subscript(
+            for: token,
+            in: self
+        )
+        var child = try value(forSubscript: `subscript`)
+        try body(&child)
+        try setValue(
+            child,
+            forSubscript: `subscript`
+        )
+    }
+
     private mutating func setValue(
         _ value: JSON,
         tokens: some Collection<JSON.Pointer.Token>
@@ -1638,26 +1688,23 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             self = value
             return
         }
-        let `subscript` = try JSON.Pointer.subscript(
-            for: token,
-            in: self
-        )
         let rest = tokens.dropFirst()
         if rest.isEmpty {
+            let `subscript` = try JSON.Pointer.subscript(
+                for: token,
+                in: self
+            )
             try setValue(
                 value,
                 forSubscript: `subscript`
             )
         } else {
-            var child = try self.value(forSubscript: `subscript`)
-            try child.setValue(
-                value,
-                tokens: rest
-            )
-            try setValue(
-                child,
-                forSubscript: `subscript`
-            )
+            try mutatingChild(at: token) { child in
+                try child.setValue(
+                    value,
+                    tokens: rest
+                )
+            }
         }
     }
 
@@ -1667,21 +1714,213 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         guard let token = tokens.first else {
             throw OperationError.cannotRemoveWholeDocument
         }
-        let `subscript` = try JSON.Pointer.subscript(
-            for: token,
-            in: self
-        )
         let rest = tokens.dropFirst()
         if rest.isEmpty {
+            let `subscript` = try JSON.Pointer.subscript(
+                for: token,
+                in: self
+            )
             try removeValue(forSubscript: `subscript`)
         } else {
-            var child = try value(forSubscript: `subscript`)
-            try child.removeValue(tokens: rest)
-            try setValue(
-                child,
-                forSubscript: `subscript`
-            )
+            try mutatingChild(at: token) { child in
+                try child.removeValue(tokens: rest)
+            }
         }
     }
+
+    private mutating func apply(
+        _ operation: Patch.Operation
+    ) throws {
+        switch operation {
+        case let .add(path, value):
+            try addValue(value, atPointer: path)
+        case let .remove(path):
+            try removeValue(atPointer: path)
+        case let .replace(path, value):
+            _ = try self.value(atPointer: path)
+            try setValue(value, atPointer: path)
+        case let .move(from, path):
+            try moveValue(from: from, to: path)
+        case let .copy(from, path):
+            let value = try self.value(atPointer: from)
+            try addValue(value, atPointer: path)
+        case let .test(path, value):
+            let actual = try self.value(atPointer: path)
+            guard Self.patchEqual(actual, value) else {
+                throw OperationError.patchTestFailed(path)
+            }
+        }
+    }
+
+    /// [RFC 6902 §4.6](https://datatracker.ietf.org/doc/html/rfc6902#section-4.6) equality, used by the
+    /// `test` operation.
+    ///
+    /// This deliberately differs from `JSON` value equality (`==`) in how it compares strings. Swift's
+    /// `String` equality — which `JSON` relies on — treats canonically equivalent strings
+    /// as equal (for example the precomposed `"é"`, `U+00E9`, and the decomposed `"e"` + combining acute,
+    /// `U+0065 U+0301`).
+    ///
+    /// RFC 6902 instead requires the code point sequences to match exactly, so strings are
+    /// compared here by their Unicode scalars. Because ``JSON`` is an in-memory model rather than a serialized
+    /// payload, "code points" means the value's Unicode scalar sequence, not the bytes of any encoding.
+    ///
+    /// Numbers keep numeric equality (`42` equals `42.0`), and arrays and objects are compared recursively.
+    ///
+    /// - Note: Object *keys* are stored in a Swift `Dictionary`, whose canonical `String` hashing collapses
+    ///   canonically equivalent keys as the object is built — so that distinction is already lost before this
+    ///   comparison runs. Only string *values* (including those nested inside arrays and objects) receive
+    ///   code-point-exact treatment.
+    private static func patchEqual(
+        _ lhs: JSON,
+        _ rhs: JSON
+    ) -> Bool {
+        switch (lhs, rhs) {
+        case let (.string(lhs), .string(rhs)):
+            lhs.unicodeScalars.elementsEqual(rhs.unicodeScalars)
+        case let (.array(lhs), .array(rhs)):
+            lhs.count == rhs.count && zip(lhs, rhs).allSatisfy { patchEqual($0, $1) }
+        case let (.object(lhs), .object(rhs)):
+            lhs.count == rhs.count && lhs.allSatisfy { key, value in
+                guard let other = rhs[key] else {
+                    return false
+                }
+                return patchEqual(value, other)
+            }
+        default:
+            lhs == rhs
+        }
+    }
+
+    private mutating func moveValue(
+        from: JSON.Pointer,
+        to path: JSON.Pointer
+    ) throws {
+        let value = try self.value(atPointer: from)
+        // A location cannot be moved into one of its own descendants.
+        let fromTokens = from.tokens
+        let toTokens = path.tokens
+        if fromTokens.count < toTokens.count,
+           toTokens.starts(with: fromTokens) {
+            throw OperationError.invalidPatchMove(from)
+        }
+        try removeValue(atPointer: from)
+        try addValue(value, atPointer: path)
+    }
+
+    private mutating func addValue(
+        _ json: JSON,
+        atPointer pointer: JSON.Pointer
+    ) throws {
+        try addValue(json, tokens: pointer.tokens)
+    }
+
+    private mutating func addValue(
+        _ json: JSON,
+        tokens: some Collection<JSON.Pointer.Token>
+    ) throws {
+        guard let token = tokens.first else {
+            self = json
+            return
+        }
+        let rest = tokens.dropFirst()
+        if rest.isEmpty {
+            switch self {
+            case var .object(object):
+                object[token] = json
+                self = .object(object)
+            case var .array(array):
+                let index = try Self.arrayInsertionIndex(for: token, count: array.count)
+                array.insert(json, at: index)
+                self = .array(array)
+            case .bool, .null, .number, .string:
+                throw OperationError.invalidSubscript(.key(token))
+            }
+        } else {
+            try mutatingChild(at: token) { child in
+                try child.addValue(json, tokens: rest)
+            }
+        }
+    }
+
+    private static func arrayInsertionIndex(
+        for token: JSON.Pointer.Token,
+        count: Int
+    ) throws -> Int {
+        if token == "-" {
+            return count
+        }
+        guard let index = JSON.Pointer.index(for: token) else {
+            throw OperationError.invalidSubscript(.key(token))
+        }
+        guard index <= count else {
+            throw OperationError.indexOutOfBounds(index)
+        }
+        return index
+    }
+
+}
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension String.StringInterpolation {
+
+    /// Interpolates the serialized JSON representation of a value into a string literal.
+    ///
+    /// Use this interpolation to embed the JSON text of any ``JSONConvertible`` value directly in a string:
+    ///
+    /// ```swift
+    /// let user: JSON = ["name": "Ada", "id": 42]
+    /// let message = "payload: \(json: user)"
+    /// // "payload: {\"id\":42,\"name\":\"Ada\"}"
+    /// ```
+    ///
+    /// The value is serialized as a JSON fragment, so scalars produce their bare JSON form (`42`, `true`,
+    /// `null`) and strings are quoted (`"Ada"`). Non-conforming floating-point values are permitted and
+    /// serialized as their string forms (`"NaN"`, `"Infinity"`, `"-Infinity"`) rather than trapping. To
+    /// control serialization, use ``appendInterpolation(json:options:)`` instead.
+    ///
+    /// - Parameter json: The value whose JSON representation is interpolated.
+    public mutating func appendInterpolation(json: some JSONConvertible) {
+        let str = try! JSON.string(
+            from: JSON(json),
+            options: .interpolationDefault
+        )
+        appendLiteral(str)
+    }
+
+    /// Interpolates the serialized JSON representation of a value into a string literal, using the provided
+    /// serialization options.
+    ///
+    /// Use this interpolation when you need to customize how the value is serialized — for example, to
+    /// pretty-print it:
+    ///
+    /// ```swift
+    /// let user: JSON = ["name": "Ada", "id": 42]
+    /// let message = try "payload: \(json: user, options: [.prettyPrinted, .fragmentsAllowed])"
+    /// ```
+    ///
+    /// Unlike ``appendInterpolation(json:)``, this overload throws rather than allowing non-conforming
+    /// floating-point values by default, so the containing string literal must be evaluated with `try`.
+    ///
+    /// - Parameters:
+    ///   - json: The value whose JSON representation is interpolated.
+    ///   - options: The ``JSON/SerializationOptions`` to use when serializing the value.
+    /// - Throws: An error if the value cannot be serialized with the provided options.
+    public mutating func appendInterpolation(
+        json: some JSONConvertible,
+        options: JSON.SerializationOptions
+    ) throws {
+        let str = try JSON.string(
+            from: JSON(json),
+            options: options
+        )
+        appendLiteral(str)
+    }
+
+}
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension JSON.SerializationOptions {
+
+    fileprivate static let interpolationDefault: JSON.SerializationOptions = [.allowNonConformingFloatingPointValues, .fragmentsAllowed, .escapeSpecialCharacters]
 
 }
