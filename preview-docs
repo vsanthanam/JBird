@@ -1,0 +1,97 @@
+#!/bin/bash
+#
+# Preview the published DocC documentation locally.
+#
+# The published site (see .scripts/build-static-docc) is a *combined* DocC
+# archive built from every JBird product with
+# --enable-experimental-combined-documentation. The swift-docc-plugin's
+# `preview-documentation` server can only preview a single target at a time and
+# does NOT serve the combined archive, so it can't faithfully preview what gets
+# published.
+#
+# Instead, this script reproduces the published build: it generates the combined
+# static-hosting archive (the same flags as .scripts/build-static-docc) into a
+# temporary directory and serves it with a plain static web server. Every
+# product and all cross-module links resolve, exactly as on the live site.
+#
+# There is no live rebuild: re-run the script to pick up documentation changes.
+#
+# The only differences from the published build are deliberate and local:
+#   * --hosting-base-path is omitted so the docs serve from the server root
+#     (http://localhost:PORT/documentation/jbird) instead of under /docs.
+#   * the output goes to a temporary directory that is removed on exit.
+#
+# Usage:
+#   ./preview-docs                # build and serve on port 8080
+#   ./preview-docs --port 9000    # serve on a different port
+#
+# Any other arguments are forwarded to `generate-documentation`.
+#
+# Eventually, we want to move away from combined documentation and just rely on @_exported,
+# However, this feature relies on changes to the DocC Plugin
+#
+# These issues can be tracked here:
+# https://github.com/vsanthanam/JBird/issues/154
+# https://github.com/swiftlang/swift-docc-plugin/issues/113
+
+set -euo pipefail
+
+cd "$(dirname "$0")"
+
+if ! command -v python3 >/dev/null 2>&1; then
+    echo "error: python3 is required to serve the documentation." >&2
+    exit 1
+fi
+
+port=8080
+extra_args=()
+while [ $# -gt 0 ]; do
+    case "$1" in
+    --port)
+        port="$2"
+        shift 2
+        ;;
+    --port=*)
+        port="${1#*=}"
+        shift
+        ;;
+    *)
+        extra_args+=("$1")
+        shift
+        ;;
+    esac
+done
+
+output_dir="$(mktemp -d)"
+trap 'rm -rf "$output_dir"' EXIT
+
+echo "Generating combined documentation for all products…"
+swift package --allow-writing-to-directory "$output_dir" \
+    generate-documentation \
+    --enable-experimental-combined-documentation \
+    --product JBird \
+    --product JBirdCore \
+    --product JBirdBuilders \
+    --product JBirdMacros \
+    --product JBirdCodableSupport \
+    --disable-indexing \
+    --transform-for-static-hosting \
+    --output-path "$output_dir" \
+    ${extra_args[@]+"${extra_args[@]}"}
+
+url="http://localhost:${port}/documentation/jbird"
+echo ""
+echo "Serving the combined documentation at:"
+echo "    ${url}"
+echo "Press Ctrl-C to stop."
+echo ""
+
+# Open the docs in a browser once the server is up (best effort, macOS).
+if command -v open >/dev/null 2>&1; then
+    (sleep 1 && open "$url") &
+fi
+
+# transform-for-static-hosting emits a real index.html per page, so a plain
+# static file server is sufficient — no SPA fallback required.
+cd "$output_dir"
+python3 -m http.server "$port"
