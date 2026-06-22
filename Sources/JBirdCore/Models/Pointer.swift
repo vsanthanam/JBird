@@ -54,14 +54,14 @@ extension JSON {
         /// - Parameter string: The pointer string, in either representation.
         /// - Throws: ``DeserializationError`` if the string is not a valid JSON Pointer.
         public init(
-            _ string: String
+            _ string: some StringProtocol
         ) throws {
-            self = try Self.pointer(from: string)
+            self = try Self.pointer(from: String(string))
         }
 
         /// Parse a pointer from a buffer of UTF-8 bytes.
         ///
-        /// The bytes are decoded as UTF-8 and then parsed the same way as ``init(_:)-(String)`` — the
+        /// The bytes are decoded as UTF-8 and then parsed the same way as ``init(_:)-(StringProtocol)`` — the
         /// representation (string or URI fragment) is detected automatically.
         ///
         /// - Parameter data: The UTF-8 encoded pointer bytes.
@@ -113,23 +113,61 @@ extension JSON {
             "#" + Self.percentEncoded(Self.stringRepresentation(of: self))
         }
 
-        /// Return a new pointer with an additional reference token appended.
+        /// Return a new pointer with one or more reference tokens appended.
         ///
-        /// - Parameter token: The unescaped reference token to append.
-        /// - Returns: A pointer addressing a child of the location this pointer addresses.
+        /// - Parameter tokens: The unescaped reference tokens to append, in order from this pointer's location.
+        /// - Returns: A pointer addressing a descendant of the location this pointer addresses.
         public func appending(
-            _ token: Token
+            _ tokens: Token...
         ) -> Pointer {
-            .init(tokens: tokens + [token])
+            .init(tokens: self.tokens + tokens)
         }
 
-        /// Append a reference token to the pointer in place.
+        /// Append one or more reference tokens to the pointer in place.
         ///
-        /// - Parameter token: The unescaped reference token to append.
+        /// - Parameter tokens: The unescaped reference tokens to append, in order from this pointer's location.
         public mutating func append(
-            _ token: Token
+            _ tokens: Token...
         ) {
-            self = appending(token)
+            self = appending(contentsOf: tokens)
+        }
+
+        /// Return a new pointer with the reference tokens of a collection appended.
+        ///
+        /// - Parameter tokens: The unescaped reference tokens to append, in order from this pointer's location.
+        /// - Returns: A pointer addressing a descendant of the location this pointer addresses.
+        public func appending(
+            contentsOf tokens: some Collection<Token>
+        ) -> Pointer {
+            .init(tokens: self.tokens + Swift.Array(tokens))
+        }
+
+        /// Append the reference tokens of a collection to the pointer in place.
+        ///
+        /// - Parameter tokens: The unescaped reference tokens to append, in order from this pointer's location.
+        public mutating func append(
+            contentsOf tokens: some Collection<Token>
+        ) {
+            self = appending(contentsOf: tokens)
+        }
+
+        /// Return a new pointer with the reference tokens of another pointer appended.
+        ///
+        /// - Parameter pointer: The pointer whose reference tokens to append.
+        /// - Returns: A pointer addressing a descendant of the location this pointer addresses.
+        public func appending(
+            contentsOf pointer: Pointer
+        ) -> Pointer {
+            appending(contentsOf: pointer.tokens)
+        }
+
+        /// Append the reference tokens of another pointer to this pointer in place.
+        ///
+        /// - Parameter pointer: The pointer whose reference tokens to append.
+        public mutating func append(
+            contentsOf pointer: Pointer
+        ) {
+            self = appending(contentsOf: pointer)
         }
 
         // MARK: - CustomStringConvertible

@@ -25,8 +25,8 @@ try json.apply(patch)
 
 // JSON value has been updated to the following:
 // {
-//   "foo": [["a", "b], ["x", "y"],
-//   "baz: 42
+//   "foo": [["a", "b"], ["x", "y"],
+//   "baz": 42
 // }
 ```
  
@@ -35,23 +35,38 @@ try json.apply(patch)
 ### Creating a Patch
 
 - ``init(operations:)``
+- ``init(from:to:)``
 
-### Building a Patch
+### Builder Methods
 
 - ``add(_:to:)-(_,JSON.Pointer)``
-- ``add(_:to:)-(_,String)``
+- ``add(_:to:)-(_,StringProtocol)``
 - ``remove(at:)-(JSON.Pointer)``
 - ``remove(at:)-(String)``
 - ``replace(at:with:)-(JSON.Pointer,_)``
-- ``replace(at:with:)-(String,_)``
+- ``replace(at:with:)-(StringProtocol,_)``
 - ``move(from:to:)-(JSON.Pointer,JSON.Pointer)``
-- ``move(from:to:)-(String,String)``
+- ``move(from:to:)-(StringProtocol,StringProtocol)``
 - ``copy(from:to:)-(JSON.Pointer,JSON.Pointer)``
-- ``copy(from:to:)-(String,String)``
+- ``copy(from:to:)-(StringProtocol,StringProtocol)``
 - ``test(for:at:)-(_,JSON.Pointer)``
-- ``test(for:at:)-(_,String)``
+- ``test(for:at:)-(_,StringProtocol)``
+
+### Manipulating Patches
+
+- ``appending(_:)``
+- ``append(_:)``
+- ``appending(contentsOf:)-(Collection<JSON.Patch.Operation>)``
+- ``append(contentsOf:)-(Collection<JSON.Patch.Operation>)``
+- ``appending(contentsOf:)-(JSON.Patch)``
+- ``append(contentsOf:)-(JSON.Patch)``
 
 ### Inspecting a Patch
 
 - ``operations``
 - ``isEmpty``
+
+### Array Literal Support
+
+- ``ArrayLiteralElement``
+- ``init(arrayLiteral:)``

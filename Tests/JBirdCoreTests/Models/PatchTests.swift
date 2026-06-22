@@ -134,6 +134,17 @@ struct PatchTests {
             #expect(try JSON.Patch().remove(at: "/a~1b") == JSON.Patch().remove(at: ["a/b"]))
         }
 
+        @Test("Builders accept any StringProtocol pointer, such as a Substring")
+        func stringProtocol() throws {
+            // The value-bearing builders take `some StringProtocol`, so a Substring works directly.
+            let path: Substring = "x/a/b".dropFirst()
+            #expect(try JSON.Patch().add(1, to: path) == JSON.Patch().add(1, to: ["a", "b"]))
+            #expect(try JSON.Patch().replace(at: path, with: 2) == JSON.Patch().replace(at: ["a", "b"], with: 2))
+            #expect(try JSON.Patch().move(from: path, to: path) == JSON.Patch().move(from: ["a", "b"], to: ["a", "b"]))
+            #expect(try JSON.Patch().copy(from: path, to: path) == JSON.Patch().copy(from: ["a", "b"], to: ["a", "b"]))
+            #expect(try JSON.Patch().test(for: 3, at: path) == JSON.Patch().test(for: 3, at: ["a", "b"]))
+        }
+
         @Test("Invalid add pointer string throws")
         func invalidAdd() {
             #expect(throws: JSON.Pointer.DeserializationError.self) {
@@ -246,4 +257,292 @@ struct PatchTests {
             #expect(try JSONDecoder().decode(JSON.Patch.self, from: data) == JSON.Patch())
         }
     }
+
+    @Suite("Diff Tests")
+    struct DiffTests {
+
+        @Test("difference(to:) is equivalent to Patch(from:to:)")
+        func methodMatchesInitializer() {
+            let source: JSON = ["a": 1]
+            let target: JSON = ["a": 2]
+            #expect(source.difference(to: target) == JSON.Patch(from: source, to: target))
+        }
+
+        @Test("Equal values produce an empty patch")
+        func equalValuesAreEmpty() {
+            #expect(JSON.Patch(from: ["a": 1, "b": [1, 2]], to: ["a": 1, "b": [1, 2]]).isEmpty)
+        }
+
+        @Suite("Round Trips")
+        struct RoundTrips {
+
+            private func assertRoundTrips(
+                from source: JSON,
+                to target: JSON,
+                sourceLocation: SourceLocation = #_sourceLocation
+            ) throws {
+                let patch = source.difference(to: target)
+                #expect(try source.applying(patch) == target, sourceLocation: sourceLocation)
+            }
+
+            static let scalarCases: [(source: JSON, target: JSON)] = [
+                (.null, 1),
+                (1, .null),
+                (true, false),
+                (1, "s"),
+                ("a", "b"),
+                (1, 2.5),
+            ]
+
+            @Test("Scalar changes round-trip", arguments: scalarCases)
+            func scalars(source: JSON, target: JSON) throws {
+                try assertRoundTrips(from: source, to: target)
+            }
+
+            static let objectCases: [(source: JSON, target: JSON)] = [
+                // Added key
+                (["a": 1], ["a": 1, "b": 2]),
+                // Removed key
+                (["a": 1, "b": 2], ["a": 1]),
+                // Changed value
+                (["a": 1], ["a": 2]),
+                // Simultaneous add, remove, and change
+                (["a": 1, "b": 2], ["a": 9, "c": 3]),
+                // Empty to populated and back
+                ([:], ["a": 1]),
+                (["a": 1], [:]),
+                // Nested object changes
+                (["a": ["b": 1]], ["a": ["b": 2, "c": 3]]),
+            ]
+
+            @Test("Object changes round-trip", arguments: objectCases)
+            func objects(source: JSON, target: JSON) throws {
+                try assertRoundTrips(from: source, to: target)
+            }
+
+            static let arrayCases: [(source: JSON, target: JSON)] = [
+                // Element changed in place
+                ([1, 2, 3], [1, 9, 3]),
+                // Grew (append)
+                ([1, 2], [1, 2, 3, 4]),
+                // Shrank (truncate)
+                ([1, 2, 3, 4], [1, 2]),
+                // Emptied and filled
+                ([1, 2], []),
+                ([], [1, 2]),
+                // Changed and resized at once
+                ([1, 2, 3], [9, 8]),
+                ([1], [9, 8, 7]),
+                // Nested array changes
+                ([[1, 2], [3]], [[1, 5], [3, 4]]),
+            ]
+
+            @Test("Array changes round-trip", arguments: arrayCases)
+            func arrays(source: JSON, target: JSON) throws {
+                try assertRoundTrips(from: source, to: target)
+            }
+
+            @Test("Deeply nested mixed changes round-trip")
+            func nested() throws {
+                let source: JSON = [
+                    "user": ["name": "ada", "roles": ["admin", "dev"]],
+                    "count": 3,
+                    "stale": true,
+                ]
+                let target: JSON = [
+                    "user": ["name": "ada", "roles": ["dev"], "active": true],
+                    "count": 4,
+                ]
+                try assertRoundTrips(from: source, to: target)
+            }
+
+            @Test("Type changes between containers and scalars round-trip")
+            func typeChanges() throws {
+                try assertRoundTrips(from: ["a": [1, 2]], to: ["a": ["x": 1]])
+                try assertRoundTrips(from: ["a": ["x": 1]], to: ["a": 5])
+                try assertRoundTrips(from: 5, to: [1, 2, 3])
+            }
+        }
+
+        @Suite("Operations")
+        struct Operations {
+
+            @Test("Removals precede additions and changes, which follow sorted key order")
+            func objectShape() {
+                let patch = JSON.Patch(from: ["a": 1, "old": 0], to: ["a": 2, "new": 9])
+                // Removed keys come first, then the surviving target keys in sorted order:
+                // "a" (changed → replace) precedes "new" (added → add).
+                #expect(patch.operations == [
+                    .remove(path: ["old"]),
+                    .replace(path: ["a"], value: 2),
+                    .add(path: ["new"], value: 9),
+                ])
+            }
+
+            @Test("Object keys are diffed in sorted order regardless of literal order")
+            func deterministicKeyOrder() {
+                let patch = JSON.Patch(from: [:], to: ["c": 3, "a": 1, "b": 2])
+                #expect(patch.operations == [
+                    .add(path: ["a"], value: 1),
+                    .add(path: ["b"], value: 2),
+                    .add(path: ["c"], value: 3),
+                ])
+            }
+
+            @Test("A grown array appends trailing elements")
+            func arrayGrowth() {
+                let patch = JSON.Patch(from: [1, 2], to: [1, 2, 3, 4])
+                #expect(patch.operations == [
+                    .add(path: ["2"], value: 3),
+                    .add(path: ["3"], value: 4),
+                ])
+            }
+
+            @Test("A shrunken array removes its surplus trailing elements")
+            func arrayShrink() {
+                // Each removal shifts the next surviving element down into the same index, so both
+                // removals address index 2.
+                let patch = JSON.Patch(from: [1, 2, 3, 4], to: [1, 2])
+                #expect(patch.operations == [
+                    .remove(path: ["2"]),
+                    .remove(path: ["2"]),
+                ])
+            }
+
+            @Test("An element inserted at the front costs a single add")
+            func arrayFrontInsertion() {
+                let patch = JSON.Patch(from: [1, 2, 3], to: [0, 1, 2, 3])
+                #expect(patch.operations == [.add(path: ["0"], value: 0)])
+            }
+
+            @Test("An element removed from the middle costs a single remove")
+            func arrayMiddleRemoval() {
+                let patch = JSON.Patch(from: [1, 2, 3], to: [1, 3])
+                #expect(patch.operations == [.remove(path: ["1"])])
+            }
+
+            @Test("An element changed in place is diffed recursively, not replaced wholesale")
+            func arrayInPlaceChange() {
+                let patch = JSON.Patch(from: [["a": 1]], to: [["a": 2]])
+                #expect(patch.operations == [.replace(path: ["0", "a"], value: 2)])
+            }
+
+            @Test("A reordering is expressed as a remove plus an add")
+            func arrayReorder() {
+                let patch = JSON.Patch(from: [1, 2, 3], to: [1, 3, 2])
+                #expect(patch.operations == [
+                    .remove(path: ["1"]),
+                    .add(path: ["2"], value: 2),
+                ])
+            }
+
+            @Test("A scalar or type change becomes a single replace")
+            func replace() {
+                #expect(
+                    JSON.Patch(
+                        from: 1,
+                        to: 2
+                    ).operations == [.replace(path: .wholeDocument, value: 2)]
+                )
+                #expect(
+                    JSON.Patch(
+                        from: [1],
+                        to: ["a": 1]
+                    ).operations == [.replace(path: .wholeDocument, value: ["a": 1])]
+                )
+            }
+
+            @Test("The diff emits no move, copy, or test operations")
+            func onlyAddRemoveReplace() {
+                let patch = JSON.Patch(
+                    from: ["a": [1, 2, 3], "b": 1],
+                    to: ["a": [1], "c": 2]
+                )
+                for operation in patch.operations {
+                    switch operation {
+                    case .add, .remove, .replace:
+                        continue
+                    case .move, .copy, .test:
+                        Issue.record("Unexpected operation: \(operation)")
+                    }
+                }
+            }
+        }
+    }
+
+    @Suite("Combining")
+    struct Combining {
+
+        static let base = JSON.Patch().add(1, to: ["a"])
+        static let removeB: JSON.Patch.Operation = .remove(path: ["b"])
+        static let testC: JSON.Patch.Operation = .test(path: ["c"], value: 3)
+        static let combined: [JSON.Patch.Operation] = [.add(path: ["a"], value: 1), removeB, testC]
+
+        @Test("appending returns a new patch with the operations appended")
+        func appendingVariadic() {
+            let patch = Combining.base.appending(Combining.removeB, Combining.testC)
+            #expect(patch.operations == Combining.combined)
+            // The original patch is left unchanged.
+            #expect(Combining.base.operations == [.add(path: ["a"], value: 1)])
+        }
+
+        @Test("append mutates the patch in place with the operations appended")
+        func appendVariadic() {
+            var patch = Combining.base
+            patch.append(Combining.removeB, Combining.testC)
+            #expect(patch.operations == Combining.combined)
+        }
+
+        @Test("appending(contentsOf:) appends a collection of operations")
+        func appendingCollection() {
+            let patch = Combining.base.appending(contentsOf: [Combining.removeB, Combining.testC])
+            #expect(patch.operations == Combining.combined)
+        }
+
+        @Test("append(contentsOf:) mutates in place with a collection of operations")
+        func appendCollection() {
+            var patch = Combining.base
+            patch.append(contentsOf: [Combining.removeB, Combining.testC])
+            #expect(patch.operations == Combining.combined)
+        }
+
+        @Test("appending(contentsOf:) concatenates another patch")
+        func appendingPatch() {
+            let other = JSON.Patch(operations: [Combining.removeB, Combining.testC])
+            #expect(Combining.base.appending(contentsOf: other).operations == Combining.combined)
+        }
+
+        @Test("append(contentsOf:) concatenates another patch in place")
+        func appendPatch() {
+            var patch = Combining.base
+            patch.append(contentsOf: JSON.Patch(operations: [Combining.removeB, Combining.testC]))
+            #expect(patch.operations == Combining.combined)
+        }
+
+        @Test("Appending nothing leaves the operations unchanged")
+        func appendingEmpty() {
+            #expect(Combining.base.appending(contentsOf: [] as [JSON.Patch.Operation]) == Combining.base)
+            #expect(Combining.base.appending(contentsOf: JSON.Patch()) == Combining.base)
+        }
+    }
+
+    @Suite("Array Literal")
+    struct ArrayLiteral {
+
+        @Test("A patch can be expressed as an array literal of operations")
+        func arrayLiteral() {
+            let patch: JSON.Patch = [
+                .add(path: ["a"], value: 1),
+                .remove(path: ["b"]),
+            ]
+            #expect(patch == JSON.Patch(operations: [.add(path: ["a"], value: 1), .remove(path: ["b"])]))
+        }
+
+        @Test("An empty array literal is an empty patch")
+        func emptyArrayLiteral() {
+            let patch: JSON.Patch = []
+            #expect(patch.isEmpty)
+        }
+    }
+
 }
