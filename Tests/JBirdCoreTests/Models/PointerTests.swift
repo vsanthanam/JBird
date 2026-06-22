@@ -119,6 +119,59 @@ struct PointerTests {
         #expect(pointer.tokens == ["users", "0", "name"])
     }
 
+    @Test("Appending Multiple Tokens At Once")
+    func appendingVariadic() throws {
+        let pointer = try JSON.Pointer("/users").appending("0", "name")
+        #expect(pointer.tokens == ["users", "0", "name"])
+    }
+
+    @Test("Appending The Contents Of A Collection")
+    func appendingContentsOf() throws {
+        let pointer = try JSON.Pointer("/users").appending(contentsOf: ["0", "name"])
+        #expect(pointer.tokens == ["users", "0", "name"])
+        // Appending an empty collection leaves the pointer unchanged.
+        #expect(pointer.appending(contentsOf: [] as [JSON.Pointer.Token]) == pointer)
+    }
+
+    @Test("Append Multiple Tokens In Place")
+    func appendVariadicMutates() throws {
+        var pointer = try JSON.Pointer("/users")
+        pointer.append("0", "name")
+        #expect(pointer.tokens == ["users", "0", "name"])
+    }
+
+    @Test("Append The Contents Of A Collection In Place")
+    func appendContentsOfMutates() throws {
+        var pointer = try JSON.Pointer("/users")
+        pointer.append(contentsOf: ["0", "name"])
+        #expect(pointer.tokens == ["users", "0", "name"])
+    }
+
+    @Test("Appending The Contents Of Another Pointer")
+    func appendingContentsOfPointer() throws {
+        let base = try JSON.Pointer("/users/0")
+        let suffix = try JSON.Pointer("/name/first")
+        let combined = base.appending(contentsOf: suffix)
+        #expect(combined.tokens == ["users", "0", "name", "first"])
+        // The original pointer is left unchanged.
+        #expect(base.tokens == ["users", "0"])
+        // Appending the whole-document pointer is a no-op.
+        #expect(base.appending(contentsOf: JSON.Pointer.wholeDocument) == base)
+    }
+
+    @Test("Append The Contents Of Another Pointer In Place")
+    func appendContentsOfPointerMutates() throws {
+        var pointer = try JSON.Pointer("/users/0")
+        try pointer.append(contentsOf: JSON.Pointer("/name/first"))
+        #expect(pointer.tokens == ["users", "0", "name", "first"])
+    }
+
+    @Test("Initializes From Any StringProtocol, Such As A Substring")
+    func stringProtocolInitializer() throws {
+        let substring: Substring = "x/users/0".dropFirst()
+        #expect(try JSON.Pointer(substring).tokens == ["users", "0"])
+    }
+
     @Test(
         "Parses URI fragments (RFC 6901 §6)",
         arguments: [

@@ -1238,6 +1238,26 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         return result
     }
 
+    /// Returns a patch that transforms this value into another.
+    ///
+    /// This is the difference between the receiver and `other`, expressed as a ``JSON/Patch``. Applying
+    /// the result to the receiver reproduces `other`:
+    ///
+    /// ```swift
+    /// let patch = source.difference(to: target)
+    /// try source.applying(patch) == target // true
+    /// ```
+    ///
+    /// See ``JSON/Patch/init(from:to:)`` for the details of how the patch is computed.
+    ///
+    /// - Parameter other: The value the returned patch transforms this value into.
+    /// - Returns: A patch describing the difference between this value and `other`.
+    public func difference(
+        to other: JSON
+    ) -> Patch {
+        Patch(from: self, to: other)
+    }
+
     /// Retrieve a value from the JSON object using a specified subscript
     /// - Parameter subscript: A subscript to use for lookup
     /// - Returns: The JSON value at the specified subscript
