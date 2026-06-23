@@ -1919,4 +1919,165 @@ struct JSONTests {
         }
     }
 
+    @Suite("Merge Patch Tests")
+    struct MergePatchTests {
+
+        @Suite("Apply")
+        struct Apply {
+
+            /// The example test cases from RFC 7386 Appendix A: (original, patch, result).
+            static let appendixA: [(target: JSON, patch: JSON, result: JSON)] = [
+                (["a": "b"], ["a": "c"], ["a": "c"]),
+                (["a": "b"], ["b": "c"], ["a": "b", "b": "c"]),
+                (["a": "b"], ["a": nil], [:]),
+                (["a": "b", "b": "c"], ["a": nil], ["b": "c"]),
+                (["a": ["b"]], ["a": "c"], ["a": "c"]),
+                (["a": "c"], ["a": ["b"]], ["a": ["b"]]),
+                (["a": ["b": "c"]], ["a": ["b": "d", "c": nil]], ["a": ["b": "d"]]),
+                (["a": [["b": "c"]]], ["a": [1]], ["a": [1]]),
+                (["a", "b"], ["c", "d"], ["c", "d"]),
+                (["a": "b"], ["c"], ["c"]),
+                (["a": "foo"], nil, nil),
+                (["a": "foo"], "bar", "bar"),
+                (["e": nil], ["a": 1], ["e": nil, "a": 1]),
+                ([1, 2], ["a": "b", "c": nil], ["a": "b"]),
+                ([:], ["a": ["bb": ["ccc": nil]]], ["a": ["bb": [:]]]),
+            ]
+
+            @Test("RFC 7386 Appendix A example test cases", arguments: appendixA)
+            func appendixAVectors(_ vector: (target: JSON, patch: JSON, result: JSON)) {
+                #expect(vector.target.applying(mergePatch: vector.patch) == vector.result)
+            }
+
+            @Test("applyMergePatch mutates the value in place")
+            func applyMutates() {
+                var value: JSON = ["a": "b"]
+                value.apply(mergePatch: ["a": "c", "b": "d"])
+                #expect(value == ["a": "c", "b": "d"])
+            }
+
+            @Test("A nil object member deletes the corresponding key")
+            func nilMemberDeletes() {
+                let target: JSON = ["title": "Goodbye!", "phoneNumber": "+01-123-456-7890"]
+                #expect(target.applying(mergePatch: ["phoneNumber": nil]) == ["title": "Goodbye!"])
+            }
+
+            @Test("An empty-object patch turns a non-object target into an empty object")
+            func emptyPatchOnScalar() {
+                #expect(JSON("x").applying(mergePatch: [:]) == [:])
+                #expect(JSON([1, 2]).applying(mergePatch: [:]) == [:])
+            }
+
+            @Test("An empty-object patch leaves an object target unchanged")
+            func emptyPatchOnObject() {
+                #expect(JSON(["a": 1]).applying(mergePatch: [:]) == ["a": 1])
+            }
+
+            @Test("A non-object patch replaces the target wholesale")
+            func nonObjectPatchReplaces() {
+                #expect(JSON(["a": 1]).applying(mergePatch: .null) == .null)
+                #expect(JSON(["a": 1]).applying(mergePatch: "scalar") == "scalar")
+                #expect(JSON(["a": 1]).applying(mergePatch: [1, 2]) == [1, 2])
+            }
+
+            @Test("Replacing an object with a scalar and a scalar with an object")
+            func typeReplacements() {
+                #expect(JSON(["a": ["x": 1]]).applying(mergePatch: ["a": 5]) == ["a": 5])
+                #expect(JSON(["a": 5]).applying(mergePatch: ["a": ["x": 1]]) == ["a": ["x": 1]])
+            }
+
+            @Test("Arrays are replaced wholesale, never merged element by element")
+            func arraysReplacedWholesale() {
+                #expect(JSON(["a": [1, 2, 3]]).applying(mergePatch: ["a": [1, 2]]) == ["a": [1, 2]])
+            }
+
+            @Test("A null inside an array value is preserved")
+            func nullInsideArrayPreserved() {
+                #expect(JSON().applying(mergePatch: ["a": [nil]]) == ["a": [nil]])
+            }
+
+            @Test("A deeply nested delete removes only the leaf")
+            func deepNestedDelete() {
+                let target: JSON = ["a": ["b": ["c": 1, "d": 2]]]
+                #expect(target.applying(mergePatch: ["a": ["b": ["c": nil]]]) == ["a": ["b": ["d": 2]]])
+            }
+
+            @Test("Applying a merge patch is idempotent")
+            func idempotent() {
+                let target: JSON = ["a": ["b": "c"], "x": 1]
+                let patch: JSON = ["a": ["b": "d", "c": nil], "x": nil, "y": 2]
+                let once = target.applying(mergePatch: patch)
+                #expect(once.applying(mergePatch: patch) == once)
+            }
+        }
+
+        @Suite("Generation")
+        struct Generation {
+
+            @Test("The diff of two equal objects is an empty-object patch")
+            func equalObjects() {
+                let json: JSON = [
+                    "a": 1,
+                    "b": [1, 2]
+                ]
+                #expect(json.mergeDifference(to: ["a": 1, "b": [1, 2]]) == [:])
+            }
+
+            @Test("The diff of two equal non-objects is the value itself")
+            func equalNonObjects() {
+                #expect(JSON(5).mergeDifference(to: 5) == 5)
+            }
+
+            @Test("A removed key becomes a null member")
+            func removedKey() {
+                #expect(JSON(["a": 1, "b": 2]).mergeDifference(to: ["a": 1]) == ["b": nil])
+            }
+
+            @Test("A changed nested object recurses and unchanged keys are omitted")
+            func changedNested() {
+                #expect(JSON(["a": ["x": 1, "y": 2]]).mergeDifference(to: ["a": ["x": 1, "y": 3]]) == ["a": ["y": 3]])
+            }
+
+            @Test("A changed array is emitted wholesale")
+            func changedArray() {
+                #expect(JSON(["a": [1, 2, 3]]).mergeDifference(to: ["a": [1, 99]]) == ["a": [1, 99]])
+            }
+
+            static let roundTripCases: [(source: JSON, target: JSON)] = [
+                (["a": 1], ["a": 2]),
+                (["a": 1], ["a": 1, "b": 2]),
+                (["a": 1, "b": 2], ["a": 1]),
+                (["a": ["b": 1]], ["a": ["b": 2, "c": 3]]),
+                (["a": [1, 2]], ["a": [3]]),
+                (["a": 1], ["a": ["x": 1]]),
+                ([:], ["a": ["b": ["c": 1]]]),
+                ([1, 2], ["a": "b"]),
+                ("scalar", ["a": 1]),
+                (["a": [nil, 1]], ["a": [2, nil]]),
+            ]
+
+            @Test("Round-trips when the target has no object-member nulls", arguments: roundTripCases)
+            func roundTrips(_ pair: (source: JSON, target: JSON)) {
+                #expect(pair.source.applying(mergePatch: pair.source.mergeDifference(to: pair.target)) == pair.target)
+            }
+
+            @Test("A null array element does not break the round trip")
+            func nullInArrayRoundTrips() {
+                let source: JSON = [:]
+                let target: JSON = ["a": [1, nil, 2]]
+                #expect(source.applying(mergePatch: source.mergeDifference(to: target)) == target)
+            }
+
+            @Test("An object-member null cannot round-trip (RFC 7386 limitation)")
+            func objectMemberNullCannotRoundTrip() {
+                let source: JSON = ["a": 1]
+                let target: JSON = ["a": nil]
+                // The generated patch deletes the key rather than setting it to null, so applying it
+                // produces an empty object — not the target. This is an inherent RFC 7386 limitation.
+                #expect(source.applying(mergePatch: source.mergeDifference(to: target)) == .object([:]))
+                #expect(source.applying(mergePatch: source.mergeDifference(to: target)) != target)
+            }
+        }
+    }
+
 }

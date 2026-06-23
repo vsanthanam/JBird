@@ -76,7 +76,7 @@ extension JSON {
             from source: JSON,
             to target: JSON
         ) {
-            self = Self.calculateDifference(
+            self = Patch.calculateDifference(
                 from: source,
                 to: target,
                 at: .wholeDocument

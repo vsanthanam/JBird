@@ -56,7 +56,7 @@ extension JSON {
         public init(
             _ string: some StringProtocol
         ) throws {
-            self = try Self.pointer(from: String(string))
+            self = try Pointer.pointer(from: String(string))
         }
 
         /// Parse a pointer from a buffer of UTF-8 bytes.
@@ -102,7 +102,7 @@ extension JSON {
         /// This property returns the [RFC 6901 §5](https://datatracker.ietf.org/doc/html/rfc6901#section-5) string representation,
         /// with reference tokens escaped (`~` as `~0`, `/` as `~1`).
         public var string: String {
-            Self.stringRepresentation(of: self)
+            Pointer.stringRepresentation(of: self)
         }
 
         /// The URL fragment representation of the pointer.
@@ -110,7 +110,7 @@ extension JSON {
         /// This property returns the [RFC 6901 §6](https://datatracker.ietf.org/doc/html/rfc6901#section-6) URI fragment
         /// representation, including the leading `#` and percent-encoded for use in a URI.
         public var uriFragment: String {
-            "#" + Self.percentEncoded(Self.stringRepresentation(of: self))
+            "#" + Pointer.percentEncoded(Pointer.stringRepresentation(of: self))
         }
 
         /// Return a new pointer with one or more reference tokens appended.
