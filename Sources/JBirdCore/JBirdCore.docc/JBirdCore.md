@@ -11,6 +11,7 @@ APIs to create, deserialize, manipulate, and serialize JSON data in Swift
 - ``JSON/Pointer``
 - ``JSON/Patch``
 - ``JSON/Patch/Operation``
+- ``JSON/Path``
 
 ### Subscripting
 
@@ -36,3 +37,4 @@ APIs to create, deserialize, manipulate, and serialize JSON data in Swift
 - ``JSON/SerializationError``
 - ``JSON/DeserializationError``
 - ``JSON/PointerError``
+- ``JSON/PathError``
