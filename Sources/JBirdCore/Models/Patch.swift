@@ -553,21 +553,12 @@ extension JSON {
             return patch
         }
 
-        /// One step of a longest-common-subsequence alignment between two arrays.
         private enum ArrayEdit {
-
-            /// An element present and equal in both arrays.
             case common(source: Int, target: Int)
-
-            /// An element present only in the source array.
             case removed(source: Int)
-
-            /// An element present only in the target array.
             case added(target: Int)
         }
 
-        /// Produce a longest-common-subsequence edit script aligning `source` with `target`, in document
-        /// order.
         private static func arrayEdits(
             from source: JSON.Array,
             to target: JSON.Array
