@@ -1,0 +1,89 @@
+// JBird
+// StringInterpolation.swift
+//
+// MIT License
+//
+// Copyright (c) 2026 Varun Santhanam
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the  Software), to deal
+//
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED  AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension String.StringInterpolation {
+
+    /// Interpolates the serialized JSON representation of a value into a string literal.
+    ///
+    /// Use this interpolation to embed the JSON text of any ``JSONConvertible`` value directly in a string:
+    ///
+    /// ```swift
+    /// let user: JSON = ["name": "Ada", "id": 42]
+    /// let message = "payload: \(json: user)"
+    /// // "payload: {\"id\":42,\"name\":\"Ada\"}"
+    /// ```
+    ///
+    /// The value is serialized as a JSON fragment, so scalars produce their bare JSON form (`42`, `true`,
+    /// `null`) and strings are quoted (`"Ada"`). Non-conforming floating-point values are permitted and
+    /// serialized as their string forms (`"NaN"`, `"Infinity"`, `"-Infinity"`) rather than trapping. To
+    /// control serialization, use ``appendInterpolation(json:options:)`` instead.
+    ///
+    /// - Parameter json: The value whose JSON representation is interpolated.
+    public mutating func appendInterpolation(json: some JSONConvertible) {
+        let str = try! JSON.string(
+            from: JSON(json),
+            options: .interpolationDefault
+        )
+        appendLiteral(str)
+    }
+
+    /// Interpolates the serialized JSON representation of a value into a string literal, using the provided
+    /// serialization options.
+    ///
+    /// Use this interpolation when you need to customize how the value is serialized — for example, to
+    /// pretty-print it:
+    ///
+    /// ```swift
+    /// let user: JSON = ["name": "Ada", "id": 42]
+    /// let message = try "payload: \(json: user, options: [.prettyPrinted, .fragmentsAllowed])"
+    /// ```
+    ///
+    /// Unlike ``appendInterpolation(json:)``, this overload throws rather than allowing non-conforming
+    /// floating-point values by default, so the containing string literal must be evaluated with `try`.
+    ///
+    /// - Parameters:
+    ///   - json: The value whose JSON representation is interpolated.
+    ///   - options: The ``JSON/SerializationOptions`` to use when serializing the value.
+    /// - Throws: An error if the value cannot be serialized with the provided options.
+    public mutating func appendInterpolation(
+        json: some JSONConvertible,
+        options: JSON.SerializationOptions
+    ) throws {
+        let str = try JSON.string(
+            from: JSON(json),
+            options: options
+        )
+        appendLiteral(str)
+    }
+
+}
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension JSON.SerializationOptions {
+
+    fileprivate static let interpolationDefault: JSON.SerializationOptions = [.allowNonConformingFloatingPointValues, .fragmentsAllowed, .escapeSpecialCharacters]
+
+}

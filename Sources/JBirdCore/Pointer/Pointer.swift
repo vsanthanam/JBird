@@ -28,6 +28,62 @@ import Foundation
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON {
 
+    /// Retrieve the value identified by a JSON Pointer.
+    /// - Parameter pointer: The pointer identifying the value. A whole-document pointer returns the receiver itself.
+    /// - Returns: The value at the pointer
+    /// - Throws: An ``OperationError`` if the pointer cannot be resolved
+    public func value(
+        atPointer pointer: Pointer
+    ) throws -> JSON {
+        var current = self
+        for token in pointer.tokens {
+            let `subscript` = try JSON.Pointer.subscript(for: token, in: current)
+            current = try current.value(forSubscript: `subscript`)
+        }
+        return current
+    }
+
+    /// Whether a value exists at the given JSON Pointer.
+    ///
+    /// - Parameter pointer: The pointer to test.
+    /// - Returns: `true` if the pointer resolves to a value, otherwise `false`. Never throws.
+    public func containsValue(
+        atPointer pointer: Pointer
+    ) -> Bool {
+        (try? value(atPointer: pointer)) != nil
+    }
+
+    /// Set the value at the location identified by a JSON Pointer.
+    ///
+    /// Every container along the pointer must already exist; intermediate containers are not created. For an
+    /// object the final token is created if absent or overwritten if present, and for an array the final token
+    /// must be an in-bounds index. A whole-document pointer replaces the entire value.
+    /// - Parameters:
+    ///   - value: The value to set
+    ///   - pointer: The pointer identifying the location to set
+    /// - Throws: An ``OperationError`` if the location cannot be resolved
+    public mutating func setValue(
+        _ value: JSON,
+        atPointer pointer: Pointer
+    ) throws {
+        try setValue(
+            value,
+            tokens: pointer.tokens
+        )
+    }
+
+    /// Remove the value at the location identified by a JSON Pointer.
+    ///
+    /// The value must exist. Removing an array element shifts the remaining elements down.
+    /// - Parameter pointer: The pointer identifying the value to remove
+    /// - Throws: ``PatchError/cannotRemoveWholeDocument`` for a whole-document pointer, or an
+    ///   ``OperationError`` if the value cannot be resolved
+    public mutating func removeValue(
+        atPointer pointer: Pointer
+    ) throws {
+        try removeValue(tokens: pointer.tokens)
+    }
+
     /// A JSON Pointer
     public struct Pointer: Equatable, Hashable, Sendable, CustomStringConvertible, ExpressibleByArrayLiteral, Codable, JSONRepresentable {
 
@@ -52,7 +108,7 @@ extension JSON {
         /// the whole document.
         ///
         /// - Parameter string: The pointer string, in either representation.
-        /// - Throws: ``DeserializationError`` if the string is not a valid JSON Pointer.
+        /// - Throws: ``PointerError`` if the string is not a valid JSON Pointer.
         public init(
             _ string: some StringProtocol
         ) throws {
@@ -65,8 +121,8 @@ extension JSON {
         /// representation (string or URI fragment) is detected automatically.
         ///
         /// - Parameter data: The UTF-8 encoded pointer bytes.
-        /// - Throws: ``DeserializationError/invalidEncoding`` if the bytes are not valid UTF-8, or any other
-        ///   ``DeserializationError`` if the decoded string is not a valid JSON Pointer.
+        /// - Throws: ``PointerError/invalidEncoding`` if the bytes are not valid UTF-8, or any other
+        ///   ``PointerError`` if the decoded string is not a valid JSON Pointer.
         public init(
             _ data: Data
         ) throws {
@@ -74,7 +130,7 @@ extension JSON {
                 data: data,
                 encoding: .utf8
             ) else {
-                throw DeserializationError.invalidEncoding
+                throw PointerError.invalidEncoding
             }
             try self.init(string)
         }
@@ -270,7 +326,7 @@ extension JSON {
                 return .wholeDocument
             }
             guard string.hasPrefix("/") else {
-                throw DeserializationError.missingLeadingSlash(string)
+                throw PointerError.missingLeadingSlash(string)
             }
             let components = try string
                 .split(
@@ -301,13 +357,13 @@ extension JSON {
                 guard index + 2 < utf8.count,
                       let high = hexDigit(utf8[index + 1]),
                       let low = hexDigit(utf8[index + 2]) else {
-                    throw DeserializationError.invalidEncoding
+                    throw PointerError.invalidEncoding
                 }
                 bytes.append((high << 4) | low)
                 index += 3
             }
             guard let decoded = String(bytes: bytes, encoding: .utf8) else {
-                throw DeserializationError.invalidEncoding
+                throw PointerError.invalidEncoding
             }
             return decoded
         }
@@ -347,7 +403,7 @@ extension JSON {
                 case "1":
                     result.append("/")
                 default:
-                    throw DeserializationError.invalidEscapeSequence(string)
+                    throw PointerError.invalidEscapeSequence(string)
                 }
             }
             return result
@@ -426,37 +482,68 @@ extension JSON {
         }
     }
 
-}
-
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
-extension JSON.Pointer {
-
-    /// An error encountered while parsing a JSON Pointer.
-    public enum DeserializationError: Error, Equatable, Sendable, CustomStringConvertible {
-
-        /// The string was non-empty but did not begin with a forward slash (`/`).
-        case missingLeadingSlash(String)
-
-        /// A reference token contained a `~` that was not followed by `0` or `1`.
-        case invalidEscapeSequence(String)
-
-        /// The pointer was not a valid UTF-8 encoded string
-        case invalidEncoding
-
-        // MARK: - CustomStringConvertible
-
-        /// A human-readable description of the error.
-        public var description: String {
-            switch self {
-            case let .missingLeadingSlash(string):
-                "JSON Pointer '\(string)' must be empty or begin with '/'"
-            case let .invalidEscapeSequence(token):
-                "JSON Pointer reference token '\(token)' contains an invalid escape sequence"
-            case .invalidEncoding:
-                "JSON Pointers must be represented as UTF-8 encoded strings"
+    private mutating func setValue(
+        _ value: JSON,
+        tokens: some Collection<JSON.Pointer.Token>
+    ) throws {
+        guard let token = tokens.first else {
+            self = value
+            return
+        }
+        let rest = tokens.dropFirst()
+        if rest.isEmpty {
+            let `subscript` = try JSON.Pointer.subscript(
+                for: token,
+                in: self
+            )
+            try setValue(
+                value,
+                forSubscript: `subscript`
+            )
+        } else {
+            try mutatingChild(at: token) { child in
+                try child.setValue(
+                    value,
+                    tokens: rest
+                )
             }
         }
+    }
 
+    private mutating func removeValue(
+        tokens: some Collection<JSON.Pointer.Token>
+    ) throws {
+        guard let token = tokens.first else {
+            throw PatchError.cannotRemoveWholeDocument
+        }
+        let rest = tokens.dropFirst()
+        if rest.isEmpty {
+            let `subscript` = try JSON.Pointer.subscript(
+                for: token,
+                in: self
+            )
+            try removeValue(forSubscript: `subscript`)
+        } else {
+            try mutatingChild(at: token) { child in
+                try child.removeValue(tokens: rest)
+            }
+        }
+    }
+
+    mutating func mutatingChild(
+        at token: JSON.Pointer.Token,
+        _ body: (inout JSON) throws -> Void
+    ) throws {
+        let `subscript` = try JSON.Pointer.subscript(
+            for: token,
+            in: self
+        )
+        var child = try value(forSubscript: `subscript`)
+        try body(&child)
+        try setValue(
+            child,
+            forSubscript: `subscript`
+        )
     }
 
 }

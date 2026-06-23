@@ -172,7 +172,7 @@ extension JSON.Patch {
                     value: json["value"]
                 )
             default:
-                throw JSON.OperationError.invalidPatchOperation(op)
+                throw JSON.PatchError.invalidPatchOperation(op)
             }
         }
     }

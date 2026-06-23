@@ -80,7 +80,7 @@ struct PatchOperationTests {
 
         @Test("Unknown op throws invalidPatchOperation")
         func unknownOp() {
-            #expect(throws: JSON.OperationError.invalidPatchOperation("bogus")) {
+            #expect(throws: JSON.PatchError.invalidPatchOperation("bogus")) {
                 try JSON.Patch.Operation(json: ["op": "bogus", "path": "/x"])
             }
         }
@@ -120,7 +120,10 @@ struct PatchOperationTests {
         @Test("Decoding malformed data throws")
         func decodeMalformed() {
             #expect(throws: (any Error).self) {
-                try JSONDecoder().decode(JSON.Patch.Operation.self, from: Data(#"{"op":"bogus"}"#.utf8))
+                try JSONDecoder().decode(
+                    JSON.Patch.Operation.self,
+                    from: Data(#"{"op":"bogus"}"#.utf8)
+                )
             }
         }
     }

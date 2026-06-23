@@ -148,48 +148,48 @@ struct PatchTests {
 
         @Test("Invalid add pointer string throws")
         func invalidAdd() {
-            #expect(throws: JSON.Pointer.DeserializationError.self) {
+            #expect(throws: JSON.PointerError.self) {
                 try JSON.Patch().add(1, to: "no-leading-slash")
             }
         }
 
         @Test("Invalid remove pointer string throws")
         func invalidRemove() {
-            #expect(throws: JSON.Pointer.DeserializationError.self) {
+            #expect(throws: JSON.PointerError.self) {
                 try JSON.Patch().remove(at: "no-leading-slash")
             }
         }
 
         @Test("Invalid replace pointer string throws")
         func invalidReplace() {
-            #expect(throws: JSON.Pointer.DeserializationError.self) {
+            #expect(throws: JSON.PointerError.self) {
                 try JSON.Patch().replace(at: "no-leading-slash", with: 1)
             }
         }
 
         @Test("Invalid move pointer strings throw")
         func invalidMove() {
-            #expect(throws: JSON.Pointer.DeserializationError.self) {
+            #expect(throws: JSON.PointerError.self) {
                 try JSON.Patch().move(from: "bad", to: "/b")
             }
-            #expect(throws: JSON.Pointer.DeserializationError.self) {
+            #expect(throws: JSON.PointerError.self) {
                 try JSON.Patch().move(from: "/a", to: "bad")
             }
         }
 
         @Test("Invalid copy pointer strings throw")
         func invalidCopy() {
-            #expect(throws: JSON.Pointer.DeserializationError.self) {
+            #expect(throws: JSON.PointerError.self) {
                 try JSON.Patch().copy(from: "bad", to: "/b")
             }
-            #expect(throws: JSON.Pointer.DeserializationError.self) {
+            #expect(throws: JSON.PointerError.self) {
                 try JSON.Patch().copy(from: "/a", to: "bad")
             }
         }
 
         @Test("Invalid test pointer string throws")
         func invalidTest() {
-            #expect(throws: JSON.Pointer.DeserializationError.self) {
+            #expect(throws: JSON.PointerError.self) {
                 try JSON.Patch().test(for: 1, at: "no-leading-slash")
             }
         }
