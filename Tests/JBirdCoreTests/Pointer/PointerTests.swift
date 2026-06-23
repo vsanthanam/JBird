@@ -52,12 +52,12 @@ struct PointerTests {
     @Test(
         "Rejects malformed pointers",
         arguments: [
-            ("foo", JSON.Pointer.DeserializationError.missingLeadingSlash("foo")),
+            ("foo", JSON.PointerError.missingLeadingSlash("foo")),
             ("/~2", .invalidEscapeSequence("~2")),
             ("/x~", .invalidEscapeSequence("x~")),
-        ] as [(string: String, error: JSON.Pointer.DeserializationError)]
+        ] as [(string: String, error: JSON.PointerError)]
     )
-    func rejects(string: String, error: JSON.Pointer.DeserializationError) {
+    func rejects(string: String, error: JSON.PointerError) {
         #expect(throws: error) {
             try JSON.Pointer(string)
         }
@@ -85,14 +85,14 @@ struct PointerTests {
 
     @Test("Data Initializer Rejects Invalid UTF-8")
     func dataInitializerInvalidUTF8() {
-        #expect(throws: JSON.Pointer.DeserializationError.invalidEncoding) {
+        #expect(throws: JSON.PointerError.invalidEncoding) {
             try JSON.Pointer(Data([0xFF, 0xFE]))
         }
     }
 
     @Test("Data Initializer Rejects A Malformed Pointer")
     func dataInitializerMalformed() {
-        #expect(throws: JSON.Pointer.DeserializationError.missingLeadingSlash("foo")) {
+        #expect(throws: JSON.PointerError.missingLeadingSlash("foo")) {
             try JSON.Pointer(Data("foo".utf8))
         }
     }
@@ -220,7 +220,7 @@ struct PointerTests {
         ]
     )
     func uriFragmentInvalidEncoding(fragment: String) {
-        #expect(throws: JSON.Pointer.DeserializationError.invalidEncoding) {
+        #expect(throws: JSON.PointerError.invalidEncoding) {
             try JSON.Pointer(fragment)
         }
     }
@@ -266,7 +266,7 @@ struct PointerTests {
 
     @Test("Initializing From A Malformed Pointer String Throws")
     func initFromMalformedJSON() {
-        #expect(throws: JSON.Pointer.DeserializationError.missingLeadingSlash("foo")) {
+        #expect(throws: JSON.PointerError.missingLeadingSlash("foo")) {
             try JSON.Pointer(json: .string("foo"))
         }
     }
@@ -345,7 +345,7 @@ struct PointerTests {
         @Test("Decoding a malformed pointer string throws")
         func decodeMalformedThrows() throws {
             let data = try JSONEncoder().encode("no-leading-slash")
-            #expect(throws: JSON.Pointer.DeserializationError.missingLeadingSlash("no-leading-slash")) {
+            #expect(throws: JSON.PointerError.missingLeadingSlash("no-leading-slash")) {
                 try JSONDecoder().decode(JSON.Pointer.self, from: data)
             }
         }

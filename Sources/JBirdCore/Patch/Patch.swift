@@ -26,6 +26,60 @@
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON {
 
+    /// Applies the operations in `patch` to this JSON value, in order.
+    ///
+    /// The patch is applied atomically: if any operation fails, an error is thrown and this value is
+    /// left unchanged.
+    /// - Parameter patch: The patch to apply.
+    /// - Throws: An ``OperationError`` if any operation cannot be applied, or a ``PatchError`` if a
+    ///   `test`, `move`, or `remove` operation fails its preconditions.
+    public mutating func apply(
+        _ patch: Patch
+    ) throws {
+        self = try applying(patch)
+    }
+
+    /// Returns a copy of this JSON value with the operations in `patch` applied, in order.
+    ///
+    /// The patch is applied atomically: if any operation fails, an error is thrown and no value is
+    /// returned.
+    /// - Parameter patch: The patch to apply.
+    /// - Returns: A new JSON value with the patch applied.
+    /// - Throws: An ``OperationError`` if any operation cannot be applied, or a ``PatchError`` if a
+    ///   `test`, `move`, or `remove` operation fails its preconditions.
+    public func applying(
+        _ patch: Patch
+    ) throws -> JSON {
+        var result = self
+        for operation in patch.operations {
+            try result.apply(operation)
+        }
+        return result
+    }
+
+    /// Returns a patch that transforms this value into another.
+    ///
+    /// This is the difference between the receiver and `other`, expressed as a ``JSON/Patch``. Applying
+    /// the result to the receiver reproduces `other`:
+    ///
+    /// ```swift
+    /// let patch = source.difference(to: target)
+    /// try source.applying(patch) == target // true
+    /// ```
+    ///
+    /// See ``JSON/Patch/init(from:to:)`` for the details of how the patch is computed.
+    ///
+    /// - Parameter other: The value the returned patch transforms this value into.
+    /// - Returns: A patch describing the difference between this value and `other`.
+    public func difference(
+        to other: JSON
+    ) -> Patch {
+        Patch(
+            from: self,
+            to: other
+        )
+    }
+
     /// A sequence of operations describing a change to a JSON document.
     public struct Patch: Equatable, Hashable, Sendable, Codable, ExpressibleByArrayLiteral, JSONRepresentable {
 
@@ -121,13 +175,16 @@ extension JSON {
         ///   - value: The value to add.
         ///   - pointer: The location to add the value, written as an [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) JSON Pointer string.
         /// - Returns: A new patch containing this patch's operations followed by the new operation.
-        /// - Throws: A ``JSON/Pointer/DeserializationError`` if `pointer` is not a valid JSON Pointer string.
+        /// - Throws: A ``JSON/PointerError`` if `pointer` is not a valid JSON Pointer string.
         public func add(
             _ value: some JSONConvertible,
             to pointer: some StringProtocol
         ) throws -> Patch {
             let pointer = try JSON.Pointer(pointer)
-            return add(value, to: pointer)
+            return add(
+                value,
+                to: pointer
+            )
         }
 
         /// Returns a new patch with a `remove` operation appended.
@@ -152,7 +209,7 @@ extension JSON {
         ///
         /// - Parameter pointer: The location of the value to remove, written as an [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) JSON Pointer string.
         /// - Returns: A new patch containing this patch's operations followed by the new operation.
-        /// - Throws: A ``JSON/Pointer/DeserializationError`` if `pointer` is not a valid JSON Pointer string.
+        /// - Throws: A ``JSON/PointerError`` if `pointer` is not a valid JSON Pointer string.
         public func remove(
             at pointer: some StringProtocol
         ) throws -> Patch {
@@ -188,7 +245,7 @@ extension JSON {
         ///   - pointer: The location of the value to replace, written as an [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) JSON Pointer string.
         ///   - value: The replacement value.
         /// - Returns: A new patch containing this patch's operations followed by the new operation.
-        /// - Throws: A ``JSON/Pointer/DeserializationError`` if `pointer` is not a valid JSON Pointer string.
+        /// - Throws: A ``JSON/PointerError`` if `pointer` is not a valid JSON Pointer string.
         public func replace(
             at pointer: some StringProtocol,
             with value: some JSONConvertible
@@ -227,7 +284,7 @@ extension JSON {
         ///   - origin: The location of the value to move, written as an [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) JSON Pointer string.
         ///   - destination: The location to move the value to, written as an [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) JSON Pointer string.
         /// - Returns: A new patch containing this patch's operations followed by the new operation.
-        /// - Throws: A ``JSON/Pointer/DeserializationError`` if either `origin` or `destination` is not a valid JSON Pointer string.
+        /// - Throws: A ``JSON/PointerError`` if either `origin` or `destination` is not a valid JSON Pointer string.
         public func move(
             from origin: some StringProtocol,
             to destination: some StringProtocol
@@ -267,7 +324,7 @@ extension JSON {
         ///   - origin: The location of the value to copy, written as an [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) JSON Pointer string.
         ///   - destination: The location to copy the value to, written as an [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) JSON Pointer string.
         /// - Returns: A new patch containing this patch's operations followed by the new operation.
-        /// - Throws: A ``JSON/Pointer/DeserializationError`` if either `origin` or `destination` is not a valid JSON Pointer string.
+        /// - Throws: A ``JSON/PointerError`` if either `origin` or `destination` is not a valid JSON Pointer string.
         public func copy(
             from origin: some StringProtocol,
             to destination: some StringProtocol
@@ -307,7 +364,7 @@ extension JSON {
         ///   - value: The value the location is expected to contain.
         ///   - pointer: The location of the value to test, written as an [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) JSON Pointer string.
         /// - Returns: A new patch containing this patch's operations followed by the new operation.
-        /// - Throws: A ``JSON/Pointer/DeserializationError`` if `pointer` is not a valid JSON Pointer string.
+        /// - Throws: A ``JSON/PointerError`` if `pointer` is not a valid JSON Pointer string.
         public func test(
             for value: some JSONConvertible,
             at pointer: some StringProtocol
@@ -634,6 +691,148 @@ extension JSON {
             return edits
         }
 
+    }
+
+    private mutating func apply(
+        _ operation: Patch.Operation
+    ) throws {
+        switch operation {
+        case let .add(path, value):
+            try addValue(value, atPointer: path)
+        case let .remove(path):
+            try removeValue(atPointer: path)
+        case let .replace(path, value):
+            _ = try self.value(atPointer: path)
+            try setValue(value, atPointer: path)
+        case let .move(from, path):
+            try moveValue(from: from, to: path)
+        case let .copy(from, path):
+            let value = try self.value(atPointer: from)
+            try addValue(value, atPointer: path)
+        case let .test(path, value):
+            let actual = try self.value(atPointer: path)
+            guard JSON.patchEqual(actual, value) else {
+                throw PatchError.patchTestFailed(path)
+            }
+        }
+    }
+
+    /// [RFC 6902 §4.6](https://datatracker.ietf.org/doc/html/rfc6902#section-4.6) equality, used by the
+    /// `test` operation.
+    ///
+    /// This deliberately differs from `JSON` value equality (`==`) in how it compares strings. Swift's
+    /// `String` equality — which `JSON` relies on — treats canonically equivalent strings
+    /// as equal (for example the precomposed `"é"`, `U+00E9`, and the decomposed `"e"` + combining acute,
+    /// `U+0065 U+0301`).
+    ///
+    /// RFC 6902 instead requires the code point sequences to match exactly, so strings are
+    /// compared here by their Unicode scalars. Because ``JSON`` is an in-memory model rather than a serialized
+    /// payload, "code points" means the value's Unicode scalar sequence, not the bytes of any encoding.
+    ///
+    /// Numbers keep numeric equality (`42` equals `42.0`), and arrays and objects are compared recursively.
+    ///
+    /// - Note: Object *keys* are stored in a Swift `Dictionary`, whose canonical `String` hashing collapses
+    ///   canonically equivalent keys as the object is built — so that distinction is already lost before this
+    ///   comparison runs. Only string *values* (including those nested inside arrays and objects) receive
+    ///   code-point-exact treatment.
+    private static func patchEqual(
+        _ lhs: JSON,
+        _ rhs: JSON
+    ) -> Bool {
+        switch (lhs, rhs) {
+        case let (.string(lhs), .string(rhs)):
+            lhs.unicodeScalars.elementsEqual(rhs.unicodeScalars)
+        case let (.array(lhs), .array(rhs)):
+            lhs.count == rhs.count && zip(lhs, rhs).allSatisfy { patchEqual($0, $1) }
+        case let (.object(lhs), .object(rhs)):
+            lhs.count == rhs.count && lhs.allSatisfy { key, value in
+                guard let other = rhs[key] else {
+                    return false
+                }
+                return patchEqual(value, other)
+            }
+        default:
+            lhs == rhs
+        }
+    }
+
+    private mutating func moveValue(
+        from: JSON.Pointer,
+        to path: JSON.Pointer
+    ) throws {
+        let value = try self.value(atPointer: from)
+        // A location cannot be moved into one of its own descendants.
+        let fromTokens = from.tokens
+        let toTokens = path.tokens
+        if fromTokens.count < toTokens.count,
+           toTokens.starts(with: fromTokens) {
+            throw PatchError.invalidPatchMove(from)
+        }
+        try removeValue(atPointer: from)
+        try addValue(
+            value,
+            atPointer: path
+        )
+    }
+
+    private mutating func addValue(
+        _ json: JSON,
+        atPointer pointer: JSON.Pointer
+    ) throws {
+        try addValue(
+            json,
+            tokens: pointer.tokens
+        )
+    }
+
+    private mutating func addValue(
+        _ json: JSON,
+        tokens: some Collection<JSON.Pointer.Token>
+    ) throws {
+        guard let token = tokens.first else {
+            self = json
+            return
+        }
+        let rest = tokens.dropFirst()
+        if rest.isEmpty {
+            switch self {
+            case var .object(object):
+                object[token] = json
+                self = .object(object)
+            case var .array(array):
+                let index = try JSON.arrayInsertionIndex(
+                    for: token,
+                    count: array.count
+                )
+                array.insert(json, at: index)
+                self = .array(array)
+            case .bool, .null, .number, .string:
+                throw OperationError.invalidSubscript(.key(token))
+            }
+        } else {
+            try mutatingChild(at: token) { child in
+                try child.addValue(
+                    json,
+                    tokens: rest
+                )
+            }
+        }
+    }
+
+    private static func arrayInsertionIndex(
+        for token: JSON.Pointer.Token,
+        count: Int
+    ) throws -> Int {
+        if token == "-" {
+            return count
+        }
+        guard let index = JSON.Pointer.index(for: token) else {
+            throw OperationError.invalidSubscript(.key(token))
+        }
+        guard index <= count else {
+            throw OperationError.indexOutOfBounds(index)
+        }
+        return index
     }
 
 }

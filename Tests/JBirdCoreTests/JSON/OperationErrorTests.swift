@@ -74,16 +74,4 @@ func operationErrorDescriptionTests() {
     let uuidDecodingFailure = JSON.OperationError.uuidDecodingFailure("foo")
     #expect(uuidDecodingFailure.description == "Cannot decode UUID from 'foo'")
 
-    let cannotRemoveWholeDocument = JSON.OperationError.cannotRemoveWholeDocument
-    #expect(cannotRemoveWholeDocument.description == "Cannot remove the whole document with a JSON Pointer")
-
-    let invalidPatchOperation = JSON.OperationError.invalidPatchOperation("frobnicate")
-    #expect(invalidPatchOperation.description == "Invalid JSON Patch operation 'frobnicate'")
-
-    let patchTestFailed = JSON.OperationError.patchTestFailed(["foo"])
-    #expect(patchTestFailed.description == "JSON Patch test failed at '/foo'")
-
-    let invalidPatchMove = JSON.OperationError.invalidPatchMove(["foo"])
-    #expect(invalidPatchMove.description == "Cannot move the value at '/foo' into one of its own descendants")
-
 }
