@@ -1949,7 +1949,7 @@ struct JSONTests {
                 #expect(vector.target.applying(mergePatch: vector.patch) == vector.result)
             }
 
-            @Test("applyMergePatch mutates the value in place")
+            @Test("apply(mergePatch:) mutates the value in place")
             func applyMutates() {
                 var value: JSON = ["a": "b"]
                 value.apply(mergePatch: ["a": "c", "b": "d"])
