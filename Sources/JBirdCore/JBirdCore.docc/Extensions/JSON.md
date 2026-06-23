@@ -204,6 +204,12 @@ let steve: JSON = [
 - ``applying(_:)``
 - ``difference(to:)``
 
+### Working with JSON Merge Patches
+
+- ``apply(mergePatch:)``
+- ``applying(mergePatch:)``
+- ``mergeDifference(to:)``
+
 ### Literal Expression Support
 
 - ``BooleanLiteralType``

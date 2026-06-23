@@ -1258,6 +1258,80 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         Patch(from: self, to: other)
     }
 
+    /// Applies a JSON Merge Patch to this value in place.
+    ///
+    /// A merge patch is itself an ordinary JSON document. Applying it recursively merges its contents into
+    /// this value: an object member whose value is `null` removes the corresponding key, any other member
+    /// sets or recursively merges that key, and a patch that is not an object replaces this value
+    /// wholesale. Arrays are always replaced wholesale — they are never merged element by element.
+    ///
+    /// Merge patch application can never fail, so this method does not throw.
+    ///
+    /// See [RFC 7386](https://datatracker.ietf.org/doc/html/rfc7386) for more information.
+    ///
+    /// - Parameter mergePatch: The merge patch document to apply.
+    public mutating func apply(
+        mergePatch: JSON
+    ) {
+        self = JSON.mergePatchApplied(
+            to: self,
+            mergePatch
+        )
+    }
+
+    /// Returns a copy of this value with a JSON Merge Patch applied.
+    ///
+    /// See ``apply(mergePatch:)`` for the merge semantics.
+    ///
+    /// A merge patch application can never fail, so this method does not throw.
+    ///
+    /// See [RFC 7386](https://datatracker.ietf.org/doc/html/rfc7386) for more information.
+    ///
+    /// - Parameter mergePatch: The merge patch document to apply.
+    /// - Returns: A new JSON value with the merge patch applied.
+    public func applying(
+        mergePatch: JSON
+    ) -> JSON {
+        JSON.mergePatchApplied(
+            to: self,
+            mergePatch
+        )
+    }
+
+    /// Returns a JSON Merge Patch that transforms this value into another.
+    ///
+    /// The returned document is the merge patch describing the difference between this value and `other`.
+    /// Applying it to this value reproduces `other`:
+    ///
+    /// ```swift
+    /// let patch = source.mergeDifference(to: target)
+    /// source.applying(mergePatch: patch) == target // true (see the limitation below)
+    /// ```
+    ///
+    /// When both values are objects they are compared key by key (a key present only in the receiver
+    /// becomes a `null` member to delete it, a key present only in `other` is added, and a key present in
+    /// both is diffed recursively); otherwise the patch is `other` itself, replacing the value wholesale.
+    /// Arrays are always replaced wholesale rather than merged element by element.
+    ///
+    /// See [RFC 7386](https://datatracker.ietf.org/doc/html/rfc7386) for more information.
+    ///
+    /// - Important: A merge patch cannot represent setting an object member to `null`, because `null` means
+    ///   "delete this key." The round trip `source.applying(mergePatch: source.mergeDifference(to: target)) == target`
+    ///   therefore holds only when `target` contains no `null` reachable as an object member value
+    ///   at any depth. (A `null` *inside an array* round-trips fine, since arrays are replaced wholesale.)
+    ///   This is an inherent limitation of [the RFC](https://datatracker.ietf.org/doc/html/rfc7386).
+    ///
+    /// - Parameter other: The value the returned merge patch transforms this value into.
+    /// - Returns: A merge patch document describing the difference between this value and `other`.
+    public func mergeDifference(
+        to other: JSON
+    ) -> JSON {
+        JSON.mergePatchDifference(
+            from: self,
+            to: other
+        )
+    }
+
     /// Retrieve a value from the JSON object using a specified subscript
     /// - Parameter subscript: A subscript to use for lookup
     /// - Returns: The JSON value at the specified subscript
@@ -1766,7 +1840,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             try addValue(value, atPointer: path)
         case let .test(path, value):
             let actual = try self.value(atPointer: path)
-            guard Self.patchEqual(actual, value) else {
+            guard JSON.patchEqual(actual, value) else {
                 throw OperationError.patchTestFailed(path)
             }
         }
@@ -1849,7 +1923,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
                 object[token] = json
                 self = .object(object)
             case var .array(array):
-                let index = try Self.arrayInsertionIndex(for: token, count: array.count)
+                let index = try JSON.arrayInsertionIndex(for: token, count: array.count)
                 array.insert(json, at: index)
                 self = .array(array)
             case .bool, .null, .number, .string:
@@ -1876,6 +1950,52 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             throw OperationError.indexOutOfBounds(index)
         }
         return index
+    }
+
+    private static func mergePatchApplied(
+        to target: JSON?,
+        _ patch: JSON
+    ) -> JSON {
+        guard case let .object(patchObject) = patch else {
+            return patch
+        }
+        var object: JSON.Object = if case let .object(targetObject)? = target {
+            targetObject
+        } else {
+            [:]
+        }
+        for (key, value) in patchObject {
+            if value == .null {
+                object[key] = nil
+            } else {
+                object[key] = mergePatchApplied(to: object[key], value)
+            }
+        }
+        return .object(object)
+    }
+
+    private static func mergePatchDifference(
+        from source: JSON,
+        to target: JSON
+    ) -> JSON {
+        guard case let .object(sourceObject) = source,
+              case let .object(targetObject) = target else {
+            return target
+        }
+        var patch = JSON.Object()
+        for key in sourceObject.keys where targetObject[key] == nil {
+            patch[key] = .null
+        }
+        for (key, targetValue) in targetObject {
+            if let sourceValue = sourceObject[key] {
+                if sourceValue != targetValue {
+                    patch[key] = mergePatchDifference(from: sourceValue, to: targetValue)
+                }
+            } else {
+                patch[key] = targetValue
+            }
+        }
+        return .object(patch)
     }
 
 }

@@ -309,13 +309,13 @@ extension JSON {
         ) throws -> Data {
             var options: JSON.SerializationOptions = [.fragmentsAllowed, .truncateWholeFloatingPointValues, .escapeForwardSlash]
 
-            if Self.encodingStrategy.unsafelyUnwrapped.outputFormatting.contains(.prettyPrinted) {
+            if Encoder.encodingStrategy.unsafelyUnwrapped.outputFormatting.contains(.prettyPrinted) {
                 options.insert(.prettyPrinted)
             }
-            if Self.encodingStrategy.unsafelyUnwrapped.outputFormatting.contains(.sortedKeys) {
+            if Encoder.encodingStrategy.unsafelyUnwrapped.outputFormatting.contains(.sortedKeys) {
                 options.insert(.sortedKeys)
             }
-            if Self.encodingStrategy.unsafelyUnwrapped.outputFormatting.contains(.withoutEscapingSlashes) {
+            if Encoder.encodingStrategy.unsafelyUnwrapped.outputFormatting.contains(.withoutEscapingSlashes) {
                 options.remove(.escapeForwardSlash)
             }
 
