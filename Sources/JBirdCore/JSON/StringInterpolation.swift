@@ -42,12 +42,13 @@ extension String.StringInterpolation {
     /// control serialization, use ``appendInterpolation(json:options:)`` instead.
     ///
     /// - Parameter json: The value whose JSON representation is interpolated.
-    public mutating func appendInterpolation(json: some JSONConvertible) {
-        let str = try! JSON.string(
-            from: JSON(json),
+    public mutating func appendInterpolation(
+        json: some JSONConvertible
+    ) {
+        try! appendInterpolation(
+            json: json,
             options: .interpolationDefault
         )
-        appendLiteral(str)
     }
 
     /// Interpolates the serialized JSON representation of a value into a string literal, using the provided
