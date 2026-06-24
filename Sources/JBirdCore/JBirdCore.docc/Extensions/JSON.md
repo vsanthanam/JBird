@@ -204,7 +204,7 @@ let steve: JSON = [
 - ``applying(_:)``
 - ``difference(to:)``
 
-### Working with JSON Merge Patches
+### Using Merge Patches
 
 - ``apply(mergePatch:)``
 - ``applying(mergePatch:)``
