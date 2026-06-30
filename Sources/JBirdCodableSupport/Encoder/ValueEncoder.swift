@@ -35,8 +35,20 @@ struct ValueEncoder: SingleValueEncodingContainer {
         encoder: InternalEncoder
     ) {
         self.encoder = encoder
-        containerIndex = encoder.pushContainer(.null)
+        containerIndex = encoder.pushContainer(nil)
     }
+
+    init(
+        encoder: InternalEncoder,
+        reusing index: Int
+    ) {
+        self.encoder = encoder
+        containerIndex = index
+    }
+
+    // MARK: - API
+
+    let containerIndex: Int
 
     // MARK: - SingleValueEncodingContainer
 
@@ -181,22 +193,16 @@ struct ValueEncoder: SingleValueEncodingContainer {
 
     // MARK: - Private
 
-    private mutating func write(
+    private let encoder: InternalEncoder
+
+    private func write(
         _ json: JSON
     ) {
-        precondition(
-            !hasWritten,
-            "Attempted to encode multiple values into a single value container at coding path \(codingPath)"
-        )
+        encoder.recordSingleValueWrite()
         encoder.store(
             container: json,
             at: containerIndex
         )
-        hasWritten = true
     }
-
-    private let encoder: InternalEncoder
-    private let containerIndex: Int
-    private var hasWritten = false
 
 }

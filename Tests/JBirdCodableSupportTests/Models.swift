@@ -1330,3 +1330,122 @@ struct SingleValueDecimal: Codable, Equatable {
         try container.encode(value)
     }
 }
+
+// MARK: - Container Reuse (Foundation Parity)
+
+struct Coordinate: Codable, Equatable {
+    let x: Int
+    let y: Int
+}
+
+/// A type-tagged enum that flattens its payload into the *same* keyed container
+/// it writes its discriminator into: `encode(to:)` requests a keyed container
+/// here and then again inside `Coordinate.encode(to:)`. Foundation merges the
+/// two requests into a single object.
+enum TaggedGeometry: Codable, Equatable {
+
+    case coordinate(Coordinate)
+    case empty(label: String)
+
+    enum CodingKeys: String, CodingKey {
+        case kind
+    }
+
+    init(from decoder: any Decoder) throws {
+        let kind = try decoder.container(keyedBy: CodingKeys.self).decode(String.self, forKey: .kind)
+        switch kind {
+        case "coordinate":
+            self = try .coordinate(Coordinate(from: decoder))
+        case let other:
+            self = .empty(label: other)
+        }
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+        case let .coordinate(coordinate):
+            try container.encode("coordinate", forKey: .kind)
+            try coordinate.encode(to: encoder)
+        case let .empty(label):
+            try container.encode(label, forKey: .kind)
+        }
+    }
+}
+
+/// Writes a header element into an unkeyed container, then delegates to an array
+/// value that requests *another* unkeyed container from the same encoder.
+/// Foundation appends both into one array.
+struct PrefixedNumbers: Codable, Equatable {
+
+    init(header: Int, rest: [Int]) {
+        self.header = header
+        self.rest = rest
+    }
+
+    let header: Int
+    let rest: [Int]
+
+    init(from decoder: any Decoder) throws {
+        var container = try decoder.unkeyedContainer()
+        header = try container.decode(Int.self)
+        var rest = [Int]()
+        while !container.isAtEnd {
+            try rest.append(container.decode(Int.self))
+        }
+        self.rest = rest
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.unkeyedContainer()
+        try container.encode(header)
+        try rest.encode(to: encoder)
+    }
+}
+
+/// Touches a single-value container and then delegates to its wrapped value,
+/// which requests *another* single-value container from the same encoder.
+struct ForwardedSingleValue: Codable, Equatable {
+
+    init(value: String) {
+        self.value = value
+    }
+
+    let value: String
+
+    init(from decoder: any Decoder) throws {
+        value = try decoder.singleValueContainer().decode(String.self)
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        _ = encoder.singleValueContainer()
+        try value.encode(to: encoder)
+    }
+}
+
+/// Requests a keyed container and then an unkeyed container from the same
+/// encoder. Mismatched container kinds trap in both JBird and Foundation.
+struct MismatchedContainers: Encodable {
+
+    enum CodingKeys: String, CodingKey {
+        case a
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var keyed = encoder.container(keyedBy: CodingKeys.self)
+        try keyed.encode(1, forKey: .a)
+        _ = encoder.unkeyedContainer()
+    }
+}
+
+/// Writes two distinct values through two single-value containers vended by the
+/// same encoder. The second write traps, matching Foundation.
+struct DoubleSingleValueWrite: Encodable {
+
+    func encode(to encoder: any Encoder) throws {
+        var first = encoder.singleValueContainer()
+        try first.encode(1)
+        var second = encoder.singleValueContainer()
+        try second.encode(2)
+    }
+}

@@ -251,4 +251,46 @@ struct ValueEncoderTests {
         #expect(decoded == value)
     }
 
+    @Test("Repeated single value container request reuses like Foundation")
+    func singleValueForwarderMatchesFoundation() throws {
+        let value = ForwardedSingleValue(value: "hello")
+        let foundation = try JSONEncoder().encode(value)
+        let jbird = try JSON.Encoder().encode(value)
+        #expect(foundation == jbird)
+        #expect(String(decoding: jbird, as: UTF8.self) == #""hello""#)
+    }
+
+    @Test("Forwarded single value round-trips")
+    func singleValueForwarderRoundTrips() throws {
+        let value = ForwardedSingleValue(value: "hello")
+        let data = try JSON.Encoder().encode(value)
+        let decoded = try JSON.Decoder().decode(ForwardedSingleValue.self, from: data)
+        #expect(decoded == value)
+    }
+
+    @Test("Writing once across two reused single value containers succeeds")
+    func writeOnceAcrossReusedContainers() throws {
+        // The first container is vended and discarded without writing; the
+        // wrapped value writes through a second, reused container. A single
+        // write total must succeed — only a *second* write should trap.
+        struct DiscardsFirstContainer: Encodable {
+            func encode(to encoder: any Encoder) throws {
+                _ = encoder.singleValueContainer()
+                var second = encoder.singleValueContainer()
+                try second.encode(42)
+            }
+        }
+        let data = try JSON.Encoder().encode(DiscardsFirstContainer())
+        #expect(String(decoding: data, as: UTF8.self) == "42")
+    }
+
+    #if compiler(>=6.2)
+        @Test("Writing twice through reused single value containers traps")
+        func doubleSingleValueWriteTraps() async {
+            await #expect(processExitsWith: .failure) {
+                _ = try JSON.Encoder().encode(DoubleSingleValueWrite())
+            }
+        }
+    #endif
+
 }

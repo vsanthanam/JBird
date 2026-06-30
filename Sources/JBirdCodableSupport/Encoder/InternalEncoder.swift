@@ -150,6 +150,14 @@ final class InternalEncoder: Encoder {
         onValueChange?(container)
     }
 
+    func recordSingleValueWrite() {
+        precondition(
+            !singleValueHasWritten,
+            "Attempted to encode multiple values into a single value container at coding path \(codingPath)"
+        )
+        singleValueHasWritten = true
+    }
+
     func popContainer() -> JSON {
         guard storage.count > depth else {
             preconditionFailure("Attempted to pop container at coding path \(codingPath) with empty stack.")
@@ -171,28 +179,63 @@ final class InternalEncoder: Encoder {
     func container<Key>(
         keyedBy type: Key.Type
     ) -> KeyedEncodingContainer<Key> where Key: CodingKey {
-        precondition(containerType == nil, "Attempted to create multiple containers at coding path \(codingPath)")
-        containerType = .keyed
-        let container = ObjectEncoder<Key>(
-            encoder: self,
-            autoPopContainers: autoPopContainers
-        )
-        return KeyedEncodingContainer(container)
+        switch containerType {
+        case nil:
+            containerType = .keyed
+            let container = ObjectEncoder<Key>(
+                encoder: self,
+                autoPopContainers: autoPopContainers
+            )
+            reusableContainerIndex = container.containerIndex
+            return KeyedEncodingContainer(container)
+        case .keyed:
+            let container = ObjectEncoder<Key>(
+                encoder: self,
+                reusing: reusableContainerIndex!
+            )
+            return KeyedEncodingContainer(container)
+        case .unkeyed,
+             .singleValue:
+            preconditionFailure("Attempted to create a keyed container at coding path \(codingPath) where a non-keyed container already exists")
+        }
     }
 
     func unkeyedContainer() -> any UnkeyedEncodingContainer {
-        precondition(containerType == nil, "Attempted to create multiple containers at coding path \(codingPath)")
-        containerType = .unkeyed
-        return ArrayEncoder(
-            encoder: self,
-            autoPopContainers: autoPopContainers
-        )
+        switch containerType {
+        case nil:
+            containerType = .unkeyed
+            let container = ArrayEncoder(
+                encoder: self,
+                autoPopContainers: autoPopContainers
+            )
+            reusableContainerIndex = container.containerIndex
+            return container
+        case .unkeyed:
+            return ArrayEncoder(
+                encoder: self,
+                reusing: reusableContainerIndex!
+            )
+        case .keyed,
+             .singleValue:
+            preconditionFailure("Attempted to create an unkeyed container at coding path \(codingPath) where a non-unkeyed container already exists")
+        }
     }
 
     func singleValueContainer() -> any SingleValueEncodingContainer {
-        precondition(containerType == nil, "Attempted to create multiple containers at coding path \(codingPath)")
-        containerType = .singleValue
-        return ValueEncoder(encoder: self)
+        switch containerType {
+        case nil:
+            containerType = .singleValue
+            let container = ValueEncoder(encoder: self)
+            reusableContainerIndex = container.containerIndex
+            return container
+        case .singleValue:
+            return ValueEncoder(
+                encoder: self,
+                reusing: reusableContainerIndex!
+            )
+        case .keyed, .unkeyed:
+            preconditionFailure("Attempted to create a single value container at coding path \(codingPath) where a non-single-value container already exists")
+        }
     }
 
     // MARK: - Private
@@ -207,6 +250,8 @@ final class InternalEncoder: Encoder {
     private let depth: Int
     private let onValueChange: ((JSON) -> Void)?
     private var containerType: ContainerType?
+    private var reusableContainerIndex: Int?
+    private var singleValueHasWritten = false
 
     // MARK: - Deinit
 

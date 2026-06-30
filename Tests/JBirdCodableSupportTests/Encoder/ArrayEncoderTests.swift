@@ -190,4 +190,20 @@ struct ArrayEncoderTests {
         #expect(foundation == jbird)
     }
 
+    @Test("Repeated unkeyed container request merges like Foundation")
+    func unkeyedFlattenMatchesFoundation() throws {
+        let value = PrefixedNumbers(header: 1, rest: [2, 3, 4])
+        let foundation = try JSONEncoder().encode(value)
+        let jbird = try JSON.Encoder().encode(value)
+        #expect(foundation == jbird)
+    }
+
+    @Test("Flattened unkeyed payload round-trips")
+    func unkeyedFlattenRoundTrips() throws {
+        let value = PrefixedNumbers(header: 1, rest: [2, 3, 4])
+        let data = try JSON.Encoder().encode(value)
+        let decoded = try JSON.Decoder().decode(PrefixedNumbers.self, from: data)
+        #expect(decoded == value)
+    }
+
 }
