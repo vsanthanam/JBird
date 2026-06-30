@@ -29,16 +29,29 @@ import JBirdCore
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 final class ArrayEncoder: UnkeyedEncodingContainer {
 
-    // MARK: - Initializer
+    // MARK: - Initializers
 
     init(
         encoder: InternalEncoder,
         autoPopContainers: Bool,
     ) {
         self.encoder = encoder
-        containerIndex = encoder.pushContainer(.array(JSON.Array()))
+        containerIndex = encoder.pushContainer([])
         self.autoPopContainers = autoPopContainers
     }
+
+    init(
+        encoder: InternalEncoder,
+        reusing index: Int
+    ) {
+        self.encoder = encoder
+        containerIndex = index
+        autoPopContainers = false
+    }
+
+    // MARK: - API
+
+    let containerIndex: Int
 
     // MARK: - UnkeyedEncodingContainer
 
@@ -263,7 +276,6 @@ final class ArrayEncoder: UnkeyedEncodingContainer {
     }
 
     private let encoder: InternalEncoder
-    private let containerIndex: Int
     private let autoPopContainers: Bool
 
     // MARK: - Deinit

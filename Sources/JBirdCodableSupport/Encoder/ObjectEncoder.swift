@@ -36,9 +36,22 @@ final class ObjectEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
         autoPopContainers: Bool
     ) {
         self.encoder = encoder
-        containerIndex = encoder.pushContainer(.object(JSON.Object()))
+        containerIndex = encoder.pushContainer([:])
         self.autoPopContainers = autoPopContainers
     }
+
+    init(
+        encoder: InternalEncoder,
+        reusing index: Int
+    ) {
+        self.encoder = encoder
+        containerIndex = index
+        autoPopContainers = false
+    }
+
+    // MARK: - API
+
+    let containerIndex: Int
 
     // MARK: - KeyedEncodingContainerProtocol
 
@@ -418,7 +431,6 @@ final class ObjectEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
     }
 
     private let encoder: InternalEncoder
-    private let containerIndex: Int
     private let autoPopContainers: Bool
 
     // MARK: - Deinit

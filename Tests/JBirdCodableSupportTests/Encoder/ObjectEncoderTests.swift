@@ -120,4 +120,38 @@ struct ObjectEncoderTests {
         #expect(foundation == jbird)
     }
 
+    @Test("Repeated keyed container request merges like Foundation")
+    func keyedFlattenMatchesFoundation() throws {
+        let values: [TaggedGeometry] = [
+            .coordinate(Coordinate(x: 3, y: 4)),
+            .empty(label: "nothing")
+        ]
+        let foundationEncoder = JSONEncoder()
+        foundationEncoder.outputFormatting = [.sortedKeys]
+        let jbirdEncoder = JSON.Encoder()
+        jbirdEncoder.outputFormatting = [.sortedKeys]
+        for value in values {
+            let foundation = try foundationEncoder.encode(value)
+            let jbird = try jbirdEncoder.encode(value)
+            #expect(foundation == jbird)
+        }
+    }
+
+    @Test("Flattened keyed payload round-trips")
+    func keyedFlattenRoundTrips() throws {
+        let value = TaggedGeometry.coordinate(Coordinate(x: 3, y: 4))
+        let data = try JSON.Encoder().encode(value)
+        let decoded = try JSON.Decoder().decode(TaggedGeometry.self, from: data)
+        #expect(decoded == value)
+    }
+
+    #if compiler(>=6.2)
+        @Test("Requesting an unkeyed container after a keyed one traps")
+        func mismatchedContainerKindsTrap() async {
+            await #expect(processExitsWith: .failure) {
+                _ = try JSON.Encoder().encode(MismatchedContainers())
+            }
+        }
+    #endif
+
 }
