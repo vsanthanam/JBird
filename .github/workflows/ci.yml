@@ -216,7 +216,7 @@ jobs:
           - swift: "6.2"
             toolchain: "6.2.3"
           - swift: "6.3"
-            toolchain: "6.3.2"
+            toolchain: "6.3.3"
     runs-on: ubuntu-latest
     outputs:
       artifact-name: ubuntu-build
@@ -249,7 +249,7 @@ jobs:
           - swift: "6.2"
             toolchain: "6.2.3"
           - swift: "6.3"
-            toolchain: "6.3.2"
+            toolchain: "6.3.3"
     needs: build-ubuntu-spm
     runs-on: ubuntu-latest
     container:
@@ -281,7 +281,7 @@ jobs:
           - swift: "6.2"
             toolchain: "6.2.3"
           - swift: "6.3"
-            toolchain: "6.3.2"
+            toolchain: "6.3.3"
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -315,7 +315,7 @@ jobs:
           - swift: "6.2"
             toolchain: "6.2.3"
           - swift: "6.3"
-            toolchain: "6.3.2"
+            toolchain: "6.3.3"
     needs: build-windows-spm
     runs-on: windows-latest
     steps:
@@ -354,8 +354,8 @@ jobs:
       - if: ${{ matrix.swift == '6.3' }}
         name: Setup Swift WASM (6.3)
         run: |
-          swift sdk install https://download.swift.org/swift-6.3.2-release/wasm-sdk/swift-6.3.2-RELEASE/swift-6.3.2-RELEASE_wasm.artifactbundle.tar.gz \
-            --checksum a61f0584c93283589f8b2f42db05c1f9a182b506c2957271402992655591dd7c
+          swift sdk install https://download.swift.org/swift-6.3.3-release/wasm-sdk/swift-6.3.3-RELEASE/swift-6.3.3-RELEASE_wasm.artifactbundle.tar.gz \
+            --checksum cabfa08b73bb8ac783927ecd15fa386e99d0c139c5f232445067bcf58379cae7
           swift sdk list
 
       - if: ${{ matrix.swift == '6.2' }}
@@ -374,7 +374,7 @@ jobs:
 
       - if: ${{ matrix.swift == '6.3' }}
         name: Build JBird (6.3)
-        run: swift build -v --swift-sdk swift-6.3.2-RELEASE_wasm --build-path .build
+        run: swift build -v --swift-sdk swift-6.3.3-RELEASE_wasm --build-path .build
 
       - if: ${{ matrix.swift == '6.2' }}
         name: Build JBird (6.2)
