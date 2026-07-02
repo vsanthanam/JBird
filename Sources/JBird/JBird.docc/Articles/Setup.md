@@ -21,7 +21,7 @@ Add the package reference to the `dependencies` parameter of `Package.swift`:
 dependencies: [
     .package(
         url: "https://github.com/vsanthanam/JBird.git",
-        from: "2.2.1"
+        from: "2.2.2"
     )
 ]
 ```
@@ -57,7 +57,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/vsanthanam/JBird.git",
-            from: "2.2.1",
+            from: "2.2.2",
             traits: [
                 .defaults // Enables `DeclarativeAPI`, `ConformanceMacros` and `CodableSupport`.
                           // Alternatively, you could explicit opt into `DeclarativeAPI`, `ConformanceMacros`, `CodableSupport`, or any combination of the three.
