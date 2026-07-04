@@ -37,7 +37,20 @@ JBird is organized around five capabilities, all built on the same `JSON` value 
 
 ### A type-safe model for creating and manipulating JSON
 
-`JSON` is a `Sendable`, `Equatable`, `Hashable` enum with one case per JSON type (`null`, `bool`, `number`, `string`, `array`, `object`). It conforms to the standard `ExpressibleBy*Literal` protocols, so you build values using ordinary Swift literals:
+`JSON` is an enum with one case per JSON valid type (`null`, `bool`, `number`, `string`, `array`, `object`).
+
+```swift
+public enum JSON {
+    case null
+    case bool(Bool)
+    case number(Number)
+    case string(String)
+    case array([JSON])
+    case object([String: JSON])
+}
+```
+
+It conforms to the standard `ExpressibleBy*Literal` protocols, so you build values using ordinary Swift literals:
 
 ```swift
 var user: JSON = [
@@ -51,9 +64,9 @@ var user: JSON = [
 Read values through throwing, typed accessors and subscripts. Subscripts chain across nested objects and arrays, and can convert to a concrete type inline:
 
 ```swift
-let name = try user["name"].stringValue             // String
-let firstRole: String = try user["roles"][0]        // String, via type inference
-let age = try user["age", as: Int.self]             // Int
+let name = try user["name"].convert(to: String.self)    // String
+let firstRole: String = try user["roles"][0]            // String, via type inference
+let age = try user["age", as: Int.self]                 // Int
 
 if user.containsValue(forKey: "email") { /* ... */ }
 ```
@@ -69,7 +82,7 @@ try user.merge(["verified": true], uniquingKeysWith: { _, new in new })
 
 ### A blazing fast JSON serializer and deserializer
 
-Parsing and serialization are backed by a hand-written C core with SIMD-accelerated scanning (SSE2 on x86-64, NEON on ARM64), an arena allocator, and string interning. It works directly with the `JSON` model, with no intermediate `Any` representation to slow things down.
+Parsing and serialization are backed by a hand-written C. It works directly with the `JSON` model, with no intermediate `Any` representation to slow things down.
 
 ```swift
 // Deserialize from Data or String
@@ -81,11 +94,11 @@ let data = try json.serialize()
 let string = try json.stringify()
 ```
 
-Both directions accept option sets (`DeserializationOptions`, `SerializationOptions`) for control over things like pretty-printing, key sorting, and duplicate-key handling, and cancellable `async` variants are available for large payloads.
+Both directions can be customized for control over things like pretty-printing, key sorting, and duplicate-key handling. Cancellable `async` variants are available for large payloads.
 
 ### Conversion between typed JSON and Swift types
 
-JBird defines a small protocol family for bridging typed JSON and other Swift types:
+JBird defines a small protocol family for bridging typed `JSON` and other Swift types:
 
 - `JSONConvertible` — a type can produce a `JSON` value (`var jsonValue: JSON`)
 - `JSONInitializable` — a type can be built from a `JSON` value (`init(json:) throws`)
@@ -98,7 +111,7 @@ let json = JSON(["a": 1, "b": 2])        // from a Swift dictionary
 let dict = try json.convert(into: [String: Int].self)
 ```
 
-For your own types, the `@JSONRepresentable` macro generates both conformances. `@JSONKey` customizes the key for a property (a literal string or `.snakeCase`), and `@OmitIfNil` drops `nil` optionals from the output:
+For your own types, the `@JSONRepresentable` macro generates both conformances.
 
 ```swift
 @JSONRepresentable
@@ -157,7 +170,7 @@ The familiar configuration strategies are all present, along with support for `E
 
 > The declarative builder, conformance macros, and `Codable` support are exposed as package traits — `DeclarativeAPI`, `ConformanceMacros`, and `CodableSupport` — all enabled by default and individually opt-out.
 
-JBird is rigorously validated against [RFC 8259](https://datatracker.ietf.org/doc/html/rfc8259) by a comprehensive test suite and a fuzzer.
+JBird is rigorously validated against [RFC 8259](https://datatracker.ietf.org/doc/html/rfc8259) by a comprehensive test suite and a software fuzzer.
 
 ## Installation
 
