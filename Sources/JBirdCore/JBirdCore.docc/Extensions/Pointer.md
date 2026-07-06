@@ -22,7 +22,7 @@ See [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) for more informati
 ### Creating Pointers
 
 - ``init(tokens:)``
-- ``init(_:)-(StringProtocol)``
+- ``init(_:)-(String)``
 - ``init(_:)-(Data)``
 - ``wholeDocument``
 

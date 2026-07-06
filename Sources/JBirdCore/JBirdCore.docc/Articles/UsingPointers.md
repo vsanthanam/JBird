@@ -27,7 +27,7 @@ The examples below all operate on this document:
 
 ## Creating a pointer
 
-The most common way to build a pointer is to parse it from its textual representation with ``JSON/Pointer/init(_:)-(StringProtocol)``. Parsing is throwing because not every string is a well-formed pointer:
+The most common way to build a pointer is to parse it from its textual representation with ``JSON/Pointer/init(_:)-(String)``. Parsing is throwing because not every string is a well-formed pointer:
 
 ```swift
 let pointer = try JSON.Pointer("/users/0/name")
@@ -117,7 +117,7 @@ pointer.string       // "/users/0/name"
 pointer.uriFragment  // "#/users/0/name"
 ```
 
-``JSON/Pointer/init(_:)-(StringProtocol)`` accepts either form and detects which it was given automatically — a leading `#` selects the URI fragment form and percent-decodes the rest:
+``JSON/Pointer/init(_:)-(String)`` accepts either form and detects which it was given automatically — a leading `#` selects the URI fragment form and percent-decodes the rest:
 
 ```swift
 try JSON.Pointer("/a b/c")    // string form

@@ -69,12 +69,12 @@ Application is **atomic**: the operations run in order, and if any one of them f
 
 RFC 6902 defines six operations, each available as both a string-based and a pointer-based builder method:
 
-- **add** (``JSON/Patch/add(_:to:)-(_,StringProtocol)``) — inserts a value. For an object it creates or replaces a key; for an array it inserts before the given index. The special index token `-` appends to the end of an array ([RFC 6902 §4.1](https://datatracker.ietf.org/doc/html/rfc6902#section-4.1)).
-- **remove** (``JSON/Patch/remove(at:)-(StringProtocol)``) — deletes the value at a location, shifting later array elements down ([§4.2](https://datatracker.ietf.org/doc/html/rfc6902#section-4.2)).
-- **replace** (``JSON/Patch/replace(at:with:)-(StringProtocol,_)``) — overwrites an existing value; the location must already exist ([§4.3](https://datatracker.ietf.org/doc/html/rfc6902#section-4.3)).
-- **move** (``JSON/Patch/move(from:to:)-(StringProtocol,StringProtocol)``) — relocates a value; it may not move a value into one of its own descendants ([§4.4](https://datatracker.ietf.org/doc/html/rfc6902#section-4.4)).
-- **copy** (``JSON/Patch/copy(from:to:)-(StringProtocol,StringProtocol)``) — duplicates a value to another location ([§4.5](https://datatracker.ietf.org/doc/html/rfc6902#section-4.5)).
-- **test** (``JSON/Patch/test(for:at:)-(_,StringProtocol)``) — asserts that a location holds an expected value, aborting the whole patch if it does not ([§4.6](https://datatracker.ietf.org/doc/html/rfc6902#section-4.6)).
+- **add** — inserts a value. For an object it creates or replaces a key; for an array it inserts before the given index. The special index token `-` appends to the end of an array ([RFC 6902 §4.1](https://datatracker.ietf.org/doc/html/rfc6902#section-4.1)).
+- **remove** — deletes the value at a location, shifting later array elements down ([§4.2](https://datatracker.ietf.org/doc/html/rfc6902#section-4.2)).
+- **replace** — overwrites an existing value; the location must already exist ([§4.3](https://datatracker.ietf.org/doc/html/rfc6902#section-4.3)).
+- **move** — relocates a value; it may not move a value into one of its own descendants ([§4.4](https://datatracker.ietf.org/doc/html/rfc6902#section-4.4)).
+- **copy** — duplicates a value to another location ([§4.5](https://datatracker.ietf.org/doc/html/rfc6902#section-4.5)).
+- **test** — asserts that a location holds an expected value, aborting the whole patch if it does not ([§4.6](https://datatracker.ietf.org/doc/html/rfc6902#section-4.6)).
 
 A `test` operation makes an edit conditional. Because patches apply atomically, a failed precondition leaves the document untouched — useful for optimistic-concurrency style updates:
 
