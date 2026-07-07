@@ -380,19 +380,19 @@
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					0782A38F2DECCDA500CE9465 = {
-						CreatedOnToolsVersion = 26.5;
+						CreatedOnToolsVersion = 26.6;
 					};
 					0782A3C22DECCDF600CE9465 = {
-						CreatedOnToolsVersion = 26.5;
+						CreatedOnToolsVersion = 26.6;
 					};
 					0789523F2DDAA08900B53A96 = {
-						CreatedOnToolsVersion = 26.5;
+						CreatedOnToolsVersion = 26.6;
 					};
 					07FA698B2EDB9FA200124BCB = {
-						CreatedOnToolsVersion = 26.5;
+						CreatedOnToolsVersion = 26.6;
 					};
 					07FE9CD22DF3440A0033B758 = {
-						CreatedOnToolsVersion = 26.5;
+						CreatedOnToolsVersion = 26.6;
 					};
 				};
 			};

@@ -17,7 +17,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Xcode Version
-        run: ./.scripts/xcode-select 26.5
+        run: ./.scripts/xcode-select 26.6
       - name: Build XCFramework
         run: ./.scripts/build-xcframework ${{ matrix.target }}
       - name: Upload XCFramework
