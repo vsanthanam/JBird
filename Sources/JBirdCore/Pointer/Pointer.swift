@@ -109,10 +109,29 @@ extension JSON {
         ///
         /// - Parameter string: The pointer string, in either representation.
         /// - Throws: ``PointerError`` if the string is not a valid JSON Pointer.
+        @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+        @available(*, deprecated)
+        @_disfavoredOverload
         public init(
             _ string: some StringProtocol
         ) throws {
             self = try Pointer.pointer(from: String(string))
+        }
+
+        /// Parse a JSON pointer from its RFC 6901 textual representation.
+        ///
+        /// The representation is detected automatically: a string beginning with `#` is parsed as the
+        /// [URI fragment](https://datatracker.ietf.org/doc/html/rfc6901#section-6) form (percent-decoded);
+        /// otherwise it is parsed as the
+        /// [string](https://datatracker.ietf.org/doc/html/rfc6901#section-5) form. The empty string refers to
+        /// the whole document.
+        ///
+        /// - Parameter string: The pointer string, in either representation.
+        /// - Throws: ``PointerError`` if the string is not a valid JSON Pointer.
+        public init(
+            _ string: String
+        ) throws {
+            self = try Pointer.pointer(from: string)
         }
 
         /// Parse a pointer from a buffer of UTF-8 bytes.

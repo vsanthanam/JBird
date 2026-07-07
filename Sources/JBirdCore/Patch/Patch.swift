@@ -176,9 +176,32 @@ extension JSON {
         ///   - pointer: The location to add the value, written as an [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) JSON Pointer string.
         /// - Returns: A new patch containing this patch's operations followed by the new operation.
         /// - Throws: A ``JSON/PointerError`` if `pointer` is not a valid JSON Pointer string.
+        @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+        @available(*, deprecated)
+        @_disfavoredOverload
         public func add(
             _ value: some JSONConvertible,
             to pointer: some StringProtocol
+        ) throws -> Patch {
+            let pointer = try JSON.Pointer(pointer)
+            return add(
+                value,
+                to: pointer
+            )
+        }
+
+        /// Returns a new patch with an `add` operation appended, addressing the location with a JSON Pointer string.
+        ///
+        /// See [the RFC](https://datatracker.ietf.org/doc/html/rfc6902#section-4.1) for more information.
+        ///
+        /// - Parameters:
+        ///   - value: The value to add.
+        ///   - pointer: The location to add the value, written as an [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) JSON Pointer string.
+        /// - Returns: A new patch containing this patch's operations followed by the new operation.
+        /// - Throws: A ``JSON/PointerError`` if `pointer` is not a valid JSON Pointer string.
+        public func add(
+            _ value: some JSONConvertible,
+            to pointer: String
         ) throws -> Patch {
             let pointer = try JSON.Pointer(pointer)
             return add(
@@ -210,8 +233,26 @@ extension JSON {
         /// - Parameter pointer: The location of the value to remove, written as an [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) JSON Pointer string.
         /// - Returns: A new patch containing this patch's operations followed by the new operation.
         /// - Throws: A ``JSON/PointerError`` if `pointer` is not a valid JSON Pointer string.
+        @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+        @available(*, deprecated)
+        @_disfavoredOverload
         public func remove(
             at pointer: some StringProtocol
+        ) throws -> Patch {
+            let path = try JSON.Pointer(pointer)
+            return remove(at: path)
+        }
+
+        /// Returns a new patch with a `remove` operation appended, addressing the location with a JSON Pointer string.
+        ///
+        /// See [the RFC](https://datatracker.ietf.org/doc/html/rfc6902#section-4.2) for more information.
+        ///
+        /// - Parameter pointer: The location of the value to remove, written as an [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) JSON Pointer string.
+        /// - Returns: A new patch containing this patch's operations followed by the new operation.
+        /// - Throws: A ``JSON/PointerError`` if `pointer` is not a valid JSON Pointer string.
+        @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+        public func remove(
+            at pointer: String
         ) throws -> Patch {
             let path = try JSON.Pointer(pointer)
             return remove(at: path)
@@ -246,8 +287,31 @@ extension JSON {
         ///   - value: The replacement value.
         /// - Returns: A new patch containing this patch's operations followed by the new operation.
         /// - Throws: A ``JSON/PointerError`` if `pointer` is not a valid JSON Pointer string.
+        @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+        @available(*, deprecated)
+        @_disfavoredOverload
         public func replace(
             at pointer: some StringProtocol,
+            with value: some JSONConvertible
+        ) throws -> Patch {
+            let pointer = try JSON.Pointer(pointer)
+            return replace(
+                at: pointer,
+                with: JSON(value)
+            )
+        }
+
+        /// Returns a new patch with a `replace` operation appended, addressing the location with a JSON Pointer string.
+        ///
+        /// See [the RFC](https://datatracker.ietf.org/doc/html/rfc6902#section-4.3) for more information.
+        ///
+        /// - Parameters:
+        ///   - pointer: The location of the value to replace, written as an [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) JSON Pointer string.
+        ///   - value: The replacement value.
+        /// - Returns: A new patch containing this patch's operations followed by the new operation.
+        /// - Throws: A ``JSON/PointerError`` if `pointer` is not a valid JSON Pointer string.
+        public func replace(
+            at pointer: String,
             with value: some JSONConvertible
         ) throws -> Patch {
             let pointer = try JSON.Pointer(pointer)
@@ -285,9 +349,33 @@ extension JSON {
         ///   - destination: The location to move the value to, written as an [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) JSON Pointer string.
         /// - Returns: A new patch containing this patch's operations followed by the new operation.
         /// - Throws: A ``JSON/PointerError`` if either `origin` or `destination` is not a valid JSON Pointer string.
+        @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+        @available(*, deprecated)
+        @_disfavoredOverload
         public func move(
             from origin: some StringProtocol,
             to destination: some StringProtocol
+        ) throws -> Patch {
+            let from = try JSON.Pointer(origin)
+            let path = try JSON.Pointer(destination)
+            return move(
+                from: from,
+                to: path
+            )
+        }
+
+        /// Returns a new patch with a `move` operation appended, addressing the locations with JSON Pointer strings.
+        ///
+        /// See [the RFC](https://datatracker.ietf.org/doc/html/rfc6902#section-4.4) for more information.
+        ///
+        /// - Parameters:
+        ///   - origin: The location of the value to move, written as an [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) JSON Pointer string.
+        ///   - destination: The location to move the value to, written as an [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) JSON Pointer string.
+        /// - Returns: A new patch containing this patch's operations followed by the new operation.
+        /// - Throws: A ``JSON/PointerError`` if either `origin` or `destination` is not a valid JSON Pointer string.
+        public func move(
+            from origin: String,
+            to destination: String
         ) throws -> Patch {
             let from = try JSON.Pointer(origin)
             let path = try JSON.Pointer(destination)
@@ -325,9 +413,33 @@ extension JSON {
         ///   - destination: The location to copy the value to, written as an [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) JSON Pointer string.
         /// - Returns: A new patch containing this patch's operations followed by the new operation.
         /// - Throws: A ``JSON/PointerError`` if either `origin` or `destination` is not a valid JSON Pointer string.
+        @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+        @available(*, deprecated)
+        @_disfavoredOverload
         public func copy(
             from origin: some StringProtocol,
             to destination: some StringProtocol
+        ) throws -> Patch {
+            let from = try JSON.Pointer(origin)
+            let path = try JSON.Pointer(destination)
+            return copy(
+                from: from,
+                to: path
+            )
+        }
+
+        /// Returns a new patch with a `copy` operation appended, addressing the locations with JSON Pointer strings.
+        ///
+        /// See [the RFC](https://datatracker.ietf.org/doc/html/rfc6902#section-4.5) for more information.
+        ///
+        /// - Parameters:
+        ///   - origin: The location of the value to copy, written as an [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) JSON Pointer string.
+        ///   - destination: The location to copy the value to, written as an [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) JSON Pointer string.
+        /// - Returns: A new patch containing this patch's operations followed by the new operation.
+        /// - Throws: A ``JSON/PointerError`` if either `origin` or `destination` is not a valid JSON Pointer string.
+        public func copy(
+            from origin: String,
+            to destination: String
         ) throws -> Patch {
             let from = try JSON.Pointer(origin)
             let path = try JSON.Pointer(destination)
@@ -365,9 +477,32 @@ extension JSON {
         ///   - pointer: The location of the value to test, written as an [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) JSON Pointer string.
         /// - Returns: A new patch containing this patch's operations followed by the new operation.
         /// - Throws: A ``JSON/PointerError`` if `pointer` is not a valid JSON Pointer string.
+        @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+        @available(*, deprecated)
+        @_disfavoredOverload
         public func test(
             for value: some JSONConvertible,
             at pointer: some StringProtocol
+        ) throws -> Patch {
+            let path = try JSON.Pointer(pointer)
+            return test(
+                for: value,
+                at: path
+            )
+        }
+
+        /// Returns a new patch with a `test` operation appended, addressing the location with a JSON Pointer string.
+        ///
+        /// See [the RFC](https://datatracker.ietf.org/doc/html/rfc6902#section-4.6) for more information.
+        ///
+        /// - Parameters:
+        ///   - value: The value the location is expected to contain.
+        ///   - pointer: The location of the value to test, written as an [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) JSON Pointer string.
+        /// - Returns: A new patch containing this patch's operations followed by the new operation.
+        /// - Throws: A ``JSON/PointerError`` if `pointer` is not a valid JSON Pointer string.
+        public func test(
+            for value: some JSONConvertible,
+            at pointer: String
         ) throws -> Patch {
             let path = try JSON.Pointer(pointer)
             return test(
