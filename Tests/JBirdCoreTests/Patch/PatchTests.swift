@@ -135,6 +135,7 @@ struct PatchTests {
         }
 
         @Test("Builders accept any StringProtocol pointer, such as a Substring")
+        @available(*, deprecated)
         func stringProtocol() throws {
             // The value-bearing builders take `some StringProtocol`, so a Substring works directly.
             let path: Substring = "x/a/b".dropFirst()
