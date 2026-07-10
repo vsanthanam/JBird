@@ -145,13 +145,11 @@ struct ObjectEncoderTests {
         #expect(decoded == value)
     }
 
-    #if compiler(>=6.2)
-        @Test("Requesting an unkeyed container after a keyed one traps")
-        func mismatchedContainerKindsTrap() async {
-            await #expect(processExitsWith: .failure) {
-                _ = try JSON.Encoder().encode(MismatchedContainers())
-            }
+    @Test("Requesting an unkeyed container after a keyed one traps")
+    func mismatchedContainerKindsTrap() async {
+        await #expect(processExitsWith: .failure) {
+            _ = try JSON.Encoder().encode(MismatchedContainers())
         }
-    #endif
+    }
 
 }

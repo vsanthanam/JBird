@@ -68,20 +68,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["26.5", "15.5"]
-        include:
-          - version: "26.5"
-            runner: macos-26
-            xcode: "26.6"
-          - version: "15.5"
-            runner: macos-15
-            xcode: "16.4"
-    runs-on: ${{ matrix.runner }}
+        version: ["26.5"]
+    runs-on: macos-26
     steps:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Select Xcode Version
-        run: ./.scripts/xcode-select ${{ matrix.xcode }}
+        run: ./.scripts/xcode-select 26.6
       - name: List SDKs
         run: xcodebuild -showsdks | grep macosx
       - name: Build JBird for macOS ${{ matrix.version }}
@@ -92,20 +85,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["26.5", "15.5"]
-        include:
-          - version: "26.5"
-            runner: macos-26
-            xcode: "26.6"
-          - version: "15.5"
-            runner: macos-15
-            xcode: "16.4"
-    runs-on: ${{ matrix.runner }}
+        version: ["26.5"]
+    runs-on: macos-26
     steps:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Select Xcode Version
-        run: ./.scripts/xcode-select ${{ matrix.xcode }}
+        run: ./.scripts/xcode-select 26.6
       - name: List SDKs
         run: xcodebuild -showsdks | grep macosx
       - name: Build JBird for Mac Catalyst ${{ matrix.version }}
@@ -142,11 +128,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.1", "6.2", "6.3"]
+        swift: ["6.2", "6.3"]
         include:
-          - swift: "6.1"
-            runner: "macos-15"
-            xcode: "16.4"
           - swift: "6.2"
             runner: "macos-26"
             xcode: "26.6"
@@ -176,11 +159,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.1", "6.2", "6.3"]
+        swift: ["6.2", "6.3"]
         include:
-          - swift: "6.1"
-            runner: "macos-15"
-            xcode: "16.4"
           - swift: "6.2"
             runner: "macos-26"
             xcode: "26.6"
@@ -209,10 +189,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.1", "6.2", "6.3"]
+        swift: ["6.2", "6.3"]
         include:
-          - swift: "6.1"
-            toolchain: "6.1"
           - swift: "6.2"
             toolchain: "6.2.3"
           - swift: "6.3"
@@ -242,10 +220,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.1", "6.2", "6.3"]
+        swift: ["6.2", "6.3"]
         include:
-          - swift: "6.1"
-            toolchain: "6.1"
           - swift: "6.2"
             toolchain: "6.2.3"
           - swift: "6.3"
@@ -274,10 +250,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.1", "6.2", "6.3"]
+        swift: ["6.2", "6.3"]
         include:
-          - swift: "6.1"
-            toolchain: "6.1"
           - swift: "6.2"
             toolchain: "6.2.3"
           - swift: "6.3"
@@ -308,10 +282,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.1", "6.2", "6.3"]
+        swift: ["6.2", "6.3"]
         include:
-          - swift: "6.1"
-            toolchain: "6.1"
           - swift: "6.2"
             toolchain: "6.2.3"
           - swift: "6.3"
@@ -343,7 +315,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.1", "6.2", "6.3"]
+        swift: ["6.2", "6.3"]
     runs-on: ubuntu-latest
     container:
       image: swift:${{ matrix.swift }}
@@ -365,13 +337,6 @@ jobs:
             --checksum 394040ecd5260e68bb02f6c20aeede733b9b90702c2204e178f3e42413edad2a
           swift sdk list
 
-      - if: ${{ matrix.swift == '6.1' }}
-        name: Setup Swift WASM
-        id: swiftwasm
-        uses: swiftwasm/setup-swiftwasm@v2
-        with:
-          tag: swift-${{ matrix.swift }}-RELEASE
-
       - if: ${{ matrix.swift == '6.3' }}
         name: Build JBird (6.3)
         run: swift build -v --swift-sdk swift-6.3.3-RELEASE_wasm --build-path .build
@@ -379,10 +344,6 @@ jobs:
       - if: ${{ matrix.swift == '6.2' }}
         name: Build JBird (6.2)
         run: swift build -v --swift-sdk swift-6.2.3-RELEASE_wasm --build-path .build
-
-      - if: ${{ matrix.swift == '6.1' }}
-        name: Build JBird
-        run: swift build -v --swift-sdk ${{ steps.swiftwasm.outputs.swift-sdk-id }} --build-path .build
 
       - name: Install `zip`
         run: apt-get update && apt-get install -y zip
@@ -399,7 +360,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.1", "6.2", "6.3"]
+        swift: ["6.2", "6.3"]
     runs-on: ubuntu-latest
     outputs:
       artifact-name: android-build-${{ matrix.swift }}

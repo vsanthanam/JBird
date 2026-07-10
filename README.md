@@ -3,7 +3,7 @@
 [![MIT License](https://img.shields.io/github/license/vsanthanam/JBird)](https://github.com/vsanthanam/JBird/blob/main/LICENSE)
 [![GitHub Release](https://img.shields.io/github/v/release/vsanthanam/JBird?include_prereleases)](https://github.com/vsanthanam/JBird/releases)
 [![Build Status](https://img.shields.io/github/check-runs/vsanthanam/JBird/main)](https://github.com/vsanthanam/JBird/actions)
-[![Swift Version](https://img.shields.io/badge/swift-%206.1%20%7C%206.2%20%7C%206.3-critical)](https://swift.org)
+[![Swift Version](https://img.shields.io/badge/swift-%206.2%20%7C%206.3-critical)](https://swift.org)
 [![Xcode](https://img.shields.io/badge/xcode-26.6-blue)](https://developer.apple.com/xcode/)
 [![Documentation](https://img.shields.io/badge/documentation-GitHub-8A2BE2)](https://usejbird.com/docs/documentation/jbird)
 [![Test Coverage](https://codecov.io/gh/vsanthanam/JBird/graph/badge.svg?token=11GDRKPRLF)](https://codecov.io/gh/vsanthanam/JBird)
@@ -214,11 +214,11 @@ JBird has been tested to work with the following platforms and Swift toolchains:
 
 | Platform | Swift Versions | Status |
 |----------|----------------|--------|
-| macOS | 6.1, 6.2, and 6.3 | ✅ Supported & Tested |
-| Linux (Ubuntu) | 6.1, 6.2, and 6.3 | ✅ Supported & Tested |
-| Windows | 6.1, 6.2, and 6.3 | ✅ Supported & Tested |
-| WebAssembly | 6.1, 6.2, and 6.3 | ⚠️ Supported (No Tests) |
-| Android | 6.1, 6.2, and 6.3 | ⚠️ Supported (No Tests) |
+| macOS | 6.2 and 6.3 | ✅ Supported & Tested |
+| Linux (Ubuntu) | 6.2 and 6.3 | ✅ Supported & Tested |
+| Windows | 6.2 and 6.3 | ✅ Supported & Tested |
+| WebAssembly | 6.2 and 6.3 | ⚠️ Supported (No Tests) |
+| Android | 6.2 and 6.3 | ⚠️ Supported (No Tests) |
 
 All supported platforms undergo continuous integration testing to ensure compatibility across different environments. Other platforms such as FreeBSD may also work, but are not validated in the built-in GitHub Actions powered CI environment.
 

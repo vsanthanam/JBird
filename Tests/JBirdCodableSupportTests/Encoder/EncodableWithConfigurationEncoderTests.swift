@@ -466,98 +466,92 @@ struct EncodableWithConfigurationEncoderTests {
     @Suite("Super Encoder Single Value Cleanup")
     struct SuperEncoderCleanupTests {
 
-        #if compiler(>=6.2)
-            @Test("Unkeyed superEncoder with singleValueContainer does not crash")
-            func unkeyedSuperEncoderSingleValue() async throws {
-                await #expect(processExitsWith: .success) {
-                    struct Wrapper: Encodable {
-                        let inner: Inner
+        @Test("Unkeyed superEncoder with singleValueContainer does not crash")
+        func unkeyedSuperEncoderSingleValue() async throws {
+            await #expect(processExitsWith: .success) {
+                struct Wrapper: Encodable {
+                    let inner: Inner
 
-                        struct Inner: Encodable {
-                            let value: String
-
-                            func encode(to encoder: any Swift.Encoder) throws {
-                                var container = encoder.singleValueContainer()
-                                try container.encode(value)
-                            }
-                        }
+                    struct Inner: Encodable {
+                        let value: String
 
                         func encode(to encoder: any Swift.Encoder) throws {
-                            var container = encoder.unkeyedContainer()
-                            try inner.encode(to: container.superEncoder())
+                            var container = encoder.singleValueContainer()
+                            try container.encode(value)
                         }
                     }
 
-                    let value = Wrapper(inner: .init(value: "hello"))
-                    _ = try JSON.Encoder().encode(value)
+                    func encode(to encoder: any Swift.Encoder) throws {
+                        var container = encoder.unkeyedContainer()
+                        try inner.encode(to: container.superEncoder())
+                    }
                 }
+
+                let value = Wrapper(inner: .init(value: "hello"))
+                _ = try JSON.Encoder().encode(value)
             }
-        #endif
+        }
 
-        #if compiler(>=6.2)
-            @Test("Keyed superEncoder with singleValueContainer does not crash")
-            func keyedSuperEncoderSingleValue() async throws {
-                await #expect(processExitsWith: .success) {
-                    struct Wrapper: Encodable {
-                        let inner: Inner
+        @Test("Keyed superEncoder with singleValueContainer does not crash")
+        func keyedSuperEncoderSingleValue() async throws {
+            await #expect(processExitsWith: .success) {
+                struct Wrapper: Encodable {
+                    let inner: Inner
 
-                        enum CodingKeys: String, CodingKey {
-                            case inner
-                        }
+                    enum CodingKeys: String, CodingKey {
+                        case inner
+                    }
 
-                        struct Inner: Encodable {
-                            let value: String
-
-                            func encode(to encoder: any Swift.Encoder) throws {
-                                var container = encoder.singleValueContainer()
-                                try container.encode(value)
-                            }
-                        }
+                    struct Inner: Encodable {
+                        let value: String
 
                         func encode(to encoder: any Swift.Encoder) throws {
-                            var container = encoder.container(keyedBy: CodingKeys.self)
-                            try inner.encode(to: container.superEncoder(forKey: .inner))
+                            var container = encoder.singleValueContainer()
+                            try container.encode(value)
                         }
                     }
 
-                    let value = Wrapper(inner: .init(value: "hello"))
-                    let encoder = JSON.Encoder()
+                    func encode(to encoder: any Swift.Encoder) throws {
+                        var container = encoder.container(keyedBy: CodingKeys.self)
+                        try inner.encode(to: container.superEncoder(forKey: .inner))
+                    }
+                }
+
+                let value = Wrapper(inner: .init(value: "hello"))
+                let encoder = JSON.Encoder()
+                encoder.outputFormatting = .sortedKeys
+                let jbird = try encoder.encode(value)
+                let foundation = try {
+                    let encoder = JSONEncoder()
                     encoder.outputFormatting = .sortedKeys
-                    let jbird = try encoder.encode(value)
-                    let foundation = try {
-                        let encoder = JSONEncoder()
-                        encoder.outputFormatting = .sortedKeys
-                        return try encoder.encode(value)
-                    }()
-                    precondition(jbird == foundation)
-                }
+                    return try encoder.encode(value)
+                }()
+                precondition(jbird == foundation)
             }
-        #endif
+        }
 
-        #if compiler(>=6.2)
-            @Test("Unkeyed superEncoder with singleValueContainer matches Foundation")
-            func unkeyedSuperEncoderSingleValueParity() async throws {
-                await #expect(processExitsWith: .success) {
-                    struct Wrapper: Encodable {
-                        let values: [String]
+        @Test("Unkeyed superEncoder with singleValueContainer matches Foundation")
+        func unkeyedSuperEncoderSingleValueParity() async throws {
+            await #expect(processExitsWith: .success) {
+                struct Wrapper: Encodable {
+                    let values: [String]
 
-                        func encode(to encoder: any Swift.Encoder) throws {
-                            var container = encoder.unkeyedContainer()
-                            for value in values {
-                                let superEnc = container.superEncoder()
-                                var svc = superEnc.singleValueContainer()
-                                try svc.encode(value)
-                            }
+                    func encode(to encoder: any Swift.Encoder) throws {
+                        var container = encoder.unkeyedContainer()
+                        for value in values {
+                            let superEnc = container.superEncoder()
+                            var svc = superEnc.singleValueContainer()
+                            try svc.encode(value)
                         }
                     }
-
-                    let value = Wrapper(values: ["a", "b", "c"])
-                    let foundation = try JSONEncoder().encode(value)
-                    let jbird = try JSON.Encoder().encode(value)
-                    precondition(foundation == jbird)
                 }
+
+                let value = Wrapper(values: ["a", "b", "c"])
+                let foundation = try JSONEncoder().encode(value)
+                let jbird = try JSON.Encoder().encode(value)
+                precondition(foundation == jbird)
             }
-        #endif
+        }
 
     }
 
