@@ -1,6 +1,7 @@
 version: 1
 builder:
   configs:
-  - scheme: JBird
+  - platform: macOS
+    scheme: JBird
 external_links:
   documentation: "https://www.usejbird.com/docs/documentation/jbird/"
