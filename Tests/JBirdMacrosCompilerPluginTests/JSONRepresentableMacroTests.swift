@@ -600,4 +600,74 @@ struct JSONRepresentableMacroTests {
         #endif
     }
 
+    @Test("Nested Declaration")
+    func nestedDeclaration() {
+        #if canImport(JBirdMacrosCompilerPlugin)
+            assertMacroExpansion(
+                """
+                @JSONRepresentable
+                struct Foo {
+
+                    let bar: Bar
+
+                    @JSONRepresentable
+                    final class Bar {
+
+                        let name: String
+
+                    }
+
+                }
+                """,
+                expandedSource: """
+                struct Foo {
+
+                    let bar: Bar
+                    final class Bar {
+
+                        let name: String
+
+                        @JBirdCore.JSON.Builder
+                        public var jsonValue: JBirdCore.JSON {
+                            "name" => name
+                        }
+
+                        public init(json: JSON) throws {
+                            self.name = try json["name"]
+                        }
+
+                    }
+
+                    @JBirdCore.JSON.Builder
+                    public var jsonValue: JBirdCore.JSON {
+                        "bar" => bar
+                    }
+
+                    public init(json: JSON) throws {
+                        self.bar = try json["bar"]
+                    }
+
+                }
+
+                extension Foo.Bar: JBirdCore.JSONConvertible {
+                }
+
+                extension Foo.Bar: JBirdCore.JSONInitializable {
+                }
+
+                extension Foo: JBirdCore.JSONConvertible {
+                }
+
+                extension Foo: JBirdCore.JSONInitializable {
+                }
+                """,
+                macroSpecs: macroSpecs
+            ) { failure in
+                Issue.record("An unexpected failure occured")
+            }
+        #else
+            Issue.record("macros are only supported when running tests for the host platform")
+        #endif
+    }
+
 }

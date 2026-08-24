@@ -127,6 +127,18 @@ struct JSONRepresentableTests {
 
     }
 
+    @Test("@JSONRepresentable Nesting Support")
+    func nestingSupport() throws {
+        let model = NestingOuter(inner: .init(name: "nesting"))
+        let json = JSON(model)
+        let decoded = try NestingOuter(json: json)
+        #expect(model == decoded)
+        #expect(json == [
+            "inner": [
+                "name": "nesting"
+            ]
+        ])
+    }
 }
 
 @JSONRepresentable
@@ -198,3 +210,29 @@ class TestClass {
 }
 
 final class TestSubClass: TestClass {}
+
+@JSONRepresentable
+struct NestingOuter: Equatable {
+
+    let inner: NestingInner
+
+    init(inner: NestingInner) {
+        self.inner = inner
+    }
+
+    @JSONRepresentable
+    final class NestingInner: Equatable {
+
+        let name: String
+
+        init(name: String) {
+            self.name = name
+        }
+
+        static func == (lhs: NestingInner, rhs: NestingInner) -> Bool {
+            lhs.name == rhs.name
+        }
+
+    }
+
+}
