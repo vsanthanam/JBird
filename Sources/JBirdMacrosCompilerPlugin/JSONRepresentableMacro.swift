@@ -42,15 +42,11 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
         in context: some MacroExpansionContext
     ) throws -> [ExtensionDeclSyntax] {
 
-        let name: String
+        let name = type.trimmedDescription
 
-        if let structDecl = declaration.as(StructDeclSyntax.self) {
-            name = structDecl.name.text
-        } else if let classDecl = declaration.as(ClassDeclSyntax.self) {
-            name = classDecl.name.text
-        } else if let enumDecl = declaration.as(EnumDeclSyntax.self) {
-            name = enumDecl.name.text
-        } else {
+        if !declaration.is(StructDeclSyntax.self),
+           !declaration.is(ClassDeclSyntax.self),
+           !declaration.is(EnumDeclSyntax.self) {
             throw MacroExpansionErrorMessage("@JSONRepresentable macro can only be applied to structs, enums or classes.")
         }
 
