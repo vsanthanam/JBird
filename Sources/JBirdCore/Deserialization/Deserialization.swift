@@ -97,43 +97,117 @@ extension JSON {
         return try $recursionDepthLimit.withValue(limit, operation: operation)
     }
 
-    /// Perform the provided async operation with a custom recursion depth limit
-    ///
-    /// By default, the recursion depth limit is set to a value that is calculated based on the memory profile of the system upon the first invocation of a deserialization operation.
-    /// Subsequent invocations will use the same limit and avoid recalculating it again.
-    ///
-    /// You can use this method to set a custom recursion depth limit:
-    ///
-    /// ```swift
-    /// let data = Data( ... )
-    /// let json = try await JSON.withRecursionDepthLimit(1000) {
-    ///     // All JSON operations performed within this closure will use a recursion depth limit of 1000
-    ///     try await JSON.deserialize(data)
-    /// }
-    /// ```
-    ///
-    /// To remove the recursion depth limit entirely, use `0`
-    ///
-    /// - Parameters:
-    ///   - limit: The desired recursion depth limit
-    ///   - isolation: The actor used to run the provided operation
-    ///   - operation: The operation to perform
-    /// - Returns: The return value of the operation
-    public static func withRecursionDepthLimit<T>(
-        _ limit: size_t,
-        isolation: isolated (any Actor)? = #isolation,
-        operation: () async throws -> T
-    ) async rethrows -> T {
-        assert(
-            limit >= 0,
-            "Recursion depth limit must be greater than or equal to 0"
-        )
-        return try await $recursionDepthLimit.withValue(
-            limit,
-            operation: operation,
-            isolation: isolation
-        )
-    }
+    #if compiler(>=6.4)
+        #if hasFeature(NonisolatedNonsendingByDefault)
+            /// Perform the provided async operation with a custom recursion depth limit
+            ///
+            /// By default, the recursion depth limit is set to a value that is calculated based on the memory profile of the system upon the first invocation of a deserialization operation.
+            /// Subsequent invocations will use the same limit and avoid recalculating it again.
+            ///
+            /// You can use this method to set a custom recursion depth limit:
+            ///
+            /// ```swift
+            /// let data = Data( ... )
+            /// let json = try await JSON.withRecursionDepthLimit(1000) {
+            ///     // All JSON operations performed within this closure will use a recursion depth limit of 1000
+            ///     try await JSON.deserialize(data)
+            /// }
+            /// ```
+            ///
+            /// To remove the recursion depth limit entirely, use `0`
+            ///
+            /// - Parameters:
+            ///   - limit: The desired recursion depth limit
+            ///   - operation: The operation to perform
+            /// - Returns: The return value of the operation
+            public static func withRecursionDepthLimit<T>(
+                _ limit: size_t,
+                operation: () async throws -> T
+            ) async rethrows -> T {
+                assert(
+                    limit >= 0,
+                    "Recursion depth limit must be greater than or equal to 0"
+                )
+                return try await $recursionDepthLimit.withValue(
+                    limit,
+                    operation: operation
+                )
+            }
+        #else
+            /// Perform the provided async operation with a custom recursion depth limit
+            ///
+            /// By default, the recursion depth limit is set to a value that is calculated based on the memory profile of the system upon the first invocation of a deserialization operation.
+            /// Subsequent invocations will use the same limit and avoid recalculating it again.
+            ///
+            /// You can use this method to set a custom recursion depth limit:
+            ///
+            /// ```swift
+            /// let data = Data( ... )
+            /// let json = try await JSON.withRecursionDepthLimit(1000) {
+            ///     // All JSON operations performed within this closure will use a recursion depth limit of 1000
+            ///     try await JSON.deserialize(data)
+            /// }
+            /// ```
+            ///
+            /// To remove the recursion depth limit entirely, use `0`
+            ///
+            /// - Parameters:
+            ///   - limit: The desired recursion depth limit
+            ///   - operation: The operation to perform
+            /// - Returns: The return value of the operation
+            public static nonisolated(nonsending) func withRecursionDepthLimit<T>(
+                _ limit: size_t,
+                operation: () async throws -> T
+            ) async rethrows -> T {
+                assert(
+                    limit >= 0,
+                    "Recursion depth limit must be greater than or equal to 0"
+                )
+                return try await $recursionDepthLimit.withValue(
+                    limit,
+                    operation: operation
+                )
+            }
+        #endif
+    #else
+        /// Perform the provided async operation with a custom recursion depth limit
+        ///
+        /// By default, the recursion depth limit is set to a value that is calculated based on the memory profile of the system upon the first invocation of a deserialization operation.
+        /// Subsequent invocations will use the same limit and avoid recalculating it again.
+        ///
+        /// You can use this method to set a custom recursion depth limit:
+        ///
+        /// ```swift
+        /// let data = Data( ... )
+        /// let json = try await JSON.withRecursionDepthLimit(1000) {
+        ///     // All JSON operations performed within this closure will use a recursion depth limit of 1000
+        ///     try await JSON.deserialize(data)
+        /// }
+        /// ```
+        ///
+        /// To remove the recursion depth limit entirely, use `0`
+        ///
+        /// - Parameters:
+        ///   - limit: The desired recursion depth limit
+        ///   - isolation: The actor used to run the provided operation
+        ///   - operation: The operation to perform
+        /// - Returns: The return value of the operation
+        public static func withRecursionDepthLimit<T>(
+            _ limit: size_t,
+            isolation: isolated (any Actor)? = #isolation,
+            operation: () async throws -> T
+        ) async rethrows -> T {
+            assert(
+                limit >= 0,
+                "Recursion depth limit must be greater than or equal to 0"
+            )
+            return try await $recursionDepthLimit.withValue(
+                limit,
+                operation: operation,
+                isolation: isolation
+            )
+        }
+    #endif
 
     /// Perform the provided operation with a custom input size limit
     ///
@@ -170,40 +244,108 @@ extension JSON {
         )
     }
 
-    /// Perform the provided async operation with a custom input size limit
-    ///
-    /// By default, the input size limit is set to a value that is calculated based on the available memory on the first invocation of a deserialization operation.
-    /// Subsequent invocations will use the same limit and avoid recalculating it again.
-    ///
-    /// You can use this method to set a custom input size limit:
-    ///
-    /// ```swift
-    /// let data = Data( ... )
-    /// let json = try await JSON.withInputSizeLimit(1024 * 1024) {
-    ///    // All JSON operations performed within this closure will use an input size limit of 1 MB
-    ///    try await JSON.deserialize(data)
-    /// }
-    /// ```
-    ///
-    /// To remove the input size limit entirely, use `0`
-    ///
-    /// - Parameters:
-    ///   - limit: The desired input size limit, in bytes
-    ///   - isolation: The actor used to execute the provided operation
-    ///   - operation: The operation to perform
-    /// - Returns: The return value of the operation
-    public static func withInputSizeLimit<T>(
-        _ limit: Int,
-        isolation: isolated (any Actor)? = #isolation,
-        operation: () async throws -> T
-    ) async rethrows -> T {
-        assert(limit >= 0, "Input size limit must be greater than or equal to 0")
-        return try await $inputSizeLimit.withValue(
-            limit,
-            operation: operation,
-            isolation: isolation
-        )
-    }
+    #if compiler(>=6.4)
+        #if hasFeature(NonisolatedNonsendingByDefault)
+            /// Perform the provided async operation with a custom input size limit
+            ///
+            /// By default, the input size limit is set to a value that is calculated based on the available memory on the first invocation of a deserialization operation.
+            /// Subsequent invocations will use the same limit and avoid recalculating it again.
+            ///
+            /// You can use this method to set a custom input size limit:
+            ///
+            /// ```swift
+            /// let data = Data( ... )
+            /// let json = try await JSON.withInputSizeLimit(1024 * 1024) {
+            ///    // All JSON operations performed within this closure will use an input size limit of 1 MB
+            ///    try await JSON.deserialize(data)
+            /// }
+            /// ```
+            ///
+            /// To remove the input size limit entirely, use `0`
+            ///
+            /// - Parameters:
+            ///   - limit: The desired input size limit, in bytes
+            ///   - operation: The operation to perform
+            /// - Returns: The return value of the operation
+            public static func withInputSizeLimit<T>(
+                _ limit: Int,
+                operation: () async throws -> T
+            ) async rethrows -> T {
+                assert(limit >= 0, "Input size limit must be greater than or equal to 0")
+                return try await $inputSizeLimit.withValue(
+                    limit,
+                    operation: operation
+                )
+            }
+        #else
+            /// Perform the provided async operation with a custom input size limit
+            ///
+            /// By default, the input size limit is set to a value that is calculated based on the available memory on the first invocation of a deserialization operation.
+            /// Subsequent invocations will use the same limit and avoid recalculating it again.
+            ///
+            /// You can use this method to set a custom input size limit:
+            ///
+            /// ```swift
+            /// let data = Data( ... )
+            /// let json = try await JSON.withInputSizeLimit(1024 * 1024) {
+            ///    // All JSON operations performed within this closure will use an input size limit of 1 MB
+            ///    try await JSON.deserialize(data)
+            /// }
+            /// ```
+            ///
+            /// To remove the input size limit entirely, use `0`
+            ///
+            /// - Parameters:
+            ///   - limit: The desired input size limit, in bytes
+            ///   - operation: The operation to perform
+            /// - Returns: The return value of the operation
+            public static nonisolated(nonsending) func withInputSizeLimit<T>(
+                _ limit: Int,
+                operation: () async throws -> T
+            ) async rethrows -> T {
+                assert(limit >= 0, "Input size limit must be greater than or equal to 0")
+                return try await $inputSizeLimit.withValue(
+                    limit,
+                    operation: operation
+                )
+            }
+        #endif
+    #else
+        /// Perform the provided async operation with a custom input size limit
+        ///
+        /// By default, the input size limit is set to a value that is calculated based on the available memory on the first invocation of a deserialization operation.
+        /// Subsequent invocations will use the same limit and avoid recalculating it again.
+        ///
+        /// You can use this method to set a custom input size limit:
+        ///
+        /// ```swift
+        /// let data = Data( ... )
+        /// let json = try await JSON.withInputSizeLimit(1024 * 1024) {
+        ///    // All JSON operations performed within this closure will use an input size limit of 1 MB
+        ///    try await JSON.deserialize(data)
+        /// }
+        /// ```
+        ///
+        /// To remove the input size limit entirely, use `0`
+        ///
+        /// - Parameters:
+        ///   - limit: The desired input size limit, in bytes
+        ///   - isolation: The actor used to execute the provided operation
+        ///   - operation: The operation to perform
+        /// - Returns: The return value of the operation
+        public static func withInputSizeLimit<T>(
+            _ limit: Int,
+            isolation: isolated (any Actor)? = #isolation,
+            operation: () async throws -> T
+        ) async rethrows -> T {
+            assert(limit >= 0, "Input size limit must be greater than or equal to 0")
+            return try await $inputSizeLimit.withValue(
+                limit,
+                operation: operation,
+                isolation: isolation
+            )
+        }
+    #endif
 
     /// Create a typed JSON value from a JSON string
     /// - Parameters:

@@ -23,13 +23,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["26.5", "18.6", "17.7", "16.6"]
-    runs-on: macos-26
+        version: ["27.0", "26.5", "18.6", "17.7", "16.6"]
+    runs-on: macos-27
     steps:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Select Xcode Version
-        run: ./.scripts/xcode-select 26.6
+        run: ./.scripts/xcode-select 27.0
       - name: Build JBird for iOS ${{ matrix.version }}
         run: ./.scripts/build-ios-xcode JBird ${{ matrix.version }}
 
@@ -38,13 +38,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["26.5", "18.6", "17.7", "16.6"]
-    runs-on: macos-26
+        version: ["27.0", "26.5", "18.6", "17.7", "16.6"]
+    runs-on: macos-27
     steps:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Select Xcode Version
-        run: ./.scripts/xcode-select 26.6
+        run: ./.scripts/xcode-select 27.0
       - name: Build JBird for tvOS ${{ matrix.version }}
         run: ./.scripts/build-tvos-xcode JBird ${{ matrix.version }}
 
@@ -53,13 +53,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["26.5", "11.6", "10.7", "9.6"]
-    runs-on: macos-26
+        version: ["27.0", "26.5", "11.6", "10.7", "9.6"]
+    runs-on: macos-27
     steps:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Select Xcode Version
-        run: ./.scripts/xcode-select 26.6
+        run: ./.scripts/xcode-select 27.0
       - name: Build JBird for watchOS ${{ matrix.version }}
         run: ./.scripts/build-watchos-xcode JBird ${{ matrix.version }}
 
@@ -68,8 +68,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["26.5", "15.5"]
+        version: ["27.0", "26.5", "15.5"]
         include:
+          - version: "27.0"
+            runner: macos-27
+            xcode: "27.0"
           - version: "26.5"
             runner: macos-26
             xcode: "26.6"
@@ -92,8 +95,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["26.5", "15.5"]
+        version: ["27.0", "26.5", "15.5"]
         include:
+          - version: "27.0"
+            runner: macos-27
+            xcode: "27.0"
           - version: "26.5"
             runner: macos-26
             xcode: "26.6"
@@ -116,19 +122,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["26.5", "2.6", "1.7"]
-    runs-on: macos-26
+        version: ["27.0", "26.5", "2.6", "1.7"]
+    runs-on: macos-27
     steps:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Select Xcode Version
-        run: ./.scripts/xcode-select 26.6
+        run: ./.scripts/xcode-select 27.0
       - name: Build JBird for visionOS ${{ matrix.version }}
         run: ./.scripts/build-visionos-xcode JBird ${{ matrix.version }}
 
   swiftformat:
     name: Run SwiftFormat
-    runs-on: macos-26
+    runs-on: macos-27
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -142,7 +148,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.1", "6.2", "6.3"]
+        swift: ["6.1", "6.2", "6.3", "6.4"]
         include:
           - swift: "6.1"
             runner: "macos-15"
@@ -153,6 +159,9 @@ jobs:
           - swift: "6.3"
             runner: "macos-26"
             xcode: "26.6"
+          - swift: "6.4"
+            runner: "macos-27"
+            xcode: "27.0"
     runs-on: ${{ matrix.runner }}
     outputs:
       artifact-name: macos-build
@@ -176,7 +185,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.1", "6.2", "6.3"]
+        swift: ["6.1", "6.2", "6.3", "6.4"]
         include:
           - swift: "6.1"
             runner: "macos-15"
@@ -187,6 +196,9 @@ jobs:
           - swift: "6.3"
             runner: "macos-26"
             xcode: "26.6"
+          - swift: "6.4"
+            runner: "macos-27"
+            xcode: "27.0"
     needs: build-macos-spm
     runs-on: ${{ matrix.runner }}
     steps:
@@ -209,7 +221,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.1", "6.2", "6.3"]
+        swift: ["6.1", "6.2", "6.3", "6.4"]
         include:
           - swift: "6.1"
             toolchain: "6.1"
@@ -217,6 +229,8 @@ jobs:
             toolchain: "6.2.3"
           - swift: "6.3"
             toolchain: "6.3.3"
+          - swift: "6.4"
+            toolchain: "6.4"
     runs-on: ubuntu-latest
     outputs:
       artifact-name: ubuntu-build
@@ -242,7 +256,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.1", "6.2", "6.3"]
+        swift: ["6.1", "6.2", "6.3", "6.4"]
         include:
           - swift: "6.1"
             toolchain: "6.1"
@@ -250,6 +264,8 @@ jobs:
             toolchain: "6.2.3"
           - swift: "6.3"
             toolchain: "6.3.3"
+          - swift: "6.4"
+            toolchain: "6.4"
     needs: build-ubuntu-spm
     runs-on: ubuntu-latest
     container:
@@ -274,7 +290,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.1", "6.2", "6.3"]
+        swift: ["6.1", "6.2", "6.3", "6.4"]
         include:
           - swift: "6.1"
             toolchain: "6.1"
@@ -282,6 +298,8 @@ jobs:
             toolchain: "6.2.3"
           - swift: "6.3"
             toolchain: "6.3.3"
+          - swift: "6.4"
+            toolchain: "6.4"
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -308,7 +326,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.1", "6.2", "6.3"]
+        swift: ["6.1", "6.2", "6.3", "6.4"]
         include:
           - swift: "6.1"
             toolchain: "6.1"
@@ -316,6 +334,8 @@ jobs:
             toolchain: "6.2.3"
           - swift: "6.3"
             toolchain: "6.3.3"
+          - swift: "6.4"
+            toolchain: "6.4"
     needs: build-windows-spm
     runs-on: windows-latest
     steps:
@@ -399,7 +419,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.1", "6.2", "6.3"]
+        swift: ["6.1", "6.2", "6.3", "6.4"]
     runs-on: ubuntu-latest
     outputs:
       artifact-name: android-build-${{ matrix.swift }}
@@ -453,12 +473,12 @@ jobs:
       fail-fast: false
       matrix:
         target: [JBird, JBirdCore, JBirdBuilders, JBirdCodableSupport]
-    runs-on: macos-26
+    runs-on: macos-27
     steps:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Select Xcode Version
-        run: ./.scripts/xcode-select 26.6
+        run: ./.scripts/xcode-select 27.0
       - name: Build XCFramework
         run: ./.scripts/build-xcframework ${{ matrix.target }}
 
@@ -498,7 +518,7 @@ jobs:
 
   static-analyzer:
     name: Run Static Analyzer
-    runs-on: macos-26
+    runs-on: macos-27
     steps:
       - name: Checkout
         uses: actions/checkout@v6

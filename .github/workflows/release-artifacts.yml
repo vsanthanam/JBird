@@ -10,14 +10,14 @@ jobs:
       matrix:
         target: [JBird, JBirdCore, JBirdBuilders, JBirdCodableSupport]
     name: Build XCFramework (${{ matrix.target }})
-    runs-on: macos-26
+    runs-on: macos-27
     outputs:
         artifact-name: ${{ matrix.target }}.xcframework.zip
     steps:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Xcode Version
-        run: ./.scripts/xcode-select 26.6
+        run: ./.scripts/xcode-select 27.0
       - name: Build XCFramework
         run: ./.scripts/build-xcframework ${{ matrix.target }}
       - name: Upload XCFramework
