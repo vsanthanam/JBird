@@ -155,7 +155,7 @@ extension JSON {
             ///   - limit: The desired recursion depth limit
             ///   - operation: The operation to perform
             /// - Returns: The return value of the operation
-            public static nonisolated(nonsending) func withRecursionDepthLimit<T>(
+            public nonisolated(nonsending) static func withRecursionDepthLimit<T>(
                 _ limit: size_t,
                 operation: () async throws -> T
             ) async rethrows -> T {
@@ -299,7 +299,7 @@ extension JSON {
             ///   - limit: The desired input size limit, in bytes
             ///   - operation: The operation to perform
             /// - Returns: The return value of the operation
-            public static nonisolated(nonsending) func withInputSizeLimit<T>(
+            public nonisolated(nonsending) static func withInputSizeLimit<T>(
                 _ limit: Int,
                 operation: () async throws -> T
             ) async rethrows -> T {
