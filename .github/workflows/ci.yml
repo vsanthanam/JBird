@@ -68,12 +68,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["27.0", "26.6", "15.5"]
+        version: ["27.0", "26.5", "15.5"]
         include:
           - version: "27.0"
             runner: xcode-27
             xcode: "27.0"
-          - version: "26.6"
+          - version: "26.5"
             runner: macos-26
             xcode: "26.6"
           - version: "15.5"
@@ -95,12 +95,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["27.0", "26.6", "15.5"]
+        version: ["27.0", "26.5", "15.5"]
         include:
           - version: "27.0"
             runner: xcode-27
             xcode: "27.0"
-          - version: "26.6"
+          - version: "26.5"
             runner: macos-26
             xcode: "26.6"
           - version: "15.5"
