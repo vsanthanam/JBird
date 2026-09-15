@@ -1,5 +1,5 @@
 #!/bin/bash
 
-VERSION="${1:-26.6}"
+VERSION="${1:-27.0}"
 
 sudo xcode-select --switch "/Applications/Xcode_${VERSION}.app"

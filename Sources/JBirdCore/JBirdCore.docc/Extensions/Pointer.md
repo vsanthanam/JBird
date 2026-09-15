@@ -36,10 +36,10 @@ See [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901) for more informati
 
 - ``appending(_:)``
 - ``append(_:)``
-- ``appending(contentsOf:)-(Collection<String>)``
-- ``append(contentsOf:)-(Collection<String>)``
-- ``appending(contentsOf:)-(JSON.Pointer)``
-- ``append(contentsOf:)-(JSON.Pointer)``
+- ``appending(contentsOf:)-(Collection<Token>)``
+- ``append(contentsOf:)-(Collection<Token>)``
+- ``appending(contentsOf:)-(Pointer)``
+- ``append(contentsOf:)-(Pointer)``
 
 ### Textual Representations
 

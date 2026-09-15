@@ -104,17 +104,17 @@ let steve: JSON = [
 
 ### Subscripting
 
-- ``value(forSubscript:)-(JSON.Subscript)``
+- ``value(forSubscript:)-(Subscript)``
 - ``value(forSubscript:)-(JSONSubscriptConvertible)``
-- ``containsValue(forSubscript:)-(JSON.Subscript)``
+- ``containsValue(forSubscript:)-(Subscript)``
 - ``containsValue(forSubscript:)-(JSONSubscriptConvertible)``
-- ``setValue(_:forSubscript:)-(_,JSON.Subscript)``
+- ``setValue(_:forSubscript:)-(_,Subscript)``
 - ``setValue(_:forSubscript:)-(_,JSONSubscriptConvertible)``
-- ``removeValue(forSubscript:)-(JSON.Subscript)``
+- ``removeValue(forSubscript:)-(Subscript)``
 - ``removeValue(forSubscript:)-(JSONSubscriptConvertible)``
-- ``subscript(_:)-(JSON.Subscript)``
+- ``subscript(_:)-(Subscript)``
 - ``subscript(_:)-(S)``
-- ``subscript(_:as:)-(JSON.Subscript,_)``
+- ``subscript(_:as:)-(Subscript,_)``
 - ``subscript(_:as:)-(S,_)``
 
 ### Working with JSON objects and arrays
@@ -127,18 +127,18 @@ let steve: JSON = [
 - ``removeValue(forKey:)``
 - ``merge(_:uniquingKeysWith:)``
 - ``merging(_:uniquingKeysWith:)``
-- ``filter(_:)-((JSON.Object.Element)->Bool)``
+- ``filter(_:)-((Object.Element)->Bool)``
 - ``filterKeys(_:)``
 - ``filterValues(_:)``
-- ``allSatisfy(_:)-((JSON.Object.Element)->Bool)``
-- ``map(_:)-((JSON.Object.Element)->T)``
+- ``allSatisfy(_:)-((Object.Element)->Bool)``
+- ``map(_:)-((Object.Element)->T)``
 - ``mapValues(_:)-((JSON)->T)``
 - ``mapValues(_:)-((JSON)->JSON)``
-- ``compactMap(_:)-((JSON.Object.Element)->ElementOfResult?)``
+- ``compactMap(_:)-((Object.Element)->ElementOfResult?)``
 - ``compactMapValues(_:)``
-- ``reduce(into:_:)-(_,(Result,JSON.Object.Element)->Void)``
-- ``reduce(_:_:)-(_,(Result,JSON.Object.Element)->Result)``
-- ``forEach(_:)-((JSON.Object.Element)->Void)``
+- ``reduce(into:_:)-(_,(Result,Object.Element)->Void)``
+- ``reduce(_:_:)-(_,(Result,Object.Element)->Result)``
+- ``forEach(_:)-((Object.Element)->Void)``
 - ``first``
 - ``last``
 - ``value(atIndex:)``
@@ -172,10 +172,10 @@ let steve: JSON = [
 - ``deserialize(_:options:)-(Data,_)``
 - ``deserialize(_:options:)-(String,_)``
 - ``DeserializationOptions``
-- ``withRecursionDepthLimit(_:operation:)``
-- ``withRecursionDepthLimit(_:isolation:operation:)``
-- ``withInputSizeLimit(_:operation:)``
-- ``withInputSizeLimit(_:isolation:operation:)``
+- ``withRecursionDepthLimit(_:operation:)-8riei``
+- ``withRecursionDepthLimit(_:operation:)-9u6jf``
+- ``withInputSizeLimit(_:operation:)-2sm2h``
+- ``withInputSizeLimit(_:operation:)-7cgom``
 - ``defaultRecursionDepthLimit``
 - ``defaultInputSizeLimit``
 
@@ -195,8 +195,8 @@ let steve: JSON = [
 - ``containsValue(atPointer:)``
 - ``setValue(_:atPointer:)``
 - ``removeValue(atPointer:)``
-- ``subscript(_:)-(JSON.Pointer)``
-- ``subscript(_:as:)-(JSON.Pointer,_)``
+- ``subscript(_:)-(Pointer)``
+- ``subscript(_:as:)-(Pointer,_)``
 
 ### Working with JSON Patches
 

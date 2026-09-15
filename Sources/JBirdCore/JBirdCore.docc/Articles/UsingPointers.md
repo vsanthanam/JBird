@@ -133,4 +133,4 @@ let users = try JSON.Pointer("/users")
 let firstName = users.appending("0", "name")   // "/users/0/name"
 ```
 
-You can append the tokens of another pointer just as easily with ``JSON/Pointer/appending(contentsOf:)-(JSON.Pointer)``, and matching mutating `append` methods modify a pointer in place.
+You can append the tokens of another pointer just as easily with ``JSON/Pointer/appending(contentsOf:)-(Pointer)``, and matching mutating `append` methods modify a pointer in place.

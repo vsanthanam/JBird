@@ -275,9 +275,13 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
         for attribute in attributes {
             let attr = try attribute.as(AttributeSyntax.self).mustExist()
             if let memberName = attr.attributeName.as(MemberTypeSyntax.self) {
-                if memberName.name.text == name { return attr }
+                if memberName.name.text == name {
+                    return attr
+                }
             } else if let identifierName = attr.attributeName.as(IdentifierTypeSyntax.self) {
-                if identifierName.name.text == name { return attr }
+                if identifierName.name.text == name {
+                    return attr
+                }
             }
         }
         return nil
@@ -456,9 +460,13 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
 
         var convertBodySections: [String] = []
         let convertFunctionsTogether = convertFunctions.joined(separator: "\n")
-        if !convertFunctionsTogether.isEmpty { convertBodySections.append(convertFunctionsTogether) }
+        if !convertFunctionsTogether.isEmpty {
+            convertBodySections.append(convertFunctionsTogether)
+        }
         let convertAttemptsBody = convertAttempts.joined(separator: "\n")
-        if !convertAttemptsBody.isEmpty { convertBodySections.append(convertAttemptsBody) }
+        if !convertAttemptsBody.isEmpty {
+            convertBodySections.append(convertAttemptsBody)
+        }
         convertBodySections.append("throw JBirdMacros.JSONMacroDecodingError(\"Enum case decoding failure\")")
 
         let initializable = DeclSyntax(
