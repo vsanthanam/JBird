@@ -115,12 +115,16 @@ xargs -0 ${LLVM_COV_BIN} report "${REPORT_ARGS[@]}" -- <"$FIL0" > "$SUMMARY_TXT"
 # LCOV (optional)
 xargs -0 ${LLVM_COV_BIN} export "${EXPORT_ARGS[@]}" -- <"$FIL0" > "${REPORT_DIR}/coverage.lcov" || true
 
-# Extract total % for CI
+# Extract total line % for CI.
+# The TOTAL row lists percentages in a fixed order: regions, functions, lines,
+# and (with newer llvm-cov) branches. Pick the third so an extra trailing
+# branch column can't change what we measure.
 TOTAL_LINE_PCT="$(
   awk '
     BEGIN{pct=""}
     $1=="TOTAL"{
-      for(i=1;i<=NF;i++){ if ($i ~ /%$/){ pct=$i } }
+      n=0
+      for(i=1;i<=NF;i++){ if ($i ~ /%$/){ n++; if (n==3){ pct=$i } } }
       gsub("%","",pct); print pct
     }
   ' "$SUMMARY_TXT" | tail -n1

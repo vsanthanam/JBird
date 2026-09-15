@@ -56,10 +56,10 @@ try json.apply(patch)
 
 - ``appending(_:)``
 - ``append(_:)``
-- ``appending(contentsOf:)-(Collection<JSON.Patch.Operation>)``
-- ``append(contentsOf:)-(Collection<JSON.Patch.Operation>)``
-- ``appending(contentsOf:)-(JSON.Patch)``
-- ``append(contentsOf:)-(JSON.Patch)``
+- ``appending(contentsOf:)-(Collection<Operation>)``
+- ``append(contentsOf:)-(Collection<Operation>)``
+- ``appending(contentsOf:)-(Patch)``
+- ``append(contentsOf:)-(Patch)``
 
 ### Inspecting a Patch
 
