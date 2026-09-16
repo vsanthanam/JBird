@@ -180,10 +180,10 @@ extension JSON {
         /// The default strategy is the ``JSON/Encoder/DataEncodingStrategy/base64`` strategy.
         public var dataEncodingStrategy: DataEncodingStrategy {
             get {
-                _dataEncodigStrategy.strategy
+                _dataEncodingStrategy.strategy
             }
             set {
-                _dataEncodigStrategy.strategy = newValue
+                _dataEncodingStrategy.strategy = newValue
             }
         }
 
@@ -329,7 +329,7 @@ extension JSON {
         private let _outputFormatting = CodingStrategy<OutputFormatting>([])
         private let _keyEncodingStrategy = CodingStrategy<KeyEncodingStrategy>(.useDefaultKeys)
         private let _dateEncodingStrategy = CodingStrategy<DateEncodingStrategy>(.deferredToDate)
-        private let _dataEncodigStrategy = CodingStrategy<DataEncodingStrategy>(.base64)
+        private let _dataEncodingStrategy = CodingStrategy<DataEncodingStrategy>(.base64)
         private let _nonConformingFloatEncodingStrategy = CodingStrategy<NonConformingFloatEncodingStrategy>(.throw)
 
         static func encodeData(
@@ -513,7 +513,7 @@ extension JSON {
             case .useDefaultKeys:
                 return key
             case let .custom(fn):
-                let path = path + [key]
+                let path = path + CollectionOfOne(key)
                 return fn(path)
             }
         }
