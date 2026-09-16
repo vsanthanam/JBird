@@ -605,7 +605,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     public func appending(
         _ json: JSON
     ) throws -> JSON {
-        try .array(arrayValue + [json])
+        try .array(arrayValue + CollectionOfOne(json))
     }
 
     /// Create a JSON array by appending the contents of another JSON array
