@@ -60,20 +60,33 @@ find .build -type d -name '*.xctest' -print0 2>/dev/null \
 | while IFS= read -r -d '' bundle; do
     find "$bundle/Contents/MacOS" -type f -perm -111 -print0 2>/dev/null || true
   done >>"$OBJ0"
-find .build -type f -perm -111 ! -path '*/.dSYM/*' -print0 2>/dev/null >>"$OBJ0" || true
+find .build -type f -perm -111 \
+  ! -path '*/.dSYM/*' ! -path '*/checkouts/*' ! -path '*/plugins/*' \
+  -print0 2>/dev/null >>"$OBJ0" || true
 
 if [ -s "$OBJ0" ]; then
-  while IFS= read -r -d '' f; do
+  # The two finds above can list the same test bundle twice; dedupe first.
+  # Keep only Mach-O files that actually carry coverage mapping, since
+  # llvm-cov errors out on any binary without it.
+  sort -zu "$OBJ0" | while IFS= read -r -d '' f; do
     [ -e "$f" ] || continue
-    if file "$f" | grep -qE 'Mach-O (64-bit|universal)|current ar archive'; then
-      printf '%s\0' "$f" >>"$FIL0"
-    fi
-  done <"$OBJ0"
+    file "$f" | grep -qE 'Mach-O (64-bit|universal)' || continue
+    otool -l "$f" 2>/dev/null | grep -q '__llvm_covmap' || continue
+    printf '%s\0' "$f" >>"$FIL0"
+  done
 fi
 if [ ! -s "$FIL0" ]; then
   echo "error: no instrumented Mach-O files found under .build/" >&2
   exit 1
 fi
+
+# llvm-cov only treats the first positional argument as a covered binary;
+# anything after it is a source-file filter. Every binary must therefore be
+# passed with -object so coverage from all test bundles is combined.
+OBJECT_ARGS=()
+while IFS= read -r -d '' f; do
+  OBJECT_ARGS+=( -object "$f" )
+done <"$FIL0"
 
 # -------- generate reports --------
 rm -rf "$REPORT_DIR"
@@ -106,21 +119,25 @@ if [ -n "$PATH_EQUIV" ]; then
 fi
 
 # HTML (navigable)
-xargs -0 ${LLVM_COV_BIN} show "${SHOW_ARGS[@]}" -- <"$FIL0"
+${LLVM_COV_BIN} show "${SHOW_ARGS[@]}" "${OBJECT_ARGS[@]}"
 
 # Text summary (also used for % extraction)
 SUMMARY_TXT="${REPORT_DIR}/summary.txt"
-xargs -0 ${LLVM_COV_BIN} report "${REPORT_ARGS[@]}" -- <"$FIL0" > "$SUMMARY_TXT"
+${LLVM_COV_BIN} report "${REPORT_ARGS[@]}" "${OBJECT_ARGS[@]}" > "$SUMMARY_TXT"
 
 # LCOV (optional)
-xargs -0 ${LLVM_COV_BIN} export "${EXPORT_ARGS[@]}" -- <"$FIL0" > "${REPORT_DIR}/coverage.lcov" || true
+${LLVM_COV_BIN} export "${EXPORT_ARGS[@]}" "${OBJECT_ARGS[@]}" > "${REPORT_DIR}/coverage.lcov" || true
 
-# Extract total % for CI
+# Extract total line % for CI.
+# The TOTAL row lists percentages in a fixed order: regions, functions, lines,
+# and (with newer llvm-cov) branches. Pick the third so an extra trailing
+# branch column can't change what we measure.
 TOTAL_LINE_PCT="$(
   awk '
     BEGIN{pct=""}
     $1=="TOTAL"{
-      for(i=1;i<=NF;i++){ if ($i ~ /%$/){ pct=$i } }
+      n=0
+      for(i=1;i<=NF;i++){ if ($i ~ /%$/){ n++; if (n==3){ pct=$i } } }
       gsub("%","",pct); print pct
     }
   ' "$SUMMARY_TXT" | tail -n1
