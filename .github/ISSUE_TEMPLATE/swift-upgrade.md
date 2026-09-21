@@ -2,7 +2,7 @@
 name: Swift/Xcode Version Upgrade
 about: Migrate to the next version of Swift
 title: 'Update to Swift __ or Xcode __'
-labels: enhancement
+labels: migration
 assignees: vsanthanam
 
 ---
@@ -24,5 +24,6 @@ assignees: vsanthanam
 - [ ] If applicable, update Windows runners workflows to use appropriate Swift version
 - [ ] If applicable, update Ubuntu runners to use appropriate Swift version
 - [ ] If applicable, update WASM runners to use appropriate Swift version
+- [ ] If applicable, update Android runners to use appropriate Swift version
 - [ ] If applicable, update CodeQL build scripts
 - [ ] If applicable, migrate the benchmark package to use the same Swift / Xcode version
