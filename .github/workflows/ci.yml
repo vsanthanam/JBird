@@ -68,7 +68,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["27.0", "26.5", "15.5"]
+        version: ["27.0", "26.5"]
         include:
           - version: "27.0"
             runner: xcode-27
@@ -76,9 +76,6 @@ jobs:
           - version: "26.5"
             runner: macos-26
             xcode: "26.6"
-          - version: "15.5"
-            runner: macos-15
-            xcode: "16.4"
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout
@@ -95,7 +92,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["27.0", "26.5", "15.5"]
+        version: ["27.0", "26.5"]
         include:
           - version: "27.0"
             runner: xcode-27
@@ -103,9 +100,6 @@ jobs:
           - version: "26.5"
             runner: macos-26
             xcode: "26.6"
-          - version: "15.5"
-            runner: macos-15
-            xcode: "16.4"
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout
@@ -148,11 +142,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.1", "6.2", "6.3", "6.4"]
+        swift: ["6.2", "6.3", "6.4"]
         include:
-          - swift: "6.1"
-            runner: "macos-15"
-            xcode: "16.4"
           - swift: "6.2"
             runner: "macos-26"
             xcode: "26.6"
@@ -185,11 +176,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.1", "6.2", "6.3", "6.4"]
+        swift: ["6.2", "6.3", "6.4"]
         include:
-          - swift: "6.1"
-            runner: "macos-15"
-            xcode: "16.4"
           - swift: "6.2"
             runner: "macos-26"
             xcode: "26.6"
@@ -221,10 +209,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.1", "6.2", "6.3", "6.4"]
+        swift: ["6.2", "6.3", "6.4"]
         include:
-          - swift: "6.1"
-            toolchain: "6.1"
           - swift: "6.2"
             toolchain: "6.2.3"
           - swift: "6.3"
@@ -256,10 +242,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.1", "6.2", "6.3", "6.4"]
+        swift: ["6.2", "6.3", "6.4"]
         include:
-          - swift: "6.1"
-            toolchain: "6.1"
           - swift: "6.2"
             toolchain: "6.2.3"
           - swift: "6.3"
@@ -290,10 +274,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.1", "6.2", "6.3", "6.4"]
+        swift: ["6.2", "6.3", "6.4"]
         include:
-          - swift: "6.1"
-            toolchain: "6.1"
           - swift: "6.2"
             toolchain: "6.2.3"
           - swift: "6.3"
@@ -326,10 +308,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.1", "6.2", "6.3", "6.4"]
+        swift: ["6.2", "6.3", "6.4"]
         include:
-          - swift: "6.1"
-            toolchain: "6.1"
           - swift: "6.2"
             toolchain: "6.2.3"
           - swift: "6.3"
@@ -363,10 +343,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.1", "6.2", "6.3", "6.4"]
+        swift: ["6.2", "6.3", "6.4"]
         include:
-          - swift: "6.1"
-            toolchain: "6.1"
           - swift: "6.2"
             toolchain: "6.2.3"
           - swift: "6.3"
@@ -439,10 +417,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.1", "6.2", "6.3", "6.4"]
+        swift: ["6.2", "6.3", "6.4"]
         include:
-          - swift: "6.1"
-            toolchain: "6.1"
           - swift: "6.2"
             toolchain: "6.2.3"
           - swift: "6.3"

@@ -51,16 +51,14 @@ extension Array: JSONConvertible where Element: JSONConvertible {
 
 }
 
-#if compiler(>=6.2)
-    @available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
-    extension InlineArray: JSONConvertible where Element: JSONConvertible {
+@available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
+extension InlineArray: JSONConvertible where Element: JSONConvertible {
 
-        public var jsonValue: JSON {
-            .array(indices.map { index in JSON(self[index]) })
-        }
-
+    public var jsonValue: JSON {
+        .array(indices.map { index in JSON(self[index]) })
     }
-#endif
+
+}
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension Dictionary: JSONConvertible where Key: JSONKeyConvertible, Value: JSONConvertible {

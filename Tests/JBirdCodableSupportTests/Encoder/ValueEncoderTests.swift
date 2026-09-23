@@ -284,13 +284,11 @@ struct ValueEncoderTests {
         #expect(String(decoding: data, as: UTF8.self) == "42")
     }
 
-    #if compiler(>=6.2)
-        @Test("Writing twice through reused single value containers traps")
-        func doubleSingleValueWriteTraps() async {
-            await #expect(processExitsWith: .failure) {
-                _ = try JSON.Encoder().encode(DoubleSingleValueWrite())
-            }
+    @Test("Writing twice through reused single value containers traps")
+    func doubleSingleValueWriteTraps() async {
+        await #expect(processExitsWith: .failure) {
+            _ = try JSON.Encoder().encode(DoubleSingleValueWrite())
         }
-    #endif
+    }
 
 }

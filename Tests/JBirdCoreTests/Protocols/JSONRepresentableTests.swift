@@ -326,113 +326,111 @@ struct JSONRepresentableTests {
 
     }
 
-    #if compiler(>=6.2)
-        @Suite("InlineArray Conformance Tests")
-        struct InlineArrayTests {
+    @Suite("InlineArray Conformance Tests")
+    struct InlineArrayTests {
 
-            @available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
-            @Test("InlineArray JSON Value")
-            func inlineArrayJSONValue() {
-                let array: InlineArray<3, String> = ["foo", "bar", "baz"]
-                let json = array.jsonValue
-                #expect(json == .array([.string("foo"), .string("bar"), .string("baz")]))
-            }
-
-            @available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
-            @Test("Empty InlineArray JSON Value")
-            func emptyInlineArrayJSONValue() {
-                let array: InlineArray<0, Int> = []
-                let json = array.jsonValue
-                #expect(json == .array([]))
-            }
-
-            @available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
-            @Test("Nested InlineArray JSON Value")
-            func nestedInlineArrayJSONValue() {
-                let array: InlineArray<2, InlineArray<2, Int>> = [[1, 2], [3, 4]]
-                let json = array.jsonValue
-                #expect(json == .array([.array([1, 2]), .array([3, 4])]))
-            }
-
-            @available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
-            @Test("InlineArray Convert")
-            func inlineArrayConvert() throws {
-                let json = JSON.array([.string("foo"), .string("bar"), .string("baz")])
-                let array = try json.convert(into: InlineArray<3, String>.self)
-                #expect(array.count == 3)
-                #expect(array[0] == "foo")
-                #expect(array[1] == "bar")
-                #expect(array[2] == "baz")
-            }
-
-            @available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
-            @Test("Empty InlineArray Convert")
-            func emptyInlineArrayConvert() throws {
-                let json = JSON.array([])
-                let array = try json.convert(into: InlineArray<0, Int>.self)
-                #expect(array.count == 0)
-            }
-
-            @available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
-            @Test("Nested InlineArray Convert")
-            func nestedInlineArrayConvert() throws {
-                let json = JSON.array([.array([1, 2]), .array([3, 4])])
-                let array = try json.convert(into: InlineArray<2, InlineArray<2, Int>>.self)
-                #expect(array[0][0] == 1)
-                #expect(array[0][1] == 2)
-                #expect(array[1][0] == 3)
-                #expect(array[1][1] == 4)
-            }
-
-            @available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
-            @Test("InlineArray Round Trip")
-            func inlineArrayRoundTrip() throws {
-                let original: InlineArray<4, Double> = [1.5, 2.5, 3.5, 4.5]
-                let json = JSON(original)
-                let restored = try json.convert(into: InlineArray<4, Double>.self)
-                for index in original.indices {
-                    #expect(restored[index] == original[index])
-                }
-            }
-
-            @available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
-            @Test("InlineArray Convert Fails With Too Few Elements")
-            func inlineArrayConvertTooFew() {
-                let json = JSON.array([.string("foo"), .string("bar")])
-                #expect(throws: JSON.OperationError.illegalCollectionConversion) {
-                    _ = try json.convert(into: InlineArray<3, String>.self)
-                }
-            }
-
-            @available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
-            @Test("InlineArray Convert Fails With Too Many Elements")
-            func inlineArrayConvertTooMany() {
-                let json = JSON.array([.string("foo"), .string("bar"), .string("baz")])
-                #expect(throws: JSON.OperationError.illegalCollectionConversion) {
-                    _ = try json.convert(into: InlineArray<2, String>.self)
-                }
-            }
-
-            @available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
-            @Test("InlineArray Convert Fails For Non-Array JSON")
-            func inlineArrayConvertNonArray() {
-                let json = JSON.string("foo")
-                #expect(throws: JSON.OperationError.illegalArrayConversion) {
-                    _ = try json.convert(into: InlineArray<1, String>.self)
-                }
-            }
-
-            @available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
-            @Test("InlineArray Convert Fails For Mismatched Element Type")
-            func inlineArrayConvertElementFailure() {
-                let json = JSON.array([.number(1), .string("two"), .number(3)])
-                #expect(throws: JSON.OperationError.illegalNumberConversion) {
-                    _ = try json.convert(into: InlineArray<3, Int>.self)
-                }
-            }
-
+        @available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
+        @Test("InlineArray JSON Value")
+        func inlineArrayJSONValue() {
+            let array: InlineArray<3, String> = ["foo", "bar", "baz"]
+            let json = array.jsonValue
+            #expect(json == .array([.string("foo"), .string("bar"), .string("baz")]))
         }
-    #endif
+
+        @available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
+        @Test("Empty InlineArray JSON Value")
+        func emptyInlineArrayJSONValue() {
+            let array: InlineArray<0, Int> = []
+            let json = array.jsonValue
+            #expect(json == .array([]))
+        }
+
+        @available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
+        @Test("Nested InlineArray JSON Value")
+        func nestedInlineArrayJSONValue() {
+            let array: InlineArray<2, InlineArray<2, Int>> = [[1, 2], [3, 4]]
+            let json = array.jsonValue
+            #expect(json == .array([.array([1, 2]), .array([3, 4])]))
+        }
+
+        @available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
+        @Test("InlineArray Convert")
+        func inlineArrayConvert() throws {
+            let json = JSON.array([.string("foo"), .string("bar"), .string("baz")])
+            let array = try json.convert(into: InlineArray<3, String>.self)
+            #expect(array.count == 3)
+            #expect(array[0] == "foo")
+            #expect(array[1] == "bar")
+            #expect(array[2] == "baz")
+        }
+
+        @available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
+        @Test("Empty InlineArray Convert")
+        func emptyInlineArrayConvert() throws {
+            let json = JSON.array([])
+            let array = try json.convert(into: InlineArray<0, Int>.self)
+            #expect(array.count == 0)
+        }
+
+        @available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
+        @Test("Nested InlineArray Convert")
+        func nestedInlineArrayConvert() throws {
+            let json = JSON.array([.array([1, 2]), .array([3, 4])])
+            let array = try json.convert(into: InlineArray<2, InlineArray<2, Int>>.self)
+            #expect(array[0][0] == 1)
+            #expect(array[0][1] == 2)
+            #expect(array[1][0] == 3)
+            #expect(array[1][1] == 4)
+        }
+
+        @available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
+        @Test("InlineArray Round Trip")
+        func inlineArrayRoundTrip() throws {
+            let original: InlineArray<4, Double> = [1.5, 2.5, 3.5, 4.5]
+            let json = JSON(original)
+            let restored = try json.convert(into: InlineArray<4, Double>.self)
+            for index in original.indices {
+                #expect(restored[index] == original[index])
+            }
+        }
+
+        @available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
+        @Test("InlineArray Convert Fails With Too Few Elements")
+        func inlineArrayConvertTooFew() {
+            let json = JSON.array([.string("foo"), .string("bar")])
+            #expect(throws: JSON.OperationError.illegalCollectionConversion) {
+                _ = try json.convert(into: InlineArray<3, String>.self)
+            }
+        }
+
+        @available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
+        @Test("InlineArray Convert Fails With Too Many Elements")
+        func inlineArrayConvertTooMany() {
+            let json = JSON.array([.string("foo"), .string("bar"), .string("baz")])
+            #expect(throws: JSON.OperationError.illegalCollectionConversion) {
+                _ = try json.convert(into: InlineArray<2, String>.self)
+            }
+        }
+
+        @available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
+        @Test("InlineArray Convert Fails For Non-Array JSON")
+        func inlineArrayConvertNonArray() {
+            let json = JSON.string("foo")
+            #expect(throws: JSON.OperationError.illegalArrayConversion) {
+                _ = try json.convert(into: InlineArray<1, String>.self)
+            }
+        }
+
+        @available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
+        @Test("InlineArray Convert Fails For Mismatched Element Type")
+        func inlineArrayConvertElementFailure() {
+            let json = JSON.array([.number(1), .string("two"), .number(3)])
+            #expect(throws: JSON.OperationError.illegalNumberConversion) {
+                _ = try json.convert(into: InlineArray<3, Int>.self)
+            }
+        }
+
+    }
 
     @Suite("Dictionary Conformance Tests")
     struct DictionaryTests {
