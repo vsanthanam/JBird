@@ -24,7 +24,6 @@
 // SOFTWARE.
 
 @testable import JBirdCore
-import JBirdParser
 import Testing
 
 @Test("DeserializationError Descriptions")
@@ -76,26 +75,4 @@ func deserializationErrorDescriptions() {
 
     let inputSizeLimitExceeded = JSON.DeserializationError.inputSizeLimitExceeded
     #expect(inputSizeLimitExceeded.description == "Input size limit exceeded")
-}
-
-@Test("Deserialiation error C initializer")
-func cInitializer() {
-    #expect(JSON.DeserializationError(JSON_UNEXPECTED_END_OF_INPUT) == .unexpectedEndOfInput)
-    #expect(JSON.DeserializationError(JSON_INVALID_JSON) == .invalidJSON)
-    #expect(JSON.DeserializationError(JSON_INVALID_CHARACTER) == .invalidCharacter)
-    #expect(JSON.DeserializationError(JSON_EXPECTED_COLON) == .expectedColon)
-    #expect(JSON.DeserializationError(JSON_EXPECTED_COMMA_OR_BRACE) == .expectedCommaOrBrace)
-    #expect(JSON.DeserializationError(JSON_EXPECTED_COMMA_OR_BRACKET) == .expectedCommaOrBracket)
-    #expect(JSON.DeserializationError(JSON_INVALID_LITERAL) == .invalidLiteral)
-    #expect(JSON.DeserializationError(JSON_INVALID_NUMBER) == .invalidNumber)
-    #expect(JSON.DeserializationError(JSON_INVALID_STRING) == .invalidString)
-    #expect(JSON.DeserializationError(JSON_MISSING_OBJECT_KEY) == .missingObjectKey)
-    #expect(JSON.DeserializationError(JSON_INVALID_UNICODE) == .invalidUnicode)
-    #expect(JSON.DeserializationError(JSON_INVALID_ESCAPE) == .invalidEscape)
-    #expect(JSON.DeserializationError(JSON_OUT_OF_MEMORY) == .outOfMemory)
-    #expect(JSON.DeserializationError(JSON_MAX_DEPTH_EXCEEDED) == .depthLimitExceeded)
-    #expect(JSON.DeserializationError(JSON_DUPLICATE_KEY) == .duplicateKey)
-    #expect(JSON.DeserializationError(JSON_NO_ERROR) == .unknown)
-    let bogusErrorCode = json_error_t(42)
-    #expect(JSON.DeserializationError(bogusErrorCode) == .unknown)
 }

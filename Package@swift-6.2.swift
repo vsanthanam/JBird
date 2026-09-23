@@ -103,9 +103,7 @@ let package = Package(
         ),
         .target(
             name: "JBirdCore",
-            dependencies: [
-                "JBirdParser"
-            ],
+            dependencies: [],
             resources: [
                 .process("PrivacyInfo.xcprivacy")
             ],
@@ -118,28 +116,7 @@ let package = Package(
         .testTarget(
             name: "JBirdCoreTests",
             dependencies: [
-                "JBirdCore",
-                "JBirdParser"
-            ],
-            swiftSettings: [
-                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
-                .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("MemberImportVisibility")
-            ]
-        ),
-        .target(
-            name: "JBirdParser",
-            publicHeadersPath: "include",
-            swiftSettings: [
-                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
-                .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("MemberImportVisibility")
-            ]
-        ),
-        .testTarget(
-            name: "JBirdParserTests",
-            dependencies: [
-                "JBirdParser"
+                "JBirdCore"
             ],
             swiftSettings: [
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
@@ -270,6 +247,5 @@ let package = Package(
             ]
         )
     ],
-    swiftLanguageModes: [.v6],
-    cLanguageStandard: .c11
+    swiftLanguageModes: [.v6]
 )

@@ -24,11 +24,6 @@
 // SOFTWARE.
 
 import Foundation
-#if BUILD_XCFRAMEWORK
-    @_implementationOnly import JBirdParser
-#else
-    import JBirdParser
-#endif
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension JSON {
@@ -143,47 +138,6 @@ extension JSON {
             }
         }
 
-        // MARK: - Private
-
-        @inline(__always)
-        init(_ result: json_error_t) {
-            switch result {
-            case JSON_UNEXPECTED_END_OF_INPUT:
-                self = .unexpectedEndOfInput
-            case JSON_INVALID_JSON:
-                self = .invalidJSON
-            case JSON_INVALID_CHARACTER:
-                self = .invalidCharacter
-            case JSON_EXPECTED_COLON:
-                self = .expectedColon
-            case JSON_EXPECTED_COMMA_OR_BRACE:
-                self = .expectedCommaOrBrace
-            case JSON_EXPECTED_COMMA_OR_BRACKET:
-                self = .expectedCommaOrBracket
-            case JSON_INVALID_LITERAL:
-                self = .invalidLiteral
-            case JSON_INVALID_NUMBER:
-                self = .invalidNumber
-            case JSON_INVALID_STRING:
-                self = .invalidString
-            case JSON_MISSING_OBJECT_KEY:
-                self = .missingObjectKey
-            case JSON_INVALID_UNICODE:
-                self = .invalidUnicode
-            case JSON_INVALID_ESCAPE:
-                self = .invalidEscape
-            case JSON_OUT_OF_MEMORY:
-                self = .outOfMemory
-            case JSON_MAX_DEPTH_EXCEEDED:
-                self = .depthLimitExceeded
-            case JSON_DUPLICATE_KEY:
-                self = .duplicateKey
-            case JSON_NO_ERROR:
-                self = .unknown
-            default:
-                self = .unknown
-            }
-        }
     }
 
 }

@@ -109,9 +109,7 @@ let package = Package(
         ),
         .target(
             name: "JBirdCore",
-            dependencies: [
-                "JBirdParser"
-            ],
+            dependencies: [],
             resources: [
                 .process("PrivacyInfo.xcprivacy")
             ],
@@ -120,20 +118,7 @@ let package = Package(
         .testTarget(
             name: "JBirdCoreTests",
             dependencies: [
-                "JBirdCore",
-                "JBirdParser"
-            ],
-            swiftSettings: swiftSettings
-        ),
-        .target(
-            name: "JBirdParser",
-            publicHeadersPath: "include",
-            swiftSettings: swiftSettings
-        ),
-        .testTarget(
-            name: "JBirdParserTests",
-            dependencies: [
-                "JBirdParser"
+                "JBirdCore"
             ],
             swiftSettings: swiftSettings
         ),
@@ -228,6 +213,5 @@ let package = Package(
             swiftSettings: swiftSettings
         )
     ],
-    swiftLanguageModes: [.v6],
-    cLanguageStandard: .c11
+    swiftLanguageModes: [.v6]
 )
