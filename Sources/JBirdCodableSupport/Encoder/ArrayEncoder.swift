@@ -166,7 +166,7 @@ final class ArrayEncoder: UnkeyedEncodingContainer {
     ) throws where T: Encodable {
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
-            codingPath: codingPath + [IndexCodingKey(count)],
+            codingPath: codingPath + CollectionOfOne<any CodingKey>(IndexCodingKey(count)),
             userInfo: encoder.userInfo,
             autoPopContainers: false,
             onValueChange: nil
@@ -204,7 +204,7 @@ final class ArrayEncoder: UnkeyedEncodingContainer {
         let index = append(.object(JSON.Object()))
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
-            codingPath: codingPath + [IndexCodingKey(index)],
+            codingPath: codingPath + CollectionOfOne<any CodingKey>(IndexCodingKey(index)),
             userInfo: encoder.userInfo,
             autoPopContainers: true
         ) { [encoder, containerIndex] json in
@@ -226,7 +226,7 @@ final class ArrayEncoder: UnkeyedEncodingContainer {
         let index = append(.array(JSON.Array()))
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
-            codingPath: codingPath + [IndexCodingKey(index)],
+            codingPath: codingPath + CollectionOfOne<any CodingKey>(IndexCodingKey(index)),
             userInfo: encoder.userInfo,
             autoPopContainers: true
         ) { [encoder, containerIndex] json in
@@ -247,7 +247,7 @@ final class ArrayEncoder: UnkeyedEncodingContainer {
         let index = append(.null)
         return InternalEncoder(
             storage: encoder.storage,
-            codingPath: codingPath + [IndexCodingKey(index)],
+            codingPath: codingPath + CollectionOfOne<any CodingKey>(IndexCodingKey(index)),
             userInfo: encoder.userInfo,
             autoPopContainers: true
         ) { [encoder, containerIndex] json in
