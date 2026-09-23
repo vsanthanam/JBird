@@ -93,8 +93,14 @@ extension JSON {
         _ limit: size_t,
         operation: () throws -> T
     ) rethrows -> T {
-        assert(limit >= 0, "Recursion depth limit must be greater than or equal to 0")
-        return try $recursionDepthLimit.withValue(limit, operation: operation)
+        assert(
+            limit >= 0,
+            "Recursion depth limit must be greater than or equal to 0"
+        )
+        return try $recursionDepthLimit.withValue(
+            limit,
+            operation: operation
+        )
     }
 
     #if compiler(>=6.4)
@@ -271,7 +277,10 @@ extension JSON {
                 _ limit: Int,
                 operation: () async throws -> T
             ) async rethrows -> T {
-                assert(limit >= 0, "Input size limit must be greater than or equal to 0")
+                assert(
+                    limit >= 0,
+                    "Input size limit must be greater than or equal to 0"
+                )
                 return try await $inputSizeLimit.withValue(
                     limit,
                     operation: operation
@@ -303,7 +312,10 @@ extension JSON {
                 _ limit: Int,
                 operation: () async throws -> T
             ) async rethrows -> T {
-                assert(limit >= 0, "Input size limit must be greater than or equal to 0")
+                assert(
+                    limit >= 0,
+                    "Input size limit must be greater than or equal to 0"
+                )
                 return try await $inputSizeLimit.withValue(
                     limit,
                     operation: operation
@@ -338,7 +350,10 @@ extension JSON {
             isolation: isolated (any Actor)? = #isolation,
             operation: () async throws -> T
         ) async rethrows -> T {
-            assert(limit >= 0, "Input size limit must be greater than or equal to 0")
+            assert(
+                limit >= 0,
+                "Input size limit must be greater than or equal to 0"
+            )
             return try await $inputSizeLimit.withValue(
                 limit,
                 operation: operation,

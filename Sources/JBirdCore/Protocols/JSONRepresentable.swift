@@ -114,6 +114,45 @@ extension String: JSONRepresentable {
 }
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension Substring: JSONRepresentable {
+
+    public var jsonValue: JSON {
+        .string(String(self))
+    }
+
+    public init(json: JSON) throws {
+        self = try Substring(json.stringValue)
+    }
+
+}
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension String.UTF8View: JSONRepresentable {
+
+    public var jsonValue: JSON {
+        .string(String(self))
+    }
+
+    public init(json: JSON) throws {
+        self = try json.stringValue.utf8
+    }
+
+}
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension String.UTF16View: JSONRepresentable {
+
+    public var jsonValue: JSON {
+        .string(String(self))
+    }
+
+    public init(json: JSON) throws {
+        self = try json.stringValue.utf16
+    }
+
+}
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension URL: JSONRepresentable {
 
     public var jsonValue: JSON {

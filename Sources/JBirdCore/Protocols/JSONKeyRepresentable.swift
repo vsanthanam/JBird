@@ -42,3 +42,42 @@ extension String: JSONKeyRepresentable {
     }
 
 }
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension Substring: JSONKeyRepresentable {
+
+    public var jsonKey: JSON.Key {
+        String(self)
+    }
+
+    public init(jsonKey: JSON.Key) throws {
+        self = Substring(jsonKey)
+    }
+
+}
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension String.UTF8View: JSONKeyRepresentable {
+
+    public var jsonKey: JSON.Key {
+        String(self)
+    }
+
+    public init(jsonKey: JSON.Key) throws {
+        self = jsonKey.utf8
+    }
+
+}
+
+@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+extension String.UTF16View: JSONKeyRepresentable {
+
+    public var jsonKey: JSON.Key {
+        String(self)
+    }
+
+    public init(jsonKey: JSON.Key) throws {
+        self = jsonKey.utf16
+    }
+
+}

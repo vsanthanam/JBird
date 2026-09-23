@@ -41,3 +41,43 @@ func rawRepKey() throws {
         _ = try RawRepKey(jsonKey: "baz")
     }
 }
+
+@Test("Test Substring Key Round Trip")
+func substringKey() throws {
+    let base = "foobarbaz"
+    let substring = base.dropFirst(3).dropLast(3)
+    #expect(substring.jsonKey == "bar")
+    let decoded = try Substring(jsonKey: "bar")
+    #expect(decoded == "bar")
+    #expect(String(decoded) == "bar")
+    let empty = try Substring(jsonKey: "")
+    #expect(empty.isEmpty)
+    let unicode = try Substring(jsonKey: "héllo 🌍")
+    #expect(unicode.jsonKey == "héllo 🌍")
+}
+
+@Test("Test UTF8View Key Round Trip")
+func utf8ViewKey() throws {
+    #expect("foo".utf8.jsonKey == "foo")
+    let decoded = try String.UTF8View(jsonKey: "héllo 🌍")
+    #expect(String(decoded) == "héllo 🌍")
+    #expect(Array(decoded) == Array("héllo 🌍".utf8))
+    #expect(decoded.jsonKey == "héllo 🌍")
+}
+
+@Test("Test UTF16View Key Round Trip")
+func utf16ViewKey() throws {
+    #expect("foo".utf16.jsonKey == "foo")
+    let decoded = try String.UTF16View(jsonKey: "héllo 🌍")
+    #expect(String(decoded) == "héllo 🌍")
+    #expect(Array(decoded) == Array("héllo 🌍".utf16))
+    #expect(decoded.jsonKey == "héllo 🌍")
+}
+
+@Test("Test Dictionary With Substring Keys")
+func substringKeyedDictionary() throws {
+    let json = JSON.object(["foo": .bool(true), "bar": .bool(false)])
+    let dictionary = try json.convert(into: [Substring: Bool].self)
+    #expect(dictionary == ["foo": true, "bar": false])
+    #expect(dictionary.jsonValue == json)
+}

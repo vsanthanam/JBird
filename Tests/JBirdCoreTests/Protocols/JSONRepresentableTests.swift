@@ -194,6 +194,119 @@ struct JSONRepresentableTests {
 
     }
 
+    @Suite("Substring Conformance Tests")
+    struct SubstringTests {
+
+        @Test("Substring JSON Value")
+        func substringJSONValue() {
+            let base = "foobarbaz"
+            let substring = base.dropFirst(3).dropLast(3)
+            let json = substring.jsonValue
+            #expect(json == .string("bar"))
+        }
+
+        @Test("Substring Convert")
+        func substringConvert() throws {
+            let json = JSON.string("bar")
+            let substring = try json.convert(into: Substring.self)
+            #expect(substring == "bar")
+            #expect(String(substring) == "bar")
+        }
+
+        @Test("Empty Substring Convert")
+        func emptySubstringConvert() throws {
+            let json = JSON.string("")
+            let substring = try json.convert(into: Substring.self)
+            #expect(substring.isEmpty)
+        }
+
+        @Test("Substring Round Trip")
+        func substringRoundTrip() throws {
+            let original: Substring = "héllo, wörld 🌍"
+            let json = original.jsonValue
+            let decoded = try json.convert(into: Substring.self)
+            #expect(decoded == original)
+        }
+
+        @Test("Substring Convert Fails For Non-String JSON")
+        func substringConvertFailsForNonString() {
+            #expect(throws: JSON.OperationError.illegalStringConversion) {
+                _ = try JSON.number(1).convert(into: Substring.self)
+            }
+        }
+
+    }
+
+    @Suite("UTF8View Conformance Tests")
+    struct UTF8ViewTests {
+
+        @Test("UTF8View JSON Value")
+        func utf8ViewJSONValue() {
+            let json = "foo".utf8.jsonValue
+            #expect(json == .string("foo"))
+        }
+
+        @Test("UTF8View Convert")
+        func utf8ViewConvert() throws {
+            let json = JSON.string("bar")
+            let view = try json.convert(into: String.UTF8View.self)
+            #expect(String(view) == "bar")
+            #expect(Array(view) == Array("bar".utf8))
+        }
+
+        @Test("UTF8View Round Trip")
+        func utf8ViewRoundTrip() throws {
+            let original = "héllo, wörld 🌍"
+            let json = original.utf8.jsonValue
+            let decoded = try json.convert(into: String.UTF8View.self)
+            #expect(String(decoded) == original)
+            #expect(Array(decoded) == Array(original.utf8))
+        }
+
+        @Test("UTF8View Convert Fails For Non-String JSON")
+        func utf8ViewConvertFailsForNonString() {
+            #expect(throws: JSON.OperationError.illegalStringConversion) {
+                _ = try JSON.bool(true).convert(into: String.UTF8View.self)
+            }
+        }
+
+    }
+
+    @Suite("UTF16View Conformance Tests")
+    struct UTF16ViewTests {
+
+        @Test("UTF16View JSON Value")
+        func utf16ViewJSONValue() {
+            let json = "foo".utf16.jsonValue
+            #expect(json == .string("foo"))
+        }
+
+        @Test("UTF16View Convert")
+        func utf16ViewConvert() throws {
+            let json = JSON.string("bar")
+            let view = try json.convert(into: String.UTF16View.self)
+            #expect(String(view) == "bar")
+            #expect(Array(view) == Array("bar".utf16))
+        }
+
+        @Test("UTF16View Round Trip")
+        func utf16ViewRoundTrip() throws {
+            let original = "héllo, wörld 🌍"
+            let json = original.utf16.jsonValue
+            let decoded = try json.convert(into: String.UTF16View.self)
+            #expect(String(decoded) == original)
+            #expect(Array(decoded) == Array(original.utf16))
+        }
+
+        @Test("UTF16View Convert Fails For Non-String JSON")
+        func utf16ViewConvertFailsForNonString() {
+            #expect(throws: JSON.OperationError.illegalStringConversion) {
+                _ = try JSON.null.convert(into: String.UTF16View.self)
+            }
+        }
+
+    }
+
     @Suite("Array Conformance Tests")
     struct ArrayTests {
 
