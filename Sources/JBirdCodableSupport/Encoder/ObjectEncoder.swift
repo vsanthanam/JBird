@@ -111,7 +111,7 @@ final class ObjectEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
         try set(
             JSON.Encoder.encodeDouble(
                 value,
-                codingPath: codingPath + CollectionOfOne(key)
+                codingPath: codingPath + CollectionOfOne<any CodingKey>(key)
             ),
             forKey: encodedKey
         )
@@ -128,7 +128,7 @@ final class ObjectEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
         try set(
             JSON.Encoder.encodeFloat(
                 value,
-                codingPath: codingPath + CollectionOfOne(key)
+                codingPath: codingPath + CollectionOfOne<any CodingKey>(key)
             ),
             forKey: encodedKey
         )
@@ -284,7 +284,7 @@ final class ObjectEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
         )
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
-            codingPath: codingPath + CollectionOfOne(key),
+            codingPath: codingPath + CollectionOfOne<any CodingKey>(key),
             userInfo: encoder.userInfo,
             autoPopContainers: false,
             onValueChange: nil
@@ -329,7 +329,7 @@ final class ObjectEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
         )
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
-            codingPath: codingPath + CollectionOfOne(key),
+            codingPath: codingPath + CollectionOfOne<any CodingKey>(key),
             userInfo: encoder.userInfo,
             autoPopContainers: true
         ) { [encoder, containerIndex] json in
@@ -356,7 +356,7 @@ final class ObjectEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
         )
         let nestedEncoder = InternalEncoder(
             storage: encoder.storage,
-            codingPath: codingPath + CollectionOfOne(key),
+            codingPath: codingPath + CollectionOfOne<any CodingKey>(key),
             userInfo: encoder.userInfo,
             autoPopContainers: true
         ) { [encoder, containerIndex] json in
@@ -381,7 +381,7 @@ final class ObjectEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
         )
         return InternalEncoder(
             storage: encoder.storage,
-            codingPath: codingPath + CollectionOfOne(superKey),
+            codingPath: codingPath + CollectionOfOne<any CodingKey>(superKey),
             userInfo: encoder.userInfo,
             autoPopContainers: true
         ) { [encoder, containerIndex] json in
@@ -403,7 +403,7 @@ final class ObjectEncoder<Key: CodingKey>: KeyedEncodingContainerProtocol {
         )
         return InternalEncoder(
             storage: encoder.storage,
-            codingPath: codingPath + CollectionOfOne(key),
+            codingPath: codingPath + CollectionOfOne<any CodingKey>(key),
             userInfo: encoder.userInfo,
             autoPopContainers: true
         ) { [encoder, containerIndex] json in

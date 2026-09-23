@@ -80,7 +80,7 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + CollectionOfOne(key),
+                codingPath: codingPath + CollectionOfOne<any CodingKey>(key),
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -100,7 +100,7 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
             return try value.decodeFloat()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + CollectionOfOne(key),
+                codingPath: codingPath + CollectionOfOne<any CodingKey>(key),
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -120,7 +120,7 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
             return try value.decodeDouble()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + CollectionOfOne(key),
+                codingPath: codingPath + CollectionOfOne<any CodingKey>(key),
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -140,7 +140,7 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + CollectionOfOne(key),
+                codingPath: codingPath + CollectionOfOne<any CodingKey>(key),
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -160,7 +160,7 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + CollectionOfOne(key),
+                codingPath: codingPath + CollectionOfOne<any CodingKey>(key),
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -180,7 +180,7 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + CollectionOfOne(key),
+                codingPath: codingPath + CollectionOfOne<any CodingKey>(key),
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -200,7 +200,7 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + CollectionOfOne(key),
+                codingPath: codingPath + CollectionOfOne<any CodingKey>(key),
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -220,7 +220,7 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + CollectionOfOne(key),
+                codingPath: codingPath + CollectionOfOne<any CodingKey>(key),
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -240,7 +240,7 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + CollectionOfOne(key),
+                codingPath: codingPath + CollectionOfOne<any CodingKey>(key),
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -260,7 +260,7 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + CollectionOfOne(key),
+                codingPath: codingPath + CollectionOfOne<any CodingKey>(key),
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -280,7 +280,7 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + CollectionOfOne(key),
+                codingPath: codingPath + CollectionOfOne<any CodingKey>(key),
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -300,7 +300,7 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + CollectionOfOne(key),
+                codingPath: codingPath + CollectionOfOne<any CodingKey>(key),
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -320,7 +320,7 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + CollectionOfOne(key),
+                codingPath: codingPath + CollectionOfOne<any CodingKey>(key),
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -340,7 +340,7 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
             return try value.convert()
         } catch {
             let context = DecodingError.Context(
-                codingPath: codingPath + CollectionOfOne(key),
+                codingPath: codingPath + CollectionOfOne<any CodingKey>(key),
                 debugDescription: "Expected \(type) but found \(value.backingTypeDescription)",
                 underlyingError: error
             )
@@ -359,7 +359,7 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
         let nestedDecoder = InternalDecoder(
             storage: decoder.storage,
             value: value,
-            codingPath: codingPath + CollectionOfOne(key),
+            codingPath: codingPath + CollectionOfOne<any CodingKey>(key),
             userInfo: decoder.userInfo,
             parent: decoder
         )
@@ -400,7 +400,7 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
         let nestedDecoder = InternalDecoder(
             storage: decoder.storage,
             value: value,
-            codingPath: codingPath + CollectionOfOne(key),
+            codingPath: codingPath + CollectionOfOne<any CodingKey>(key),
             userInfo: decoder.userInfo,
             parent: decoder
         )
@@ -414,7 +414,7 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
         let nestedDecoder = InternalDecoder(
             storage: decoder.storage,
             value: value,
-            codingPath: codingPath + CollectionOfOne(key),
+            codingPath: codingPath + CollectionOfOne<any CodingKey>(key),
             userInfo: decoder.userInfo,
             parent: decoder
         )
@@ -426,7 +426,7 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
         return InternalDecoder(
             storage: decoder.storage,
             value: value,
-            codingPath: codingPath + CollectionOfOne(SuperCodingKey()),
+            codingPath: codingPath + CollectionOfOne<any CodingKey>(SuperCodingKey()),
             userInfo: decoder.userInfo,
             parent: decoder
         )
@@ -439,7 +439,7 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
         return InternalDecoder(
             storage: decoder.storage,
             value: value,
-            codingPath: codingPath + CollectionOfOne(key),
+            codingPath: codingPath + CollectionOfOne<any CodingKey>(key),
             userInfo: decoder.userInfo,
             parent: decoder
         )
@@ -458,7 +458,7 @@ final class ObjectDecoder<Key>: KeyedDecodingContainerProtocol where Key: Coding
             throw DecodingError.keyNotFound(
                 key,
                 .init(
-                    codingPath: codingPath + CollectionOfOne(key),
+                    codingPath: codingPath + CollectionOfOne<any CodingKey>(key),
                     debugDescription: "Couldn't find value for key '\(key.stringValue)'"
                 )
             )

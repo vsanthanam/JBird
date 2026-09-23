@@ -304,7 +304,7 @@ extension JSON {
                 return CamelCaseCodingKey(key)
             case let .custom(fn):
                 let codingKey = ObjectCodingKey(key)
-                let path = path + CollectionOfOne(codingKey)
+                let path = path + CollectionOfOne<any CodingKey>(codingKey)
                 return fn(path)
             }
         }

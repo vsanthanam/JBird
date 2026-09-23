@@ -513,7 +513,7 @@ extension JSON {
             case .useDefaultKeys:
                 return key
             case let .custom(fn):
-                let path = path + CollectionOfOne(key)
+                let path = path + CollectionOfOne<any CodingKey>(key)
                 return fn(path)
             }
         }
