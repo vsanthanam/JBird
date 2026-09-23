@@ -1,4 +1,4 @@
-// swift-tools-version: 6.3
+// swift-tools-version: 6.4
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -51,7 +51,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/ordo-one/benchmark",
-            exact: "1.33.0"
+            exact: "1.36.2"
         ),
         jbird,
         .package(

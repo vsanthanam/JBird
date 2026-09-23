@@ -1860,4 +1860,91 @@ struct JBirdParserTests {
         #expect(json_get_type(value1) == JSON_BOOLEAN)
         #expect(json_get_boolean(value1) == false)
     }
+
+    // MARK: - Length and Key Identifier Tests
+
+    @Test("String and key lengths")
+    func stringAndKeyLengths() throws {
+        let raw = #"{"short":"a\u0000b","a_much_longer_key_than_sixteen":"","esc\"aped":"xyz"}"#
+        let jsonData = try #require(raw.data(using: .utf8))
+        var value: OpaquePointer?
+
+        let result = jsonData.withUnsafeBytes { bytes in
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+        }
+
+        defer {
+            json_free(value)
+        }
+
+        #expect(result == JSON_NO_ERROR)
+        #expect(json_get_object_size(value) == 3)
+        #expect(json_get_object_key_length(value, 0) == 5)
+        #expect(json_get_object_key_length(value, 1) == 30)
+        #expect(json_get_object_key_length(value, 2) == 8)
+        #expect(json_get_string_length(json_get_object_value(value, 0)) == 3)
+        #expect(json_get_string_length(json_get_object_value(value, 1)) == 0)
+        #expect(json_get_string_length(json_get_object_value(value, 2)) == 3)
+    }
+
+    @Test("Key identifiers are shared by equal keys")
+    func keyIdentifiers() throws {
+        let raw = #"[{"a":1,"b":2},{"b":3,"a":4,"c":5},{"esc\"aped":6,"esc\"aped":7}]"#
+        let jsonData = try #require(raw.data(using: .utf8))
+        var value: OpaquePointer?
+
+        let result = jsonData.withUnsafeBytes { bytes in
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+        }
+
+        defer {
+            json_free(value)
+        }
+
+        #expect(result == JSON_NO_ERROR)
+        let first = try #require(json_get_array_element(value, 0))
+        let second = try #require(json_get_array_element(value, 1))
+        let third = try #require(json_get_array_element(value, 2))
+
+        let a = json_get_object_key_id(first, 0)
+        let b = json_get_object_key_id(first, 1)
+        #expect(a != b)
+        #expect(json_get_object_key_id(second, 0) == b)
+        #expect(json_get_object_key_id(second, 1) == a)
+        let c = json_get_object_key_id(second, 2)
+        #expect(c != a && c != b)
+        let escaped = json_get_object_key_id(third, 0)
+        #expect(json_get_object_key_id(third, 1) == escaped)
+        #expect(json_get_key_count(value) == 4)
+        #expect(json_get_key_count(first) == 4)
+        #expect(Set([a, b, c, escaped]) == Set(0..<4))
+    }
+
+    @Test("Length and identifier accessors on mismatched values")
+    func lengthAccessorsOnMismatchedValues() throws {
+        let raw = #"[42,"x"]"#
+        let jsonData = try #require(raw.data(using: .utf8))
+        var value: OpaquePointer?
+
+        let result = jsonData.withUnsafeBytes { bytes in
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+        }
+
+        defer {
+            json_free(value)
+        }
+
+        #expect(result == JSON_NO_ERROR)
+        let number = try #require(json_get_array_element(value, 0))
+        let string = try #require(json_get_array_element(value, 1))
+
+        #expect(json_get_string_length(number) == 0)
+        #expect(json_get_string_length(nil) == 0)
+        #expect(json_get_object_key_length(value, 0) == 0)
+        #expect(json_get_object_key_length(nil, 0) == 0)
+        #expect(json_get_object_key_id(string, 0) == 0)
+        #expect(json_get_object_key_id(nil, 0) == 0)
+        #expect(json_get_key_count(value) == 0)
+        #expect(json_get_key_count(nil) == 0)
+    }
 }

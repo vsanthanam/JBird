@@ -963,4 +963,127 @@ struct DeserializationTests {
         }
     }
 
+    @Suite("Repeated Object Shape Tests")
+    struct RepeatedShapeTests {
+
+        @Test("Objects With Repeated Keys")
+        func repeatedShapes() async throws {
+            let raw = #"""
+            [{"a":1,"b":"x"},{"a":2,"b":"y"},{"a":3,"b":"z"}]
+            """#
+            let data = try #require(raw.data(using: .utf8))
+            let json = try JSON(data)
+            #expect(json == [["a": 1, "b": "x"], ["a": 2, "b": "y"], ["a": 3, "b": "z"]])
+            let fromString = try JSON(jsonString: raw)
+            #expect(fromString == json)
+            let fromAsyncData = try await JSON.deserialize(data)
+            #expect(fromAsyncData == json)
+        }
+
+        @Test("Nested Objects With Alternating Shapes")
+        func nestedAlternatingShapes() async throws {
+            let raw = #"""
+            [{"id":1,"user":{"name":"a","tag":"t"}},{"id":2,"user":{"name":"b","tag":"u"}},{"id":3,"user":{"name":"c","tag":"v"}}]
+            """#
+            let data = try #require(raw.data(using: .utf8))
+            let json = try JSON(data)
+            #expect(json == [
+                ["id": 1, "user": ["name": "a", "tag": "t"]],
+                ["id": 2, "user": ["name": "b", "tag": "u"]],
+                ["id": 3, "user": ["name": "c", "tag": "v"]]
+            ])
+            let fromAsyncData = try await JSON.deserialize(data)
+            #expect(fromAsyncData == json)
+        }
+
+        @Test("Same Keys In Different Order")
+        func differentKeyOrder() throws {
+            let raw = #"""
+            [{"a":1,"b":2},{"b":3,"a":4},{"a":5,"b":6}]
+            """#
+            let data = try #require(raw.data(using: .utf8))
+            let json = try JSON(data)
+            #expect(json == [["a": 1, "b": 2], ["a": 4, "b": 3], ["a": 5, "b": 6]])
+        }
+
+        @Test("Duplicate Keys After A Repeated Shape")
+        func duplicateKeysAfterShape() throws {
+            let raw = #"""
+            [{"a":1,"b":2},{"a":1,"b":2,"a":3},{"a":4,"b":5}]
+            """#
+            let data = try #require(raw.data(using: .utf8))
+            let json = try JSON(data)
+            #expect(json == [["a": 1, "b": 2], ["a": 3, "b": 2], ["a": 4, "b": 5]])
+        }
+
+        @Test("Repeated Shapes With Omitted Null Keys")
+        func omitNullKeys() throws {
+            let raw = #"""
+            [{"a":1,"b":null},{"a":2,"b":null},{"a":3,"b":4}]
+            """#
+            let data = try #require(raw.data(using: .utf8))
+            let json = try JSON.value(for: data, options: .omitNullKeys)
+            #expect(json == [["a": 1], ["a": 2], ["a": 3, "b": 4]])
+            let withNulls = try JSON(data)
+            #expect(withNulls == [["a": 1, "b": nil], ["a": 2, "b": nil], ["a": 3, "b": 4]])
+        }
+
+        @Test("Repeated Shapes With Omitted Null Values")
+        func omitNullValues() throws {
+            let raw = #"""
+            [{"a":[1,null],"b":null},{"a":[null,2],"b":null},null]
+            """#
+            let data = try #require(raw.data(using: .utf8))
+            let json = try JSON.value(for: data, options: .omitNullValues)
+            #expect(json == [["a": [1]], ["a": [2]]])
+        }
+
+        @Test("Repeated Long And Escaped Keys")
+        func longAndEscapedKeys() throws {
+            let raw = #"""
+            [{"a_very_long_key_name_indeed":1,"esc\"aped\nkey":2},{"a_very_long_key_name_indeed":3,"esc\"aped\nkey":4}]
+            """#
+            let data = try #require(raw.data(using: .utf8))
+            let json = try JSON(data)
+            #expect(json == [
+                ["a_very_long_key_name_indeed": 1, "esc\"aped\nkey": 2],
+                ["a_very_long_key_name_indeed": 3, "esc\"aped\nkey": 4]
+            ])
+        }
+
+        @Test("Many Distinct Shapes")
+        func manyDistinctShapes() throws {
+            let count = 600
+            let raw = "[" + (0..<count).map { #"{"k\#($0)":\#($0),"shared":true}"# }.joined(separator: ",") + "]"
+            let data = try #require(raw.data(using: .utf8))
+            let json = try JSON(data)
+            let expected = JSON.array((0..<count).map { .object(["k\($0)": .number(.init($0)), "shared": true]) })
+            #expect(json == expected)
+        }
+
+        @Test("Empty Strings And Keys")
+        func emptyStringsAndKeys() async throws {
+            let raw = #"""
+            [{"":"","a":""},{"":"x","a":""}]
+            """#
+            let data = try #require(raw.data(using: .utf8))
+            let json = try JSON(data)
+            #expect(json == [["": "", "a": ""], ["": "x", "a": ""]])
+            let fromAsyncData = try await JSON.deserialize(data)
+            #expect(fromAsyncData == json)
+        }
+
+        @Test("Embedded NUL Character In String")
+        func embeddedNul() async throws {
+            let raw = #"""
+            {"a\u0000b":"c\u0000d"}
+            """#
+            let data = try #require(raw.data(using: .utf8))
+            let json = try JSON(data)
+            #expect(json == ["a\u{0}b": "c\u{0}d"])
+            let fromAsyncData = try await JSON.deserialize(data)
+            #expect(fromAsyncData == json)
+        }
+    }
+
 }
