@@ -52,26 +52,24 @@ extension Array: JSONInitializable where Element: JSONInitializable {
 
 }
 
-#if compiler(>=6.2)
-    @available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
-    extension InlineArray: JSONInitializable where Element: JSONInitializable {
+@available(macOS 26.0, macCatalyst 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, visionOS 26.0, *)
+extension InlineArray: JSONInitializable where Element: JSONInitializable {
 
-        public init(json: JSON) throws {
-            let arr = try json.arrayValue
-            guard count == arr.count else {
-                throw JSON.OperationError.illegalCollectionConversion
-            }
-            let mapped = try arr[0..<count]
-                .map { value in
-                    try value.convert(into: Element.self)
-                }
-            self = .init { index in
-                mapped[index]
-            }
+    public init(json: JSON) throws {
+        let arr = try json.arrayValue
+        guard count == arr.count else {
+            throw JSON.OperationError.illegalCollectionConversion
         }
-
+        let mapped = try arr[0..<count]
+            .map { value in
+                try value.convert(into: Element.self)
+            }
+        self = .init { index in
+            mapped[index]
+        }
     }
-#endif
+
+}
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 extension Dictionary: JSONInitializable where Key: JSONKeyInitializable, Value: JSONInitializable {

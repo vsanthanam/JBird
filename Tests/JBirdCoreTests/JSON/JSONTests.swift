@@ -467,30 +467,27 @@ struct JSONTests {
             }
         }
 
-        #if compiler(>=6.2)
-            /// For reasons I do not understand, this test crashes the Swift 6.1 compiler.
-            @Test("Subscript with parameter packs and type conversion")
-            @available(*, deprecated)
-            func subscriptPacksWithType() throws {
-                let json: JSON = [
-                    "foo": [
-                        "bar": [1, 2, 3]
-                    ]
+        @Test("Subscript with parameter packs and type conversion")
+        @available(*, deprecated)
+        func subscriptPacksWithType() throws {
+            let json: JSON = [
+                "foo": [
+                    "bar": [1, 2, 3]
                 ]
+            ]
 
-                let value = try json["foo", "bar", 1, as: Int.self]
-                #expect(value == 2)
-                #expect(throws: JSON.OperationError.invalidSubscript(.key("qux"))) {
-                    _ = try json["foo", "bar", "qux", as: Int.self]
-                }
-                #expect(throws: JSON.OperationError.keyNotFound("baz")) {
-                    _ = try json["foo", "baz", as: Int.self]
-                }
-                #expect(throws: JSON.OperationError.indexOutOfBounds(5)) {
-                    _ = try json["foo", "bar", 5, as: Int.self]
-                }
+            let value = try json["foo", "bar", 1, as: Int.self]
+            #expect(value == 2)
+            #expect(throws: JSON.OperationError.invalidSubscript(.key("qux"))) {
+                _ = try json["foo", "bar", "qux", as: Int.self]
             }
-        #endif
+            #expect(throws: JSON.OperationError.keyNotFound("baz")) {
+                _ = try json["foo", "baz", as: Int.self]
+            }
+            #expect(throws: JSON.OperationError.indexOutOfBounds(5)) {
+                _ = try json["foo", "bar", 5, as: Int.self]
+            }
+        }
 
         @Test("Value for key tests")
         func valueForKey() throws {
