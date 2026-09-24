@@ -160,6 +160,7 @@ typedef struct string_pool_entry {
     const char *str;
     size_t len;
     uint32_t hash;
+    uint32_t id;
     struct string_pool_entry *next;
 } string_pool_entry_t;
 
@@ -213,6 +214,7 @@ typedef struct json_string {
     } data;
     size_t length;
     bool is_small;
+    uint32_t pool_id;
 } json_string_t;
 
 typedef json_string_t json_key_t;
@@ -301,7 +303,7 @@ static bool json_string_pool_resize(string_pool_t *pool, json_memory_arena_t *ar
     return true;
 }
 
-static const char *json_string_pool_get_or_add(string_pool_t *pool, const char *str, size_t len, json_memory_arena_t *arena) {
+static const char *json_string_pool_get_or_add(string_pool_t *pool, const char *str, size_t len, json_memory_arena_t *arena, uint32_t *out_id) {
     if (!pool->buckets) {
         return NULL;
     }
@@ -312,6 +314,7 @@ static const char *json_string_pool_get_or_add(string_pool_t *pool, const char *
     string_pool_entry_t *entry = pool->buckets[bucket_idx];
     while (entry) {
         if (entry->hash == hash && entry->len == len && memcmp(entry->str, str, len) == 0) {
+            *out_id = entry->id;
             return entry->str; // Found existing string
         }
         entry = entry->next;
@@ -330,10 +333,12 @@ static const char *json_string_pool_get_or_add(string_pool_t *pool, const char *
     new_entry->str = new_str;
     new_entry->len = len;
     new_entry->hash = hash;
+    new_entry->id = (uint32_t)pool->entry_count;
     new_entry->next = pool->buckets[bucket_idx];
     pool->buckets[bucket_idx] = new_entry;
 
     pool->entry_count++;
+    *out_id = new_entry->id;
 
     if (pool->entry_count > (pool->bucket_count * 3) / 4) {
         json_string_pool_resize(pool, arena);
@@ -725,6 +730,12 @@ const char *json_get_string(const json_value_t *value) {
     return json_string_get(&value->data.string);
 }
 
+size_t json_get_string_length(const json_value_t *value) {
+    if (!value || value->type != JSON_STRING)
+        return 0;
+    return value->data.string.length;
+}
+
 size_t json_get_array_size(const json_value_t *array) {
     return (array && array->type == JSON_ARRAY) ? array->data.array.count : 0;
 }
@@ -750,6 +761,27 @@ size_t json_get_object_size(const json_value_t *object) {
 
 const char *json_get_object_key(const json_value_t *object, size_t index) {
     return json_get_object_key_internal(object, index);
+}
+
+size_t json_get_object_key_length(const json_value_t *object, size_t index) {
+    if (!object || object->type != JSON_OBJECT || index >= object->data.object.count) {
+        return 0;
+    }
+    return object->data.object.keys[index].length;
+}
+
+uint32_t json_get_object_key_id(const json_value_t *object, size_t index) {
+    if (!object || object->type != JSON_OBJECT || index >= object->data.object.count) {
+        return 0;
+    }
+    return object->data.object.keys[index].pool_id;
+}
+
+size_t json_get_key_count(const json_value_t *value) {
+    if (!value || !value->arena) {
+        return 0;
+    }
+    return value->arena->string_pool.entry_count;
 }
 
 json_value_t *json_get_object_value(const json_value_t *object, size_t index) {
@@ -1400,9 +1432,10 @@ static json_error_t json_parse_object(json_parser_t *parser, json_value_t **out_
 
         const char *key;
         size_t key_len;
+        uint32_t key_id = 0;
         if (try_parse_simple_string(parser, &key, &key_len)) {
             const char *interned_key = json_string_pool_get_or_add(&parser->arena->string_pool,
-                                                                   key, key_len, parser->arena);
+                                                                   key, key_len, parser->arena, &key_id);
             if (!interned_key) {
                 parser->current_depth--;
                 return JSON_OUT_OF_MEMORY;
@@ -1446,6 +1479,7 @@ static json_error_t json_parse_object(json_parser_t *parser, json_value_t **out_
 
             json_string_t *str = &object->data.object.keys[object->data.object.count];
             str->length = key_len;
+            str->pool_id = key_id;
 
             if (key_len < SMALL_STRING_SIZE) {
                 str->is_small = true;
@@ -1465,7 +1499,7 @@ static json_error_t json_parse_object(json_parser_t *parser, json_value_t **out_
 
             const char *interned_key = json_string_pool_get_or_add(&parser->arena->string_pool,
                                                                    parser->temp_buffer, parser->temp_size,
-                                                                   parser->arena);
+                                                                   parser->arena, &key_id);
             if (!interned_key) {
                 parser->current_depth--;
                 return JSON_OUT_OF_MEMORY;
@@ -1508,6 +1542,7 @@ static json_error_t json_parse_object(json_parser_t *parser, json_value_t **out_
 
             json_string_t *str = &object->data.object.keys[object->data.object.count];
             str->length = parser->temp_size;
+            str->pool_id = key_id;
 
             if (parser->temp_size < SMALL_STRING_SIZE) {
                 str->is_small = true;

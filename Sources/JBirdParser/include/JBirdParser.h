@@ -133,6 +133,14 @@ double json_get_double(const json_value_t *value);
 const char *json_get_string(const json_value_t *value);
 
 /**
+ * @brief Get the length in bytes of a JSON string value
+ *
+ * @param value The JSON value (must be of type JSON_STRING)
+ * @return The number of UTF-8 bytes in the string, not including the terminator
+ */
+size_t json_get_string_length(const json_value_t *value);
+
+/**
  * @brief Get the size of a JSON array
  *
  * @param array The JSON value (must be of type JSON_ARRAY)
@@ -165,6 +173,35 @@ size_t json_get_object_size(const json_value_t *object);
  * @return The key string at the specified index
  */
 const char *json_get_object_key(const json_value_t *object, size_t index);
+
+/**
+ * @brief Get the length in bytes of the key at a specific index in a JSON object
+ *
+ * @param object The JSON value (must be of type JSON_OBJECT)
+ * @param index The index of the key
+ * @return The number of UTF-8 bytes in the key, not including the terminator
+ */
+size_t json_get_object_key_length(const json_value_t *object, size_t index);
+
+/**
+ * @brief Get the interned identifier of the key at a specific index in a JSON object
+ *
+ * Every distinct key string in a parsed document is assigned a dense identifier in the range
+ * `[0, json_get_key_count(root))`. Two keys with the same identifier are byte-for-byte equal.
+ *
+ * @param object The JSON value (must be of type JSON_OBJECT)
+ * @param index The index of the key
+ * @return The identifier of the key
+ */
+uint32_t json_get_object_key_id(const json_value_t *object, size_t index);
+
+/**
+ * @brief Get the number of distinct object keys in the parsed document
+ *
+ * @param value Any JSON value from the document
+ * @return The number of distinct keys, which bounds the identifiers returned by `json_get_object_key_id`
+ */
+size_t json_get_key_count(const json_value_t *value);
 
 /**
  * @brief Get the value at a specific index in a JSON object

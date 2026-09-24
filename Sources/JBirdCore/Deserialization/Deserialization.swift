@@ -501,58 +501,8 @@ extension JSON {
                 throw DeserializationError.unknown
             }
 
-            @inline(__always)
-            func materialize(
-                _ value: OpaquePointer,
-                _ options: DeserializationOptions
-            ) throws -> JSON {
-                let type = json_get_type(value)
-                switch type {
-                case JSON_NULL:
-                    return .null
-                case JSON_BOOLEAN:
-                    return .bool(json_get_boolean(value))
-                case JSON_NUMBER_INT:
-                    return .number(JSON.Number(json_get_int(value)))
-                case JSON_NUMBER_DOUBLE:
-                    return .number(JSON.Number(json_get_double(value)))
-                case JSON_STRING:
-                    let str = String(cString: json_get_string(value))
-                    return .string(str)
-                case JSON_ARRAY:
-                    let count = json_get_array_size(value)
-                    var array = Array()
-                    array.reserveCapacity(count)
-
-                    for i in 0..<count {
-                        let element = json_get_array_element(value, i).unsafelyUnwrapped
-                        let value = try materialize(element, options)
-                        if !options.contains(.omitNullValues) || !value.isNull {
-                            array.append(value)
-                        }
-                    }
-
-                    return .array(array)
-                case JSON_OBJECT:
-                    let count = json_get_object_size(value)
-                    var object = Object()
-                    object.reserveCapacity(count)
-
-                    for i in 0..<count {
-                        let key = String(cString: json_get_object_key(value, i))
-                        let objValue = json_get_object_value(value, i).unsafelyUnwrapped
-                        let value = try materialize(objValue, options)
-                        if (!options.contains(.omitNullKeys) && !options.contains(.omitNullValues)) || !value.isNull {
-                            object[key] = value
-                        }
-                    }
-                    return .object(object)
-                default:
-                    throw DeserializationError.unknown
-                }
-            }
-
-            let json = try materialize(jsonValue, options)
+            var materializer = Materializer(root: jsonValue, options: options)
+            let json = try materializer.materialize(jsonValue)
             if !options.contains(.fragmentsAllowed) {
                 switch json {
                 case .array, .object:
@@ -565,6 +515,174 @@ extension JSON {
                 throw DeserializationError.illegalFragment
             }
             return json
+        }
+
+    }
+
+    private struct Materializer {
+
+        init(
+            root: OpaquePointer,
+            options: DeserializationOptions
+        ) {
+            omitNullValues = options.contains(.omitNullValues)
+            omitNullObjectValues = omitNullValues || options.contains(.omitNullKeys)
+            keys = [String?](repeating: nil, count: Int(json_get_key_count(root)))
+        }
+
+        mutating func materialize(
+            _ value: OpaquePointer
+        ) throws -> JSON {
+            switch json_get_type(value) {
+            case JSON_NULL:
+                return .null
+            case JSON_BOOLEAN:
+                return .bool(json_get_boolean(value))
+            case JSON_NUMBER_INT:
+                return .number(JSON.Number(json_get_int(value)))
+            case JSON_NUMBER_DOUBLE:
+                return .number(JSON.Number(json_get_double(value)))
+            case JSON_STRING:
+                return .string(String(parserBytes: json_get_string(value).unsafelyUnwrapped, count: json_get_string_length(value)))
+            case JSON_ARRAY:
+                return try .array(materializeArray(value))
+            case JSON_OBJECT:
+                return try .object(materializeObject(value))
+            default:
+                throw DeserializationError.unknown
+            }
+        }
+
+        private final class Shape {
+
+            init(
+                ids: [UInt32],
+                template: Object,
+                indices: [Object.Index]
+            ) {
+                self.ids = ids
+                self.template = template
+                self.indices = indices
+            }
+
+            let ids: [UInt32]
+            let template: Object
+            let indices: [Object.Index]
+
+        }
+
+        private static let maxShapes = 256
+
+        private let omitNullValues: Bool
+        private let omitNullObjectValues: Bool
+        private var keys: [String?]
+        private var shapes: [UInt64: Shape] = [:]
+
+        private mutating func materializeArray(
+            _ value: OpaquePointer
+        ) throws -> Array {
+            let count = json_get_array_size(value)
+            var array = Array()
+            array.reserveCapacity(count)
+            for index in 0..<count {
+                let element = try materialize(json_get_array_element(value, index).unsafelyUnwrapped)
+                if omitNullValues, element.isNull {
+                    continue
+                }
+                array.append(element)
+            }
+            return array
+        }
+
+        private mutating func materializeObject(
+            _ value: OpaquePointer
+        ) throws -> Object {
+            let count = json_get_object_size(value)
+            let canUseShape = count >= 2 && !omitNullObjectValues
+            let signature = canUseShape ? shapeSignature(value, count) : 0
+
+            if canUseShape, let shape = shape(matching: signature, value, count) {
+                var object = shape.template
+                for index in 0..<count {
+                    let element = try materialize(json_get_object_value(value, index).unsafelyUnwrapped)
+                    object.values[shape.indices[index]] = element
+                }
+                return object
+            }
+
+            var object = Object()
+            object.reserveCapacity(count)
+            for index in 0..<count {
+                let element = try materialize(json_get_object_value(value, index).unsafelyUnwrapped)
+                if omitNullObjectValues, element.isNull {
+                    continue
+                }
+                object[key(of: value, at: index)] = element
+            }
+
+            if canUseShape, object.count == count, shapes.count < Self.maxShapes {
+                cacheShape(signature, value, count, object)
+            }
+            return object
+        }
+
+        private func shapeSignature(
+            _ value: OpaquePointer,
+            _ count: Int
+        ) -> UInt64 {
+            var hash = UInt64(count) &* 0x9E37_79B9_7F4A_7C15
+            for index in 0..<count {
+                hash = (hash ^ UInt64(json_get_object_key_id(value, index))) &* 0x100_0000_01B3
+            }
+            return hash
+        }
+
+        private func shape(
+            matching signature: UInt64,
+            _ value: OpaquePointer,
+            _ count: Int
+        ) -> Shape? {
+            guard let shape = shapes[signature], shape.ids.count == count else {
+                return nil
+            }
+            for index in 0..<count where shape.ids[index] != json_get_object_key_id(value, index) {
+                return nil
+            }
+            return shape
+        }
+
+        private mutating func cacheShape(
+            _ signature: UInt64,
+            _ value: OpaquePointer,
+            _ count: Int,
+            _ object: Object
+        ) {
+            var ids = [UInt32]()
+            ids.reserveCapacity(count)
+            var template = object
+            for index in template.indices {
+                template.values[index] = .null
+            }
+            var indices = [Object.Index]()
+            indices.reserveCapacity(count)
+            for index in 0..<count {
+                ids.append(json_get_object_key_id(value, index))
+                indices.append(template.index(forKey: key(of: value, at: index)).unsafelyUnwrapped)
+            }
+            shapes[signature] = Shape(ids: ids, template: template, indices: indices)
+        }
+
+        private mutating func key(
+            of object: OpaquePointer,
+            at index: Int
+        ) -> String {
+            let id = Int(json_get_object_key_id(object, index))
+            if let key = keys[id] {
+                return key
+            }
+            let key = String(parserBytes: json_get_object_key(object, index).unsafelyUnwrapped, count: json_get_object_key_length(object, index))
+            keys[id] = key
+            return key
         }
 
     }
@@ -621,7 +739,7 @@ extension JSON {
                     case JSON_NUMBER_DOUBLE:
                         return .number(JSON.Number(json_get_double(value)))
                     case JSON_STRING:
-                        let str = String(cString: json_get_string(value))
+                        let str = String(parserBytes: json_get_string(value).unsafelyUnwrapped, count: json_get_string_length(value))
                         return .string(str)
                     case JSON_ARRAY:
                         let count = json_get_array_size(value)
@@ -643,7 +761,7 @@ extension JSON {
                         object.reserveCapacity(count)
 
                         for i in 0..<count {
-                            let key = String(cString: json_get_object_key(value, i))
+                            let key = String(parserBytes: json_get_object_key(value, i).unsafelyUnwrapped, count: json_get_object_key_length(value, i))
                             let objValue = json_get_object_value(value, i).unsafelyUnwrapped
                             let value = try await materialize(objValue, options)
                             if (!options.contains(.omitNullKeys) && !options.contains(.omitNullValues)) || !value.isNull {
@@ -721,7 +839,7 @@ extension JSON {
                     case JSON_NUMBER_DOUBLE:
                         return .number(JSON.Number(json_get_double(value)))
                     case JSON_STRING:
-                        let str = String(cString: json_get_string(value))
+                        let str = String(parserBytes: json_get_string(value).unsafelyUnwrapped, count: json_get_string_length(value))
                         return .string(str)
                     case JSON_ARRAY:
                         let count = json_get_array_size(value)
@@ -743,7 +861,7 @@ extension JSON {
                         object.reserveCapacity(count)
 
                         for i in 0..<count {
-                            let key = String(cString: json_get_object_key(value, i))
+                            let key = String(parserBytes: json_get_object_key(value, i).unsafelyUnwrapped, count: json_get_object_key_length(value, i))
                             let objValue = json_get_object_value(value, i).unsafelyUnwrapped
                             let value = try await materialize(objValue, options)
                             if (!options.contains(.omitNullKeys) && !options.contains(.omitNullValues)) || !value.isNull {
@@ -811,6 +929,28 @@ extension JSON {
         let physicalMemory = Double(ProcessInfo.processInfo.physicalMemory)
         let cap = size_t(physicalMemory * 0.01)
         return min(max(cap, 1 * 1024 * 1024), 50 * 1024 * 1024)
+    }
+
+}
+
+extension String {
+
+    @inline(__always)
+    fileprivate init(
+        parserBytes bytes: UnsafePointer<CChar>,
+        count: Int
+    ) {
+        guard count > 0 else {
+            self = ""
+            return
+        }
+        self = String(unsafeUninitializedCapacity: count) { buffer in
+            UnsafeMutableRawPointer(buffer.baseAddress.unsafelyUnwrapped).copyMemory(
+                from: bytes,
+                byteCount: count
+            )
+            return count
+        }
     }
 
 }
