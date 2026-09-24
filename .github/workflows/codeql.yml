@@ -95,8 +95,14 @@ jobs:
     - if: matrix.build-mode == 'manual' && matrix.language == 'swift'
       name: Build JBird
       shell: bash
+      # `--disable-sandbox` is a workaround: on macOS 27 GA, /usr/bin/sandbox-exec is
+      # arm64e-only and the CodeQL build tracer cannot re-spawn it, so SwiftPM's
+      # sandboxed manifest evaluation fails with "Bad CPU type in executable (86)".
+      # This workflow only runs on pushes to main and on a schedule, never on fork
+      # pull requests, so the sandbox is not load-bearing here. Remove once CodeQL
+      # can trace sandboxed SwiftPM builds on macOS 27.
       run: |
-        /usr/bin/swift build -v --package-path /Users/runner/work/JBird/JBird/
+        /usr/bin/swift build -v --disable-sandbox --package-path /Users/runner/work/JBird/JBird/
     - if: matrix.build-mode == 'manual' && matrix.language == 'c-cpp'
       name: Build JBirdParser
       shell: bash
