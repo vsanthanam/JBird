@@ -474,9 +474,44 @@ static const char *json_string_get(const json_string_t *str) {
     return str->is_small ? str->data.buf : str->data.ptr;
 }
 
+#if defined(JBird_USE_SSE2)
+static inline size_t json_skip_plain_string_bytes(const uint8_t *input, size_t index, size_t length) {
+    const __m128i quote = _mm_set1_epi8('"');
+    const __m128i backslash = _mm_set1_epi8('\\');
+    const __m128i space = _mm_set1_epi8(0x20);
+    while (index + 16 <= length) {
+        __m128i chunk = _mm_loadu_si128((const __m128i *)(input + index));
+        __m128i hit = _mm_or_si128(_mm_or_si128(_mm_cmpeq_epi8(chunk, quote), _mm_cmpeq_epi8(chunk, backslash)),
+                                   _mm_cmplt_epi8(_mm_xor_si128(chunk, _mm_set1_epi8((char)0x80)),
+                                                  _mm_xor_si128(space, _mm_set1_epi8((char)0x80))));
+        if (_mm_movemask_epi8(hit) != 0)
+            break;
+        index += 16;
+    }
+    return index;
+}
+#elif defined(JBird_USE_NEON)
+static inline size_t json_skip_plain_string_bytes(const uint8_t *input, size_t index, size_t length) {
+    const uint8x16_t quote = vdupq_n_u8('"');
+    const uint8x16_t backslash = vdupq_n_u8('\\');
+    const uint8x16_t space = vdupq_n_u8(0x20);
+    while (index + 16 <= length) {
+        uint8x16_t chunk = vld1q_u8(input + index);
+        uint8x16_t hit = vorrq_u8(vorrq_u8(vceqq_u8(chunk, quote), vceqq_u8(chunk, backslash)), vcltq_u8(chunk, space));
+        if (vmaxvq_u8(hit) != 0)
+            break;
+        index += 16;
+    }
+    return index;
+}
+#endif
+
 static bool json_scan_simple_string(json_parser_t *parser, const char **str_start, size_t *str_len) {
     size_t start_index = parser->index;
     size_t length = 0;
+
+    parser->index = json_skip_plain_string_bytes(parser->input, parser->index, parser->length);
+    length = parser->index - start_index;
 
     while (parser->index < parser->length) {
         uint8_t c = parser->input[parser->index];
@@ -1698,7 +1733,7 @@ static bool try_parse_simple_string(json_parser_t *parser, const char **out_str,
         return false;
     start_idx++;
 
-    size_t curr_idx = start_idx;
+    size_t curr_idx = json_skip_plain_string_bytes(input, start_idx, length);
     while (curr_idx < length) {
         uint8_t c = input[curr_idx];
 
