@@ -1,19 +1,37 @@
 #!/bin/bash
+set -e
 
-rm Package.resolved
-swift package reset
+# Usage: ./compare [release|remote]
+#
+#   release  Compare the local checkout against the release pinned in Package.swift
+#   remote   Compare the local checkout against the latest commit on main (default)
+
+reference="${1:-remote}"
+
+case "$reference" in
+  release|remote) ;;
+  *)
+    echo "Usage: $0 [release|remote]" >&2
+    exit 1
+    ;;
+esac
 
 export BENCHMARK_TARGET=jbird
 
-export JBIRD_SOURCE=release
+rm -f Package.resolved
+swift package reset
 
-swift package --allow-writing-to-package-directory benchmark baseline update release
+export JBIRD_SOURCE="$reference"
 
-rm Package.resolved
+swift package --allow-writing-to-package-directory benchmark baseline update "$reference"
+
+rm -f Package.resolved
 swift package reset
 
 export JBIRD_SOURCE=local
 
-swift package --allow-writing-to-package-directory benchmark baseline update main
+swift package --allow-writing-to-package-directory benchmark baseline update local
 
-swift package benchmark baseline compare release main > results.txt
+swift package benchmark baseline compare "$reference" local > results.txt
+
+echo "Wrote results.txt comparing '$reference' against the local checkout"
