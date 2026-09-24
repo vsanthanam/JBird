@@ -8,35 +8,35 @@ JBird provides a modern, Swift-first approach to JSON processing that eliminates
 
 The library is designed around the central `JSON` enum which safely represents all JSON value types: objects, arrays, strings, numbers, booleans, and null. This approach provides compile-time safety while maintaining runtime performance, making JSON manipulation both safer and more ergonomic.
 
-### Features
+## Features
 
 JBird has a number of features that you might want to exclude from your project. You can include them all in your project by importing the `JBird` module, or you can import individual features such as `JBirdCore` or `JBirdBuilders` individually if you are environment with binary size or build time constraints. See <doc:Setup> for more information on how to setup JBird in your Swift projects.
 
-#### Type safe JSON in Swift
+### Type safe JSON in Swift
 
 JBird's ``/JBirdCore/JSON`` enum eliminates unsafe type casting by representing each JSON value type explicitly. The enum conforms to Swift's `ExpressibleBy*Literal` protocols, allowing natural JSON construction using Swift's literal syntax. Each JSON value type is statically known, preventing runtime type errors and providing compile-time safety.
 
 For more information, see the ``/JBirdCore`` API reference, and the ``/JBirdCore/JSON`` symbol reference.
 
-##### Declarative JSON composition with result builders
+#### Declarative JSON composition with result builders
 
 Create JSON structures using Swift's result builder syntax with `JSON.Builder`. Build arrays and objects declaratively without manual dictionary or array construction. The `=>` operator provides clean key-value pair syntax for objects, while array builders support mixed-type elements naturally.
 
 For more information, see the ``/JBirdBuilders`` API reference.
 
-#### Convert between typed JSON values and other Swift types
+### Convert between typed JSON values and other Swift types
 
 JBird provides seamless conversion between `JSON` values and native Swift types through the `JSONRepresentable` protocol system. Built-in conformances cover all standard Swift types, while custom types can easily adopt the protocols for automatic conversion.
 
 For more information, see <doc:/JBirdCore/Conversion>
 
-##### Using macros to easily implement `JSONRepresentable` conformance
+#### Using macros to easily implement `JSONRepresentable` conformance
 
 The `@JSONRepresentable` macro automatically generates encoding and decoding implementations for Swift types. Use `@JSONKey` to customize property names, `@OmitIfNil` to exclude nil values during encoding, and support for snake_case conversion. The macro system eliminates boilerplate while providing full control over the JSON representation.
 
 For more information, see the ``/JBirdMacros`` API reference.
 
-#### Use JBird to encode and decode `Codable` types with blazing performance
+### Use JBird to encode and decode `Codable` types with blazing performance
 
 JBird includes drop-in replacements for Foundation's `JSONEncoder` and `JSONDecoder`. These implementations can be used with any `Codable`-conforming Swift type, but benefit from JBird's superior performance.
 

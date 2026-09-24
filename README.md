@@ -12,24 +12,29 @@ A blazing fast, type-safe library for working with JSON in Swift
 
 ## Why JBird?
 
-Working with JSON in Swift usually means choosing between two extremes. Foundation's `JSONSerialization` hands you `Any` and forces you to cast and unwrap at every step. `Codable` is type-safe but rigid: it expects your Swift types to mirror the payload exactly, and reaching into a single field of an arbitrary document is awkward.
+Between the Standard Library and Foundation, Swift developers have two standard methods to read JSON, neither of which are ideal:
 
-JBird closes that gap. It models JSON as a first-class Swift value you can read, traverse, and mutate directly — without ever losing type safety — and pairs that model with a fast, C-backed parsing core. And when you *do* want to work with concrete Swift types, JBird converts cleanly to and from them, including a drop-in `Codable` encoder and decoder.
+- `JSONSerialization` returns values of type `Any`. You must cast and unwrap each value before it can be used.
+- `Codable` is type-safe. But your Swift types must have the same structure as the JSON document. It is difficult to read one field from a document that has no matching Swift type.
+
+JBird a complete, standardized way to work with JSON documents in Swift that solves both of these issues, and then some. It stores a JSON document as a Swift value of type `JSON`. You can read, move through, and change this value directly. The compiler checks the types at each step. A parser written in C reads the document into this value.
+
+JBird can also convert a `JSON` value to and from your own Swift types. This includes an encoder and a decoder that you can use in place of `JSONEncoder` and `JSONDecoder`.
 
 ```swift
-// Foundation: cast and unwrap at every level
+// Foundation: cast and unwrap at each level
 if let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
    let user = root["user"] as? [String: Any],
    let name = user["name"] as? String {
     // ...finally usable
 }
 
-// JBird: type-safe traversal in a single expression
+// JBird: read the value in one expression
 let json = try JSON(data)
 let name: String = try json["user"]["name"]
 ```
 
-For more background, see [the documentation](https://www.usejbird.com/docs/documentation/jbird/whyjbird).
+For more information, see [the documentation](https://www.usejbird.com/docs/documentation/jbird/whyjbird).
 
 ## Features
 
@@ -104,14 +109,14 @@ JBird defines a small protocol family for bridging typed `JSON` and other Swift 
 - `JSONInitializable` — a type can be built from a `JSON` value (`init(json:) throws`)
 - `JSONRepresentable` — both of the above
 
-Many standard library types already conform.
+Many standard library types already implement conformance for you out of the box.
 
 ```swift
 let json = JSON(["a": 1, "b": 2])        // from a Swift dictionary
 let dict = try json.convert(into: [String: Int].self)
 ```
 
-For your own types, the `@JSONRepresentable` macro generates both conformances.
+For your own types, the `@JSONRepresentable` macro can leverage the compiler to automatically implement conformance in many / most cases
 
 ```swift
 @JSONRepresentable
