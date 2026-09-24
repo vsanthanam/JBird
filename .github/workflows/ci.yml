@@ -282,6 +282,10 @@ jobs:
             toolchain: "6.3.3"
           - swift: "6.4"
             toolchain: "6.4.0"
+            # The 6.4 build engine touches resource bundles while their contents are still being
+            # written. Compiling swift-syntax from source instead of using the prebuilt keeps the
+            # two tasks apart. See https://github.com/vsanthanam/JBird/issues/436.
+            extra-flags: "--disable-experimental-prebuilts"
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -292,7 +296,7 @@ jobs:
           swift-version: swift-${{ matrix.toolchain }}-release
           swift-build: ${{ matrix.toolchain }}-RELEASE
       - name: Build JBird
-        run: swift build -v --build-tests --disable-xctest --build-path .build -c debug -Xlinker /INCREMENTAL:NO
+        run: swift build -v --build-tests --disable-xctest --build-path .build -c debug -Xlinker /INCREMENTAL:NO ${{ matrix.extra-flags }}
       - name: Compress Build
         shell: pwsh
         run: |
