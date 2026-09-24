@@ -504,6 +504,12 @@ static inline size_t json_skip_plain_string_bytes(const uint8_t *input, size_t i
     }
     return index;
 }
+#else
+static inline size_t json_skip_plain_string_bytes(const uint8_t *input, size_t index, size_t length) {
+    (void)input;
+    (void)length;
+    return index;
+}
 #endif
 
 static bool json_scan_simple_string(json_parser_t *parser, const char **str_start, size_t *str_len) {
