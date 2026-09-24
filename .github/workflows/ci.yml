@@ -282,6 +282,10 @@ jobs:
             toolchain: "6.3.3"
           - swift: "6.4"
             toolchain: "6.4.0"
+            # The 6.4 build engine touches resource bundles while their contents are still being
+            # written. Compiling swift-syntax from source instead of using the prebuilt keeps the
+            # two tasks apart. See https://github.com/vsanthanam/JBird/issues/436.
+            extra-flags: "--disable-experimental-prebuilts"
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -292,7 +296,7 @@ jobs:
           swift-version: swift-${{ matrix.toolchain }}-release
           swift-build: ${{ matrix.toolchain }}-RELEASE
       - name: Build JBird
-        run: swift build -v --build-tests --disable-xctest --build-path .build -c debug -Xlinker /INCREMENTAL:NO
+        run: swift build -v --build-tests --disable-xctest --build-path .build -c debug -Xlinker /INCREMENTAL:NO ${{ matrix.extra-flags }}
       - name: Compress Build
         shell: pwsh
         run: |
@@ -347,61 +351,32 @@ jobs:
         include:
           - swift: "6.2"
             toolchain: "6.2.3"
+            sdk: "swift-6.2.3-RELEASE_wasm"
+            url: "https://download.swift.org/swift-6.2.3-release/wasm-sdk/swift-6.2.3-RELEASE/swift-6.2.3-RELEASE_wasm.artifactbundle.tar.gz"
+            checksum: "394040ecd5260e68bb02f6c20aeede733b9b90702c2204e178f3e42413edad2a"
           - swift: "6.3"
             toolchain: "6.3.3"
+            sdk: "swift-6.3.3-RELEASE_wasm"
+            url: "https://download.swift.org/swift-6.3.3-release/wasm-sdk/swift-6.3.3-RELEASE/swift-6.3.3-RELEASE_wasm.artifactbundle.tar.gz"
+            checksum: "cabfa08b73bb8ac783927ecd15fa386e99d0c139c5f232445067bcf58379cae7"
           - swift: "6.4"
             toolchain: "6.4.0"
+            sdk: "swift-6.4.0-RELEASE_wasm"
+            url: "https://download.swift.org/swift-6.4.0-release/wasm-sdk/swift-6.4.0-RELEASE/swift-6.4.0-RELEASE_wasm.artifactbundle.tar.gz"
+            checksum: "f07b7be3c586d92d7a07051fc6d303b87ebea67eadc40640ba59d5a8b79aa86d"
     runs-on: ubuntu-latest
     container:
       image: swift:${{ matrix.toolchain }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-
-      - if: ${{ matrix.swift == '6.4' }}
-        name: Setup Swift WASM (6.4)
+      - name: Setup Swift WASM (${{ matrix.swift }})
         run: |
-          swift sdk install https://download.swift.org/swift-6.4.0-release/wasm-sdk/swift-6.4.0-RELEASE/swift-6.4.0-RELEASE_wasm.artifactbundle.tar.gz \
-            --checksum f07b7be3c586d92d7a07051fc6d303b87ebea67eadc40640ba59d5a8b79aa86d
+          swift sdk install ${{ matrix.url }} \
+            --checksum ${{ matrix.checksum }}
           swift sdk list
-
-      - if: ${{ matrix.swift == '6.3' }}
-        name: Setup Swift WASM (6.3)
-        run: |
-          swift sdk install https://download.swift.org/swift-6.3.3-release/wasm-sdk/swift-6.3.3-RELEASE/swift-6.3.3-RELEASE_wasm.artifactbundle.tar.gz \
-            --checksum cabfa08b73bb8ac783927ecd15fa386e99d0c139c5f232445067bcf58379cae7
-          swift sdk list
-
-      - if: ${{ matrix.swift == '6.2' }}
-        name: Setup Swift WASM (6.2)
-        run: |
-          swift sdk install https://download.swift.org/swift-6.2.3-release/wasm-sdk/swift-6.2.3-RELEASE/swift-6.2.3-RELEASE_wasm.artifactbundle.tar.gz \
-            --checksum 394040ecd5260e68bb02f6c20aeede733b9b90702c2204e178f3e42413edad2a
-          swift sdk list
-
-      - if: ${{ matrix.swift == '6.1' }}
-        name: Setup Swift WASM
-        id: swiftwasm
-        uses: swiftwasm/setup-swiftwasm@v2
-        with:
-          tag: swift-${{ matrix.swift }}-RELEASE
-
-      - if: ${{ matrix.swift == '6.4' }}
-        name: Build JBird (6.4)
-        run: swift build -v --swift-sdk swift-6.4.0-RELEASE_wasm --build-path .build
-
-      - if: ${{ matrix.swift == '6.3' }}
-        name: Build JBird (6.3)
-        run: swift build -v --swift-sdk swift-6.3.3-RELEASE_wasm --build-path .build
-
-      - if: ${{ matrix.swift == '6.2' }}
-        name: Build JBird (6.2)
-        run: swift build -v --swift-sdk swift-6.2.3-RELEASE_wasm --build-path .build
-
-      - if: ${{ matrix.swift == '6.1' }}
-        name: Build JBird
-        run: swift build -v --swift-sdk ${{ steps.swiftwasm.outputs.swift-sdk-id }} --build-path .build
-
+      - name: Build JBird (${{ matrix.swift }})
+        run: swift build -v --swift-sdk ${{ matrix.sdk }} --build-path .build
       - name: Install `zip`
         run: apt-get update && apt-get install -y zip
       - name: Compress Build
