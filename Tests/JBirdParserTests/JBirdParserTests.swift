@@ -1947,4 +1947,99 @@ struct JBirdParserTests {
         #expect(json_get_key_count(value) == 0)
         #expect(json_get_key_count(nil) == 0)
     }
+
+    @Test("Closing quote at every lane position")
+    func closingQuoteAtEveryLanePosition() throws {
+        for length in 0 ..< 40 {
+            let content = String(repeating: "a", count: length)
+            for raw in [#"["\#(content)","padding-padding-padding"]"#, #"["\#(content)"]"#] {
+                let (result, value) = try parse(raw)
+                defer { json_free(value) }
+                #expect(result == JSON_NO_ERROR, "length \(length)")
+                let element = try #require(json_get_array_element(value, 0))
+                #expect(json_get_string_length(element) == length, "length \(length)")
+                #expect(try String(cString: #require(json_get_string(element))) == content, "length \(length)")
+            }
+        }
+    }
+
+    @Test("Escape at every lane position")
+    func escapeAtEveryLanePosition() throws {
+        for length in 0 ..< 40 {
+            let prefix = String(repeating: "a", count: length)
+            let raw = #"["\#(prefix)\n\#(prefix)","padding-padding-padding"]"#
+            let (result, value) = try parse(raw)
+            defer { json_free(value) }
+            #expect(result == JSON_NO_ERROR, "length \(length)")
+            let element = try #require(json_get_array_element(value, 0))
+            #expect(try String(cString: #require(json_get_string(element))) == prefix + "\n" + prefix, "length \(length)")
+        }
+    }
+
+    @Test("Control byte at every lane position")
+    func controlByteAtEveryLanePosition() {
+        for length in 0 ..< 40 {
+            var bytes = Array(#"[""#.utf8)
+            bytes.append(contentsOf: repeatElement(UInt8(ascii: "a"), count: length))
+            bytes.append(0x01)
+            bytes.append(contentsOf: Array(#"","padding-padding-padding"]"#.utf8))
+            var value: OpaquePointer?
+            let result = bytes.withUnsafeBufferPointer { buffer in
+                json_parse(buffer.baseAddress, buffer.count, &value, true, false, false, 0)
+            }
+            defer { json_free(value) }
+            #expect(result == JSON_INVALID_STRING, "length \(length)")
+        }
+    }
+
+    @Test("Non-ASCII bytes are not treated as control bytes")
+    func nonASCIIBytesAtEveryLanePosition() throws {
+        for length in 0 ..< 40 {
+            let content = String(repeating: "a", count: length) + "é🙂" + String(repeating: "b", count: length)
+            let raw = #"["\#(content)","padding-padding-padding"]"#
+            let (result, value) = try parse(raw)
+            defer { json_free(value) }
+            #expect(result == JSON_NO_ERROR, "length \(length)")
+            let element = try #require(json_get_array_element(value, 0))
+            #expect(try String(cString: #require(json_get_string(element))) == content, "length \(length)")
+        }
+    }
+
+    @Test("Object key terminator at every lane position")
+    func objectKeyAtEveryLanePosition() throws {
+        for length in 0 ..< 40 {
+            let key = String(repeating: "k", count: length)
+            for raw in [#"{"\#(key)":1,"padding-padding-padding":2}"#, #"{"\#(key)":1}"#] {
+                let (result, value) = try parse(raw)
+                defer { json_free(value) }
+                #expect(result == JSON_NO_ERROR, "length \(length)")
+                #expect(json_get_object_key_length(value, 0) == length, "length \(length)")
+                #expect(try String(cString: #require(json_get_object_key(value, 0))) == key, "length \(length)")
+            }
+            let escaped = #"{"\#(key)\t\#(key)":1,"padding-padding-padding":2}"#
+            let (result, value) = try parse(escaped)
+            defer { json_free(value) }
+            #expect(result == JSON_NO_ERROR, "length \(length)")
+            #expect(try String(cString: #require(json_get_object_key(value, 0))) == key + "\t" + key, "length \(length)")
+        }
+    }
+
+    @Test("Unterminated string longer than one chunk")
+    func unterminatedLongString() throws {
+        let (result, value) = try parse(#"[""# + String(repeating: "a", count: 50))
+        defer { json_free(value) }
+        #expect(result == JSON_UNEXPECTED_END_OF_INPUT)
+    }
+
+    private func parse(
+        _ raw: String
+    ) throws -> (json_error_t, OpaquePointer?) {
+        let jsonData = try #require(raw.data(using: .utf8))
+        var value: OpaquePointer?
+        let result = jsonData.withUnsafeBytes { bytes in
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+        }
+        return (result, value)
+    }
+
 }

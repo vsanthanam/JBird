@@ -231,16 +231,17 @@ For additional installation instructions, see [the documentation](https://www.us
 
 ## Performance
 
-JBird is designed with performance and memory efficiency in mind, with benchmarks showing it to be one of the fastest JSON parsers available for Swift. The core parsing engine is written in C and is heavily optimized, making it significantly faster than pure Swift alternatives.
+JBird is designed with performance and memory efficiency in mind, with benchmarks showing it to be one of the fastest JSON parsers available for Swift. The core parsing engine is written in C, uses SIMD to scan string content, and is heavily optimized, making it significantly faster than pure Swift alternatives.
 
-JBird demonstrates exceptional performance compared to other popular JSON parsing libraries:
+On realistic JSON documents ranging from 64KB to 5MB, in both minified and pretty-printed formats, JBird compares favorably to other popular Swift JSON parsing libraries:
 
-- **Speed**: JBird parses JSON 2-5x faster than SwiftyJSON and about 25% faster than Foundation
-- **Memory Efficiency**: JBird uses significantly less memory than other parsers (up to a 95% reduction)
-- **Resource Usage**: JBird requires dramatically fewer CPU instructions and memory allocations for equivelent payloads
-- **Consistent Performance**: JBird maintains its performance advantage across different JSON file sizes and formats
+- **Speed**: JBird parses about 2x faster than Foundation's `JSONSerialization`, about 2x faster than Freddy, and 7-8x faster than SwiftyJSON
+- **CPU Work**: JBird executes roughly half the CPU instructions of Foundation and Freddy, and about one eighth the instructions of SwiftyJSON, for equivalent payloads
+- **Memory Efficiency**: JBird's peak memory use is 85-90% lower than Foundation's and 60-70% lower than SwiftyJSON's, and on par with Freddy's
+- **Allocations**: JBird performs about 30% fewer heap allocations than Foundation and about 50% fewer than SwiftyJSON
+- **Consistent Performance**: JBird's advantage holds steady across file sizes and formats, and grows on string-heavy inputs, where it is 8-11x faster than every library measured
 
-These benchmarks were run on a variety of JSON files ranging from 64KB to 5MB, in both minified and pretty-printed formats. You can explore the comparisons with common Swift JSON libraries (Foundation, SwiftyJSON, etc.) in the `/Benchmarks` directory.
+You can explore the full comparisons with Foundation, Freddy, and SwiftyJSON, including percentile breakdowns for wall clock time, throughput, instructions, memory, and allocations, in the `/Benchmarks` directory.
 
 ## Usage & Documentation
 
