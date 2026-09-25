@@ -231,7 +231,7 @@ For additional installation instructions, see [the documentation](https://www.us
 
 ## Performance
 
-JBird is designed with performance and memory efficiency in mind, with benchmarks showing it to be one of the fastest JSON parsers available for Swift. The core parsing engine is written in C, uses SIMD to scan string content, and is heavily optimized, making it significantly faster than pure Swift alternatives.
+JBird is designed with performance and memory efficiency in mind, with benchmarks showing it to be one of the fastest JSON parsers available for Swift. The core parsing engine is written in C, and is heavily optimized, making it significantly faster than pure Swift alternatives.
 
 On realistic JSON documents ranging from 64KB to 5MB, in both minified and pretty-printed formats, JBird compares favorably to other popular Swift JSON parsing libraries:
 
