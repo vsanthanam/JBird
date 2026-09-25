@@ -353,6 +353,10 @@ jobs:
             sdk: "swift-6.4.0-RELEASE_wasm"
             url: "https://download.swift.org/swift-6.4.0-release/wasm-sdk/swift-6.4.0-RELEASE/swift-6.4.0-RELEASE_wasm.artifactbundle.tar.gz"
             checksum: "f07b7be3c586d92d7a07051fc6d303b87ebea67eadc40640ba59d5a8b79aa86d"
+            # Test binaries are only built (and run, see test-wasm-spm) on 6.4. The prebuilt
+            # swift-syntax archive is a host (macOS/Linux) library, and SwiftPM substitutes it into
+            # the wasm test-runner link, so swift-syntax is compiled from source for wasm instead.
+            extra-flags: "--build-tests --disable-experimental-prebuilts"
     runs-on: ubuntu-latest
     container:
       image: swift:${{ matrix.toolchain }}
@@ -365,7 +369,7 @@ jobs:
             --checksum ${{ matrix.checksum }}
           swift sdk list
       - name: Build JBird (${{ matrix.swift }})
-        run: swift build -v --swift-sdk ${{ matrix.sdk }} --build-path .build
+        run: swift build -v --swift-sdk ${{ matrix.sdk }} --build-path .build ${{ matrix.extra-flags }}
       - name: Install `zip`
         run: apt-get update && apt-get install -y zip
       - name: Compress Build
@@ -375,6 +379,43 @@ jobs:
         with:
           name: wasm-build-${{ matrix.swift }}
           path: build.zip
+
+  test-wasm-spm:
+    name: Test JBird (WebAssembly)
+    strategy:
+      fail-fast: false
+      matrix:
+        swift: ["6.4"]
+        include:
+          - swift: "6.4"
+            toolchain: "6.4.0"
+            sdk: "swift-6.4.0-RELEASE_wasm"
+            url: "https://download.swift.org/swift-6.4.0-release/wasm-sdk/swift-6.4.0-RELEASE/swift-6.4.0-RELEASE_wasm.artifactbundle.tar.gz"
+            checksum: "f07b7be3c586d92d7a07051fc6d303b87ebea67eadc40640ba59d5a8b79aa86d"
+    needs: build-wasm-spm
+    runs-on: ubuntu-latest
+    container:
+      image: swift:${{ matrix.toolchain }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup Swift WASM (${{ matrix.swift }})
+        run: |
+          swift sdk install ${{ matrix.url }} \
+            --checksum ${{ matrix.checksum }}
+          swift sdk list
+      - name: Download Build
+        uses: actions/download-artifact@v8
+        with:
+          name: wasm-build-${{ matrix.swift }}
+          path: .
+      - name: Install `unzip`
+        run: apt-get update && apt-get install -y unzip
+      - name: Decompress Build
+        run: unzip build.zip
+      - name: Test JBird (${{ matrix.swift }})
+        # The toolchain ships WasmKit, which SwiftPM uses to execute the wasm test binaries.
+        run: swift test --swift-sdk ${{ matrix.sdk }} --build-path .build --skip-build --disable-experimental-prebuilts
 
   build-android-spm:
     name: Build JBird (Android)
@@ -536,6 +577,7 @@ jobs:
       - build-windows-spm
       - test-windows-spm
       - build-wasm-spm
+      - test-wasm-spm
       - build-android-spm
       - build-xcframework
       - lint
@@ -558,6 +600,7 @@ jobs:
             [[ "${{ needs.build-windows-spm.result }}" == "failure" ]] || \
             [[ "${{ needs.test-windows-spm.result }}" == "failure" ]] || \
             [[ "${{ needs.build-wasm-spm.result }}" == "failure" ]] || \
+            [[ "${{ needs.test-wasm-spm.result }}" == "failure" ]] || \
             [[ "${{ needs.build-android-spm.result }}" == "failure" ]] || \
             [[ "${{ needs.build-xcframework.result }}" == "failure" ]] || \
             [[ "${{ needs.lint.result }}" == "failure" ]] || \

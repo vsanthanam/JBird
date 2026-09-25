@@ -145,11 +145,14 @@ struct ObjectEncoderTests {
         #expect(decoded == value)
     }
 
-    @Test("Requesting an unkeyed container after a keyed one traps")
-    func mismatchedContainerKindsTrap() async {
-        await #expect(processExitsWith: .failure) {
-            _ = try JSON.Encoder().encode(MismatchedContainers())
+    // Exit tests are unavailable on WebAssembly, so trap tests are skipped there.
+    #if !os(WASI)
+        @Test("Requesting an unkeyed container after a keyed one traps")
+        func mismatchedContainerKindsTrap() async {
+            await #expect(processExitsWith: .failure) {
+                _ = try JSON.Encoder().encode(MismatchedContainers())
+            }
         }
-    }
+    #endif
 
 }

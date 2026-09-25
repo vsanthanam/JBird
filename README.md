@@ -217,13 +217,13 @@ JBird supports the full range of Apple platforms when working with Xcode, whethe
 
 JBird has been tested to work with the following platforms and Swift toolchains:
 
-| Platform | Swift Versions | Status |
-|----------|----------------|--------|
-| macOS | 6.2, 6.3, and 6.4 | ✅ Supported & Tested |
-| Linux (Ubuntu) | 6.2, 6.3, and 6.4 | ✅ Supported & Tested |
-| Windows | 6.2, 6.3, and 6.4 | ✅ Supported & Tested |
-| WebAssembly | 6.2, 6.3, and 6.4 | ⚠️ Supported (No Tests) |
-| Android | 6.2, 6.3, and 6.4 | ⚠️ Supported (No Tests) |
+| Platform | Swift 6.2 | Swift 6.3 |  Swift 6.4 |
+|----------|----------------|--------| --- |
+| macOS | ✅ Supported & Tested | ✅ Supported & Tested |✅ Supported & Tested  |
+| Linux (Ubuntu) | ✅ Supported & Tested | ✅ Supported & Tested | ✅ Supported & Tested|
+| Windows | ✅ Supported & Tested | ✅ Supported & Tested | ✅ Supported & Tested|
+| WebAssembly | ⚠️ Supported (No Tests) | ⚠️ Supported (No Tests) | ✅ Supported & Tested|
+| Android | ⚠️ Supported (No Tests) | ⚠️ Supported (No Tests) | ⚠️ Supported (No Tests) |
 
 All supported platforms undergo continuous integration testing to ensure compatibility across different environments. Other platforms such as FreeBSD may also work, but are not validated in the built-in GitHub Actions powered CI environment.
 
