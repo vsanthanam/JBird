@@ -1,0 +1,63 @@
+#!/bin/bash
+set -euo pipefail
+
+# Append a GitHub job summary for a `swift test` run.
+#
+# Usage: summarize-tests <heading> <log-file>
+#
+# The log file should contain the combined stdout/stderr of `swift test`.
+# Swift Testing prints a single "Test run with N tests ... passed/failed"
+# line at the end of a run; that line, plus any recorded issues, is what
+# gets surfaced in the summary.
+
+if [ $# -ne 2 ]; then
+  echo "Usage: $0 <heading> <log-file>" >&2
+  exit 1
+fi
+
+HEADING="$1"
+LOG_FILE="$2"
+
+if [ -z "${GITHUB_STEP_SUMMARY:-}" ]; then
+  echo "GITHUB_STEP_SUMMARY is not set; nothing to do."
+  exit 0
+fi
+
+if [ ! -f "$LOG_FILE" ]; then
+  {
+    echo "### $HEADING"
+    echo ""
+    echo "⚠️ No test output was captured (\`$LOG_FILE\` is missing)."
+  } >> "$GITHUB_STEP_SUMMARY"
+  exit 0
+fi
+
+RUN_LINE="$(grep -E 'Test run with .* (passed|failed) after' "$LOG_FILE" | tail -n 1 || true)"
+# Strip the leading status glyph; the emoji below carries that information.
+RUN_LINE="$(echo "$RUN_LINE" | sed -E 's/^[^A-Za-z]*//')"
+
+ISSUES="$(grep -E '(recorded an issue|failed after .* with [0-9]+ issue)' "$LOG_FILE" | grep -v 'Test run with' || true)"
+
+{
+  echo "### $HEADING"
+  echo ""
+  if [ -z "$RUN_LINE" ]; then
+    echo "⚠️ No test run summary was found in the output."
+  elif echo "$RUN_LINE" | grep -q ' passed after '; then
+    echo "✅ $RUN_LINE"
+  else
+    echo "❌ $RUN_LINE"
+  fi
+  if [ -n "$ISSUES" ]; then
+    echo ""
+    echo "<details>"
+    echo "<summary>Recorded issues</summary>"
+    echo ""
+    echo '```'
+    echo "$ISSUES"
+    echo '```'
+    echo ""
+    echo "</details>"
+  fi
+  echo ""
+} >> "$GITHUB_STEP_SUMMARY"

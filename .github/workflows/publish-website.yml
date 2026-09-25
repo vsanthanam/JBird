@@ -71,3 +71,10 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+      - name: Summarize Deployment
+        run: |
+          {
+            echo "### Website Deployed"
+            echo ""
+            echo "🚀 Published to <${{ steps.deployment.outputs.page_url }}>"
+          } >> "$GITHUB_STEP_SUMMARY"

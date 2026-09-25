@@ -144,28 +144,44 @@ TOTAL_LINE_PCT="$(
 )"
 TOTAL_LINE_PCT="${TOTAL_LINE_PCT:-0}"
 
+# Threshold
+BELOW_THRESHOLD=false
+if [ "${FAIL_ON_THRESHOLD}" = "true" ]; then
+  FLOOR_TOTAL="$(printf '%.0f' "$(echo "$TOTAL_LINE_PCT" | awk '{print $1+0}')")"
+  if [ "${FLOOR_TOTAL}" -lt "${COVERAGE_THRESHOLD}" ]; then
+    BELOW_THRESHOLD=true
+  fi
+fi
+
 # GitHub Job Summary
 if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
   {
     echo "## Code Coverage"
     echo ""
-    echo "**Total line coverage:** ${TOTAL_LINE_PCT}%"
+    if [ "${FAIL_ON_THRESHOLD}" = "true" ]; then
+      if [ "${BELOW_THRESHOLD}" = "true" ]; then
+        echo "❌ **Total line coverage:** ${TOTAL_LINE_PCT}% (below the ${COVERAGE_THRESHOLD}% threshold)"
+      else
+        echo "✅ **Total line coverage:** ${TOTAL_LINE_PCT}% (threshold: ${COVERAGE_THRESHOLD}%)"
+      fi
+    else
+      echo "**Total line coverage:** ${TOTAL_LINE_PCT}%"
+    fi
     echo ""
-    echo "| Artifact | Path |"
-    echo "|---|---|"
-    echo "| HTML report | \`${REPORT_DIR}/index.html\` |"
-    echo "| Summary (text) | \`${SUMMARY_TXT}\` |"
-    echo "| LCOV | \`${REPORT_DIR}/coverage.lcov\` |"
+    echo "<details>"
+    echo "<summary>Per-file report</summary>"
+    echo ""
+    echo '```'
+    sed "s|${PWD}/||g" "$SUMMARY_TXT"
+    echo '```'
+    echo ""
+    echo "</details>"
   } >> "$GITHUB_STEP_SUMMARY"
 fi
 
-# Threshold
-if [ "${FAIL_ON_THRESHOLD}" = "true" ]; then
-  FLOOR_TOTAL="$(printf '%.0f' "$(echo "$TOTAL_LINE_PCT" | awk '{print $1+0}')")"
-  if [ "${FLOOR_TOTAL}" -lt "${COVERAGE_THRESHOLD}" ]; then
-    echo "Coverage ${TOTAL_LINE_PCT}% is below threshold ${COVERAGE_THRESHOLD}%." >&2
-    exit 2
-  fi
+if [ "${BELOW_THRESHOLD}" = "true" ]; then
+  echo "Coverage ${TOTAL_LINE_PCT}% is below threshold ${COVERAGE_THRESHOLD}%." >&2
+  exit 2
 fi
 
 # Local convenience

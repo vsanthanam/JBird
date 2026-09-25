@@ -23,14 +23,38 @@ set -e
 
 echo "$output"
 
+summarize() {
+    if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+        {
+            echo "### Documentation"
+            echo ""
+            echo "$1"
+            if [ -n "${2:-}" ]; then
+                echo ""
+                echo "<details>"
+                echo "<summary>Diagnostics</summary>"
+                echo ""
+                echo '```'
+                echo "$2"
+                echo '```'
+                echo ""
+                echo "</details>"
+            fi
+        } >> "$GITHUB_STEP_SUMMARY"
+    fi
+}
+
 if [ $exit_code -ne 0 ]; then
     echo "❌ Documentation generation failed with errors."
+    summarize "❌ Documentation generation failed with errors." "$(echo "$output" | grep -E '\b(error|warning):' || true)"
     exit $exit_code
 fi
 
 if echo "$output" | grep -q '\bwarning:'; then
     echo "❌ Documentation generation succeeded, but warnings were emitted."
+    summarize "❌ Documentation generation succeeded, but warnings were emitted." "$(echo "$output" | grep '\bwarning:')"
     exit 1
 fi
 
 echo "✅ Documentation generated without warnings."
+summarize "✅ Documentation generated without warnings."

@@ -268,3 +268,29 @@ cd "$OUTPUT_DIR"
 zip -r "$XCFRAMEWORK_NAME.zip" "$XCFRAMEWORK_NAME"
 
 echo "✨ XCFramework compressed at $OUTPUT_DIR/$XCFRAMEWORK_NAME.zip"
+
+# GitHub Job Summary
+if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+  PLIST="$XCFRAMEWORK_NAME/Info.plist"
+  if [ "$BUILD_STATIC" = true ]; then
+    LINKAGE="static"
+  else
+    LINKAGE="dynamic"
+  fi
+  {
+    echo "### $XCFRAMEWORK_NAME"
+    echo ""
+    echo "**Linkage:** $LINKAGE · **Archive:** \`$XCFRAMEWORK_NAME.zip\` ($(du -h "$XCFRAMEWORK_NAME.zip" | cut -f1))"
+    echo ""
+    echo "| Platform | Variant | Architectures |"
+    echo "|---|---|---|"
+    i=0
+    while /usr/libexec/PlistBuddy -c "Print :AvailableLibraries:$i:SupportedPlatform" "$PLIST" >/dev/null 2>&1; do
+      platform="$(/usr/libexec/PlistBuddy -c "Print :AvailableLibraries:$i:SupportedPlatform" "$PLIST")"
+      variant="$(/usr/libexec/PlistBuddy -c "Print :AvailableLibraries:$i:SupportedPlatformVariant" "$PLIST" 2>/dev/null || echo "device")"
+      archs="$(/usr/libexec/PlistBuddy -c "Print :AvailableLibraries:$i:SupportedArchitectures" "$PLIST" | sed -n 's/^ *\([A-Za-z0-9_]*\) *$/\1/p' | paste -sd ' ' -)"
+      echo "| $platform | $variant | $archs |"
+      i=$((i + 1))
+    done
+  } >> "$GITHUB_STEP_SUMMARY"
+fi

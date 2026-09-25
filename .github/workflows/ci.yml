@@ -191,7 +191,11 @@ jobs:
       - name: Decompress Build
         run: unzip build.zip
       - name: Test JBird
-        run: swift test --skip-build
+        shell: bash
+        run: swift test --skip-build 2>&1 | tee test-output.log
+      - name: Summarize Tests
+        if: ${{ always() }}
+        run: ./.scripts/summarize-tests "macOS · Swift ${{ matrix.swift }}" test-output.log
 
   build-ubuntu-spm:
     name: Build JBird (Ubuntu)
@@ -256,7 +260,11 @@ jobs:
       - name: Decompress Build
         run: unzip build.zip
       - name: Test JBird
-        run: swift test --skip-build
+        shell: bash
+        run: swift test --skip-build 2>&1 | tee test-output.log
+      - name: Summarize Tests
+        if: ${{ always() }}
+        run: ./.scripts/summarize-tests "Ubuntu · Swift ${{ matrix.swift }}" test-output.log
 
   build-windows-spm:
     name: Build JBird (Windows)
@@ -329,7 +337,12 @@ jobs:
         run: |
           Expand-Archive -Path "build.zip" -DestinationPath "." -Force
       - name: Test JBird
-        run: swift test --disable-xctest --skip-build
+        shell: bash
+        run: swift test --disable-xctest --skip-build 2>&1 | tee test-output.log
+      - name: Summarize Tests
+        if: ${{ always() }}
+        shell: bash
+        run: bash ./.scripts/summarize-tests "Windows · Swift ${{ matrix.swift }}" test-output.log
 
   build-wasm-spm:
     name: Build JBird (WebAssembly)
@@ -435,14 +448,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Install Toolchain
-        uses: jdx/mise-action@v4
-        with:
-          version: 2026.8.15
       - name: Select Xcode Version
         run: ./.scripts/xcode-select
       - name: Validate Documentation
-        run: mise run check-docc
+        run: ./.scripts/lint-docc
 
   build-xcframework:
     name: Build XCFrameworks
@@ -461,7 +470,7 @@ jobs:
       - name: Select Xcode Version
         run: ./.scripts/xcode-select 27.0
       - name: Build XCFramework
-        run: mise run build-xcframework ${{ matrix.target }}
+        run: ./.scripts/build-xcframework ${{ matrix.target }}
 
   coverage:
     name: Measure Test Coverage
@@ -517,8 +526,30 @@ jobs:
             -configuration Debug \
             -destination 'platform=macOS' \
             -derivedDataPath "$DERIVED_DATA" \
-            clean analyze
+            clean analyze 2>&1 | tee analyzer-output.log
           rm -rf "$DERIVED_DATA"
+      - name: Summarize Analyzer Results
+        if: ${{ always() }}
+        run: |
+          WARNINGS="$(grep -E '^[^ :]+:[0-9]+:[0-9]+: warning:' analyzer-output.log | sed "s|$GITHUB_WORKSPACE/||g" | sort -u || true)"
+          {
+            echo "### Static Analyzer (JBirdParser)"
+            echo ""
+            if [ -z "$WARNINGS" ]; then
+              echo "✅ No warnings reported."
+            else
+              echo "⚠️ $(echo "$WARNINGS" | wc -l | tr -d ' ') warning(s) reported."
+              echo ""
+              echo "<details>"
+              echo "<summary>Warnings</summary>"
+              echo ""
+              echo '```'
+              echo "$WARNINGS"
+              echo '```'
+              echo ""
+              echo "</details>"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
 
   validate-pr:
     name: Validate Pull Request
@@ -545,25 +576,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check upstream jobs
+        env:
+          NEEDS: ${{ toJSON(needs) }}
         run: |
-          if [[ "${{ needs.build-ios-xcode.result }}" == "failure" ]] || \
-            [[ "${{ needs.build-tvos-xcode.result }}" == "failure" ]] || \
-            [[ "${{ needs.build-watchos-xcode.result }}" == "failure" ]] || \
-            [[ "${{ needs.build-macos-xcode.result }}" == "failure" ]] || \
-            [[ "${{ needs.build-visionos-xcode.result }}" == "failure" ]] || \
-            [[ "${{ needs.build-macos-spm.result }}" == "failure" ]] || \
-            [[ "${{ needs.test-macos-spm.result }}" == "failure" ]] || \
-            [[ "${{ needs.build-ubuntu-spm.result }}" == "failure" ]] || \
-            [[ "${{ needs.test-ubuntu-spm.result }}" == "failure" ]] || \
-            [[ "${{ needs.build-windows-spm.result }}" == "failure" ]] || \
-            [[ "${{ needs.test-windows-spm.result }}" == "failure" ]] || \
-            [[ "${{ needs.build-wasm-spm.result }}" == "failure" ]] || \
-            [[ "${{ needs.build-android-spm.result }}" == "failure" ]] || \
-            [[ "${{ needs.build-xcframework.result }}" == "failure" ]] || \
-            [[ "${{ needs.lint.result }}" == "failure" ]] || \
-            [[ "${{ needs.lint-docc.result }}" == "failure" ]] || \
-            [[ "${{ needs.coverage.result }}" == "failure" ]] || \
-            [[ "${{ needs.static-analyzer.result }}" == "failure" ]]; then
+          {
+            echo "## Pull Request Validation"
+            echo ""
+            echo "| Job | Result |"
+            echo "|---|---|"
+            jq -r '
+              to_entries[]
+              | .value.result as $r
+              | (if $r == "success" then "✅"
+                 elif $r == "failure" then "❌"
+                 elif $r == "cancelled" then "🚫"
+                 else "⏭️" end) as $icon
+              | "| `\(.key)` | \($icon) \($r) |"
+            ' <<< "$NEEDS"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if jq -e 'any(.[]; .result == "failure")' <<< "$NEEDS" >/dev/null; then
             echo "❌ Required job failed."
             exit 1
           else

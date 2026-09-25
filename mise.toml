@@ -23,14 +23,6 @@ run = "swiftformat . --lint"
 description = "Check C formatting with clang-format"
 run = 'find Sources Fuzzer -type f \( -name "*.c" -o -name "*.h" \) -exec clang-format --style=file --dry-run --Werror "{}" +'
 
-[tasks."check-docc"]
-description = "Build documentation and fail on warnings"
-run = "./.scripts/lint-docc"
-
 [tasks.lint]
 description = "Check formatting of all sources"
 depends = ["lint:*"]
-
-[tasks.build-xcframework]
-description = "Build an XCFramework (usage: mise run build-xcframework <target> [--static] [--platforms p1,p2,...])"
-run = "./.scripts/build-xcframework"

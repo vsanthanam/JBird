@@ -81,17 +81,16 @@ Replace `.defaults` with a smaller set to trim functionality—for example, `tra
 
 `JBird`, `JBirdCore` and `JBirdBuilders` are shipped as precompiled XCFrameworks for macOS, iOS, watchOS, tvOS, and visionOS. Download the artifacts from [GitHub Releases](https://github.com/vsanthanam/JBird/releases) or build them locally.
 
-Local builds use [mise](https://mise.jdx.dev) to provide the pinned versions of the tools the build depends on. Install mise, then fetch the tools and run the build task from the repository root:
+Local builds run the `build-xcframework` script from the repository root. The script uses [xcbeautify](https://github.com/cpisciotta/xcbeautify) for readable build output when it is installed; [mise](https://mise.jdx.dev) provides the pinned version via `mise install`, but the script works without it.
 
 ```shell
 $ cd path/to/JBird
-$ mise install
-$ mise run build-xcframework <module_name>
+$ ./.scripts/build-xcframework <module_name>
 ```
 
-The task produces dynamic frameworks for every supported Apple platform by default and writes them to the `Products` directory. Use `--static` for static libraries and `--platforms` to restrict the build to particular Apple platforms. XCFrameworks do not support Swift macros, so `JBirdMacros` is unavailable in this format.
+The script produces dynamic frameworks for every supported Apple platform by default and writes them to the `Products` directory. Use `--static` for static libraries and `--platforms` to restrict the build to particular Apple platforms. XCFrameworks do not support Swift macros, so `JBirdMacros` is unavailable in this format.
 
-You can run the same task for `JBird`, `JBirdCore` or `JBirdBuilders`. Because `JBird` is an `@_exported` shim, any consumer of that XCFramework should also embed the `JBirdCore` and `JBirdBuilders` frameworks that it re-exports.
+You can run the same script for `JBird`, `JBirdCore` or `JBirdBuilders`. Because `JBird` is an `@_exported` shim, any consumer of that XCFramework should also embed the `JBirdCore` and `JBirdBuilders` frameworks that it re-exports.
 
 ### Compile from source
 

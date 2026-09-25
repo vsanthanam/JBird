@@ -23,7 +23,7 @@ jobs:
       - name: Xcode Version
         run: ./.scripts/xcode-select 27.0
       - name: Build XCFramework
-        run: mise run build-xcframework ${{ matrix.target }}
+        run: ./.scripts/build-xcframework ${{ matrix.target }}
       - name: Upload XCFramework
         uses: actions/upload-artifact@v7
         with:
@@ -48,9 +48,18 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: ./${{ matrix.target }}.xcframework.zip
+      - name: Summarize Release Asset
+        run: |
+          ASSET="${{ matrix.target }}.xcframework.zip"
+          URL="https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/$ASSET"
+          {
+            echo "### ${{ matrix.target }}.xcframework"
+            echo ""
+            echo "📎 Attached [\`$ASSET\`]($URL) ($(du -h "$ASSET" | cut -f1)) to release [${{ github.event.release.tag_name }}](${{ github.event.release.html_url }})."
+          } >> "$GITHUB_STEP_SUMMARY"
   build-docc-archive:
     name: Build DocC Archive
-    runs-on: macos-27
+    runs-on: xcode-27
     outputs:
       artifact-name: archive
     steps:
@@ -87,3 +96,12 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: ./JBird.doccarchive.zip
+      - name: Summarize Release Asset
+        run: |
+          ASSET="JBird.doccarchive.zip"
+          URL="https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/$ASSET"
+          {
+            echo "### JBird.doccarchive"
+            echo ""
+            echo "📎 Attached [\`$ASSET\`]($URL) ($(du -h "$ASSET" | cut -f1)) to release [${{ github.event.release.tag_name }}](${{ github.event.release.html_url }})."
+          } >> "$GITHUB_STEP_SUMMARY"
