@@ -415,53 +415,6 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         return try value(forSubscript: `subscript`)
     }
 
-    /// Retrieve a value from the JSON object using a specified path
-    /// - Parameter path: The path to use for lookup
-    /// - Returns: The JSON value at the specified path
-    /// - Throws: An error, if the JSON value does not contain a value at the provided path, or of the JSON value is incompatible with the provided JSON subscript.
-    @available(*, deprecated, renamed: "value(atPath:)", message: "Use pointer based access instead. This method will be removed in a future release.")
-    @_disfavoredOverload
-    public func value(
-        atPath path: [Subscript]
-    ) throws -> JSON {
-        var json = self
-        try path.forEach { component in
-            json = try json.value(forSubscript: component)
-        }
-        return json
-    }
-
-    /// Retrieve a value from the JSON object using a specified path
-    /// - Parameter path: The path to use for lookup
-    /// - Returns: The JSON value at the specified path
-    /// - Throws: An error, if the JSON value does not contain a value at the provided path, or of the JSON value is incompatible with the provided JSON subscript.
-    @available(*, deprecated, message: "Use pointer based access instead. This method will be removed in a future release.")
-    public func value(
-        atPath path: Subscript...
-    ) throws -> JSON {
-        var json = self
-        try path.forEach { component in
-            json = try json.value(forSubscript: component)
-        }
-        return json
-    }
-
-    /// Retrieve a value from the JSON object using a specified path
-    /// - Parameter path: The path to use for lookup
-    /// - Returns: The JSON value at the specified path
-    /// - Throws: An error, if the JSON value does not contain a value at the provided path, or if the JSON value is incompatible with the provided JSON subscript.
-    @available(*, deprecated, message: "Use pointer based access instead. This method will be removed in a future release.")
-    public func value<each PathComponent>(
-        atPath path: repeat each PathComponent
-    ) throws -> JSON where repeat each PathComponent: JSONSubscriptConvertible {
-        var json = self
-        for component in repeat each path {
-            let `subscript` = Subscript(component)
-            json = try json.value(forSubscript: `subscript`)
-        }
-        return json
-    }
-
     /// Check whether a JSON object contains a value for the provided key
     /// - Parameter key: The key
     /// - Returns: `true` if the object contains the provided key, `false` if the object does not contain the provided key, or if the JSON value is not an object
@@ -1230,44 +1183,11 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// Retrieve a value from the JSON object using a specified subscript
     /// - Parameter subscript: A subscript to use for lookup
     /// - Returns: The JSON value at the specified subscript
-    @available(*, deprecated, message: "Use pointer based access instead. This method will be removed in a future release.")
-    public subscript(
-        _ subscript: Subscript...
-    ) -> JSON {
-        get throws {
-            var json = self
-            try `subscript`
-                .forEach { `subscript` in
-                    json = try json.value(forSubscript: `subscript`)
-                }
-            return json
-        }
-    }
-
-    /// Retrieve a value from the JSON object using a specified subscript
-    /// - Parameter subscript: A subscript to use for lookup
-    /// - Returns: The JSON value at the specified subscript
     public subscript(
         _ subscript: Subscript
     ) -> JSON {
         get throws {
             try value(forSubscript: `subscript`)
-        }
-    }
-
-    /// Retrieve a value from the JSON object using a specified subscript
-    /// - Parameter path: A subscript to use for lookup
-    /// - Returns: The JSON value at the specified subscript
-    @available(*, deprecated, message: "Use pointer based access instead. This method will be removed in a future release.")
-    public subscript<each PathComponent>(
-        _ path: repeat each PathComponent
-    ) -> JSON where repeat each PathComponent: JSONSubscriptConvertible {
-        get throws {
-            var json = self
-            for component in repeat each path {
-                json = try json.value(forSubscript: component)
-            }
-            return json
         }
     }
 
@@ -1288,52 +1208,12 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ///   - type: The type to convert into. This type can be inferred from the callsite.
     /// - Returns: The JSON value at the specified subscript
     @_disfavoredOverload
-    @available(*, deprecated, message: "Use pointer based access instead. This method will be removed in a future release.")
-    public subscript<T>(
-        _ subscript: Subscript...,
-        as type: T.Type = T.self
-    ) -> T where T: JSONInitializable {
-        get throws {
-            var json = self
-            try `subscript`.forEach { `subscript` in
-                json = try json[`subscript`]
-            }
-            return try json.convert(into: type)
-        }
-    }
-
-    /// Retrieve a value from the JSON object using a specified subscript
-    /// - Parameters:
-    ///   - subscript: A subscript to use for lookup
-    ///   - type: The type to convert into. This type can be inferred from the callsite.
-    /// - Returns: The JSON value at the specified subscript
-    @_disfavoredOverload
     public subscript<T>(
         _ subscript: Subscript,
         as type: T.Type = T.self
     ) -> T where T: JSONInitializable {
         get throws {
             try value(forSubscript: `subscript`).convert()
-        }
-    }
-
-    /// Retrieve a value from the JSON object using a specified subscript
-    /// - Parameters:
-    ///   - subscript: A subscript to use for lookup
-    ///   - type: The type to convert into. This type can be inferred from the callsite.
-    /// - Returns: The JSON value at the specified subscript
-    @_disfavoredOverload
-    @available(*, deprecated, message: "Use pointer based access instead. This method will be removed in a future release.")
-    public subscript<each PathComponent, T>(
-        _ subscript: repeat each PathComponent,
-        as type: T.Type = T.self
-    ) -> T where repeat each PathComponent: JSONSubscriptConvertible, T: JSONInitializable {
-        get throws {
-            var json = self
-            for component in repeat each `subscript` {
-                json = try json[component]
-            }
-            return try json.convert(into: type)
         }
     }
 
