@@ -1,4 +1,0 @@
-#!/bin/bash
-
-find Sources Fuzzer -type f \( -name "*.c" -o -name "*.h" \) \
-    -exec clang-format --style=file --dry-run --Werror "{}" +
