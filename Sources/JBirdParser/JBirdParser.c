@@ -512,6 +512,55 @@ static inline size_t json_skip_plain_string_bytes(const uint8_t *input, size_t i
 }
 #endif
 
+#if defined(JBird_USE_SSE2)
+static inline size_t json_skip_whitespace_bytes(const uint8_t *input, size_t index, size_t length) {
+    const __m128i space = _mm_set1_epi8(' ');
+    const __m128i tab = _mm_set1_epi8('\t');
+    const __m128i newline = _mm_set1_epi8('\n');
+    const __m128i carriage_return = _mm_set1_epi8('\r');
+    while (index + 16 <= length) {
+        __m128i chunk = _mm_loadu_si128((const __m128i *)(input + index));
+        __m128i whitespace = _mm_or_si128(_mm_or_si128(_mm_cmpeq_epi8(chunk, space), _mm_cmpeq_epi8(chunk, tab)),
+                                          _mm_or_si128(_mm_cmpeq_epi8(chunk, newline), _mm_cmpeq_epi8(chunk, carriage_return)));
+        unsigned int mask = (unsigned int)_mm_movemask_epi8(whitespace);
+        if (mask != 0xFFFF)
+            return index + __builtin_ctz(~mask);
+        index += 16;
+    }
+    return index;
+}
+#elif defined(JBird_USE_NEON)
+static inline size_t json_skip_whitespace_bytes(const uint8_t *input, size_t index, size_t length) {
+    const uint8x16_t space = vdupq_n_u8(' ');
+    const uint8x16_t tab = vdupq_n_u8('\t');
+    const uint8x16_t newline = vdupq_n_u8('\n');
+    const uint8x16_t carriage_return = vdupq_n_u8('\r');
+    while (index + 16 <= length) {
+        uint8x16_t chunk = vld1q_u8(input + index);
+        uint8x16_t whitespace = vorrq_u8(vorrq_u8(vceqq_u8(chunk, space), vceqq_u8(chunk, tab)),
+                                         vorrq_u8(vceqq_u8(chunk, newline), vceqq_u8(chunk, carriage_return)));
+        // Narrow each 16-bit lane pair to 4 bits so the 16 lanes fit in one 64-bit mask.
+        uint64_t mask = vget_lane_u64(vreinterpret_u64_u8(vshrn_n_u16(vreinterpretq_u16_u8(whitespace), 4)), 0);
+        if (mask != UINT64_MAX)
+            return index + (__builtin_ctzll(~mask) >> 2);
+        index += 16;
+    }
+    return index;
+}
+#else
+static inline size_t json_skip_whitespace_bytes(const uint8_t *input, size_t index, size_t length) {
+    // No vector unit: skip 8 spaces at a time, which covers space-indented input.
+    while (index + 8 <= length) {
+        uint64_t word;
+        memcpy(&word, input + index, sizeof(word));
+        if (word != UINT64_C(0x2020202020202020))
+            break;
+        index += 8;
+    }
+    return index;
+}
+#endif
+
 static bool json_scan_simple_string(json_parser_t *parser, const char **str_start, size_t *str_len) {
     size_t start_index = parser->index;
     size_t length = 0;
@@ -850,7 +899,17 @@ static uint8_t json_next(json_parser_t *parser) {
     return parser->input[parser->index++];
 }
 
-static inline void json_consume_whitespace(json_parser_t *parser) {
+static __attribute__((noinline)) size_t json_consume_long_whitespace(const uint8_t *input, size_t index, size_t length) {
+    index = json_skip_whitespace_bytes(input, index, length);
+
+    while (index < length && is_whitespace(input[index])) {
+        index++;
+    }
+
+    return index;
+}
+
+static inline __attribute__((always_inline)) void json_consume_whitespace(json_parser_t *parser) {
     if (parser->require_minified) {
         return;
     }
@@ -859,14 +918,14 @@ static inline void json_consume_whitespace(json_parser_t *parser) {
     size_t length = parser->length;
     size_t index = parser->index;
 
-    while (index < length) {
-        uint8_t c = input[index];
+    if (index >= length || !is_whitespace(input[index])) {
+        return;
+    }
 
-        if (is_whitespace(c)) {
-            index++;
-        } else {
-            break;
-        }
+    index++;
+
+    if (index < length && is_whitespace(input[index])) {
+        index = json_consume_long_whitespace(input, index + 1, length);
     }
 
     parser->index = index;
