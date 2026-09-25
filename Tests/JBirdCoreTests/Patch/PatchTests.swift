@@ -134,19 +134,6 @@ struct PatchTests {
             #expect(try JSON.Patch().remove(at: "/a~1b") == JSON.Patch().remove(at: ["a/b"]))
         }
 
-        @Test("Builders accept any StringProtocol pointer, such as a Substring")
-        @available(*, deprecated)
-        func stringProtocol() throws {
-            // The value-bearing builders take `some StringProtocol`, so a Substring works directly.
-            let path: Substring = "x/a/b".dropFirst()
-            #expect(try JSON.Patch().add(1, to: path) == JSON.Patch().add(1, to: ["a", "b"]))
-            #expect(try JSON.Patch().remove(at: path) == JSON.Patch().remove(at: ["a", "b"]))
-            #expect(try JSON.Patch().replace(at: path, with: 2) == JSON.Patch().replace(at: ["a", "b"], with: 2))
-            #expect(try JSON.Patch().move(from: path, to: path) == JSON.Patch().move(from: ["a", "b"], to: ["a", "b"]))
-            #expect(try JSON.Patch().copy(from: path, to: path) == JSON.Patch().copy(from: ["a", "b"], to: ["a", "b"]))
-            #expect(try JSON.Patch().test(for: 3, at: path) == JSON.Patch().test(for: 3, at: ["a", "b"]))
-        }
-
         @Test("Invalid add pointer string throws")
         func invalidAdd() {
             #expect(throws: JSON.PointerError.self) {

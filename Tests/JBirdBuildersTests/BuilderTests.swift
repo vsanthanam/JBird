@@ -249,13 +249,26 @@ struct BuilderTests {
             ]
         )
 
-        func complexBuilder(darkTheme: Bool, hasNotifications: Bool, tags: [String], json: JSON) {
-            let user = buildUser(darkTheme: darkTheme, hasNotifications: hasNotifications, tags: tags)
+        func complexBuilder(
+            darkTheme: Bool,
+            hasNotifications: Bool,
+            tags: [String],
+            json: JSON
+        ) {
+            let user = buildUser(
+                darkTheme: darkTheme,
+                hasNotifications: hasNotifications,
+                tags: tags
+            )
             #expect(user == json)
         }
 
         @JSON.Builder
-        private func buildUser(darkTheme: Bool, hasNotifications: Bool, tags: [String]) -> JSON {
+        private func buildUser(
+            darkTheme: Bool,
+            hasNotifications: Bool,
+            tags: [String]
+        ) -> JSON {
             "id" => 123
             "profile" => {
                 "name" => "Alice"

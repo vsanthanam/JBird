@@ -166,13 +166,6 @@ struct PointerTests {
         #expect(pointer.tokens == ["users", "0", "name", "first"])
     }
 
-    @Test("Initializes From Any StringProtocol, Such As A Substring")
-    @available(*, deprecated)
-    func stringProtocolInitializer() throws {
-        let substring: Substring = "x/users/0".dropFirst()
-        #expect(try JSON.Pointer(substring).tokens == ["users", "0"])
-    }
-
     @Test(
         "Parses URI fragments (RFC 6901 §6)",
         arguments: [
