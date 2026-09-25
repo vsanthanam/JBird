@@ -2031,6 +2031,84 @@ struct JBirdParserTests {
         #expect(result == JSON_UNEXPECTED_END_OF_INPUT)
     }
 
+    @Test("Whitespace run of every length between tokens")
+    func whitespaceRunAtEveryLanePosition() throws {
+        for length in 0 ..< 40 {
+            for character in [" ", "\t", "\n", "\r"] {
+                let run = String(repeating: character, count: length)
+                let raw = "[\(run)1,\(run)2\(run)]\(run)"
+                let (result, value) = try parse(raw)
+                defer { json_free(value) }
+                #expect(result == JSON_NO_ERROR, "length \(length) character \(character.debugDescription)")
+                #expect(json_get_array_size(value) == 2, "length \(length)")
+                #expect(json_get_int(json_get_array_element(value, 0)) == 1, "length \(length)")
+                #expect(json_get_int(json_get_array_element(value, 1)) == 2, "length \(length)")
+            }
+        }
+    }
+
+    @Test("Mixed whitespace run of every length")
+    func mixedWhitespaceRunAtEveryLanePosition() throws {
+        let cycle: [Character] = [" ", "\t", "\n", "\r"]
+        for length in 0 ..< 40 {
+            let run = String((0 ..< length).map { cycle[$0 % cycle.count] })
+            let raw = "{\(run)\"key\"\(run):\(run)true\(run)}"
+            let (result, value) = try parse(raw)
+            defer { json_free(value) }
+            #expect(result == JSON_NO_ERROR, "length \(length)")
+            #expect(try String(cString: #require(json_get_object_key(value, 0))) == "key", "length \(length)")
+            #expect(json_get_boolean(json_get_object_value(value, 0)) == true, "length \(length)")
+        }
+    }
+
+    @Test("Whitespace run of every length before a string")
+    func whitespaceBeforeStringAtEveryLanePosition() throws {
+        for length in 0 ..< 40 {
+            let run = String(repeating: " ", count: length)
+            let raw = "[\(run)\"padding-padding-padding\"]"
+            let (result, value) = try parse(raw)
+            defer { json_free(value) }
+            #expect(result == JSON_NO_ERROR, "length \(length)")
+            let element = try #require(json_get_array_element(value, 0))
+            #expect(try String(cString: #require(json_get_string(element))) == "padding-padding-padding", "length \(length)")
+        }
+    }
+
+    @Test("Trailing whitespace of every length at end of input")
+    func trailingWhitespaceAtEveryLanePosition() throws {
+        for length in 0 ..< 40 {
+            let (result, value) = try parse("[1]" + String(repeating: " ", count: length))
+            defer { json_free(value) }
+            #expect(result == JSON_NO_ERROR, "length \(length)")
+        }
+    }
+
+    @Test("Invalid whitespace byte at every lane position")
+    func invalidWhitespaceByteAtEveryLanePosition() {
+        for length in 0 ..< 40 {
+            for invalid: UInt8 in [0x0B, 0x0C, 0x00, 0xA0] {
+                var bytes = Array("[".utf8)
+                bytes.append(contentsOf: repeatElement(UInt8(ascii: " "), count: length))
+                bytes.append(invalid)
+                bytes.append(contentsOf: repeatElement(UInt8(ascii: " "), count: 20))
+                bytes.append(contentsOf: Array("1]".utf8))
+                var value: OpaquePointer?
+                let result = bytes.withUnsafeBufferPointer { buffer in
+                    json_parse(buffer.baseAddress, buffer.count, &value, true, false, false, 0)
+                }
+                defer { json_free(value) }
+                #expect(result != JSON_NO_ERROR, "length \(length) byte \(invalid)")
+            }
+        }
+    }
+
+    @Test("Whitespace longer than one chunk then end of input")
+    func unterminatedWhitespace() throws {
+        let (result, value) = try parse("[" + String(repeating: " ", count: 50))
+        defer { json_free(value) }
+        #expect(result == JSON_UNEXPECTED_END_OF_INPUT)
+    }
+
     private func parse(
         _ raw: String
     ) throws -> (json_error_t, OpaquePointer?) {
