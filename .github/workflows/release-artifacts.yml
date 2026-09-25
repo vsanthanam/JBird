@@ -23,7 +23,7 @@ jobs:
       - name: Xcode Version
         run: ./.scripts/xcode-select 27.0
       - name: Build XCFramework
-        run: ./.scripts/build-xcframework ${{ matrix.target }}
+        run: mise run build-xcframework ${{ matrix.target }}
       - name: Upload XCFramework
         uses: actions/upload-artifact@v7
         with:
