@@ -79,16 +79,19 @@ Replace `.defaults` with a smaller set to trim functionality—for example, `tra
 
 ### Binary distribution via XCFramework
 
-`JBird`, `JBirdCore` and `JBirdBuilders` are shipped as precompiled XCFrameworks for macOS, iOS, watchOS, tvOS, and visionOS. Download the artifacts from [GitHub Releases](https://github.com/vsanthanam/JBird/releases) or create them locally using the provided script:
+`JBird`, `JBirdCore` and `JBirdBuilders` are shipped as precompiled XCFrameworks for macOS, iOS, watchOS, tvOS, and visionOS. Download the artifacts from [GitHub Releases](https://github.com/vsanthanam/JBird/releases) or build them locally.
+
+Local builds use [mise](https://mise.jdx.dev) to provide the pinned versions of the tools the build depends on. Install mise, then fetch the tools and run the build task from the repository root:
 
 ```shell
 $ cd path/to/JBird
-$ ./.scripts/build-xcframework <module_name>
+$ mise install
+$ mise run build-xcframework <module_name>
 ```
 
-The script produces dynamic frameworks for every supported Apple platform by default. Use `--static` for static libraries and `--platforms` to restrict the build for particular Apple platformns. XCFrameworks do not support Swift macros, so `JBirdMacros` is unavailable in this format.
+The task produces dynamic frameworks for every supported Apple platform by default and writes them to the `Products` directory. Use `--static` for static libraries and `--platforms` to restrict the build to particular Apple platforms. XCFrameworks do not support Swift macros, so `JBirdMacros` is unavailable in this format.
 
-You can run the same script for `JBird`, `JBirdCore` or `JBirdBuilders`. Because `JBird` is an `@_exported` shim, any consumer of that XCFramework should also embed the `JBirdCore` and `JBirdBuilders` frameworks that it re-exports.
+You can run the same task for `JBird`, `JBirdCore` or `JBirdBuilders`. Because `JBird` is an `@_exported` shim, any consumer of that XCFramework should also embed the `JBirdCore` and `JBirdBuilders` frameworks that it re-exports.
 
 ### Compile from source
 

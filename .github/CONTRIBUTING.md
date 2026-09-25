@@ -65,8 +65,9 @@ JBird maintains 100% test coverage for its codebase:
 
 ## Code Style
 
-- Use SwiftFormat for formatting Swift code. You can run SwiftFormat with `$ ./swiftformat`
-- Maintain C11 compliance for the parser core. You can run the clang-format with `$ ./clang-format`
+- Formatters are managed with [mise](https://mise.jdx.dev). Run `$ mise install` once to get the pinned tool versions.
+- Format everything with `$ mise run format`, or check without modifying files with `$ mise run lint`. Use `format:swift`, `format:c`, `lint:swift`, or `lint:c` to run a single formatter, and `$ mise run check-docc` to build the documentation and fail on warnings.
+- Maintain C11 compliance for the parser core.
 - Internal facing APIs should be self-documenting, and should rarely use documentation unless it's absolutely necessary.
 - Similarly, code comments are usually not helpful. You should add them only when the decision you're making is not obvious or requires extra justification.
 

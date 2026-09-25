@@ -16,10 +16,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+      - name: Install Toolchain
+        uses: jdx/mise-action@v4
+        with:
+          version: 2026.8.15
       - name: Xcode Version
         run: ./.scripts/xcode-select 27.0
       - name: Build XCFramework
-        run: ./.scripts/build-xcframework ${{ matrix.target }}
+        run: mise run build-xcframework ${{ matrix.target }}
       - name: Upload XCFramework
         uses: actions/upload-artifact@v7
         with:

@@ -28,6 +28,9 @@ Benchmarks/Package.resolved
 /*.gcno
 **/xcshareddata/WorkspaceSettings.xcsettings
 
+# XCFramework Output
+/Products/
+
 # Fuzzer
 Fuzzer/findings/
 Fuzzer/fuzz_harness
