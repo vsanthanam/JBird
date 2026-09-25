@@ -65,10 +65,6 @@ let package = Package(
         .package(
             url: "https://github.com/swiftlang/swift-docc-plugin.git",
             exact: "1.5.0"
-        ),
-        .package(
-            url: "https://github.com/nicklockwood/SwiftFormat.git",
-            exact: "0.63.0"
         )
     ],
     targets: [

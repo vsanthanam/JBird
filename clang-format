@@ -1,35 +1,8 @@
 #!/bin/bash
 
-set -e
-
-# Check for clang-format
-if ! command -v clang-format &> /dev/null; then
-  echo "⚠️  clang-format is not installed."
-
-  # Check for Homebrew
-  if ! command -v brew &> /dev/null; then
-    echo "❌ Homebrew is not installed. Please install Homebrew first:"
-    echo "    https://brew.sh/"
-    exit 1
-  fi
-
-  # Prompt to install via Homebrew
-  read -p "Would you like to install clang-format using Homebrew? [y/N] " choice
-  case "$choice" in
-    y|Y )
-      echo "🔧 Installing clang-format..."
-      brew install clang-format
-      ;;
-    * )
-      echo "❌ Aborting. clang-format is required."
-      exit 1
-      ;;
-  esac
-fi
-
-# Format all .c and .h files recursively
+# Format all .c and .h files in the parser and fuzzer sources
 echo "✨ Formatting .c and .h files"
-find . -path ./\.build -prune -o -type f \( -name "*.c" -o -name "*.h" \) -exec clang-format -i "{}" +
+find Sources Fuzzer -type f \( -name "*.c" -o -name "*.h" \) -exec clang-format -i "{}" +
 if [ $? -eq 0 ]; then
   echo "✅ Formatting complete."
 else
