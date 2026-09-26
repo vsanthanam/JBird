@@ -84,8 +84,7 @@ struct ArrayDecoderTests {
 
     @Test("Decode Doubles")
     func decodeDoubles() throws {
-//        let value: Doubles = [3.14159, -0.1234]
-        let values: Doubles = [1.2, -2.1]
+        let values: Doubles = [3.14159, -0.1234]
         let data = try JSONEncoder().encode(values)
         let foundation = try JSONDecoder().decode(Doubles.self, from: data)
         let jbird = try JSON.Decoder().decode(Doubles.self, from: data)

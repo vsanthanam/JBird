@@ -1519,8 +1519,7 @@ struct JBirdParserTests {
         #expect(result == JSON_NO_ERROR)
         #expect(value != nil)
         #expect(json_get_type(value) == JSON_NUMBER_DOUBLE)
-        // TODO: Fix precision tests
-        #expect(json_get_double(value) > 0)
+        #expect(json_get_double(value) == 1e30)
     }
 
     @Test("Parse extremely large negative number")
@@ -1540,8 +1539,116 @@ struct JBirdParserTests {
         #expect(result == JSON_NO_ERROR)
         #expect(value != nil)
         #expect(json_get_type(value) == JSON_NUMBER_DOUBLE)
-        // TODO: Fix precision tests
-        #expect(json_get_double(value) < 0)
+        #expect(json_get_double(value) == -1e30)
+    }
+
+    @Test(
+        "Parse double is correctly rounded",
+        arguments: [
+            "-0.1234",
+            "3.14159",
+            "0.1",
+            "0.30000000000000004",
+            "65.613616999999977",
+            "1e23",
+            "7.2057594037927933e+16",
+            "999999999999999999999999999999",
+            "-999999999999999999999999999999",
+            "123456789012345678901234567890.123456789",
+            "1.00000000000000011102230246251565404236316680908203125",
+            "1.7976931348623157e308",
+            "8.988465674311579e307",
+            "2.2250738585072014e-308",
+            "2.2250738585072011e-308",
+            "4.9406564584124654e-324",
+        ]
+    )
+    func parseDoubleIsCorrectlyRounded(raw: String) throws {
+        let jsonData = try #require(raw.data(using: .utf8))
+        var value: OpaquePointer?
+
+        let result = jsonData.withUnsafeBytes { bytes in
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+        }
+
+        defer {
+            json_free(value)
+        }
+
+        #expect(result == JSON_NO_ERROR)
+        #expect(value != nil)
+        #expect(json_get_type(value) == JSON_NUMBER_DOUBLE)
+        let expected = try #require(Double(raw))
+        #expect(json_get_double(value).bitPattern == expected.bitPattern)
+    }
+
+    @Test(
+        "Parse integer that fits in Int64 stays an integer regardless of what follows it",
+        arguments: [
+            ("1000000000000000000", Int64(1_000_000_000_000_000_000)),
+            ("1234567890123456789", Int64(1_234_567_890_123_456_789)),
+            ("9223372036854775806", Int64.max - 1),
+            ("9223372036854775807", Int64.max),
+            ("-1000000000000000000", Int64(-1_000_000_000_000_000_000)),
+            ("-1234567890123456789", Int64(-1_234_567_890_123_456_789)),
+            ("-9223372036854775807", Int64.min + 1),
+            ("-9223372036854775808", Int64.min),
+        ]
+    )
+    func parseLargeIntegerFollowedByMoreInput(literal: String, expected: Int64) throws {
+        // Regression test for #434: the classification must depend on the
+        // value, not on the digit count or on how many bytes follow the
+        // literal. The trailing elements push the total past the 16-byte SIMD
+        // chunk so both the vectorized and scalar paths see the same input.
+        let raw = "[\(literal), 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]"
+        let jsonData = try #require(raw.data(using: .utf8))
+        var value: OpaquePointer?
+
+        let result = jsonData.withUnsafeBytes { bytes in
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, 0)
+        }
+
+        defer {
+            json_free(value)
+        }
+
+        #expect(result == JSON_NO_ERROR)
+        #expect(value != nil)
+        #expect(json_get_type(value) == JSON_ARRAY)
+        #expect(json_get_array_size(value) == 13)
+        let first = json_get_array_element(value, 0)
+        #expect(json_get_type(first) == JSON_NUMBER_INT)
+        #expect(json_get_int(first) == expected)
+    }
+
+    @Test(
+        "Parse integer just outside Int64 becomes a double regardless of what follows it",
+        arguments: [
+            "9223372036854775808",
+            "-9223372036854775809",
+            "12345678901234567890",
+        ]
+    )
+    func parseOverflowingIntegerFollowedByMoreInput(literal: String) throws {
+        let raw = "[\(literal), 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]"
+        let jsonData = try #require(raw.data(using: .utf8))
+        var value: OpaquePointer?
+
+        let result = jsonData.withUnsafeBytes { bytes in
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, 0)
+        }
+
+        defer {
+            json_free(value)
+        }
+
+        #expect(result == JSON_NO_ERROR)
+        #expect(value != nil)
+        #expect(json_get_type(value) == JSON_ARRAY)
+        let first = json_get_array_element(value, 0)
+        #expect(json_get_type(first) == JSON_NUMBER_DOUBLE)
+        let expected = try #require(Double(literal))
+        #expect(json_get_double(first).bitPattern == expected.bitPattern)
     }
 
     @Test("Parse long string")
