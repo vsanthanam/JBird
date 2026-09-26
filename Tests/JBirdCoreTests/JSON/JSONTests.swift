@@ -1286,8 +1286,6 @@ struct JSONTests {
             }
         }
 
-        // MARK: - Setting
-
         @Test("Set creates an object key")
         func setCreatesKey() throws {
             var document = Self.document
@@ -1383,8 +1381,6 @@ struct JSONTests {
             try decoder.decode(JSON.self, from: Data(string.utf8))
         }
 
-        // MARK: - Encoding Scalars
-
         @Test("Encode Null")
         func encodeNull() throws {
             #expect(try encodeString(.null) == "null")
@@ -1440,8 +1436,6 @@ struct JSONTests {
             let decoded = try decode(encodeString(json))
             #expect(decoded == json)
         }
-
-        // MARK: - Decoding Scalars
 
         @Test("Decode Null")
         func decodeNull() throws {
@@ -1503,8 +1497,6 @@ struct JSONTests {
             }
         }
 
-        // MARK: - Round Trips
-
         @Test("Round Trip Scalars")
         func roundTripScalars() throws {
             let values: [JSON] = [.null, true, false, 0, 42, -7, 4.5, -3.14, "", "string with \" quote"]
@@ -1539,8 +1531,6 @@ struct JSONTests {
             #expect(try roundTrip(json) == json)
         }
 
-        // MARK: - Interoperability
-
         @Test("Encoded Output Matches JSONSerialization")
         func encodedMatchesFoundation() throws {
             let json: JSON = ["a": 1, "b": [2, 3], "c": "four"]
@@ -1573,8 +1563,6 @@ struct JSONTests {
             let decoded = try decoder.decode(Wrapper.self, from: data)
             #expect(decoded == wrapper)
         }
-
-        // MARK: - Malformed Single Value
 
         @Test("Decode Unsupported Single Value Throws")
         func decodeUnsupportedSingleValueThrows() {

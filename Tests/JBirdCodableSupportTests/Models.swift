@@ -1331,8 +1331,6 @@ struct SingleValueDecimal: Codable, Equatable {
     }
 }
 
-// MARK: - Container Reuse (Foundation Parity)
-
 struct Coordinate: Codable, Equatable {
     let x: Int
     let y: Int

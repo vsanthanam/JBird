@@ -30,8 +30,6 @@ import Testing
 @Suite("JBird Parser Tests")
 struct JBirdParserTests {
 
-    // MARK: - Basic Parsing Tests
-
     @Test("Parse null value")
     func parseNull() throws {
         let raw = "null"
@@ -531,8 +529,6 @@ struct JBirdParserTests {
         #expect(json_get_type(value) == JSON_OBJECT)
         #expect(json_get_object_size(value) == 3)
     }
-
-    // MARK: - BOM Tests
 
     @Test("Parse with BOM allowed")
     func parseWithBOMAllowed() {
@@ -1281,8 +1277,6 @@ struct JBirdParserTests {
         #expect(abs(json_get_double(value) - 1.5e-2) < 1e-6)
     }
 
-    // MARK: - Boundary Value Tests
-
     @Test("Parse INT64_MAX as integer")
     func parseInt64MaxAsInteger() throws {
         let raw = "9223372036854775807" // INT64_MAX
@@ -1860,8 +1854,6 @@ struct JBirdParserTests {
         #expect(json_get_type(value1) == JSON_BOOLEAN)
         #expect(json_get_boolean(value1) == false)
     }
-
-    // MARK: - Length and Key Identifier Tests
 
     @Test("String and key lengths")
     func stringAndKeyLengths() throws {

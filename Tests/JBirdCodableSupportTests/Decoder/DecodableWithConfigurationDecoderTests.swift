@@ -31,8 +31,6 @@ import Testing
 @Suite("DecodableWithConfiguration Decoder Tests")
 struct DecodableWithConfigurationDecoderTests {
 
-    // MARK: - Test Models
-
     struct TaggedValue: CodableWithConfiguration, Equatable {
         let value: Int
         let tag: String
@@ -77,8 +75,6 @@ struct DecodableWithConfigurationDecoderTests {
             .init(tag: "default")
         }
     }
-
-    // MARK: - Top-Level Decoding
 
     @Suite("Top-Level Configuration Decoding")
     struct TopLevelTests {
@@ -177,8 +173,6 @@ struct DecodableWithConfigurationDecoderTests {
 
     }
 
-    // MARK: - Strategy Integration
-
     @Suite("Configuration Decoding With Strategies")
     struct StrategyTests {
 
@@ -267,8 +261,6 @@ struct DecodableWithConfigurationDecoderTests {
 
     }
 
-    // MARK: - Round-Trip
-
     @Suite("Configuration Round-Trip")
     struct RoundTripTests {
 
@@ -312,8 +304,6 @@ struct DecodableWithConfigurationDecoderTests {
         }
 
     }
-
-    // MARK: - Sendable
 
     @Suite("Concurrent Configuration Decoding")
     struct SendableTests {

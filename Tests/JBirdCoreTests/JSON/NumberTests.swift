@@ -212,8 +212,6 @@ struct NumberTests {
             return try decoder.decode(JSON.Number.self, from: data)
         }
 
-        // MARK: - Encoding
-
         @Test("Encode Integer")
         func encodeInteger() throws {
             let data = try encoder.encode(JSON.Number(42))
@@ -237,8 +235,6 @@ struct NumberTests {
             let data = try encoder.encode(JSON.Number.zero)
             #expect(String(data: data, encoding: .utf8) == "0")
         }
-
-        // MARK: - Decoding
 
         @Test("Decode Integer")
         func decodeInteger() throws {
@@ -283,8 +279,6 @@ struct NumberTests {
                 _ = try decoder.decode(JSON.Number.self, from: Data("\"not a number\"".utf8))
             }
         }
-
-        // MARK: - Round Trips
 
         @Test("Round Trip Integer")
         func roundTripInteger() throws {

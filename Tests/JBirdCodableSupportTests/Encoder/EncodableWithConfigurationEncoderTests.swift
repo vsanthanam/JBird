@@ -31,8 +31,6 @@ import Testing
 @Suite("EncodableWithConfiguration Encoder Tests")
 struct EncodableWithConfigurationEncoderTests {
 
-    // MARK: - Test Models
-
     struct TaggedValue: EncodableWithConfiguration {
         let value: Int
 
@@ -59,8 +57,6 @@ struct EncodableWithConfigurationEncoderTests {
             .init(tag: "default")
         }
     }
-
-    // MARK: - Top-Level Encoding
 
     @Suite("Top-Level Configuration Encoding")
     struct TopLevelTests {
@@ -151,8 +147,6 @@ struct EncodableWithConfigurationEncoderTests {
 
     }
 
-    // MARK: - Formatting & Strategy Integration
-
     @Suite("Configuration Encoding With Strategies")
     struct StrategyTests {
 
@@ -232,8 +226,6 @@ struct EncodableWithConfigurationEncoderTests {
         }
 
     }
-
-    // MARK: - Container-Level Configuration Encoding
 
     @Suite("Container-Level Configuration Encoding")
     struct ContainerTests {
@@ -434,8 +426,6 @@ struct EncodableWithConfigurationEncoderTests {
 
     }
 
-    // MARK: - Sendable
-
     @Suite("Concurrent Configuration Encoding")
     struct SendableTests {
 
@@ -460,8 +450,6 @@ struct EncodableWithConfigurationEncoderTests {
         }
 
     }
-
-    // MARK: - Super Encoder + Single Value Container
 
     @Suite("Super Encoder Single Value Cleanup")
     struct SuperEncoderCleanupTests {
