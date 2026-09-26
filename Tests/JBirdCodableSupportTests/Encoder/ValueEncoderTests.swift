@@ -284,11 +284,14 @@ struct ValueEncoderTests {
         #expect(String(decoding: data, as: UTF8.self) == "42")
     }
 
-    @Test("Writing twice through reused single value containers traps")
-    func doubleSingleValueWriteTraps() async {
-        await #expect(processExitsWith: .failure) {
-            _ = try JSON.Encoder().encode(DoubleSingleValueWrite())
+    // Exit tests are unavailable on WebAssembly, so trap tests are skipped there.
+    #if !os(WASI)
+        @Test("Writing twice through reused single value containers traps")
+        func doubleSingleValueWriteTraps() async {
+            await #expect(processExitsWith: .failure) {
+                _ = try JSON.Encoder().encode(DoubleSingleValueWrite())
+            }
         }
-    }
+    #endif
 
 }
