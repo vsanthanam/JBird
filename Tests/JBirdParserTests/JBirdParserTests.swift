@@ -37,7 +37,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -57,7 +57,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -77,7 +77,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
         defer {
             json_free(value)
@@ -97,7 +97,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -119,7 +119,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -140,7 +140,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -160,7 +160,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -181,7 +181,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -201,7 +201,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -224,7 +224,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -250,7 +250,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -276,7 +276,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -301,7 +301,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -326,7 +326,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -351,7 +351,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -373,7 +373,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -413,7 +413,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -440,7 +440,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -462,7 +462,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -517,7 +517,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -539,7 +539,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, true, true, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, true, true, true, 0)
         }
 
         defer {
@@ -561,7 +561,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, false, true, 0)
         }
 
         defer {
@@ -579,7 +579,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -601,7 +601,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, true, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, true, false, true, 0)
         }
 
         defer {
@@ -621,7 +621,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 3)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 3)
         }
 
         defer {
@@ -641,7 +641,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 3)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 3)
         }
 
         defer {
@@ -655,7 +655,7 @@ struct JBirdParserTests {
     @Test("Parse null input")
     func parseNullInput() {
         var value: OpaquePointer?
-        let result = json_parse(nil, 0, &value, true, false, false, 0)
+        let result = json_parse(nil, 0, &value, true, false, false, true, 0)
 
         #expect(result == JSON_INVALID_JSON)
         #expect(value == nil)
@@ -667,7 +667,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -687,7 +687,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -707,7 +707,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -727,7 +727,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -747,7 +747,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -767,7 +767,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -787,7 +787,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -807,7 +807,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -827,7 +827,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -844,7 +844,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -864,7 +864,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -884,7 +884,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -904,7 +904,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -924,7 +924,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -944,7 +944,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -964,7 +964,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -984,7 +984,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -1004,7 +1004,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -1024,7 +1024,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -1044,7 +1044,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -1062,7 +1062,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -1082,7 +1082,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -1103,7 +1103,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -1123,7 +1123,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -1143,7 +1143,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -1198,7 +1198,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -1218,7 +1218,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -1242,7 +1242,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -1264,7 +1264,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -1284,7 +1284,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
         }
 
         defer {
@@ -1304,7 +1304,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
         }
 
         defer {
@@ -1324,7 +1324,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
         }
 
         defer {
@@ -1344,7 +1344,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
         }
 
         defer {
@@ -1365,7 +1365,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
         }
 
         defer {
@@ -1386,7 +1386,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
         }
 
         defer {
@@ -1407,7 +1407,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
         }
 
         defer {
@@ -1428,7 +1428,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
         }
 
         defer {
@@ -1449,7 +1449,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
         }
 
         defer {
@@ -1469,7 +1469,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
         }
 
         defer {
@@ -1489,7 +1489,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
         }
 
         defer {
@@ -1509,7 +1509,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
         }
 
         defer {
@@ -1529,7 +1529,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
         }
 
         defer {
@@ -1568,7 +1568,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -1605,7 +1605,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
         }
 
         defer {
@@ -1635,7 +1635,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
         }
 
         defer {
@@ -1659,7 +1659,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -1684,7 +1684,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         #expect(result == JSON_NO_ERROR)
@@ -1707,7 +1707,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -1736,7 +1736,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -1771,7 +1771,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -1802,7 +1802,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -1836,7 +1836,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -1858,7 +1858,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -1878,7 +1878,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -1898,7 +1898,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -1917,7 +1917,7 @@ struct JBirdParserTests {
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, true, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, true, true, 0)
         }
 
         defer {
@@ -1936,7 +1936,7 @@ struct JBirdParserTests {
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -1969,7 +1969,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -1993,7 +1993,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -2026,7 +2026,7 @@ struct JBirdParserTests {
         var value: OpaquePointer?
 
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
 
         defer {
@@ -2084,7 +2084,7 @@ struct JBirdParserTests {
             bytes.append(contentsOf: Array(#"","padding-padding-padding"]"#.utf8))
             var value: OpaquePointer?
             let result = bytes.withUnsafeBufferPointer { buffer in
-                json_parse(buffer.baseAddress, buffer.count, &value, true, false, false, 0)
+                json_parse(buffer.baseAddress, buffer.count, &value, true, false, false, true, 0)
             }
             defer { json_free(value) }
             #expect(result == JSON_INVALID_STRING, "length \(length)")
@@ -2193,7 +2193,7 @@ struct JBirdParserTests {
                 bytes.append(contentsOf: Array("1]".utf8))
                 var value: OpaquePointer?
                 let result = bytes.withUnsafeBufferPointer { buffer in
-                    json_parse(buffer.baseAddress, buffer.count, &value, true, false, false, 0)
+                    json_parse(buffer.baseAddress, buffer.count, &value, true, false, false, true, 0)
                 }
                 defer { json_free(value) }
                 #expect(result != JSON_NO_ERROR, "length \(length) byte \(invalid)")
@@ -2214,7 +2214,7 @@ struct JBirdParserTests {
         let jsonData = try #require(raw.data(using: .utf8))
         var value: OpaquePointer?
         let result = jsonData.withUnsafeBytes { bytes in
-            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, 0)
+            json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
         return (result, value)
     }

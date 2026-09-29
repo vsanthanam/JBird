@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
 
         json_value_t *value = NULL;
 
-        json_error_t err = json_parse(buf, len, &value, true, false, false, 100);
+        json_error_t err = json_parse(buf, len, &value, true, false, false, true, 100);
 
         if (err == JSON_NO_ERROR && value != NULL) {
             json_type_t type = json_get_type(value);
@@ -66,13 +66,19 @@ int main(int argc, char *argv[]) {
         }
 
         value = NULL;
-        err = json_parse(buf, len, &value, false, false, true, 50);
+        err = json_parse(buf, len, &value, false, false, true, true, 50);
         if (err == JSON_NO_ERROR && value != NULL) {
             json_free(value);
         }
 
         value = NULL;
-        err = json_parse(buf, len, &value, false, true, false, 100);
+        err = json_parse(buf, len, &value, false, true, false, true, 100);
+        if (err == JSON_NO_ERROR && value != NULL) {
+            json_free(value);
+        }
+
+        value = NULL;
+        err = json_parse(buf, len, &value, true, false, false, false, 100);
         if (err == JSON_NO_ERROR && value != NULL) {
             json_free(value);
         }
@@ -104,7 +110,7 @@ int main(int argc, char *argv[]) {
     }
 
     json_value_t *value = NULL;
-    json_error_t err = json_parse(buf, len, &value, true, false, false, 100);
+    json_error_t err = json_parse(buf, len, &value, true, false, false, true, 100);
 
     if (err == JSON_NO_ERROR) {
         printf("Parse successful, type: %d\n", json_get_type(value));

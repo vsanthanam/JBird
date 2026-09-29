@@ -932,6 +932,7 @@ typedef struct {
     json_memory_arena_t *arena;
     bool require_minified;
     bool strict_keys;
+    bool validate_utf8;
     size_t max_depth;
     size_t current_depth;
 } json_parser_t;
@@ -1155,11 +1156,14 @@ static const char *json_string_get(const json_string_t *str) {
     return str->is_small ? str->data.buf : str->data.ptr;
 }
 
+// Skips 16-byte chunks that contain no quote, backslash, or control character.
+// The high bit of `*high_bits` is set if any skipped byte is not ASCII.
 #if defined(JBird_USE_SSE2)
-static inline size_t json_skip_plain_string_bytes(const uint8_t *input, size_t index, size_t length) {
+static inline size_t json_skip_plain_string_bytes(const uint8_t *input, size_t index, size_t length, uint8_t *high_bits) {
     const __m128i quote = _mm_set1_epi8('"');
     const __m128i backslash = _mm_set1_epi8('\\');
     const __m128i space = _mm_set1_epi8(0x20);
+    __m128i seen = _mm_setzero_si128();
     while (index + 16 <= length) {
         __m128i chunk = _mm_loadu_si128((const __m128i *)(input + index));
         __m128i hit = _mm_or_si128(_mm_or_si128(_mm_cmpeq_epi8(chunk, quote), _mm_cmpeq_epi8(chunk, backslash)),
@@ -1167,28 +1171,35 @@ static inline size_t json_skip_plain_string_bytes(const uint8_t *input, size_t i
                                                   _mm_xor_si128(space, _mm_set1_epi8((char)0x80))));
         if (_mm_movemask_epi8(hit) != 0)
             break;
+        seen = _mm_or_si128(seen, chunk);
         index += 16;
     }
+    if (_mm_movemask_epi8(seen) != 0)
+        *high_bits |= 0x80;
     return index;
 }
 #elif defined(JBird_USE_NEON)
-static inline size_t json_skip_plain_string_bytes(const uint8_t *input, size_t index, size_t length) {
+static inline size_t json_skip_plain_string_bytes(const uint8_t *input, size_t index, size_t length, uint8_t *high_bits) {
     const uint8x16_t quote = vdupq_n_u8('"');
     const uint8x16_t backslash = vdupq_n_u8('\\');
     const uint8x16_t space = vdupq_n_u8(0x20);
+    uint8x16_t seen = vdupq_n_u8(0);
     while (index + 16 <= length) {
         uint8x16_t chunk = vld1q_u8(input + index);
         uint8x16_t hit = vorrq_u8(vorrq_u8(vceqq_u8(chunk, quote), vceqq_u8(chunk, backslash)), vcltq_u8(chunk, space));
         if (vmaxvq_u8(hit) != 0)
             break;
+        seen = vorrq_u8(seen, chunk);
         index += 16;
     }
+    *high_bits |= vmaxvq_u8(seen);
     return index;
 }
 #else
-static inline size_t json_skip_plain_string_bytes(const uint8_t *input, size_t index, size_t length) {
+static inline size_t json_skip_plain_string_bytes(const uint8_t *input, size_t index, size_t length, uint8_t *high_bits) {
     (void)input;
     (void)length;
+    (void)high_bits;
     return index;
 }
 #endif
@@ -1240,17 +1251,76 @@ static inline size_t json_skip_whitespace_bytes(const uint8_t *input, size_t ind
 }
 #endif
 
+static bool json_utf8_is_valid(const uint8_t *bytes, size_t length) {
+    size_t i = 0;
+    while (i < length) {
+        if (i + 8 <= length) {
+            uint64_t word;
+            memcpy(&word, bytes + i, sizeof(word));
+            if ((word & UINT64_C(0x8080808080808080)) == 0) {
+                i += 8;
+                continue;
+            }
+        }
+
+        uint8_t c = bytes[i];
+        if (c < 0x80) {
+            i++;
+            continue;
+        }
+
+        size_t needed;
+        uint8_t lower = 0x80;
+        uint8_t upper = 0xBF;
+        if (c >= 0xC2 && c <= 0xDF) {
+            needed = 1;
+        } else if (c >= 0xE0 && c <= 0xEF) {
+            needed = 2;
+            if (c == 0xE0)
+                lower = 0xA0;
+            else if (c == 0xED)
+                upper = 0x9F;
+        } else if (c >= 0xF0 && c <= 0xF4) {
+            needed = 3;
+            if (c == 0xF0)
+                lower = 0x90;
+            else if (c == 0xF4)
+                upper = 0x8F;
+        } else {
+            return false;
+        }
+
+        if (length - i - 1 < needed)
+            return false;
+        if (bytes[i + 1] < lower || bytes[i + 1] > upper)
+            return false;
+        for (size_t k = 2; k <= needed; k++) {
+            if ((bytes[i + k] & 0xC0) != 0x80)
+                return false;
+        }
+        i += needed + 1;
+    }
+    return true;
+}
+
 static bool json_scan_simple_string(json_parser_t *parser, const char **str_start, size_t *str_len) {
     size_t start_index = parser->index;
     size_t length = 0;
+    uint8_t high_bits = 0;
 
-    parser->index = json_skip_plain_string_bytes(parser->input, parser->index, parser->length);
+    parser->index = json_skip_plain_string_bytes(parser->input, parser->index, parser->length, &high_bits);
     length = parser->index - start_index;
 
     while (parser->index < parser->length) {
         uint8_t c = parser->input[parser->index];
 
         if (char_class[c] == CHAR_CLASS_QUOTE) {
+            // Invalid UTF-8 falls back to the slow path, which reports the error
+            if (parser->validate_utf8 && (high_bits & 0x80) &&
+                !json_utf8_is_valid(parser->input + start_index, length)) {
+                parser->index = start_index;
+                return false;
+            }
             *str_start = (const char *)(parser->input + start_index);
             *str_len = length;
             parser->index++;
@@ -1259,6 +1329,7 @@ static bool json_scan_simple_string(json_parser_t *parser, const char **str_star
             parser->index = start_index;
             return false;
         } else {
+            high_bits |= c;
             parser->index++;
             length++;
         }
@@ -1399,7 +1470,7 @@ static json_error_t json_array_push(json_value_t *array, json_value_t *element, 
     return JSON_NO_ERROR;
 }
 
-static void json_parser_init(json_parser_t *parser, const uint8_t *input, size_t length, bool require_minified, bool strict_keys, size_t max_depth) {
+static void json_parser_init(json_parser_t *parser, const uint8_t *input, size_t length, bool require_minified, bool strict_keys, bool validate_utf8, size_t max_depth) {
     parser->input = input;
     parser->length = length;
     parser->index = 0;
@@ -1409,6 +1480,7 @@ static void json_parser_init(json_parser_t *parser, const uint8_t *input, size_t
     parser->arena = json_arena_init(length);
     parser->require_minified = require_minified;
     parser->strict_keys = strict_keys;
+    parser->validate_utf8 = validate_utf8;
     parser->max_depth = max_depth;
     parser->current_depth = 0;
 }
@@ -1719,6 +1791,8 @@ static json_error_t json_parse_string_into_temp_buffer(json_parser_t *parser) {
         return err;
     json_temp_buffer_clear(parser);
 
+    // Escapes always produce valid UTF-8, so only raw bytes need to be tracked
+    uint8_t high_bits = 0;
     bool escape_mode = false;
     while (json_has_more(parser)) {
         uint8_t c = json_next(parser);
@@ -1776,12 +1850,16 @@ static json_error_t json_parse_string_into_temp_buffer(json_parser_t *parser) {
             if (err != JSON_NO_ERROR)
                 return err;
         } else if (c == '"') {
+            if (parser->validate_utf8 && (high_bits & 0x80) &&
+                !json_utf8_is_valid((const uint8_t *)parser->temp_buffer, parser->temp_size))
+                return JSON_INVALID_UNICODE;
             return JSON_NO_ERROR;
         } else if (c == '\\') {
             escape_mode = true;
         } else if (c < 0x20) {
             return JSON_INVALID_STRING;
         } else {
+            high_bits |= c;
             err = json_temp_buffer_append_byte(parser, c);
             if (err != JSON_NO_ERROR)
                 return err;
@@ -2497,11 +2575,17 @@ static bool try_parse_simple_string(json_parser_t *parser, const char **out_str,
         return false;
     start_idx++;
 
-    size_t curr_idx = json_skip_plain_string_bytes(input, start_idx, length);
+    uint8_t high_bits = 0;
+    size_t curr_idx = json_skip_plain_string_bytes(input, start_idx, length, &high_bits);
     while (curr_idx < length) {
         uint8_t c = input[curr_idx];
 
         if (char_class[c] == CHAR_CLASS_QUOTE) {
+            // Invalid UTF-8 falls back to the slow path, which reports the error
+            if (parser->validate_utf8 && (high_bits & 0x80) &&
+                !json_utf8_is_valid(input + start_idx, curr_idx - start_idx)) {
+                return false;
+            }
             *out_str = (const char *)(input + start_idx);
             *out_len = curr_idx - start_idx;
             parser->index = curr_idx + 1;
@@ -2512,13 +2596,14 @@ static bool try_parse_simple_string(json_parser_t *parser, const char **out_str,
             return false;
         }
 
+        high_bits |= c;
         curr_idx++;
     }
 
     return false;
 }
 
-json_error_t json_parse(const uint8_t *data, size_t length, json_value_t **out_value, bool allow_bom, bool require_minified, bool strict_keys, size_t max_depth) {
+json_error_t json_parse(const uint8_t *data, size_t length, json_value_t **out_value, bool allow_bom, bool require_minified, bool strict_keys, bool validate_utf8, size_t max_depth) {
     if (!data || !out_value) {
         return JSON_INVALID_JSON;
     }
@@ -2526,7 +2611,7 @@ json_error_t json_parse(const uint8_t *data, size_t length, json_value_t **out_v
     *out_value = NULL;
 
     json_parser_t parser;
-    json_parser_init(&parser, data, length, require_minified, strict_keys, max_depth);
+    json_parser_init(&parser, data, length, require_minified, strict_keys, validate_utf8, max_depth);
 
     if (!parser.arena) {
         json_parser_cleanup(&parser);

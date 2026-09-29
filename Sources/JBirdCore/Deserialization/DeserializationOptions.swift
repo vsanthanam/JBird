@@ -119,6 +119,13 @@ extension JSON {
         /// - Note: The use of this option can impact parser performance, especially for large JSON objects with many keys.
         public static let requireUniqueKeys = DeserializationOptions(rawValue: 1 << 7)
 
+        /// Whether or not strings and keys are allowed to contain byte sequences that are not valid UTF-8
+        ///
+        /// [RFC 8259](https://www.rfc-editor.org/rfc/rfc8259#section-8.1) requires JSON text to be encoded as UTF-8.
+        /// By default, the deserialization will fail with ``JSON/DeserializationError/invalidUnicode`` if any string or key contains a byte sequence that is not valid UTF-8.
+        /// When this option is enabled, such byte sequences are accepted, and each invalid sequence is replaced with the Unicode replacement character (`U+FFFD`) in the deserialized value.
+        public static let allowInvalidUTF8 = DeserializationOptions(rawValue: 1 << 8)
+
         /// The default set of deserialization options
         public static let `default`: DeserializationOptions = [.fragmentsAllowed, .allowByteOrderMark]
 
