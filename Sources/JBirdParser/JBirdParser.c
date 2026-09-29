@@ -991,13 +991,13 @@ static const char *json_string_pool_get_or_add(string_pool_t *pool, const char *
     }
 
     uint32_t hash = hash_string(str, len);
-    size_t bucket_idx = hash & (pool->bucket_count - 1); // Assumes power of 2
+    size_t bucket_idx = hash & (pool->bucket_count - 1);
 
     string_pool_entry_t *entry = pool->buckets[bucket_idx];
     while (entry) {
         if (entry->hash == hash && entry->len == len && memcmp(entry->str, str, len) == 0) {
             *out_id = entry->id;
-            return entry->str; // Found existing string
+            return entry->str;
         }
         entry = entry->next;
     }
@@ -1221,7 +1221,6 @@ static inline size_t json_skip_whitespace_bytes(const uint8_t *input, size_t ind
         uint8x16_t chunk = vld1q_u8(input + index);
         uint8x16_t whitespace = vorrq_u8(vorrq_u8(vceqq_u8(chunk, space), vceqq_u8(chunk, tab)),
                                          vorrq_u8(vceqq_u8(chunk, newline), vceqq_u8(chunk, carriage_return)));
-        // Narrow each 16-bit lane pair to 4 bits so the 16 lanes fit in one 64-bit mask.
         uint64_t mask = vget_lane_u64(vreinterpret_u64_u8(vshrn_n_u16(vreinterpretq_u16_u8(whitespace), 4)), 0);
         if (mask != UINT64_MAX)
             return index + (__builtin_ctzll(~mask) >> 2);
@@ -1231,7 +1230,6 @@ static inline size_t json_skip_whitespace_bytes(const uint8_t *input, size_t ind
 }
 #else
 static inline size_t json_skip_whitespace_bytes(const uint8_t *input, size_t index, size_t length) {
-    // No vector unit: skip 8 spaces at a time, which covers space-indented input.
     while (index + 8 <= length) {
         uint64_t word;
         memcpy(&word, input + index, sizeof(word));
@@ -1766,9 +1764,9 @@ static json_error_t json_parse_string_into_temp_buffer(json_parser_t *parser) {
                         return JSON_INVALID_UNICODE;
                     uint32_t codepoint = 0x10000 + (((code_unit1 & 0x3FF) << 10) | (code_unit2 & 0x3FF));
                     err = json_add_codepoint(parser, codepoint);
-                } else if (code_unit1 >= 0xDC00 && code_unit1 <= 0xDFFF) { // Low surrogate without high
+                } else if (code_unit1 >= 0xDC00 && code_unit1 <= 0xDFFF) {
                     return JSON_INVALID_UNICODE;
-                } else { // BMP
+                } else {
                     err = json_add_codepoint(parser, code_unit1);
                 }
                 break;
@@ -1861,7 +1859,6 @@ static double json_eisel_lemire(uint64_t mantissa, int64_t exponent) {
     int64_t power2 = ((217706 * exponent) >> 16) + 63 + (int64_t)upper_bit - leading_zeros + 1023;
 
     if (power2 <= 0) {
-        // Subnormal or zero.
         if (-power2 + 1 >= 64) {
             return 0.0;
         }
@@ -2267,7 +2264,6 @@ static json_error_t json_parse_object(json_parser_t *parser, json_value_t **out_
                 object->data.object.capacity = new_capacity;
             }
 
-            // Check for duplicate keys
             if (parser->strict_keys) {
                 for (size_t i = 0; i < object->data.object.count; i++) {
                     const char *existing_key = json_string_get(&object->data.object.keys[i]);
