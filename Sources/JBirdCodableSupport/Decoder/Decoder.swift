@@ -106,20 +106,28 @@ extension JSON {
         /// A dictionary you use to customize the decoding process by providing contextual information.
         public var userInfo: [CodingUserInfoKey: any Sendable] {
             get {
-                _userInfo.strategy
+                _userInfo.withLock { value in
+                    value
+                }
             }
             set {
-                _userInfo.strategy = newValue
+                _userInfo.withLock { value in
+                    value = newValue
+                }
             }
         }
 
         /// A value that determines how to decode a type’s coding keys from JSON keys.
         public var keyDecodingStrategy: KeyDecodingStrategy {
             get {
-                _keyDecodingStrategy.strategy
+                _keyDecodingStrategy.withLock { value in
+                    value
+                }
             }
             set {
-                _keyDecodingStrategy.strategy = newValue
+                _keyDecodingStrategy.withLock { value in
+                    value = newValue
+                }
             }
         }
 
@@ -128,10 +136,14 @@ extension JSON {
         /// The default strategy is ``JSON/Decoder/DateDecodingStrategy/deferredToDate``.
         public var dateDecodingStrategy: DateDecodingStrategy {
             get {
-                _dateDecodingStrategy.strategy
+                _dateDecodingStrategy.withLock { value in
+                    value
+                }
             }
             set {
-                _dateDecodingStrategy.strategy = newValue
+                _dateDecodingStrategy.withLock { value in
+                    value = newValue
+                }
             }
         }
 
@@ -140,10 +152,14 @@ extension JSON {
         /// The default strategy is ``JSON/Decoder/DataDecodingStrategy/base64``.
         public var dataDecodingStrategy: DataDecodingStrategy {
             get {
-                _dataDecodingStrategy.strategy
+                _dataDecodingStrategy.withLock { value in
+                    value
+                }
             }
             set {
-                _dataDecodingStrategy.strategy = newValue
+                _dataDecodingStrategy.withLock { value in
+                    value = newValue
+                }
             }
         }
 
@@ -152,10 +168,14 @@ extension JSON {
         /// The default strategy is ``JSON/Decoder/NonConformingFloatDecodingStrategy/throw``.
         public var nonConformingFloatDecodingStrategy: NonConformingFloatDecodingStrategy {
             get {
-                _nonConformingFloatDecodingStrategy.strategy
+                _nonConformingFloatDecodingStrategy.withLock { value in
+                    value
+                }
             }
             set {
-                _nonConformingFloatDecodingStrategy.strategy = newValue
+                _nonConformingFloatDecodingStrategy.withLock { value in
+                    value = newValue
+                }
             }
         }
 
@@ -287,11 +307,11 @@ extension JSON {
             }
         }
 
-        private let _userInfo = CodingStrategy<[CodingUserInfoKey: any Sendable]>([:])
-        private let _keyDecodingStrategy = CodingStrategy<KeyDecodingStrategy>(.useDefaultKeys)
-        private let _dateDecodingStrategy = CodingStrategy<DateDecodingStrategy>(.deferredToDate)
-        private let _dataDecodingStrategy = CodingStrategy<DataDecodingStrategy>(.base64)
-        private let _nonConformingFloatDecodingStrategy = CodingStrategy<NonConformingFloatDecodingStrategy>(.throw)
+        private let _userInfo = CompatibilityMutex<[CodingUserInfoKey: any Sendable]>([:])
+        private let _keyDecodingStrategy = CompatibilityMutex<KeyDecodingStrategy>(.useDefaultKeys)
+        private let _dateDecodingStrategy = CompatibilityMutex<DateDecodingStrategy>(.deferredToDate)
+        private let _dataDecodingStrategy = CompatibilityMutex<DataDecodingStrategy>(.base64)
+        private let _nonConformingFloatDecodingStrategy = CompatibilityMutex<NonConformingFloatDecodingStrategy>(.throw)
 
         static func decodeKey(
             path: [any CodingKey],
