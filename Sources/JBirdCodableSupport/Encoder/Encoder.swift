@@ -136,30 +136,42 @@ extension JSON {
         /// A dictionary you use to customize the encoding process by providing contextual information.
         public var userInfo: [CodingUserInfoKey: any Sendable] {
             get {
-                _userInfo.strategy
+                _userInfo.withLock { value in
+                    value
+                }
             }
             set {
-                _userInfo.strategy = newValue
+                _userInfo.withLock { value in
+                    value = newValue
+                }
             }
         }
 
         /// A value that determines the readability, size, and element order of the encoded JSON object.
         public var outputFormatting: OutputFormatting {
             get {
-                _outputFormatting.strategy
+                _outputFormatting.withLock { value in
+                    value
+                }
             }
             set {
-                _outputFormatting.strategy = newValue
+                _outputFormatting.withLock { value in
+                    value = newValue
+                }
             }
         }
 
         /// A value that determines how to encode a type’s coding keys as JSON keys.
         public var keyEncodingStrategy: KeyEncodingStrategy {
             get {
-                _keyEncodingStrategy.strategy
+                _keyEncodingStrategy.withLock { value in
+                    value
+                }
             }
             set {
-                _keyEncodingStrategy.strategy = newValue
+                _keyEncodingStrategy.withLock { value in
+                    value = newValue
+                }
             }
         }
 
@@ -168,10 +180,14 @@ extension JSON {
         /// The default strategy is the ``JSON/Encoder/DateEncodingStrategy/deferredToDate`` strategy.
         public var dateEncodingStrategy: DateEncodingStrategy {
             get {
-                _dateEncodingStrategy.strategy
+                _dateEncodingStrategy.withLock { value in
+                    value
+                }
             }
             set {
-                _dateEncodingStrategy.strategy = newValue
+                _dateEncodingStrategy.withLock { value in
+                    value = newValue
+                }
             }
         }
 
@@ -180,10 +196,14 @@ extension JSON {
         /// The default strategy is the ``JSON/Encoder/DataEncodingStrategy/base64`` strategy.
         public var dataEncodingStrategy: DataEncodingStrategy {
             get {
-                _dataEncodingStrategy.strategy
+                _dataEncodingStrategy.withLock { value in
+                    value
+                }
             }
             set {
-                _dataEncodingStrategy.strategy = newValue
+                _dataEncodingStrategy.withLock { value in
+                    value = newValue
+                }
             }
         }
 
@@ -192,10 +212,14 @@ extension JSON {
         /// The default strategy is the ``JSON/Encoder/NonConformingFloatEncodingStrategy/throw`` strategy.
         public var nonConformingFloatEncodingStrategy: NonConformingFloatEncodingStrategy {
             get {
-                _nonConformingFloatEncodingStrategy.strategy
+                _nonConformingFloatEncodingStrategy.withLock { value in
+                    value
+                }
             }
             set {
-                _nonConformingFloatEncodingStrategy.strategy = newValue
+                _nonConformingFloatEncodingStrategy.withLock { value in
+                    value = newValue
+                }
             }
         }
 
@@ -325,12 +349,12 @@ extension JSON {
             )
         }
 
-        private let _userInfo = CodingStrategy<[CodingUserInfoKey: any Sendable]>([:])
-        private let _outputFormatting = CodingStrategy<OutputFormatting>([])
-        private let _keyEncodingStrategy = CodingStrategy<KeyEncodingStrategy>(.useDefaultKeys)
-        private let _dateEncodingStrategy = CodingStrategy<DateEncodingStrategy>(.deferredToDate)
-        private let _dataEncodingStrategy = CodingStrategy<DataEncodingStrategy>(.base64)
-        private let _nonConformingFloatEncodingStrategy = CodingStrategy<NonConformingFloatEncodingStrategy>(.throw)
+        private let _userInfo = CompatibilityMutex<[CodingUserInfoKey: any Sendable]>([:])
+        private let _outputFormatting = CompatibilityMutex<OutputFormatting>([])
+        private let _keyEncodingStrategy = CompatibilityMutex<KeyEncodingStrategy>(.useDefaultKeys)
+        private let _dateEncodingStrategy = CompatibilityMutex<DateEncodingStrategy>(.deferredToDate)
+        private let _dataEncodingStrategy = CompatibilityMutex<DataEncodingStrategy>(.base64)
+        private let _nonConformingFloatEncodingStrategy = CompatibilityMutex<NonConformingFloatEncodingStrategy>(.throw)
 
         static func encodeData(
             _ data: Data,
