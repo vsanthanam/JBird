@@ -46,7 +46,7 @@ typedef enum {
     JSON_INVALID_NUMBER,            /**< Invalid number format */
     JSON_INVALID_STRING,            /**< Invalid string format */
     JSON_MISSING_OBJECT_KEY,        /**< Object is missing a key */
-    JSON_INVALID_UNICODE,           /**< Invalid Unicode character in string */
+    JSON_INVALID_UNICODE,           /**< Invalid Unicode escape or invalid UTF-8 in string */
     JSON_INVALID_ESCAPE,            /**< Invalid escape sequence in string */
     JSON_OUT_OF_MEMORY,             /**< Memory allocation failed */
     JSON_MAX_DEPTH_EXCEEDED,        /**< Maximum recursion depth exceeded */
@@ -80,10 +80,11 @@ typedef struct json_value json_value_t;
  * @param allow_bom Whether to allow BOM (Byte Order Mark) at the beginning of the data
  * @param require_minified Whether to require the JSON to be minified (no whitespace)
  * @param strict_keys Whether to enforce strict key rules (no duplicate keys, etc.)
+ * @param validate_utf8 Whether to reject strings and keys that contain byte sequences that are not valid UTF-8
  * @param max_depth Maximum recursion depth (0 for unlimited)
  * @return Error code indicating success or failure
  */
-json_error_t json_parse(const uint8_t *data, size_t length, json_value_t **out_value, bool allow_bom, bool require_minified, bool strict_keys, size_t max_depth);
+json_error_t json_parse(const uint8_t *data, size_t length, json_value_t **out_value, bool allow_bom, bool require_minified, bool strict_keys, bool validate_utf8, size_t max_depth);
 
 /**
  * @brief Free memory allocated for a JSON value

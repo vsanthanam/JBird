@@ -75,7 +75,9 @@ extension JSON {
         /// Thrown when an object has a value without a corresponding key.
         case missingObjectKey
 
-        /// Thrown when a Unicode escape sequence in a string is malformed or invalid.
+        /// Thrown when a Unicode escape sequence in a string is malformed or invalid, or when a string contains a byte sequence that is not valid UTF-8.
+        ///
+        /// Invalid UTF-8 can be tolerated using ``JSON/DeserializationOptions/allowInvalidUTF8``.
         case invalidUnicode
 
         /// Thrown when an escape sequence in a string is invalid or unrecognized.

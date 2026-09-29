@@ -485,6 +485,7 @@ extension JSON {
                     options.contains(.allowByteOrderMark),
                     options.contains(.requireMinified),
                     options.contains(.requireUniqueKeys),
+                    !options.contains(.allowInvalidUTF8),
                     options.contains(.ignoreRecursionDepthLimit) ? 0 : recursionDepthLimit
                 )
             }
@@ -707,6 +708,7 @@ extension JSON {
                         options.contains(.allowByteOrderMark),
                         options.contains(.requireMinified),
                         options.contains(.requireUniqueKeys),
+                        !options.contains(.allowInvalidUTF8),
                         options.contains(.ignoreRecursionDepthLimit) ? 0 : recursionDepthLimit
                     )
                 }
@@ -807,6 +809,7 @@ extension JSON {
                         options.contains(.allowByteOrderMark),
                         options.contains(.requireMinified),
                         options.contains(.requireUniqueKeys),
+                        !options.contains(.allowInvalidUTF8),
                         options.contains(.ignoreRecursionDepthLimit) ? 0 : recursionDepthLimit
                     )
                 }

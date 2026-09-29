@@ -869,6 +869,100 @@ struct DeserializationTests {
             }
         }
 
+        static let invalidUTF8Sequences: [[UInt8]] = [
+            [0xFF], // invalid lead byte
+            [0x80], // unexpected continuation byte
+            [0xC0, 0xAF], // overlong 2-byte sequence
+            [0xE0, 0x80, 0xAF], // overlong 3-byte sequence
+            [0xED, 0xA0, 0x80], // encoded surrogate
+            [0xF4, 0x90, 0x80, 0x80], // above U+10FFFF
+            [0xC3], // truncated 2-byte sequence
+            [0xE2, 0x82], // truncated 3-byte sequence
+        ]
+
+        static func document(key: [UInt8] = Array("key".utf8), value: [UInt8]) -> Data {
+            Data(Array(#"{""#.utf8) + key + Array(#"": ""#.utf8) + value + Array(#""}"#.utf8))
+        }
+
+        @Test("Invalid UTF-8 in string value", arguments: invalidUTF8Sequences)
+        func invalidUTF8Value(sequence: [UInt8]) async throws {
+            let values: [[UInt8]] = [
+                sequence,
+                Array("a long ascii prefix".utf8) + sequence + Array("and suffix".utf8),
+                Array(#"escaped\n"#.utf8) + sequence,
+            ]
+            for value in values {
+                let data = Self.document(value: value)
+                #expect(throws: JSON.DeserializationError.invalidUnicode) {
+                    _ = try JSON(data)
+                }
+                await #expect(throws: JSON.DeserializationError.invalidUnicode) {
+                    _ = try await JSON.deserialize(data)
+                }
+            }
+        }
+
+        @Test("Invalid UTF-8 in object key", arguments: invalidUTF8Sequences)
+        func invalidUTF8Key(sequence: [UInt8]) throws {
+            for key in [sequence, Array(#"escaped\n"#.utf8) + sequence] {
+                let data = Self.document(key: key, value: Array("value".utf8))
+                #expect(throws: JSON.DeserializationError.invalidUnicode) {
+                    _ = try JSON(data)
+                }
+            }
+        }
+
+        @Test("Invalid UTF-8 at every lane position", arguments: invalidUTF8Sequences)
+        func invalidUTF8LanePosition(sequence: [UInt8]) throws {
+            for offset in 0 ..< 48 {
+                let bytes = Array(repeating: UInt8(ascii: "a"), count: offset) + sequence + Array(repeating: UInt8(ascii: "b"), count: 64 - offset)
+                #expect(throws: JSON.DeserializationError.invalidUnicode) {
+                    _ = try JSON(Self.document(value: bytes))
+                }
+                #expect(throws: JSON.DeserializationError.invalidUnicode) {
+                    _ = try JSON(Self.document(key: bytes, value: Array("value".utf8)))
+                }
+            }
+        }
+
+        @Test("Invalid UTF-8 in fragment")
+        func invalidUTF8Fragment() throws {
+            let data = Data([0x22, 0xFF, 0x22])
+            #expect(throws: JSON.DeserializationError.invalidUnicode) {
+                _ = try JSON(data)
+            }
+        }
+
+    }
+
+    @Test("Valid multi-byte UTF-8")
+    func validMultiByteUTF8() throws {
+        let raw = #"{"clé": "héllo wörld — 日本語 🐦", "🐦 \n": "é é"}"#
+        let json = try JSON(Data(raw.utf8))
+        #expect(json == ["clé": "héllo wörld — 日本語 🐦", "🐦 \n": "é é"])
+    }
+
+    @Test("Valid multi-byte UTF-8 at every lane position")
+    func validMultiByteUTF8LanePosition() throws {
+        for scalar in ["é", "—", "🐦"] {
+            for offset in 0 ..< 48 {
+                let string = String(repeating: "a", count: offset) + scalar + String(repeating: "b", count: 64 - offset)
+                let raw = #"{"\#(string)": "\#(string)"}"#
+                #expect(try JSON(Data(raw.utf8)) == [string: .string(string)])
+            }
+        }
+    }
+
+    @Test("Allow invalid UTF-8")
+    func allowInvalidUTF8() async throws {
+        let raw = Data(Array(#"{""#.utf8) + [0xFF] + Array(#"": "a"#.utf8) + [0xC3] + Array(#"\n"}"#.utf8))
+        let options = JSON.DeserializationOptions.default.union(.allowInvalidUTF8)
+        let expected: JSON = ["\u{FFFD}": "a\u{FFFD}\n"]
+        #expect(try JSON.value(for: raw, options: options) == expected)
+        #expect(try await JSON.deserialize(raw, options: options) == expected)
+        #expect(throws: JSON.DeserializationError.invalidUnicode) {
+            _ = try JSON.value(for: raw, options: .default)
+        }
     }
 
     @Test("Deserialization Recursion Depth Limit")
