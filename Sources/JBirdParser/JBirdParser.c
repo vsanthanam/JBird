@@ -708,6 +708,33 @@ static const uint64_t json_powers_of_five_128[JSON_LARGEST_POWER_OF_TEN - JSON_S
     {0x8E679C2F5E44FF8F, 0x570F09EAA7EA7648},
 };
 
+#define JSON_MANTISSA_LIMIT 1000000000000000000ULL
+#define JSON_CLINGER_MAX_MANTISSA (1ULL << 53)
+#define JSON_EXPONENT_CLAMP 100000
+
+static const uint64_t pow10_u64_table[20] = {
+    1ULL,
+    10ULL,
+    100ULL,
+    1000ULL,
+    10000ULL,
+    100000ULL,
+    1000000ULL,
+    10000000ULL,
+    100000000ULL,
+    1000000000ULL,
+    10000000000ULL,
+    100000000000ULL,
+    1000000000000ULL,
+    10000000000000ULL,
+    100000000000000ULL,
+    1000000000000000ULL,
+    10000000000000000ULL,
+    100000000000000000ULL,
+    1000000000000000000ULL,
+    10000000000000000000ULL
+};
+
 typedef enum {
     CHAR_CLASS_NONE = 0,
     CHAR_CLASS_DIGIT = 1,
@@ -1766,53 +1793,6 @@ static json_error_t json_parse_string_into_temp_buffer(json_parser_t *parser) {
     return JSON_UNEXPECTED_END_OF_INPUT;
 }
 
-// MARK: - Number Parsing
-//
-// Numbers are parsed in two stages. The scanner reads the decimal digits into an
-// exact 64-bit mantissa (at most 19 significant digits) and a base-10 exponent.
-// The conversion stage then rounds that exact decimal to the nearest double
-// exactly once, so results match `strtod` and Foundation bit for bit:
-//
-//   1. Clinger's fast path when the mantissa fits in 53 bits and the power of
-//      ten is exactly representable, which covers most real-world numbers.
-//   2. The Eisel-Lemire algorithm, which is exact for any mantissa below 2^64
-//      and any decimal exponent in the range of double.
-//   3. `strtod` only when the input has more than 19 significant digits and the
-//      two Eisel-Lemire candidates disagree on the rounding.
-
-// Mantissa values below this can accept one more decimal digit without
-// exceeding 19 digits, which is guaranteed to fit in a uint64_t.
-#define JSON_MANTISSA_LIMIT 1000000000000000000ULL
-
-// Mantissas up to 2^53 are exactly representable as a double.
-#define JSON_CLINGER_MAX_MANTISSA (1ULL << 53)
-
-// Exponents beyond this magnitude are clamped while scanning. Any exponent this
-// large already produces zero or infinity regardless of the mantissa.
-#define JSON_EXPONENT_CLAMP 100000
-
-static const uint64_t pow10_u64_table[20] = {
-    1ULL,
-    10ULL,
-    100ULL,
-    1000ULL,
-    10000ULL,
-    100000ULL,
-    1000000ULL,
-    10000000ULL,
-    100000000ULL,
-    1000000000ULL,
-    10000000000ULL,
-    100000000000ULL,
-    1000000000000ULL,
-    10000000000000ULL,
-    100000000000000ULL,
-    1000000000000000ULL,
-    10000000000000000ULL,
-    100000000000000000ULL,
-    1000000000000000000ULL,
-    10000000000000000000ULL};
-
 typedef struct {
     uint64_t high;
     uint64_t low;
@@ -1859,11 +1839,6 @@ static inline double json_double_from_bits(uint64_t bits) {
     return value;
 }
 
-// Computes the double nearest to mantissa * 10^exponent using the Eisel-Lemire
-// algorithm. Requires mantissa != 0 and exponent within
-// [JSON_SMALLEST_POWER_OF_TEN, JSON_LARGEST_POWER_OF_TEN]. This follows the
-// reference implementation in fast_float, including the proof by Mushtak and
-// Lemire that the truncated 128-bit product is always accurate enough.
 static double json_eisel_lemire(uint64_t mantissa, int64_t exponent) {
     int leading_zeros = json_leading_zeros(mantissa);
     uint64_t w = mantissa << leading_zeros;
@@ -1871,8 +1846,6 @@ static double json_eisel_lemire(uint64_t mantissa, int64_t exponent) {
     const uint64_t *power = json_powers_of_five_128[exponent - JSON_SMALLEST_POWER_OF_TEN];
     json_uint128_t product = json_full_multiply(w, power[0]);
 
-    // The top 55 bits of the product are exact unless the 9 bits below them are
-    // all ones, in which case the next 64 bits of the power are folded in.
     if ((product.high & 0x1FF) == 0x1FF) {
         json_uint128_t second = json_full_multiply(w, power[1]);
         product.low += second.high;
@@ -1885,7 +1858,6 @@ static double json_eisel_lemire(uint64_t mantissa, int64_t exponent) {
     int shift = (int)upper_bit + 9;
     uint64_t binary_mantissa = product.high >> shift;
 
-    // floor(log2(10^exponent)) + 63, then rebased against the double exponent bias.
     int64_t power2 = ((217706 * exponent) >> 16) + 63 + (int64_t)upper_bit - leading_zeros + 1023;
 
     if (power2 <= 0) {
@@ -1896,13 +1868,10 @@ static double json_eisel_lemire(uint64_t mantissa, int64_t exponent) {
         binary_mantissa >>= -power2 + 1;
         binary_mantissa += (binary_mantissa & 1);
         binary_mantissa >>= 1;
-        // Rounding may have carried into the smallest normal.
         power2 = (binary_mantissa < (1ULL << 52)) ? 0 : 1;
         return json_double_from_bits(binary_mantissa | ((uint64_t)power2 << 52));
     }
 
-    // Halfway cases between two doubles must round to even. They can only occur
-    // when 5^exponent fits in 64 bits and the discarded product bits were zero.
     if (product.low <= 1 && exponent >= -4 && exponent <= 23 && (binary_mantissa & 3) == 1) {
         if ((binary_mantissa << shift) == product.high) {
             binary_mantissa &= ~1ULL;
@@ -1925,9 +1894,6 @@ static double json_eisel_lemire(uint64_t mantissa, int64_t exponent) {
     return json_double_from_bits(binary_mantissa | ((uint64_t)power2 << 52));
 }
 
-// Converts the unsigned decimal text using the C library. Only reached for
-// inputs with more than 19 significant digits whose rounding Eisel-Lemire
-// could not settle. `fallback` is returned if the text cannot be converted.
 static double json_strtod_fallback(const uint8_t *text, size_t length, double fallback) {
     char stack_buffer[128];
     char *buffer = stack_buffer;
@@ -1944,7 +1910,6 @@ static double json_strtod_fallback(const uint8_t *text, size_t length, double fa
     double value = strtod(buffer, &end);
 
     if (end != buffer + length) {
-        // The C locale may use a decimal separator other than '.'.
         struct lconv *locale = localeconv();
         char *dot = memchr(buffer, '.', length);
         if (locale && locale->decimal_point && locale->decimal_point[0] != '\0' && locale->decimal_point[1] == '\0' && dot) {
@@ -1962,24 +1927,16 @@ static double json_strtod_fallback(const uint8_t *text, size_t length, double fa
     return value;
 }
 
-// Rounds mantissa * 10^exponent to the nearest double exactly once. `truncated`
-// indicates that the input had more than 19 significant digits and the dropped
-// digits were not all zero; `text` and `text_length` cover the unsigned number
-// text for the rare cases that need the C library.
 static double json_decimal_to_double(uint64_t mantissa, int64_t exponent, bool truncated, const uint8_t *text, size_t text_length) {
     if (mantissa == 0) {
         return 0.0;
     }
 
     if (!truncated && mantissa <= JSON_CLINGER_MAX_MANTISSA) {
-        // Clinger's fast path: both operands are exact, so one IEEE operation
-        // produces the correctly rounded result.
         if (exponent >= -22 && exponent <= 22) {
             double value = (double)mantissa;
             return exponent < 0 ? value / pow10_table[-exponent] : value * pow10_table[exponent];
         }
-        // Extended fast path: fold part of the exponent into the mantissa while
-        // it still fits in 53 bits.
         if (exponent > 22 && exponent <= 22 + 19) {
             uint64_t scale = pow10_u64_table[exponent - 22];
             if (mantissa <= JSON_CLINGER_MAX_MANTISSA / scale) {
@@ -1988,19 +1945,16 @@ static double json_decimal_to_double(uint64_t mantissa, int64_t exponent, bool t
         }
     }
 
-    // mantissa < 10^19 < 2^64, so any smaller exponent rounds to zero.
     if (exponent < JSON_SMALLEST_POWER_OF_TEN) {
         return 0.0;
     }
-    // mantissa >= 1, so any larger exponent overflows.
+
     if (exponent > JSON_LARGEST_POWER_OF_TEN) {
         return INFINITY;
     }
-
+    
     double value = json_eisel_lemire(mantissa, exponent);
     if (truncated) {
-        // The true value lies strictly between mantissa and mantissa + 1 at this
-        // exponent. If both round to the same double, so does the true value.
         double upper = json_eisel_lemire(mantissa + 1, exponent);
         if (value != upper) {
             value = json_strtod_fallback(text, text_length, value);
@@ -2032,7 +1986,6 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
     bool is_double = false;
     uint8_t digit;
 
-    // Integer part. Leading zeros are not permitted, so "0" stands alone.
     if (*p == '0') {
         p++;
         if (p < end && (uint8_t)(*p - '0') <= 9) {
@@ -2052,7 +2005,6 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
         }
     }
 
-    // Fraction part.
     if (p < end && *p == '.') {
         is_double = true;
         p++;
@@ -2061,7 +2013,6 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
         }
         while (p < end && (digit = (uint8_t)(*p - '0')) <= 9) {
             if (mantissa < JSON_MANTISSA_LIMIT) {
-                // Leading zeros keep the mantissa at zero and cost nothing.
                 mantissa = mantissa * 10 + digit;
                 exponent--;
             } else if (digit != 0) {
@@ -2071,7 +2022,6 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
         }
     }
 
-    // Exponent part.
     if (p < end && (*p | 0x20) == 'e') {
         is_double = true;
         p++;
@@ -2095,8 +2045,6 @@ static json_error_t json_parse_number(json_parser_t *parser, json_value_t **out_
 
     parser->index = (size_t)(p - input);
 
-    // Integers that fit in int64_t stay integers. `exponent` is non-zero here
-    // only if integer digits were dropped, which means the value is too large.
     if (!is_double && exponent == 0) {
         uint64_t limit = is_negative ? ((uint64_t)INT64_MAX + 1u) : (uint64_t)INT64_MAX;
         if (mantissa <= limit) {
