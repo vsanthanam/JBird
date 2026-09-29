@@ -732,8 +732,7 @@ static const uint64_t pow10_u64_table[20] = {
     10000000000000000ULL,
     100000000000000000ULL,
     1000000000000000000ULL,
-    10000000000000000000ULL
-};
+    10000000000000000000ULL};
 
 typedef enum {
     CHAR_CLASS_NONE = 0,
@@ -1949,7 +1948,7 @@ static double json_decimal_to_double(uint64_t mantissa, int64_t exponent, bool t
     if (exponent > JSON_LARGEST_POWER_OF_TEN) {
         return INFINITY;
     }
-    
+
     double value = json_eisel_lemire(mantissa, exponent);
     if (truncated) {
         double upper = json_eisel_lemire(mantissa + 1, exponent);
