@@ -45,12 +45,11 @@ struct CompatibilityMutex<Value>: ~Copyable where Value: ~Copyable {
         }
     }
 
-    // Swift 6.2.3's region-isolation checking rejects forwarding `inout sending` storage into `body`
-    // ("sending 'value' risks causing data races"), both from the `Mutex` closure and from the `LockBox` pointee.
-    // Swift 6.2.4 and later accept it, so they keep the full `Mutex`-style signature.
-    // Older compilers drop `sending` from `body`'s `inout` parameter, which leaves nothing to forward.
-    // The two declarations are otherwise identical.
-    #if compiler(>=6.2.4)
+    // Swift 6.2 toolchains on non-Apple platforms have slightly different region isolation rules that do not properly forward `sending` from the `inout`.
+    // Swift 6.2.4 in Xcode fixes this, and Swift 6.3 fixes it for non-Apple platforms, too.
+    // The body of these two functions are identical, save for this requirement.
+    // We will drop this when we drop support for Swift 6.2.x
+    #if compiler(>=6.3)
         borrowing func withLock<Result, Failure>(
             _ body: (inout sending Value) throws(Failure) -> sending Result
         ) throws(Failure) -> sending Result where Result: ~Copyable, Failure: Error {
