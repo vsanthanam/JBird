@@ -18,6 +18,10 @@ export BENCHMARK_TARGET=swiftyjson
 
 swift package --allow-writing-to-package-directory benchmark baseline update swiftyjson
 
+export BENCHMARK_TARGET=ikigajson
+
+swift package --allow-writing-to-package-directory benchmark baseline update ikigajson
+
 rm -rf Results
 
 mkdir Results
@@ -25,3 +29,4 @@ mkdir Results
 swift package benchmark baseline compare foundation jbird --format markdown > Results/foundation.md
 swift package benchmark baseline compare swiftyjson jbird --format markdown > Results/swiftyjson.md
 swift package benchmark baseline compare freddy jbird --format markdown > Results/freddy.md
+swift package benchmark baseline compare ikigajson jbird --format markdown > Results/ikigajson.md

@@ -61,6 +61,10 @@ let package = Package(
         .package(
             url: "https://github.com/SwiftyJSON/SwiftyJSON.git",
             exact: "5.0.2"
+        ),
+        .package(
+            url: "https://github.com/orlandos-nl/swift-json.git",
+            exact: "2.5.4"
         )
     ],
     targets: [
@@ -76,7 +80,11 @@ let package = Package(
                     package: "JBird"
                 ),
                 "Freddy",
-                "SwiftyJSON"
+                "SwiftyJSON",
+                .product(
+                    name: "IkigaJSON",
+                    package: "swift-json"
+                )
             ],
             path: "JBirdBenchmark",
             resources: [

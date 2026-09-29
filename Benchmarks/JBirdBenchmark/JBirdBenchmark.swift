@@ -26,6 +26,7 @@
 import Benchmark
 import Foundation
 import Freddy
+import IkigaJSON
 import JBird
 import SwiftyJSON
 
@@ -60,12 +61,13 @@ enum Library: String {
     case jbird
     case swiftyjson
     case freddy
+    case ikigajson
 }
 
 func selectedLibrary() -> Library {
     let raw = ProcessInfo.processInfo.environment["BENCHMARK_TARGET"]
     guard let raw, let library = Library(rawValue: raw) else {
-        fatalError("Set BENCHMARK_TARGET to one of: foundation, jbird, swiftyjson, freddy")
+        fatalError("Set BENCHMARK_TARGET to one of: foundation, jbird, swiftyjson, freddy, ikigajson")
     }
     return library
 }
@@ -82,17 +84,25 @@ nonisolated(unsafe) let benchmarks = {
     case .foundation:
         parse = { data in _ = try JSONSerialization.jsonObject(with: data) }
         setup = nil
-
     case .jbird:
         parse = { data in _ = try JBird.JSON(data) }
         setup = { JBird.JSON.warmLimits() }
-
     case .swiftyjson:
         parse = { data in _ = try SwiftyJSON.JSON(data: data) }
         setup = nil
-
     case .freddy:
         parse = { data in _ = try Freddy.JSON(data: data) }
+        setup = nil
+    case .ikigajson:
+        // IkigaJSON has no untyped entry point, so pick the container type from the root value.
+        // Parsing tokenizes and indexes the whole document, but values are decoded lazily on access.
+        parse = { data in
+            if data.first == UInt8(ascii: "{") {
+                _ = try IkigaJSON.JSONObject(data: data)
+            } else {
+                _ = try IkigaJSON.JSONArray(data: data)
+            }
+        }
         setup = nil
     }
 
