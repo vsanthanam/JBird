@@ -45,23 +45,48 @@ struct CompatibilityMutex<Value>: ~Copyable where Value: ~Copyable {
         }
     }
 
-    borrowing func withLock<Result, E>(
-        _ body: (inout sending Value) throws(E) -> sending Result
-    ) throws(E) -> sending Result where Result: ~Copyable, E: Error {
-        if usesMutex, #available(macOS 15.0, macCatalyst 18.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *) {
-            let pointer = storage.assumingMemoryBound(to: Mutex<Value>.self)
-            return try pointer.pointee.withLock { (value: inout sending Value) throws(E) -> sending Result in
-                try body(&value)
+    // Swift 6.2.3's region-isolation checking rejects forwarding `inout sending` storage into `body`
+    // ("sending 'value' risks causing data races"), both from the `Mutex` closure and from the `LockBox` pointee.
+    // Swift 6.2.4 and later accept it, so they keep the full `Mutex`-style signature.
+    // Older compilers drop `sending` from `body`'s `inout` parameter, which leaves nothing to forward.
+    // The two declarations are otherwise identical.
+    #if compiler(>=6.2.4)
+        borrowing func withLock<Result, Failure>(
+            _ body: (inout sending Value) throws(Failure) -> sending Result
+        ) throws(Failure) -> sending Result where Result: ~Copyable, Failure: Error {
+            if usesMutex, #available(macOS 15.0, macCatalyst 18.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *) {
+                let pointer = storage.assumingMemoryBound(to: Mutex<Value>.self)
+                return try pointer.pointee.withLock { (value: inout sending Value) throws(Failure) -> sending Result in
+                    try body(&value)
+                }
+            } else {
+                let pointer = storage.assumingMemoryBound(to: LockBox.self)
+                pointer.pointee.lock.lock()
+                defer {
+                    pointer.pointee.lock.unlock()
+                }
+                return try body(&pointer.pointee.value)
             }
-        } else {
-            let pointer = storage.assumingMemoryBound(to: LockBox.self)
-            pointer.pointee.lock.lock()
-            defer {
-                pointer.pointee.lock.unlock()
-            }
-            return try body(&pointer.pointee.value)
         }
-    }
+    #else
+        borrowing func withLock<Result, Failure>(
+            _ body: (inout Value) throws(Failure) -> sending Result
+        ) throws(Failure) -> sending Result where Result: ~Copyable, Failure: Error {
+            if usesMutex, #available(macOS 15.0, macCatalyst 18.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *) {
+                let pointer = storage.assumingMemoryBound(to: Mutex<Value>.self)
+                return try pointer.pointee.withLock { (value: inout sending Value) throws(Failure) -> sending Result in
+                    try body(&value)
+                }
+            } else {
+                let pointer = storage.assumingMemoryBound(to: LockBox.self)
+                pointer.pointee.lock.lock()
+                defer {
+                    pointer.pointee.lock.unlock()
+                }
+                return try body(&pointer.pointee.value)
+            }
+        }
+    #endif
 
     private struct LockBox: ~Copyable {
         let lock = NSLock()
