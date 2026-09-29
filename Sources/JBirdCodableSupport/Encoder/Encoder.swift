@@ -134,7 +134,7 @@ extension JSON {
         }
 
         /// A dictionary you use to customize the encoding process by providing contextual information.
-        public var userInfo: [CodingUserInfoKey : any Sendable] {
+        public var userInfo: [CodingUserInfoKey: any Sendable] {
             get {
                 _userInfo.strategy
             }
