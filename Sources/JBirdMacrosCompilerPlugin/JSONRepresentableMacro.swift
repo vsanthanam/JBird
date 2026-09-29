@@ -50,21 +50,39 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
             throw MacroExpansionErrorMessage("@JSONRepresentable macro can only be applied to structs, enums or classes.")
         }
 
-        let convertible = try DeclSyntax(
-            """
-            extension \(raw: name): JBirdCore.JSONConvertible {}
-            """
-        )
-        .as(ExtensionDeclSyntax.self)
-        .mustExist()
+        #if compiler(>=6.3)
+            let convertible = try DeclSyntax(
+                """
+                extension \(raw: name): JBirdCore::JSONConvertible {}
+                """
+            )
+            .as(ExtensionDeclSyntax.self)
+            .mustExist()
 
-        let initializable = try DeclSyntax(
-            """
-            extension \(raw: name): JBirdCore.JSONInitializable {}
-            """
-        )
-        .as(ExtensionDeclSyntax.self)
-        .mustExist()
+            let initializable = try DeclSyntax(
+                """
+                extension \(raw: name): JBirdCore::JSONInitializable {}
+                """
+            )
+            .as(ExtensionDeclSyntax.self)
+            .mustExist()
+        #else
+            let convertible = try DeclSyntax(
+                """
+                extension \(raw: name): JBirdCore.JSONConvertible {}
+                """
+            )
+            .as(ExtensionDeclSyntax.self)
+            .mustExist()
+
+            let initializable = try DeclSyntax(
+                """
+                extension \(raw: name): JBirdCore.JSONInitializable {}
+                """
+            )
+            .as(ExtensionDeclSyntax.self)
+            .mustExist()
+        #endif
 
         return [convertible, initializable]
     }
@@ -136,14 +154,25 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
             }
             .joined(separator: "\n")
 
-        let convertible = DeclSyntax(
-            """
-            @JBirdCore.JSON.Builder
-            public var jsonValue: JBirdCore.JSON {
-                \(raw: encodeItems)
-            }
-            """
-        )
+        #if compiler(>=6.3)
+            let convertible = DeclSyntax(
+                """
+                @JBirdCore::JSON.Builder
+                public var jsonValue: JBirdCore::JSON {
+                    \(raw: encodeItems)
+                }
+                """
+            )
+        #else
+            let convertible = DeclSyntax(
+                """
+                @JBirdCore.JSON.Builder
+                public var jsonValue: JBirdCore.JSON {
+                    \(raw: encodeItems)
+                }
+                """
+            )
+        #endif
 
         let convertItems = stored
             .map { prop in
@@ -161,23 +190,43 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
             }
             .joined(separator: "\n")
 
-        let initializable = if useRequiredInit {
-            DeclSyntax(
-                """
-                public required init(json: JSON) throws {
-                    \(raw: convertItems)
-                }
-                """
-            )
-        } else {
-            DeclSyntax(
-                """
-                public init(json: JSON) throws {
-                    \(raw: convertItems)
-                }
-                """
-            )
-        }
+        #if compiler(>=6.3)
+            let initializable = if useRequiredInit {
+                DeclSyntax(
+                    """
+                    public required init(json: JBirdCore::JSON) throws {
+                        \(raw: convertItems)
+                    }
+                    """
+                )
+            } else {
+                DeclSyntax(
+                    """
+                    public init(json: JBirdCore::JSON) throws {
+                        \(raw: convertItems)
+                    }
+                    """
+                )
+            }
+        #else
+            let initializable = if useRequiredInit {
+                DeclSyntax(
+                    """
+                    public required init(json: JBirdCore.JSON) throws {
+                        \(raw: convertItems)
+                    }
+                    """
+                )
+            } else {
+                DeclSyntax(
+                    """
+                    public init(json: JBirdCore.JSON) throws {
+                        \(raw: convertItems)
+                    }
+                    """
+                )
+            }
+        #endif
 
         return [convertible, initializable]
     }
@@ -317,16 +366,29 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
                         return "\"\(key)\" => \(varName)"
                     }.joined(separator: "\n")
 
-                    encodeSwitchCases.append(
-                        """
-                        case let .\(element.name)(\(varsAsArgument)):
-                            JSON {
-                                "\(element.name.text)" => JSON {
-                                    \(varsAsBody)
+                    #if compiler(>=6.3)
+                        encodeSwitchCases.append(
+                            """
+                            case let .\(element.name)(\(varsAsArgument)):
+                                JBirdCore::JSON {
+                                    "\(element.name.text)" => JBirdCore::JSON {
+                                        \(varsAsBody)
+                                    }
                                 }
-                            }
-                        """
-                    )
+                            """
+                        )
+                    #else
+                        encodeSwitchCases.append(
+                            """
+                            case let .\(element.name)(\(varsAsArgument)):
+                                JBirdCore.JSON {
+                                    "\(element.name.text)" => JBirdCore.JSON {
+                                        \(varsAsBody)
+                                    }
+                                }
+                            """
+                        )
+                    #endif
 
                     let associatedDecode = vars.map { varName in
                         "let \(varName) = try associatedValues[\"\(keys[varName]!)\"]"
@@ -358,14 +420,25 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
                     """)
                 } else {
                     if vars.count == 1, let only = vars.first {
-                        encodeSwitchCases.append(
-                            """
-                            case let .\(element.name)(\(varsAsArgument)):
-                                JSON {
-                                    \"\(element.name.text)\" => \(only)
-                                }
-                            """
-                        )
+                        #if compiler(>=6.3)
+                            encodeSwitchCases.append(
+                                """
+                                case let .\(element.name)(\(varsAsArgument)):
+                                    JBirdCore::JSON {
+                                        \"\(element.name.text)\" => \(only)
+                                    }
+                                """
+                            )
+                        #else
+                            encodeSwitchCases.append(
+                                """
+                                case let .\(element.name)(\(varsAsArgument)):
+                                    JBirdCore.JSON {
+                                        \"\(element.name.text)\" => \(only)
+                                    }
+                                """
+                            )
+                        #endif
 
                         let fnName = "convert_case_\(element.name.text)"
                         let fn = """
@@ -383,16 +456,29 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
                         """)
                     } else {
                         let varsAsBody = vars.joined(separator: "\n")
-                        encodeSwitchCases.append(
-                            """
-                            case let .\(element.name)(\(varsAsArgument)):
-                                JSON {
-                                    \"\(element.name.text)\" => JSON {
-                                        \(varsAsBody)
+                        #if compiler(>=6.3)
+                            encodeSwitchCases.append(
+                                """
+                                case let .\(element.name)(\(varsAsArgument)):
+                                    JBirdCore::JSON {
+                                        \"\(element.name.text)\" => JBirdCore::JSON {
+                                            \(varsAsBody)
+                                        }
                                     }
-                                }
-                            """
-                        )
+                                """
+                            )
+                        #else
+                            encodeSwitchCases.append(
+                                """
+                                case let .\(element.name)(\(varsAsArgument)):
+                                    JBirdCore.JSON {
+                                        \"\(element.name.text)\" => JBirdCore.JSON {
+                                            \(varsAsBody)
+                                        }
+                                    }
+                                """
+                            )
+                        #endif
 
                         let indices = Array(0..<vars.count)
                         let associatedDecode = indices.map { idx in
@@ -429,15 +515,27 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
                 )
 
                 let fnName = "convert_case_\(element.name.text)"
-                let fn = """
-                func \(fnName)() throws -> Self {
-                    let raw = try json.convert(into: String.self)
-                    guard raw == \"\(element.name.text)\" else {
-                        throw JBirdMacros.JSONMacroDecodingError(\"Enum case decoding failure\")
+                #if compiler(>=6.3)
+                    let fn = """
+                    func \(fnName)() throws -> Self {
+                        let raw = try json.convert(into: Swift::String.self)
+                        guard raw == \"\(element.name.text)\" else {
+                            throw JBirdMacros::JSONMacroDecodingError(\"Enum case decoding failure\")
+                        }
+                        return .\(element.name.text)
                     }
-                    return .\(element.name.text)
-                }
-                """
+                    """
+                #else
+                    let fn = """
+                    func \(fnName)() throws -> Self {
+                        let raw = try json.convert(into: Swift.String.self)
+                        guard raw == \"\(element.name.text)\" else {
+                            throw JBirdMacros.JSONMacroDecodingError(\"Enum case decoding failure\")
+                        }
+                        return .\(element.name.text)
+                    }
+                    """
+                #endif
                 convertFunctions.append(fn)
                 convertAttempts.append("""
                 if let value = try? \(fnName)() {
@@ -448,15 +546,27 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
             }
         }
 
-        let convertible = DeclSyntax(
-            """
-            public var jsonValue: JBirdCore.JSON {
-                switch self {
-                    \(raw: encodeSwitchCases.joined(separator: "\n"))
+        #if compiler(>=6.3)
+            let convertible = DeclSyntax(
+                """
+                public var jsonValue: JBirdCore::JSON {
+                    switch self {
+                        \(raw: encodeSwitchCases.joined(separator: "\n"))
+                    }
                 }
-            }
-            """
-        )
+                """
+            )
+        #else
+            let convertible = DeclSyntax(
+                """
+                public var jsonValue: JBirdCore.JSON {
+                    switch self {
+                        \(raw: encodeSwitchCases.joined(separator: "\n"))
+                    }
+                }
+                """
+            )
+        #endif
 
         var convertBodySections: [String] = []
         let convertFunctionsTogether = convertFunctions.joined(separator: "\n")
@@ -467,15 +577,29 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
         if !convertAttemptsBody.isEmpty {
             convertBodySections.append(convertAttemptsBody)
         }
-        convertBodySections.append("throw JBirdMacros.JSONMacroDecodingError(\"Enum case decoding failure\")")
+        #if compiler(>=6.3)
+            convertBodySections.append("throw JBirdMacros::JSONMacroDecodingError(\"Enum case decoding failure\")")
+        #else
+            convertBodySections.append("throw JBirdMacros.JSONMacroDecodingError(\"Enum case decoding failure\")")
+        #endif
 
-        let initializable = DeclSyntax(
-            """
-            public init(json: JSON) throws {
-                \(raw: convertBodySections.joined(separator: "\n\n"))
-            }
-            """
-        )
+        #if compiler(>=6.3)
+            let initializable = DeclSyntax(
+                """
+                public init(json: JBirdCore::JSON) throws {
+                    \(raw: convertBodySections.joined(separator: "\n\n"))
+                }
+                """
+            )
+        #else
+            let initializable = DeclSyntax(
+                """
+                public init(json: JBirdCore.JSON) throws {
+                    \(raw: convertBodySections.joined(separator: "\n\n"))
+                }
+                """
+            )
+        #endif
 
         return [convertible, initializable]
     }
