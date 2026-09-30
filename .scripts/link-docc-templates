@@ -1,0 +1,44 @@
+#!/bin/bash
+#
+# Link the shared DocC templates in .docc (such as header.html) into every
+# documentation catalog.
+#
+# The combined documentation build converts each catalog separately, so each
+# page only gets the templates from its own catalog. Rather than check in a
+# copy for every catalog, the build scripts link them in before building.
+# Templates only take effect with --experimental-enable-custom-templates.
+#
+# Usage:
+#   ./.scripts/link-docc-templates            # create the links
+#   ./.scripts/link-docc-templates --remove   # remove the links
+
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+remove=false
+if [ "${1:-}" = "--remove" ]; then
+    remove=true
+fi
+
+for catalog in Sources/*/*.docc; do
+    for template in .docc/*; do
+        link="$catalog/$(basename "$template")"
+        if [ "$remove" = true ]; then
+            if [ -L "$link" ]; then
+                rm "$link"
+            fi
+        elif [ -e "$link" ] && [ ! -L "$link" ]; then
+            echo "error: $link already exists and is not a link to $template." >&2
+            exit 1
+        else
+            ln -sf "$PWD/$template" "$link"
+        fi
+    done
+done
+
+if [ "$remove" = true ]; then
+    echo "✅ Removed DocC template links."
+else
+    echo "✅ Linked DocC templates into $(ls -d Sources/*/*.docc | wc -l | tr -d ' ') catalogs."
+fi

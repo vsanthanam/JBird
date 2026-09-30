@@ -1,5 +1,9 @@
 #!/bin/bash
 
+set -e
+
+./.scripts/link-docc-templates
+
 swift package --allow-writing-to-directory docs \
     generate-documentation \
     --enable-experimental-combined-documentation \
@@ -10,5 +14,6 @@ swift package --allow-writing-to-directory docs \
     --product JBirdCodableSupport \
     --disable-indexing \
     --transform-for-static-hosting \
+    --experimental-enable-custom-templates \
     --hosting-base-path docs \
     --output-path docs

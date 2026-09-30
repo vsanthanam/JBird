@@ -40,3 +40,6 @@ Fuzzer/json.dict
 # Benchmark Results
 Benchmarks/.benchmarkBaselines/
 Benchmarks/results.txt
+
+# DocC templates linked from .docc by .scripts/link-docc-templates
+Sources/*/*.docc/header.html
