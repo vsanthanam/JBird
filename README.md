@@ -3,9 +3,10 @@
 [![MIT License](https://img.shields.io/github/license/vsanthanam/JBird)](https://github.com/vsanthanam/JBird/blob/main/LICENSE)
 [![GitHub Release](https://img.shields.io/github/v/release/vsanthanam/JBird?include_prereleases)](https://github.com/vsanthanam/JBird/releases)
 [![Build Status](https://img.shields.io/github/check-runs/vsanthanam/JBird/main)](https://github.com/vsanthanam/JBird/actions)
-[![Swift Version](https://img.shields.io/badge/swift-%206.2%20%7C%206.3%20%7C%206.4-critical)](https://swift.org)
+[![Swift Version](https://img.shields.io/badge/swift-%206.2%20%7C%206.3%20%7C%206.4-F05138)](https://swift.org)
 [![Xcode](https://img.shields.io/badge/xcode-27.0-blue)](https://developer.apple.com/xcode/)
-[![Documentation](https://img.shields.io/badge/documentation-GitHub-8A2BE2)](https://usejbird.com/docs/documentation/jbird)
+[![Platforms](https://img.shields.io/badge/platforms-macOS%2013%2B%20%7C%20Mac%20Catalyst%2016%2B%20%7C%20iOS%2016%2B%20%7C%20watchOS%209%2B%20%7C%20tvOS%2016%2B%20%7C%20visionOS%201%2B%20%7C%20Linux%20%7C%20Windows%20%7C%20Android%20%7C%20Wasm-8A2BE2)](https://github.com/vsanthanam/JBird/blob/main/Package.swift)
+[![Documentation](https://img.shields.io/badge/documentation-GitHub-teal)](https://usejbird.com/docs/documentation/jbird)
 [![Test Coverage](https://codecov.io/gh/vsanthanam/JBird/graph/badge.svg?token=11GDRKPRLF)](https://codecov.io/gh/vsanthanam/JBird)
 
 A blazing fast, type-safe library for working with JSON in Swift
