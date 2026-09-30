@@ -1156,8 +1156,6 @@ static const char *json_string_get(const json_string_t *str) {
     return str->is_small ? str->data.buf : str->data.ptr;
 }
 
-// Skips 16-byte chunks that contain no quote, backslash, or control character.
-// The high bit of `*high_bits` is set if any skipped byte is not ASCII.
 #if defined(JBird_USE_SSE2)
 static inline size_t json_skip_plain_string_bytes(const uint8_t *input, size_t index, size_t length, uint8_t *high_bits) {
     const __m128i quote = _mm_set1_epi8('"');
@@ -1315,7 +1313,6 @@ static bool json_scan_simple_string(json_parser_t *parser, const char **str_star
         uint8_t c = parser->input[parser->index];
 
         if (char_class[c] == CHAR_CLASS_QUOTE) {
-            // Invalid UTF-8 falls back to the slow path, which reports the error
             if (parser->validate_utf8 && (high_bits & 0x80) &&
                 !json_utf8_is_valid(parser->input + start_index, length)) {
                 parser->index = start_index;
@@ -1791,7 +1788,6 @@ static json_error_t json_parse_string_into_temp_buffer(json_parser_t *parser) {
         return err;
     json_temp_buffer_clear(parser);
 
-    // Escapes always produce valid UTF-8, so only raw bytes need to be tracked
     uint8_t high_bits = 0;
     bool escape_mode = false;
     while (json_has_more(parser)) {
@@ -2581,7 +2577,6 @@ static bool try_parse_simple_string(json_parser_t *parser, const char **out_str,
         uint8_t c = input[curr_idx];
 
         if (char_class[c] == CHAR_CLASS_QUOTE) {
-            // Invalid UTF-8 falls back to the slow path, which reports the error
             if (parser->validate_utf8 && (high_bits & 0x80) &&
                 !json_utf8_is_valid(input + start_idx, curr_idx - start_idx)) {
                 return false;
