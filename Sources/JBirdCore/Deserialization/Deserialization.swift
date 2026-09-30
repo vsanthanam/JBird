@@ -476,7 +476,7 @@ extension JSON {
                 throw DeserializationError.inputSizeLimitExceeded
             }
 
-            var jsonValue: OpaquePointer?
+            var jsonValue: UnsafeMutablePointer<json_value_t>?
             let result = data.withUnsafeBytes { buffer in
                 json_parse(
                     buffer.baseAddress?.assumingMemoryBound(to: UInt8.self),
@@ -523,7 +523,7 @@ extension JSON {
     private struct Materializer {
 
         init(
-            root: OpaquePointer,
+            root: UnsafeMutablePointer<json_value_t>,
             options: DeserializationOptions
         ) {
             omitNullValues = options.contains(.omitNullValues)
@@ -532,7 +532,7 @@ extension JSON {
         }
 
         mutating func materialize(
-            _ value: OpaquePointer
+            _ value: UnsafeMutablePointer<json_value_t>
         ) throws -> JSON {
             switch json_get_type(value) {
             case JSON_NULL:
@@ -580,7 +580,7 @@ extension JSON {
         private var shapes: [UInt64: Shape] = [:]
 
         private mutating func materializeArray(
-            _ value: OpaquePointer
+            _ value: UnsafeMutablePointer<json_value_t>
         ) throws -> Array {
             let count = json_get_array_size(value)
             var array = Array()
@@ -596,7 +596,7 @@ extension JSON {
         }
 
         private mutating func materializeObject(
-            _ value: OpaquePointer
+            _ value: UnsafeMutablePointer<json_value_t>
         ) throws -> Object {
             let count = json_get_object_size(value)
             let canUseShape = count >= 2 && !omitNullObjectValues
@@ -628,7 +628,7 @@ extension JSON {
         }
 
         private func shapeSignature(
-            _ value: OpaquePointer,
+            _ value: UnsafeMutablePointer<json_value_t>,
             _ count: Int
         ) -> UInt64 {
             var hash = UInt64(count) &* 0x9E37_79B9_7F4A_7C15
@@ -640,7 +640,7 @@ extension JSON {
 
         private func shape(
             matching signature: UInt64,
-            _ value: OpaquePointer,
+            _ value: UnsafeMutablePointer<json_value_t>,
             _ count: Int
         ) -> Shape? {
             guard let shape = shapes[signature], shape.ids.count == count else {
@@ -654,7 +654,7 @@ extension JSON {
 
         private mutating func cacheShape(
             _ signature: UInt64,
-            _ value: OpaquePointer,
+            _ value: UnsafeMutablePointer<json_value_t>,
             _ count: Int,
             _ object: Object
         ) {
@@ -674,7 +674,7 @@ extension JSON {
         }
 
         private mutating func key(
-            of object: OpaquePointer,
+            of object: UnsafeMutablePointer<json_value_t>,
             at index: Int
         ) -> String {
             let id = Int(json_get_object_key_id(object, index))
@@ -699,7 +699,7 @@ extension JSON {
                     throw DeserializationError.inputSizeLimitExceeded
                 }
 
-                var jsonValue: OpaquePointer?
+                var jsonValue: UnsafeMutablePointer<json_value_t>?
                 let result = data.withUnsafeBytes { buffer in
                     json_parse(
                         buffer.baseAddress?.assumingMemoryBound(to: UInt8.self),
@@ -726,7 +726,7 @@ extension JSON {
                 }
 
                 func materialize(
-                    _ value: OpaquePointer,
+                    _ value: UnsafeMutablePointer<json_value_t>,
                     _ options: DeserializationOptions
                 ) async throws -> JSON {
                     try Task.checkCancellation()
@@ -800,7 +800,7 @@ extension JSON {
                     throw DeserializationError.inputSizeLimitExceeded
                 }
 
-                var jsonValue: OpaquePointer?
+                var jsonValue: UnsafeMutablePointer<json_value_t>?
                 let result = data.withUnsafeBytes { buffer in
                     json_parse(
                         buffer.baseAddress?.assumingMemoryBound(to: UInt8.self),
@@ -827,7 +827,7 @@ extension JSON {
                 }
 
                 nonisolated(nonsending) func materialize(
-                    _ value: OpaquePointer,
+                    _ value: UnsafeMutablePointer<json_value_t>,
                     _ options: DeserializationOptions
                 ) async throws -> JSON {
                     try Task.checkCancellation()

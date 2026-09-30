@@ -67,9 +67,72 @@ typedef enum {
 } json_type_t;
 
 /**
- * @brief Opaque structure representing a JSON value
+ * @brief Maximum size (including the terminator) of a string stored inline in a json_string_t
  */
-typedef struct json_value json_value_t;
+#define SMALL_STRING_SIZE 16
+
+/**
+ * @brief Opaque memory arena that owns every value in a parsed document
+ */
+typedef struct json_memory_arena json_memory_arena_t;
+
+/**
+ * @brief A string or object key stored in the arena
+ *
+ * Strings shorter than SMALL_STRING_SIZE are stored inline; longer strings point into the arena.
+ * Use json_string_get to obtain the NUL-terminated bytes regardless of representation.
+ */
+typedef struct json_string {
+    union {
+        char *ptr;
+        char buf[SMALL_STRING_SIZE];
+    } data;
+    size_t length;
+    bool is_small;
+    uint32_t pool_id;
+} json_string_t;
+
+typedef json_string_t json_key_t;
+
+/**
+ * @brief A parsed JSON value
+ *
+ * The layout is public so that the accessor functions below can be inlined by callers,
+ * including Swift. Treat the fields as read-only; values are created and freed by the parser.
+ */
+typedef struct json_value {
+    json_type_t type;
+    json_memory_arena_t *arena;
+    union {
+        bool boolean;
+        int64_t integer;
+        double number;
+        json_string_t string;
+        struct {
+            struct json_value **elements;
+            size_t count;
+            size_t capacity;
+        } array;
+        struct {
+            json_key_t *keys;
+            struct json_value **values;
+            size_t count;
+            size_t capacity;
+        } object;
+    } data;
+} json_value_t;
+
+/**
+ * @brief Get the NUL-terminated bytes of an arena string
+ *
+ * @param str The arena string
+ * @return A pointer to the string bytes, or NULL if str is NULL
+ */
+static inline const char *json_string_get(const json_string_t *str) {
+    if (!str)
+        return NULL;
+    return str->is_small ? str->data.buf : str->data.ptr;
+}
 
 /**
  * @brief Parse JSON data into a value structure
@@ -99,7 +162,9 @@ void json_free(json_value_t *value);
  * @param value The JSON value
  * @return The type of the JSON value
  */
-json_type_t json_get_type(const json_value_t *value);
+static inline json_type_t json_get_type(const json_value_t *value) {
+    return value ? value->type : JSON_NULL;
+}
 
 /**
  * @brief Get the boolean value from a JSON value
@@ -107,7 +172,9 @@ json_type_t json_get_type(const json_value_t *value);
  * @param value The JSON value (must be of type JSON_BOOLEAN)
  * @return The boolean value
  */
-bool json_get_boolean(const json_value_t *value);
+static inline bool json_get_boolean(const json_value_t *value) {
+    return (value && value->type == JSON_BOOLEAN) ? value->data.boolean : false;
+}
 
 /**
  * @brief Get the integer value from a JSON value
@@ -115,7 +182,18 @@ bool json_get_boolean(const json_value_t *value);
  * @param value The JSON value (must be of type JSON_NUMBER_INT)
  * @return The integer value
  */
-int64_t json_get_int(const json_value_t *value);
+static inline int64_t json_get_int(const json_value_t *value) {
+    if (!value)
+        return 0;
+
+    if (value->type == JSON_NUMBER_INT) {
+        return value->data.integer;
+    } else if (value->type == JSON_NUMBER_DOUBLE) {
+        return (int64_t)value->data.number;
+    }
+
+    return 0;
+}
 
 /**
  * @brief Get the double value from a JSON value
@@ -123,7 +201,18 @@ int64_t json_get_int(const json_value_t *value);
  * @param value The JSON value (must be of type JSON_NUMBER_DOUBLE)
  * @return The double value
  */
-double json_get_double(const json_value_t *value);
+static inline double json_get_double(const json_value_t *value) {
+    if (!value)
+        return 0.0;
+
+    if (value->type == JSON_NUMBER_DOUBLE) {
+        return value->data.number;
+    } else if (value->type == JSON_NUMBER_INT) {
+        return (double)value->data.integer;
+    }
+
+    return 0.0;
+}
 
 /**
  * @brief Get the string value from a JSON value
@@ -131,7 +220,11 @@ double json_get_double(const json_value_t *value);
  * @param value The JSON value (must be of type JSON_STRING)
  * @return The string value
  */
-const char *json_get_string(const json_value_t *value);
+static inline const char *json_get_string(const json_value_t *value) {
+    if (!value || value->type != JSON_STRING)
+        return NULL;
+    return json_string_get(&value->data.string);
+}
 
 /**
  * @brief Get the length in bytes of a JSON string value
@@ -139,7 +232,11 @@ const char *json_get_string(const json_value_t *value);
  * @param value The JSON value (must be of type JSON_STRING)
  * @return The number of UTF-8 bytes in the string, not including the terminator
  */
-size_t json_get_string_length(const json_value_t *value);
+static inline size_t json_get_string_length(const json_value_t *value) {
+    if (!value || value->type != JSON_STRING)
+        return 0;
+    return value->data.string.length;
+}
 
 /**
  * @brief Get the size of a JSON array
@@ -147,7 +244,9 @@ size_t json_get_string_length(const json_value_t *value);
  * @param array The JSON value (must be of type JSON_ARRAY)
  * @return The number of elements in the array
  */
-size_t json_get_array_size(const json_value_t *array);
+static inline size_t json_get_array_size(const json_value_t *array) {
+    return (array && array->type == JSON_ARRAY) ? array->data.array.count : 0;
+}
 
 /**
  * @brief Get an element from a JSON array by index
@@ -156,7 +255,12 @@ size_t json_get_array_size(const json_value_t *array);
  * @param index The index of the element to retrieve
  * @return The JSON value at the specified index
  */
-json_value_t *json_get_array_element(const json_value_t *array, size_t index);
+static inline json_value_t *json_get_array_element(const json_value_t *array, size_t index) {
+    if (!array || array->type != JSON_ARRAY || index >= array->data.array.count) {
+        return NULL;
+    }
+    return array->data.array.elements[index];
+}
 
 /**
  * @brief Get the number of key-value pairs in a JSON object
@@ -164,7 +268,9 @@ json_value_t *json_get_array_element(const json_value_t *array, size_t index);
  * @param object The JSON value (must be of type JSON_OBJECT)
  * @return The number of key-value pairs
  */
-size_t json_get_object_size(const json_value_t *object);
+static inline size_t json_get_object_size(const json_value_t *object) {
+    return (object && object->type == JSON_OBJECT) ? object->data.object.count : 0;
+}
 
 /**
  * @brief Get the key at a specific index in a JSON object
@@ -173,7 +279,12 @@ size_t json_get_object_size(const json_value_t *object);
  * @param index The index of the key to retrieve
  * @return The key string at the specified index
  */
-const char *json_get_object_key(const json_value_t *object, size_t index);
+static inline const char *json_get_object_key(const json_value_t *object, size_t index) {
+    if (!object || object->type != JSON_OBJECT || index >= object->data.object.count) {
+        return NULL;
+    }
+    return json_string_get(&object->data.object.keys[index]);
+}
 
 /**
  * @brief Get the length in bytes of the key at a specific index in a JSON object
@@ -182,7 +293,12 @@ const char *json_get_object_key(const json_value_t *object, size_t index);
  * @param index The index of the key
  * @return The number of UTF-8 bytes in the key, not including the terminator
  */
-size_t json_get_object_key_length(const json_value_t *object, size_t index);
+static inline size_t json_get_object_key_length(const json_value_t *object, size_t index) {
+    if (!object || object->type != JSON_OBJECT || index >= object->data.object.count) {
+        return 0;
+    }
+    return object->data.object.keys[index].length;
+}
 
 /**
  * @brief Get the interned identifier of the key at a specific index in a JSON object
@@ -194,7 +310,12 @@ size_t json_get_object_key_length(const json_value_t *object, size_t index);
  * @param index The index of the key
  * @return The identifier of the key
  */
-uint32_t json_get_object_key_id(const json_value_t *object, size_t index);
+static inline uint32_t json_get_object_key_id(const json_value_t *object, size_t index) {
+    if (!object || object->type != JSON_OBJECT || index >= object->data.object.count) {
+        return 0;
+    }
+    return object->data.object.keys[index].pool_id;
+}
 
 /**
  * @brief Get the number of distinct object keys in the parsed document
@@ -211,6 +332,11 @@ size_t json_get_key_count(const json_value_t *value);
  * @param index The index of the value to retrieve
  * @return The JSON value at the specified index
  */
-json_value_t *json_get_object_value(const json_value_t *object, size_t index);
+static inline json_value_t *json_get_object_value(const json_value_t *object, size_t index) {
+    if (!object || object->type != JSON_OBJECT || index >= object->data.object.count) {
+        return NULL;
+    }
+    return object->data.object.values[index];
+}
 
 #endif /* JBirdParser_h */

@@ -47,7 +47,6 @@
 #define JSON_SMALL_JSON_THRESHOLD (128 * 1024)
 #define JSON_STANDARD_JSON_THRESHOLD (1024 * 1024)
 
-#define SMALL_STRING_SIZE 16
 #define STRING_POOL_INITIAL_SIZE 64
 #define STRING_POOL_INITIAL_BUCKETS 128
 
@@ -888,40 +887,6 @@ typedef struct json_memory_arena {
     string_pool_t string_pool;
 } json_memory_arena_t;
 
-typedef struct json_string {
-    union {
-        char *ptr;
-        char buf[SMALL_STRING_SIZE];
-    } data;
-    size_t length;
-    bool is_small;
-    uint32_t pool_id;
-} json_string_t;
-
-typedef json_string_t json_key_t;
-
-struct json_value {
-    json_type_t type;
-    json_memory_arena_t *arena;
-    union {
-        bool boolean;
-        int64_t integer;
-        double number;
-        json_string_t string;
-        struct {
-            struct json_value **elements;
-            size_t count;
-            size_t capacity;
-        } array;
-        struct {
-            json_key_t *keys;
-            struct json_value **values;
-            size_t count;
-            size_t capacity;
-        } object;
-    } data;
-};
-
 typedef struct {
     const uint8_t *input;
     size_t length;
@@ -1148,12 +1113,6 @@ static void json_string_init(json_string_t *str, const char *text, size_t len, j
             str->data.ptr[len] = '\0';
         }
     }
-}
-
-static const char *json_string_get(const json_string_t *str) {
-    if (!str)
-        return NULL;
-    return str->is_small ? str->data.buf : str->data.ptr;
 }
 
 // Skips 16-byte chunks that contain no quote, backslash, or control character.
@@ -1531,105 +1490,11 @@ static void json_temp_buffer_clear(json_parser_t *parser) {
     parser->temp_size = 0;
 }
 
-json_type_t json_get_type(const json_value_t *value) {
-    return value ? value->type : JSON_NULL;
-}
-
-bool json_get_boolean(const json_value_t *value) {
-    return (value && value->type == JSON_BOOLEAN) ? value->data.boolean : false;
-}
-
-int64_t json_get_int(const json_value_t *value) {
-    if (!value)
-        return 0;
-
-    if (value->type == JSON_NUMBER_INT) {
-        return value->data.integer;
-    } else if (value->type == JSON_NUMBER_DOUBLE) {
-        return (int64_t)value->data.number;
-    }
-
-    return 0;
-}
-
-double json_get_double(const json_value_t *value) {
-    if (!value)
-        return 0.0;
-
-    if (value->type == JSON_NUMBER_DOUBLE) {
-        return value->data.number;
-    } else if (value->type == JSON_NUMBER_INT) {
-        return (double)value->data.integer;
-    }
-
-    return 0.0;
-}
-
-const char *json_get_string(const json_value_t *value) {
-    if (!value || value->type != JSON_STRING)
-        return NULL;
-    return json_string_get(&value->data.string);
-}
-
-size_t json_get_string_length(const json_value_t *value) {
-    if (!value || value->type != JSON_STRING)
-        return 0;
-    return value->data.string.length;
-}
-
-size_t json_get_array_size(const json_value_t *array) {
-    return (array && array->type == JSON_ARRAY) ? array->data.array.count : 0;
-}
-
-json_value_t *json_get_array_element(const json_value_t *array, size_t index) {
-    if (!array || array->type != JSON_ARRAY || index >= array->data.array.count) {
-        return NULL;
-    }
-    return array->data.array.elements[index];
-}
-
-static const char *json_get_object_key_internal(const json_value_t *object, size_t index) {
-    if (!object || object->type != JSON_OBJECT || index >= object->data.object.count) {
-        return NULL;
-    }
-
-    return json_string_get(&object->data.object.keys[index]);
-}
-
-size_t json_get_object_size(const json_value_t *object) {
-    return (object && object->type == JSON_OBJECT) ? object->data.object.count : 0;
-}
-
-const char *json_get_object_key(const json_value_t *object, size_t index) {
-    return json_get_object_key_internal(object, index);
-}
-
-size_t json_get_object_key_length(const json_value_t *object, size_t index) {
-    if (!object || object->type != JSON_OBJECT || index >= object->data.object.count) {
-        return 0;
-    }
-    return object->data.object.keys[index].length;
-}
-
-uint32_t json_get_object_key_id(const json_value_t *object, size_t index) {
-    if (!object || object->type != JSON_OBJECT || index >= object->data.object.count) {
-        return 0;
-    }
-    return object->data.object.keys[index].pool_id;
-}
-
 size_t json_get_key_count(const json_value_t *value) {
     if (!value || !value->arena) {
         return 0;
     }
     return value->arena->string_pool.entry_count;
-}
-
-json_value_t *json_get_object_value(const json_value_t *object, size_t index) {
-    if (!object || object->type != JSON_OBJECT || index >= object->data.object.count) {
-        return NULL;
-    }
-    return object->data.object.values[index];
 }
 
 static bool json_has_more(json_parser_t *parser) {
