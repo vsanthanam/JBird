@@ -46,6 +46,8 @@ jobs:
         run: unzip docs.zip
       - name: Setup Jekyll Configuration
         run: ./.scripts/setup-theme
+      - name: Setup Pages from Community Files
+        run: ./.scripts/setup-pages
       - name: Move Website Contents
         run: |
           shopt -s dotglob nullglob

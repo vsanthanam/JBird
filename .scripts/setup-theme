@@ -1,12 +1,19 @@
 #!/bin/bash
 
-cat > _config.yml <<EOF
-remote_theme: vsanthanam/aviary@v0.2.0
+cat > _config.yml <<EOC
+remote_theme: vsanthanam/aviary@v0.3.0
 plugins:
 - jekyll-remote-theme
 documentation_url: "https://www.usejbird.com/docs/documentation/jbird"
 copyright_owner: "Varun Santhanam"
 social_image: "https://www.usejbird.com/assets/images/social-preview.png"
-EOF
+navigation:
+- title: "Contributing"
+  url: "/contributing/"
+- title: "Code of Conduct"
+  url: "/code-of-conduct/"
+- title: "Security Policy"
+  url: "/security/"
+EOC
 
 echo "✅ _config.yml created."

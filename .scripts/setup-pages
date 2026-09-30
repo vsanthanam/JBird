@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -euo pipefail
+
+# page <source> <destination> <title> <permalink>
+page() {
+    {
+        printf -- '---\ntitle: "%s"\npermalink: %s\n---\n\n' "$3" "$4"
+        cat "$1"
+    } > "$2"
+    echo "✅ $2 created from $1."
+}
+
+page .github/CONTRIBUTING.md contributing.md "Contributing" /contributing/
+page .github/CODE_OF_CONDUCT.md code-of-conduct.md "Code of Conduct" /code-of-conduct/
+page .github/SECURITY.md security.md "Security Policy" /security/
