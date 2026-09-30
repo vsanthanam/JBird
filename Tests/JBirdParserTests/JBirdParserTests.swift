@@ -34,7 +34,7 @@ struct JBirdParserTests {
     func parseNull() throws {
         let raw = "null"
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -54,7 +54,7 @@ struct JBirdParserTests {
     func parseTrue() throws {
         let raw = "true"
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -74,7 +74,7 @@ struct JBirdParserTests {
     func parseFalse() throws {
         let raw = "false"
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -94,7 +94,7 @@ struct JBirdParserTests {
     func parseInteger() throws {
         let raw = "42"
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -116,7 +116,7 @@ struct JBirdParserTests {
     func parseNegativeInteger() throws {
         let raw = "-123"
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -137,7 +137,7 @@ struct JBirdParserTests {
     func parseZero() throws {
         let raw = "0"
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -157,7 +157,7 @@ struct JBirdParserTests {
     func parseDouble() throws {
         let raw = "3.14159"
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -178,7 +178,7 @@ struct JBirdParserTests {
     func parseScientificNotation() throws {
         let raw = "1.23e10"
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -198,7 +198,7 @@ struct JBirdParserTests {
     func parseNegativeScientificNotation() throws {
         let raw = "-1.5e-3"
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -221,7 +221,7 @@ struct JBirdParserTests {
         "hello"
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -247,7 +247,7 @@ struct JBirdParserTests {
         ""
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -273,7 +273,7 @@ struct JBirdParserTests {
         "hello\nworld\t!"    
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -298,7 +298,7 @@ struct JBirdParserTests {
         "\u0048\u0065\u006C\u006C\u006F"
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -323,7 +323,7 @@ struct JBirdParserTests {
         "\uD83D\uDE00"    
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -348,7 +348,7 @@ struct JBirdParserTests {
         []
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -370,7 +370,7 @@ struct JBirdParserTests {
         [1, 2, 3]
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -410,7 +410,7 @@ struct JBirdParserTests {
         [[1, 2], [3, 4]]
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -437,7 +437,7 @@ struct JBirdParserTests {
         {}
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -459,7 +459,7 @@ struct JBirdParserTests {
         {"name": "John", "age": 30}    
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -514,7 +514,7 @@ struct JBirdParserTests {
         }
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -536,7 +536,7 @@ struct JBirdParserTests {
         let jsonString = "true"
         let jsonData = Data(bom + jsonString.utf8)
 
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, true, true, true, 0)
@@ -558,7 +558,7 @@ struct JBirdParserTests {
         let jsonString = "true"
         let jsonData = Data(bom + jsonString.utf8)
 
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, false, true, 0)
@@ -576,7 +576,7 @@ struct JBirdParserTests {
     func parseWithWhitespaceAllowed() throws {
         let raw = "  \t\n  true  \r\n  "
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -598,7 +598,7 @@ struct JBirdParserTests {
          true 
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, true, false, true, 0)
@@ -618,7 +618,7 @@ struct JBirdParserTests {
         [[[[[true]]]]]
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 3)
@@ -638,7 +638,7 @@ struct JBirdParserTests {
         [[true]]
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 3)
@@ -654,7 +654,7 @@ struct JBirdParserTests {
 
     @Test("Parse null input")
     func parseNullInput() {
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
         let result = json_parse(nil, 0, &value, true, false, false, true, 0)
 
         #expect(result == JSON_INVALID_JSON)
@@ -664,7 +664,7 @@ struct JBirdParserTests {
     @Test("Parse empty input")
     func parseEmptyInput() throws {
         let jsonData = try #require("".data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -684,7 +684,7 @@ struct JBirdParserTests {
         xyz
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -704,7 +704,7 @@ struct JBirdParserTests {
         tr
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -724,7 +724,7 @@ struct JBirdParserTests {
         fal
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -744,7 +744,7 @@ struct JBirdParserTests {
         nul
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -764,7 +764,7 @@ struct JBirdParserTests {
         01
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -784,7 +784,7 @@ struct JBirdParserTests {
         -
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -804,7 +804,7 @@ struct JBirdParserTests {
         "hello
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -824,7 +824,7 @@ struct JBirdParserTests {
         "hello\x\"
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -841,7 +841,7 @@ struct JBirdParserTests {
     @Test("Parse string with control character")
     func parseStringWithControlCharacter() {
         let jsonData = Data([0x22, 0x01, 0x22])
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -861,7 +861,7 @@ struct JBirdParserTests {
         "\uXXXX"
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -881,7 +881,7 @@ struct JBirdParserTests {
         "\uD800"
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -901,7 +901,7 @@ struct JBirdParserTests {
         "\uDC00"
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -921,7 +921,7 @@ struct JBirdParserTests {
         [1, 2
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -941,7 +941,7 @@ struct JBirdParserTests {
         [1; 2]
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -961,7 +961,7 @@ struct JBirdParserTests {
         {123: "value"}
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -981,7 +981,7 @@ struct JBirdParserTests {
         {"key" "value}    
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -1001,7 +1001,7 @@ struct JBirdParserTests {
         {"key1": "value1"; "key2": "value2"}    
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -1021,7 +1021,7 @@ struct JBirdParserTests {
         {"key": "value"
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -1041,7 +1041,7 @@ struct JBirdParserTests {
         true false
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -1059,7 +1059,7 @@ struct JBirdParserTests {
     func getBooleanFromNonBoolean() throws {
         let raw = "42"
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -1079,7 +1079,7 @@ struct JBirdParserTests {
     func getIntFromNull() throws {
         let raw = "null"
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -1100,7 +1100,7 @@ struct JBirdParserTests {
     func getStringFromNonString() throws {
         let raw = "42"
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -1120,7 +1120,7 @@ struct JBirdParserTests {
     func getArraySizeFromNonArray() throws {
         let raw = "42"
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -1140,7 +1140,7 @@ struct JBirdParserTests {
     func getObjectSizeFromNonObject() throws {
         let raw = "42"
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -1195,7 +1195,7 @@ struct JBirdParserTests {
     func parseLargeInteger() throws {
         let raw = "9223372036854775807"
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -1215,7 +1215,7 @@ struct JBirdParserTests {
     func parseNegativeLargeInteger() throws {
         let raw = "-9223372036854775808"
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -1239,7 +1239,7 @@ struct JBirdParserTests {
         1e+10
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -1261,7 +1261,7 @@ struct JBirdParserTests {
     @Test("Parse number with capital E")
     func parseNumberWithCapitalE() throws {
         let jsonData = try #require("1.5E-2".data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -1281,7 +1281,7 @@ struct JBirdParserTests {
     func parseInt64MaxAsInteger() throws {
         let raw = "9223372036854775807" // INT64_MAX
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
@@ -1301,7 +1301,7 @@ struct JBirdParserTests {
     func parseInt64MinAsInteger() throws {
         let raw = "-9223372036854775808" // INT64_MIN
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
@@ -1321,7 +1321,7 @@ struct JBirdParserTests {
     func parseInt64MaxPlusOneAsDouble() throws {
         let raw = "9223372036854775808" // INT64_MAX + 1
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
@@ -1341,7 +1341,7 @@ struct JBirdParserTests {
     func parseInt64MinMinusOneAsDouble() throws {
         let raw = "-9223372036854775809" // INT64_MIN - 1
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
@@ -1362,7 +1362,7 @@ struct JBirdParserTests {
         // This tests the fallback path (< 16 bytes remaining)
         let raw = "123"
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
@@ -1383,7 +1383,7 @@ struct JBirdParserTests {
         // This tests the SIMD-optimized path (>= 16 bytes remaining)
         let raw = "12345678901234567890" // 20 digits, should overflow to double
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
@@ -1404,7 +1404,7 @@ struct JBirdParserTests {
         // This tests the SIMD-optimized path with negative overflow
         let raw = "-12345678901234567890" // 20 digits, should overflow to double
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
@@ -1425,7 +1425,7 @@ struct JBirdParserTests {
         // 18 digits should still fit in int64 (within safe processing range)
         let raw = "123456789012345678" // 18 digits
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
@@ -1446,7 +1446,7 @@ struct JBirdParserTests {
         // 18 digits should still fit in int64 (within safe processing range)
         let raw = "-123456789012345678" // 18 digits
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
@@ -1466,7 +1466,7 @@ struct JBirdParserTests {
     func parseInt64MaxMinusOneAsInteger() throws {
         let raw = "9223372036854775806" // INT64_MAX - 1
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
@@ -1486,7 +1486,7 @@ struct JBirdParserTests {
     func parseInt64MinPlusOneAsInteger() throws {
         let raw = "-9223372036854775807" // INT64_MIN + 1
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
@@ -1506,7 +1506,7 @@ struct JBirdParserTests {
     func parseExtremelyLargePositiveNumber() throws {
         let raw = "999999999999999999999999999999"
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
@@ -1526,7 +1526,7 @@ struct JBirdParserTests {
     func parseExtremelyLargeNegativeNumber() throws {
         let raw = "-999999999999999999999999999999"
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
@@ -1565,7 +1565,7 @@ struct JBirdParserTests {
     )
     func parseDoubleIsCorrectlyRounded(raw: String) throws {
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -1602,7 +1602,7 @@ struct JBirdParserTests {
         // chunk so both the vectorized and scalar paths see the same input.
         let raw = "[\(literal), 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]"
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
@@ -1632,7 +1632,7 @@ struct JBirdParserTests {
     func parseOverflowingIntegerFollowedByMoreInput(literal: String) throws {
         let raw = "[\(literal), 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]"
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, false, false, true, true, 0)
@@ -1656,7 +1656,7 @@ struct JBirdParserTests {
         let longString = String(repeating: "a", count: 1000)
         let raw = "\"" + longString + "\""
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -1681,7 +1681,7 @@ struct JBirdParserTests {
         "\"\/\b\f\n\r\t"
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -1704,7 +1704,7 @@ struct JBirdParserTests {
         let elements = Array(1...100).map(String.init).joined(separator: ", ")
         let raw = "[" + elements + "]"
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -1733,7 +1733,7 @@ struct JBirdParserTests {
         let properties = (1...50).map { "\"key\($0)\": \($0)" }.joined(separator: ", ")
         let raw = "{" + properties + "}"
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -1768,7 +1768,7 @@ struct JBirdParserTests {
         [null, true, false, 42, 3.14, "hello", [], {}]
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -1799,7 +1799,7 @@ struct JBirdParserTests {
         {"key with spaces": 1, "key\nwith\tescapes": 2, "key\u0041": 3}    
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -1833,7 +1833,7 @@ struct JBirdParserTests {
     )
     func parseNumberEdgeCases(jsonString: String, expected: Int) throws {
         let jsonData = try #require(jsonString.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -1855,7 +1855,7 @@ struct JBirdParserTests {
         "\u12"
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -1875,7 +1875,7 @@ struct JBirdParserTests {
         "\uD800\u0041
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -1895,7 +1895,7 @@ struct JBirdParserTests {
         "\uD800\uD801
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -1915,7 +1915,7 @@ struct JBirdParserTests {
         {"foo":true,"foo":true}
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, true, true, 0)
         }
@@ -1934,7 +1934,7 @@ struct JBirdParserTests {
         {"foo":true,"foo":false}
         """#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
@@ -1966,7 +1966,7 @@ struct JBirdParserTests {
     func stringAndKeyLengths() throws {
         let raw = #"{"short":"a\u0000b","a_much_longer_key_than_sixteen":"","esc\"aped":"xyz"}"#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -1990,7 +1990,7 @@ struct JBirdParserTests {
     func keyIdentifiers() throws {
         let raw = #"[{"a":1,"b":2},{"b":3,"a":4,"c":5},{"esc\"aped":6,"esc\"aped":7}]"#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -2023,7 +2023,7 @@ struct JBirdParserTests {
     func lengthAccessorsOnMismatchedValues() throws {
         let raw = #"[42,"x"]"#
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
 
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
@@ -2082,7 +2082,7 @@ struct JBirdParserTests {
             bytes.append(contentsOf: repeatElement(UInt8(ascii: "a"), count: length))
             bytes.append(0x01)
             bytes.append(contentsOf: Array(#"","padding-padding-padding"]"#.utf8))
-            var value: OpaquePointer?
+            var value: UnsafeMutablePointer<json_value_t>?
             let result = bytes.withUnsafeBufferPointer { buffer in
                 json_parse(buffer.baseAddress, buffer.count, &value, true, false, false, true, 0)
             }
@@ -2191,7 +2191,7 @@ struct JBirdParserTests {
                 bytes.append(invalid)
                 bytes.append(contentsOf: repeatElement(UInt8(ascii: " "), count: 20))
                 bytes.append(contentsOf: Array("1]".utf8))
-                var value: OpaquePointer?
+                var value: UnsafeMutablePointer<json_value_t>?
                 let result = bytes.withUnsafeBufferPointer { buffer in
                     json_parse(buffer.baseAddress, buffer.count, &value, true, false, false, true, 0)
                 }
@@ -2210,9 +2210,9 @@ struct JBirdParserTests {
 
     private func parse(
         _ raw: String
-    ) throws -> (json_error_t, OpaquePointer?) {
+    ) throws -> (json_error_t, UnsafeMutablePointer<json_value_t>?) {
         let jsonData = try #require(raw.data(using: .utf8))
-        var value: OpaquePointer?
+        var value: UnsafeMutablePointer<json_value_t>?
         let result = jsonData.withUnsafeBytes { bytes in
             json_parse(bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, &value, true, false, false, true, 0)
         }
