@@ -1,0 +1,90 @@
+#!/usr/bin/env python3
+#
+# Usage: ./export <jmh-directory> <baseline> [<baseline> ...] > Results/results.json
+#
+# Combines the JMH exports of the given baselines (written by
+# `swift package benchmark baseline read <baseline> --format jmh`) into one
+# compact JSON file with every metric's percentiles, mean, and sample count.
+#
+# The values come straight from the recorded histograms, so unlike the markdown
+# comparisons they are not rounded or rescaled. The raw samples in the JMH
+# exports are dropped.
+
+import json
+import os
+import re
+import sys
+
+NAMES = {
+    "foundation": "Foundation",
+    "freddy": "Freddy",
+    "jbird": "JBird",
+    "swiftyjson": "SwiftyJSON",
+}
+
+# JMH reports these as plain counts
+BYTES = {"Memory (resident peak)", "Malloc (bytes total)", "Malloc / free Δ (bytes)"}
+
+PERCENTILES = {"0.0": "p0", "50.0": "p50", "90.0": "p90", "95.0": "p95", "99.0": "p99", "100.0": "p100"}
+
+
+def metric(name, jmh, samples):
+    unit = "bytes" if name in BYTES else jmh["scoreUnit"]
+    result = {"unit": unit, "mean": jmh["score"]}
+    for key, label in PERCENTILES.items():
+        result[label] = jmh["scorePercentiles"][key]
+    result["samples"] = samples
+    return result
+
+
+def results(path):
+    with open(path, encoding="utf-8") as file:
+        elements = json.load(file)
+
+    inputs = {}
+    for element in elements:
+        match = re.search(r"Parse_\((.+)\)$", element["benchmark"])
+        if not match:
+            sys.exit(f"error: unexpected benchmark name '{element['benchmark']}' in {path}.")
+        samples = element["measurementIterations"]
+        metrics = {"Throughput (# / s)": metric("Throughput (# / s)", element["primaryMetric"], samples)}
+        for name, jmh in element["secondaryMetrics"].items():
+            metrics[name] = metric(name, jmh, samples)
+        inputs[match.group(1)] = dict(sorted(metrics.items()))
+    return dict(sorted(inputs.items()))
+
+
+def machine(baseline):
+    path = os.path.join(".benchmarkBaselines", "JBirdBenchmark", baseline, "results.json")
+    with open(path, encoding="utf-8") as file:
+        info = json.load(file)["machine"]
+    kernel = re.match(r"Darwin Kernel Version ([\d.]+)", info["kernelVersion"])
+    return {
+        "processorType": info["processorType"],
+        "processors": info["processors"],
+        "memoryGB": info["memory"],
+        "kernel": f"Darwin {kernel.group(1)}" if kernel else info["kernelVersion"],
+    }
+
+
+def main():
+    if len(sys.argv) < 3:
+        sys.exit("usage: ./export <jmh-directory> <baseline> [<baseline> ...]")
+
+    directory, baselines = sys.argv[1], sys.argv[2:]
+    export = {
+        "machine": machine(baselines[0]),
+        "libraries": {
+            baseline: {
+                "name": NAMES.get(baseline, baseline),
+                "results": results(os.path.join(directory, f"{baseline}.jmh.json")),
+            }
+            for baseline in baselines
+        },
+    }
+    json.dump(export, sys.stdout, ensure_ascii=False, indent=2)
+    sys.stdout.write("\n")
+
+
+if __name__ == "__main__":
+    main()

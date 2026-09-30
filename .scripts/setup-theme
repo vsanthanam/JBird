@@ -1,19 +1,29 @@
 #!/bin/bash
 
 cat > _config.yml <<EOC
-remote_theme: vsanthanam/aviary@v0.3.0
+remote_theme: vsanthanam/aviary@v0.4.0
 plugins:
 - jekyll-remote-theme
 documentation_url: "https://www.usejbird.com/docs/documentation/jbird"
 copyright_owner: "Varun Santhanam"
 social_image: "https://www.usejbird.com/assets/images/social-preview.png"
 navigation:
-- title: "Contributing"
-  url: "/contributing/"
-- title: "Code of Conduct"
-  url: "/code-of-conduct/"
-- title: "Security Policy"
-  url: "/security/"
+  header:
+  - title: "Documentation"
+    url: "https://www.usejbird.com/docs/documentation/jbird"
+  - title: "Benchmarks"
+    url: "/benchmarks/"
+  - title: "Contributing"
+    url: "/contributing/"
+  footer:
+  - title: "Contributing"
+    url: "/contributing/"
+  - title: "Code of Conduct"
+    url: "/code-of-conduct/"
+  - title: "Security Policy"
+    url: "/security/"
+  - title: "License"
+    url: "https://github.com/vsanthanam/JBird/blob/main/LICENSE"
 EOC
 
 echo "✅ _config.yml created."

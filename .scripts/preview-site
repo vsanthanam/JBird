@@ -1,0 +1,160 @@
+#!/bin/bash
+#
+# Preview the published website locally.
+#
+# The website is built by .github/workflows/publish-website.yml, which assembles
+# the site in the repository root (README.md, the community files in .github,
+# the benchmark results, and the contents of .web), then builds it with the actions/jekyll-build-pages
+# Docker image. That image runs the same github-pages gem as GitHub Pages, so
+# plugins like jekyll-default-layout and jekyll-readme-index behave exactly as
+# they do on the live site.
+#
+# This script reproduces the published build: it assembles the site with the
+# same scripts as the workflow into a temporary directory, builds it with the
+# same Docker image, and serves the result with a plain static web server.
+#
+# There is no live rebuild: re-run the script to pick up changes.
+#
+# The only differences from the published build are deliberate and local:
+#   * the site is assembled in a temporary directory that is removed on exit,
+#     so the working copy is never modified.
+#   * the DocC documentation is not built. The Documentation button links to
+#     the live site, and .scripts/preview-docs previews the documentation.
+#
+# Requirements:
+#   * Docker Desktop, running. The build image is x86 only and runs under
+#     emulation on Apple silicon.
+#   * The GitHub CLI (optional). If signed in, its token is passed to the
+#     build to avoid GitHub API rate limits when loading repository metadata.
+#
+# Usage:
+#   mise run preview:site                                 # build and serve on port 4000
+#   mise run preview:site --port 9000                     # serve on a different port
+#   mise run preview:site --theme main                    # use a different ref of vsanthanam/aviary
+#   mise run preview:site --theme-path ~/Desktop/aviary   # use a local checkout of the theme
+
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+# Keep in sync with the version used by actions/jekyll-build-pages@v1
+image="ghcr.io/actions/jekyll-build-pages:v1.0.13"
+
+port=4000
+theme_ref=""
+theme_path=""
+while [ $# -gt 0 ]; do
+    case "$1" in
+    --port)
+        port="$2"
+        shift 2
+        ;;
+    --port=*)
+        port="${1#*=}"
+        shift
+        ;;
+    --theme)
+        theme_ref="$2"
+        shift 2
+        ;;
+    --theme=*)
+        theme_ref="${1#*=}"
+        shift
+        ;;
+    --theme-path)
+        theme_path="$2"
+        shift 2
+        ;;
+    --theme-path=*)
+        theme_path="${1#*=}"
+        shift
+        ;;
+    *)
+        echo "error: unknown argument '$1'." >&2
+        exit 1
+        ;;
+    esac
+done
+
+if [ -n "$theme_ref" ] && [ -n "$theme_path" ]; then
+    echo "error: --theme and --theme-path cannot be used together." >&2
+    exit 1
+fi
+
+if [ -n "$theme_path" ] && [ ! -d "$theme_path/_layouts" ]; then
+    echo "error: '$theme_path' does not look like a Jekyll theme (no _layouts directory)." >&2
+    exit 1
+fi
+
+if ! command -v python3 >/dev/null 2>&1; then
+    echo "error: python3 is required to serve the website." >&2
+    exit 1
+fi
+
+if ! docker info >/dev/null 2>&1; then
+    echo "error: Docker is not running. Start Docker Desktop and try again." >&2
+    exit 1
+fi
+
+repo_dir="$(pwd)"
+if lsof -nP -iTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1; then
+    echo "error: port $port is already in use (PID $(lsof -tiTCP:"$port" -sTCP:LISTEN | head -1)). Stop that process or pass --port." >&2
+    exit 1
+fi
+
+site_dir="$(mktemp -d)"
+server_pid=""
+trap '[ -n "$server_pid" ] && kill "$server_pid" 2>/dev/null; rm -rf "$site_dir"' EXIT
+trap 'exit 130' INT TERM HUP
+
+echo "Assembling website…"
+cp README.md "$site_dir/"
+mkdir -p "$site_dir/.github" "$site_dir/Benchmarks/Results"
+cp .github/*.md "$site_dir/.github/"
+cp Benchmarks/Results/results.json "$site_dir/Benchmarks/Results/"
+(cd "$site_dir" && "$repo_dir/.scripts/setup-theme" && "$repo_dir/.scripts/setup-pages" && "$repo_dir/.scripts/setup-benchmarks")
+
+if [ -n "$theme_ref" ]; then
+    sed -i '' "s|^remote_theme: .*|remote_theme: vsanthanam/aviary@$theme_ref|" "$site_dir/_config.yml"
+    echo "✅ Using vsanthanam/aviary@$theme_ref."
+elif [ -n "$theme_path" ]; then
+    for dir in _layouts _includes _sass assets; do
+        if [ -d "$theme_path/$dir" ]; then
+            cp -R "$theme_path/$dir" "$site_dir/"
+        fi
+    done
+    sed -i '' '/^remote_theme: /d' "$site_dir/_config.yml"
+    echo "✅ Using the theme at $theme_path."
+fi
+
+cp -R .web/. "$site_dir/"
+
+echo "Building website…"
+docker run --rm \
+    --platform linux/amd64 \
+    --volume "$site_dir:/github/workspace" \
+    --env GITHUB_WORKSPACE=/github/workspace \
+    --env GITHUB_REPOSITORY=vsanthanam/JBird \
+    --env GITHUB_API_URL=https://api.github.com \
+    --env INPUT_SOURCE=./ \
+    --env INPUT_DESTINATION=./_site \
+    --env INPUT_BUILD_REVISION="$(git rev-parse HEAD)" \
+    --env INPUT_TOKEN="$(gh auth token 2>/dev/null || true)" \
+    --env INPUT_VERBOSE=false \
+    --env INPUT_FUTURE=false \
+    "$image"
+
+url="http://localhost:${port}/"
+echo ""
+echo "Serving the website at:"
+echo "    ${url}"
+echo "Press Ctrl-C to stop."
+echo ""
+
+if command -v open >/dev/null 2>&1; then
+    (sleep 1 && open "$url") &
+fi
+
+python3 -m http.server "$port" --directory "$site_dir/_site" &
+server_pid=$!
+wait "$server_pid"

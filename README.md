@@ -5,7 +5,6 @@
 [![Build Status](https://img.shields.io/github/check-runs/vsanthanam/JBird/main)](https://github.com/vsanthanam/JBird/actions)
 [![Swift Version](https://img.shields.io/badge/swift-%206.2%20%7C%206.3%20%7C%206.4-F05138)](https://swift.org)
 [![Xcode](https://img.shields.io/badge/xcode-27.0-blue)](https://developer.apple.com/xcode/)
-[![Platforms](https://img.shields.io/badge/platforms-macOS%2013%2B%20%7C%20Mac%20Catalyst%2016%2B%20%7C%20iOS%2016%2B%20%7C%20watchOS%209%2B%20%7C%20tvOS%2016%2B%20%7C%20visionOS%201%2B%20%7C%20Linux%20%7C%20Windows%20%7C%20Android%20%7C%20Wasm-8A2BE2)](https://github.com/vsanthanam/JBird/blob/main/Package.swift)
 [![Documentation](https://img.shields.io/badge/documentation-GitHub-teal)](https://usejbird.com/docs/documentation/jbird)
 [![Test Coverage](https://codecov.io/gh/vsanthanam/JBird/graph/badge.svg?token=11GDRKPRLF)](https://codecov.io/gh/vsanthanam/JBird)
 
@@ -242,7 +241,7 @@ On realistic JSON documents ranging from 64KB to 5MB, in both minified and prett
 - **Allocations**: JBird performs about 30% fewer heap allocations than Foundation and about 50% fewer than SwiftyJSON
 - **Consistent Performance**: JBird's advantage holds steady across file sizes and formats, and grows on string-heavy inputs, where it is 8-11x faster than every library measured
 
-You can explore the full comparisons with Foundation, Freddy, and SwiftyJSON, including percentile breakdowns for wall clock time, throughput, instructions, memory, and allocations, in the `/Benchmarks` directory.
+You can explore the full comparisons with Foundation, Freddy, and SwiftyJSON, including percentile breakdowns for wall clock time, throughput, instructions, memory, and allocations, on [the benchmarks page](https://www.usejbird.com/benchmarks/).
 
 ## Usage & Documentation
 

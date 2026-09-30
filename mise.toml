@@ -34,3 +34,11 @@ depends = ["lint:*"]
 [tasks.build-xcframework]
 description = "Build an XCFramework (usage: mise run build-xcframework <target> [--static] [--platforms p1,p2,...])"
 run = "./.scripts/build-xcframework"
+
+[tasks."preview:docs"]
+description = "Build and serve the combined DocC documentation (usage: mise run preview:docs [--port <port>])"
+run = "./.scripts/preview-docs"
+
+[tasks."preview:site"]
+description = "Build and serve the website (usage: mise run preview:site [--port <port>] [--theme <ref> | --theme-path <path>])"
+run = "./.scripts/preview-site"
