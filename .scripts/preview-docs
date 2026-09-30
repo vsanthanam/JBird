@@ -22,8 +22,8 @@
 #   * the output goes to a temporary directory that is removed on exit.
 #
 # Usage:
-#   ./preview-docs                # build and serve on port 8080
-#   ./preview-docs --port 9000    # serve on a different port
+#   mise run preview:docs                # build and serve on port 8080
+#   mise run preview:docs --port 9000    # serve on a different port
 #
 # Any other arguments are forwarded to `generate-documentation`.
 #
@@ -36,7 +36,7 @@
 
 set -euo pipefail
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 
 if ! command -v python3 >/dev/null 2>&1; then
     echo "error: python3 is required to serve the documentation." >&2
@@ -62,8 +62,15 @@ while [ $# -gt 0 ]; do
     esac
 done
 
+if lsof -nP -iTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1; then
+    echo "error: port $port is already in use (PID $(lsof -tiTCP:"$port" -sTCP:LISTEN | head -1)). Stop that process or pass --port." >&2
+    exit 1
+fi
+
 output_dir="$(mktemp -d)"
-trap 'rm -rf "$output_dir"' EXIT
+server_pid=""
+trap '[ -n "$server_pid" ] && kill "$server_pid" 2>/dev/null; rm -rf "$output_dir"' EXIT
+trap 'exit 130' INT TERM HUP
 
 echo "Generating combined documentation for all products…"
 swift package --allow-writing-to-directory "$output_dir" \
@@ -93,5 +100,9 @@ fi
 
 # transform-for-static-hosting emits a real index.html per page, so a plain
 # static file server is sufficient — no SPA fallback required.
-cd "$output_dir"
-python3 -m http.server "$port"
+# Run the server in the background and wait on it, so the EXIT trap can stop it
+# however the script ends. Otherwise it could outlive the script and keep
+# serving the deleted documentation on the same port.
+python3 -m http.server "$port" --directory "$output_dir" &
+server_pid=$!
+wait "$server_pid"

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 export JBIRD_SOURCE=local
 
@@ -25,3 +26,9 @@ mkdir Results
 swift package benchmark baseline compare foundation jbird --format markdown > Results/foundation.md
 swift package benchmark baseline compare swiftyjson jbird --format markdown > Results/swiftyjson.md
 swift package benchmark baseline compare freddy jbird --format markdown > Results/freddy.md
+
+jmh_dir="$(mktemp -d)"
+trap 'rm -rf "$jmh_dir"' EXIT
+
+swift package --allow-writing-to-directory "$jmh_dir" benchmark baseline read jbird foundation freddy swiftyjson --format jmh --path "$jmh_dir"
+./export "$jmh_dir" jbird foundation freddy swiftyjson > Results/results.json

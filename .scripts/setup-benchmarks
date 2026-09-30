@@ -1,0 +1,237 @@
+#!/usr/bin/env python3
+#
+# Create the website's benchmark pages from Benchmarks/Results/results.json.
+#
+# results.json is written by Benchmarks/instrument (see Benchmarks/export). This
+# script writes:
+#
+#   * benchmarks/index.md: JBird's median parse time and speedup over each
+#     library for every input, with links to each input's page.
+#   * benchmarks/<input>.md: an overview of the key metrics for every library,
+#     and the mean and percentiles of every metric.
+
+import html
+import json
+import os
+import sys
+
+RESULTS = "Benchmarks/Results/results.json"
+OUTPUT_DIR = "benchmarks"
+
+# The order inputs appear in. Inputs not listed here appear after these.
+INPUT_ORDER = [
+    "64kb", "64kb-pretty",
+    "256kb", "256kb-pretty",
+    "512kb", "512kb-pretty",
+    "1mb", "1mb-pretty",
+    "5mb", "5mb-pretty",
+    "twitter", "canada",
+    "array", "deeply-nested", "integers", "numeric", "strings",
+]
+
+# The order metrics appear in on each input's page
+METRIC_ORDER = [
+    "Time (wall clock)",
+    "Time (total CPU)",
+    "Throughput (# / s)",
+    "Instructions",
+    "Memory (resident peak)",
+    "Malloc (total)",
+    "Malloc (bytes total)",
+    "Free (total)",
+    "Malloc / free Δ",
+    "Malloc / free Δ (bytes)",
+]
+
+WALL_CLOCK = "Time (wall clock)"
+PERCENTILES = ["p0", "p50", "p90", "p95", "p99", "p100"]
+
+
+def input_label(name):
+    size, _, variant = name.partition("-")
+    if size[:-2].isdigit() and size[-2:] in ("kb", "mb"):
+        label = f"{size[:-2]} {size[-2:].upper()}"
+        return label + ", pretty-printed" if variant == "pretty" else label
+    return name.replace("-", " ").capitalize()
+
+
+def format_time(microseconds):
+    if microseconds >= 1000:
+        return f"{microseconds / 1000:.2f} ms"
+    return f"{microseconds:.1f} μs"
+
+
+def format_bytes(value):
+    for unit, size in (("GB", 1e9), ("MB", 1e6), ("KB", 1e3)):
+        if value >= size:
+            return f"{value / size:.1f} {unit}"
+    return f"{value:.0f} bytes"
+
+
+def format_count(value):
+    for unit, size in (("B", 1e9), ("M", 1e6), ("K", 1e3)):
+        if value >= size:
+            return f"{value / size:.1f}{unit}"
+    return f"{value:.0f}"
+
+
+def format_exact(value, unit):
+    """Formats a value for the full tables, which show every digit."""
+    if unit == "μs":
+        return f"{value:,.1f}"
+    return f"{value:,.0f}"
+
+
+def unit_label(unit):
+    return {"#": "count", "# / s": "per second"}.get(unit, unit)
+
+
+def write_page(path, title, permalink, body):
+    with open(path, "w", encoding="utf-8") as file:
+        file.write(f'---\ntitle: "{title}"\npermalink: {permalink}\n---\n\n{body}')
+    print(f"✅ {path} created.")
+
+
+def index_page(data, libraries, names):
+    jbird = data["libraries"]["jbird"]
+    others = [library for library in libraries if library != "jbird"]
+    other_names = [data["libraries"][library]["name"] for library in others]
+    if len(other_names) > 1:
+        library_list = ", ".join(other_names[:-1]) + f", and {other_names[-1]}"
+    else:
+        library_list = other_names[0]
+    machine = data["machine"]
+
+    lines = [
+        "# Benchmarks",
+        "",
+        f"JBird is benchmarked against {library_list} with "
+        "[package-benchmark](https://github.com/ordo-one/benchmark). "
+        "The inputs include documents from 64 KB to 5 MB in minified and pretty-printed formats, "
+        "real-world documents, and documents made up mostly of one kind of value.",
+        "",
+        f"The results were recorded on an {machine['processorType']} Mac with {machine['processors']} cores "
+        f"and {machine['memoryGB']} GB of memory, running {machine['kernel']}.",
+        "",
+        "## Summary",
+        "",
+        "JBird's median time to parse each input, and how many times faster JBird is than each library. "
+        "Select an input to see every metric for every library.",
+        "",
+        "| Input | JBird | " + " | ".join(f"vs {name}" for name in other_names) + " |",
+        "|:--|--:|" + "--:|" * len(others),
+    ]
+    for name in names:
+        reference = jbird["results"][name][WALL_CLOCK]["p50"]
+        cells = [f"[{input_label(name)}](/benchmarks/{name}/)", format_time(reference)]
+        for library in others:
+            results = data["libraries"][library]["results"].get(name)
+            if results:
+                cells.append(f"{results[WALL_CLOCK]['p50'] / reference:.1f}×")
+            else:
+                cells.append("–")
+        lines.append("| " + " | ".join(cells) + " |")
+
+    lines += [
+        "",
+        "## Running the Benchmarks",
+        "",
+        "The benchmarks are in the [`Benchmarks`](https://github.com/vsanthanam/JBird/tree/main/Benchmarks) "
+        "directory of the repository. To run them and regenerate these results, run `./instrument` from that directory.",
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def input_page(data, libraries, names, index):
+    name = names[index]
+    rows = [(data["libraries"][library]["name"], data["libraries"][library]["results"][name])
+            for library in libraries if name in data["libraries"][library]["results"]]
+
+    lines = [
+        f"[Benchmarks](/benchmarks/) › {input_label(name)}",
+        "",
+        f"# {input_label(name)}",
+        "",
+        "## Overview",
+        "",
+        "Median values for each library. For every metric, lower values are better.",
+        "",
+        "| Library | Time | Instructions | Peak memory | Allocations |",
+        "|:--|--:|--:|--:|--:|",
+    ]
+    for library_name, results in rows:
+        cells = [
+            library_name,
+            format_time(results[WALL_CLOCK]["p50"]),
+            format_count(results["Instructions"]["p50"]),
+            format_bytes(results["Memory (resident peak)"]["p50"]),
+            format_count(results["Malloc (total)"]["p50"]),
+        ]
+        lines.append("| " + " | ".join(cells) + " |")
+
+    lines += [
+        "",
+        "## All Metrics",
+        "",
+        "The mean of each metric, and its percentiles from p0 (the lowest sample) to p100 (the highest sample). "
+        "For every metric except throughput, lower values are better.",
+        "",
+    ]
+    metrics = [metric for metric in METRIC_ORDER if metric in rows[0][1]]
+    metrics += [metric for metric in rows[0][1] if metric not in metrics]
+    for metric in metrics:
+        unit = rows[0][1][metric]["unit"]
+        columns = ["Mean"] + PERCENTILES + ["Samples"]
+        lines.append(f"<details><summary>{html.escape(metric)} ({html.escape(unit_label(unit))})</summary>")
+        lines.append("<table>")
+        lines.append("<thead><tr><th></th>" + "".join(f'<th style="text-align: right">{column}</th>' for column in columns) + "</tr></thead>")
+        lines.append("<tbody>")
+        for library_name, results in rows:
+            values = results[metric]
+            cells = [format_exact(values["mean"], unit)] + [format_exact(values[p], unit) for p in PERCENTILES]
+            cells.append(f"{values['samples']:,}")
+            lines.append(f"<tr><th>{html.escape(library_name)}</th>" + "".join(f'<td style="text-align: right">{cell}</td>' for cell in cells) + "</tr>")
+        lines.append("</tbody>")
+        lines.append("</table>")
+        lines.append("</details>")
+
+    links = []
+    if index > 0:
+        links.append(f"[← {input_label(names[index - 1])}](/benchmarks/{names[index - 1]}/)")
+    links.append("[All inputs](/benchmarks/)")
+    if index < len(names) - 1:
+        links.append(f"[{input_label(names[index + 1])} →](/benchmarks/{names[index + 1]}/)")
+    lines += ["", "---", "", " · ".join(links), ""]
+    return "\n".join(lines)
+
+
+def main():
+    if not os.path.exists(RESULTS):
+        sys.exit(f"error: {RESULTS} not found. Run Benchmarks/instrument to create it.")
+    with open(RESULTS, encoding="utf-8") as file:
+        data = json.load(file)
+
+    if "jbird" not in data["libraries"]:
+        sys.exit(f"error: {RESULTS} has no results for jbird.")
+
+    # JBird first, then the other libraries in the order they were exported
+    libraries = ["jbird"] + [library for library in data["libraries"] if library != "jbird"]
+
+    available = data["libraries"]["jbird"]["results"]
+    names = [name for name in INPUT_ORDER if name in available]
+    names += [name for name in available if name not in names]
+
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    write_page(os.path.join(OUTPUT_DIR, "index.md"), "Benchmarks", "/benchmarks/", index_page(data, libraries, names))
+    for index, name in enumerate(names):
+        write_page(
+            os.path.join(OUTPUT_DIR, f"{name}.md"),
+            f"Benchmarks: {input_label(name)}",
+            f"/benchmarks/{name}/",
+            input_page(data, libraries, names, index),
+        )
+
+
+if __name__ == "__main__":
+    main()
