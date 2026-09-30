@@ -16,6 +16,9 @@
 #
 # There is no live rebuild: re-run the script to pick up documentation changes.
 #
+# Like the published build, it links the shared templates in .docc (such as the
+# site header) into every catalog, and removes the links when it exits.
+#
 # The only differences from the published build are deliberate and local:
 #   * --hosting-base-path is omitted so the docs serve from the server root
 #     (http://localhost:PORT/documentation/jbird) instead of under /docs.
@@ -69,8 +72,10 @@ fi
 
 output_dir="$(mktemp -d)"
 server_pid=""
-trap '[ -n "$server_pid" ] && kill "$server_pid" 2>/dev/null; rm -rf "$output_dir"' EXIT
+trap '[ -n "$server_pid" ] && kill "$server_pid" 2>/dev/null; rm -rf "$output_dir"; ./.scripts/link-docc-templates --remove' EXIT
 trap 'exit 130' INT TERM HUP
+
+./.scripts/link-docc-templates
 
 echo "Generating combined documentation for all products…"
 swift package --allow-writing-to-directory "$output_dir" \
@@ -83,6 +88,7 @@ swift package --allow-writing-to-directory "$output_dir" \
     --product JBirdCodableSupport \
     --disable-indexing \
     --transform-for-static-hosting \
+    --experimental-enable-custom-templates \
     --output-path "$output_dir" \
     ${extra_args[@]+"${extra_args[@]}"}
 
