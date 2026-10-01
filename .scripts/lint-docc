@@ -6,7 +6,9 @@ temp_dir=$(mktemp -d)
 trap 'rm -rf "$temp_dir"' EXIT
 
 set +e
+# --build-system native: see .scripts/build-static-docc
 output=$(swift package \
+    --build-system native \
     --allow-writing-to-directory "$temp_dir" \
     generate-documentation \
     --enable-experimental-combined-documentation \
@@ -28,7 +30,9 @@ if [ $exit_code -ne 0 ]; then
     exit $exit_code
 fi
 
-if echo "$output" | grep -q '\bwarning:'; then
+# SwiftPM warns that --build-system native is deprecated; that warning is
+# expected (see .scripts/build-static-docc) and is not a documentation warning.
+if echo "$output" | grep -v -- "'--build-system native' has been deprecated" | grep -q '\bwarning:'; then
     echo "❌ Documentation generation succeeded, but warnings were emitted."
     exit 1
 fi

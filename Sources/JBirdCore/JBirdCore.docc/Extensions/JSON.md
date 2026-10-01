@@ -104,17 +104,17 @@ let steve: JSON = [
 
 ### Subscripting
 
-- ``value(forSubscript:)-(Subscript)``
+- ``value(forSubscript:)-(JSON.Subscript)``
 - ``value(forSubscript:)-(JSONSubscriptConvertible)``
-- ``containsValue(forSubscript:)-(Subscript)``
+- ``containsValue(forSubscript:)-(JSON.Subscript)``
 - ``containsValue(forSubscript:)-(JSONSubscriptConvertible)``
-- ``setValue(_:forSubscript:)-(_,Subscript)``
+- ``setValue(_:forSubscript:)-(_,JSON.Subscript)``
 - ``setValue(_:forSubscript:)-(_,JSONSubscriptConvertible)``
-- ``removeValue(forSubscript:)-(Subscript)``
+- ``removeValue(forSubscript:)-(JSON.Subscript)``
 - ``removeValue(forSubscript:)-(JSONSubscriptConvertible)``
-- ``subscript(_:)-(Subscript)``
+- ``subscript(_:)-(JSON.Subscript)``
 - ``subscript(_:)-(S)``
-- ``subscript(_:as:)-(Subscript,_)``
+- ``subscript(_:as:)-(JSON.Subscript,_)``
 - ``subscript(_:as:)-(S,_)``
 
 ### Working with JSON objects and arrays
@@ -127,18 +127,18 @@ let steve: JSON = [
 - ``removeValue(forKey:)``
 - ``merge(_:uniquingKeysWith:)``
 - ``merging(_:uniquingKeysWith:)``
-- ``filter(_:)-((Object.Element)->Bool)``
+- ``filter(_:)-((JSON.Object.Element)->Bool)``
 - ``filterKeys(_:)``
 - ``filterValues(_:)``
-- ``allSatisfy(_:)-((Object.Element)->Bool)``
-- ``map(_:)-((Object.Element)->T)``
+- ``allSatisfy(_:)-((JSON.Object.Element)->Bool)``
+- ``map(_:)-((JSON.Object.Element)->T)``
 - ``mapValues(_:)-((JSON)->T)``
 - ``mapValues(_:)-((JSON)->JSON)``
-- ``compactMap(_:)-((Object.Element)->ElementOfResult?)``
+- ``compactMap(_:)-((JSON.Object.Element)->ElementOfResult?)``
 - ``compactMapValues(_:)``
-- ``reduce(into:_:)-(_,(Result,Object.Element)->Void)``
-- ``reduce(_:_:)-(_,(Result,Object.Element)->Result)``
-- ``forEach(_:)-((Object.Element)->Void)``
+- ``reduce(into:_:)-(_,(Result,JSON.Object.Element)->Void)``
+- ``reduce(_:_:)-(_,(Result,JSON.Object.Element)->Result)``
+- ``forEach(_:)-((JSON.Object.Element)->Void)``
 - ``first``
 - ``last``
 - ``value(atIndex:)``
@@ -195,8 +195,8 @@ let steve: JSON = [
 - ``containsValue(atPointer:)``
 - ``setValue(_:atPointer:)``
 - ``removeValue(atPointer:)``
-- ``subscript(_:)-(Pointer)``
-- ``subscript(_:as:)-(Pointer,_)``
+- ``subscript(_:)-(JSON.Pointer)``
+- ``subscript(_:as:)-(JSON.Pointer,_)``
 
 ### Working with JSON Patches
 

@@ -4,7 +4,14 @@ set -e
 
 ./.scripts/link-docc-templates
 
-swift package --allow-writing-to-directory docs \
+# Use the native build system. The Swift Build system (the default since
+# Swift 6.4 / Xcode 27) emits symbol graphs at compile time, and that path
+# includes every symbol from an `@_exported import` in the exporting module's
+# graph without doc comments or source locations. For JBird, an umbrella of
+# `@_exported` shims, that duplicates the whole API under /JBird with no
+# documentation. The native build system runs swift-symbolgraph-extract, which
+# omits re-exported symbols. See swiftlang/swift-docc-plugin#113.
+swift package --build-system native --allow-writing-to-directory docs \
     generate-documentation \
     --enable-experimental-combined-documentation \
     --product JBird \
