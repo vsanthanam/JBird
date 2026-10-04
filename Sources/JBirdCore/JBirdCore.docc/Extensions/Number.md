@@ -10,17 +10,11 @@ JSON numbers are represented in base 10 using decimal digits. The `Number` enum 
 
 You can create JSON numbers using Swift's numeric literal syntax:
 
-```swift
-let intValue: JSON.Number = 42
-let doubleValue: JSON.Number = 3.14
-```
+@Snippet(path: "JBird/Snippets/Number/WorkingWithNumbers", slice: "literals")
 
 You can also initialize numbers from types conforming to ``JSONNumberConvertible``:
 
-```swift
-let fromInt = JSON.Number(42)
-let fromDouble = JSON.Number(3.14)
-```
+@Snippet(path: "JBird/Snippets/Number/WorkingWithNumbers", slice: "convertible")
 
 Most numeric types in the Swift Standard Library already conform to `JSONNumberConvertible`.
 
@@ -28,21 +22,7 @@ Most numeric types in the Swift Standard Library already conform to `JSONNumberC
 
 The `Number` type provides properties to safely extract values and check the number type:
 
-```swift
-let number: JSON.Number = 42
-
-// Check if the number is an integer
-if number.isInteger {
-    // Extract the integer value
-    let intValue = try number.convert(into: Int.self) // 42
-}
-
-// Check if the number is a double
-if number.isFloatingPoint {
-    // Extract the double value
-    let doubleValue = try number.convert(into: Double.self) // 3.14
-}
-```
+@Snippet(path: "JBird/Snippets/Number/WorkingWithNumbers", slice: "inspecting")
 
 ## Topics
 

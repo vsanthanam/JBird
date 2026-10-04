@@ -6,10 +6,7 @@ A JSON Pointer ([RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901)) is a 
 
 A pointer contains a sequence of *reference tokens*. Each token is preceded by a forward slash (`/`); the empty string is a valid pointer that refers to the whole document.
 
-```swift
-let pointer = try JSON.Pointer("/users/0/name")
-print(pointer.tokens)  // ["users", "0", "name"]
-```
+@Snippet(path: "JBird/Snippets/UsingPointers/CreatingPointers", slice: "parsing")
 
 Every Unicode code point is permitted in a token except `/` and `~`, which are escaped as `~1` and `~0`, respectively.
 
