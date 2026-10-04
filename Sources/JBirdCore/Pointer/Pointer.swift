@@ -33,7 +33,7 @@ extension JSON {
     /// - Returns: The value at the pointer
     /// - Throws: An ``OperationError`` if the pointer cannot be resolved
     public func value(
-        atPointer pointer: Pointer
+        atPointer pointer: borrowing Pointer
     ) throws -> JSON {
         var current = self
         for token in pointer.tokens {
@@ -48,7 +48,7 @@ extension JSON {
     /// - Parameter pointer: The pointer to test.
     /// - Returns: `true` if the pointer resolves to a value, otherwise `false`. Never throws.
     public func containsValue(
-        atPointer pointer: Pointer
+        atPointer pointer: borrowing Pointer
     ) -> Bool {
         (try? value(atPointer: pointer)) != nil
     }
@@ -63,8 +63,8 @@ extension JSON {
     ///   - pointer: The pointer identifying the location to set
     /// - Throws: An ``OperationError`` if the location cannot be resolved
     public mutating func setValue(
-        _ value: JSON,
-        atPointer pointer: Pointer
+        _ value: consuming JSON,
+        atPointer pointer: borrowing Pointer
     ) throws {
         try setValue(
             value,
@@ -79,7 +79,7 @@ extension JSON {
     /// - Throws: ``PatchError/cannotRemoveWholeDocument`` for a whole-document pointer, or an
     ///   ``OperationError`` if the value cannot be resolved
     public mutating func removeValue(
-        atPointer pointer: Pointer
+        atPointer pointer: borrowing Pointer
     ) throws {
         try removeValue(tokens: pointer.tokens)
     }
@@ -212,7 +212,7 @@ extension JSON {
         /// - Parameter pointer: The pointer whose reference tokens to append.
         /// - Returns: A pointer addressing a descendant of the location this pointer addresses.
         public func appending(
-            contentsOf pointer: Pointer
+            contentsOf pointer: borrowing Pointer
         ) -> Pointer {
             appending(contentsOf: pointer.tokens)
         }
@@ -221,7 +221,7 @@ extension JSON {
         ///
         /// - Parameter pointer: The pointer whose reference tokens to append.
         public mutating func append(
-            contentsOf pointer: Pointer
+            contentsOf pointer: borrowing Pointer
         ) {
             self = appending(contentsOf: pointer)
         }
@@ -281,8 +281,8 @@ extension JSON {
         // MARK: - Private
 
         static func `subscript`(
-            for token: Token,
-            in document: JSON
+            for token: consuming Token,
+            in document: borrowing JSON
         ) throws -> JSON.Subscript {
             switch document {
             case .object:
@@ -410,7 +410,7 @@ extension JSON {
         }
 
         private static func stringRepresentation(
-            of pointer: JSON.Pointer
+            of pointer: borrowing JSON.Pointer
         ) -> String {
             guard !pointer.tokens.isEmpty else {
                 return ""
@@ -483,7 +483,7 @@ extension JSON {
     }
 
     private mutating func setValue(
-        _ value: JSON,
+        _ value: consuming JSON,
         tokens: some Collection<JSON.Pointer.Token>
     ) throws {
         guard let token = tokens.first else {
@@ -501,6 +501,7 @@ extension JSON {
                 forSubscript: `subscript`
             )
         } else {
+            let value = value
             try mutatingChild(at: token) { child in
                 try child.setValue(
                     value,
