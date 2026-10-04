@@ -55,14 +55,14 @@ extension JSON {
 
         /// Passes an already-built array of elements through unchanged.
         public static func buildExpression(
-            _ expression: Array
+            _ expression: consuming Array
         ) -> Array {
             expression
         }
 
         /// Wraps a single ``JBirdCore/JSON`` value as a one-element array of array elements.
         public static func buildExpression(
-            _ expression: JSON
+            _ expression: consuming JSON
         ) -> Array {
             [expression]
         }
@@ -70,7 +70,7 @@ extension JSON {
         /// Converts a `JSONConvertible` value into a one-element array of array elements.
         @_disfavoredOverload
         public static func buildExpression(
-            _ expression: some JSONConvertible
+            _ expression: consuming some JSONConvertible
         ) -> Array {
             [JSON(expression)]
         }
@@ -98,28 +98,28 @@ extension JSON {
 
         /// Selects the array elements from the first branch of an `if`/`else` statement.
         public static func buildEither(
-            first component: Array
+            first component: consuming Array
         ) -> Array {
             component
         }
 
         /// Selects the array elements from the second branch of an `if`/`else` statement.
         public static func buildEither(
-            second component: Array
+            second component: consuming Array
         ) -> Array {
             component
         }
 
         /// Supplies an empty array of elements when an optional `if` statement has no value.
         public static func buildOptional(
-            _ component: Array?
+            _ component: consuming Array?
         ) -> Array {
             component ?? []
         }
 
         /// Produces a ``JBirdCore/JSON`` array from the accumulated array elements.
         public static func buildFinalResult(
-            _ component: Array
+            _ component: consuming Array
         ) -> JSON {
             .array(component)
         }
@@ -133,7 +133,7 @@ extension JSON {
 
         /// Wraps a single key-value pair as a one-element array of object entries.
         public static func buildExpression(
-            _ expression: (Key, Value)
+            _ expression: consuming (Key, Value)
         ) -> [(Key, Value)] {
             [expression]
         }
@@ -141,7 +141,7 @@ extension JSON {
         /// Converts a convertible key and value into a one-element array of object entries.
         @_disfavoredOverload
         public static func buildExpression(
-            _ expression: (some JSONKeyConvertible, some JSONConvertible)
+            _ expression: consuming (some JSONKeyConvertible, some JSONConvertible)
         ) -> [(Key, Value)] {
             let (key, value) = expression
             return [(Key(key), Value(value))]
@@ -168,21 +168,21 @@ extension JSON {
 
         /// Selects the object entries from the first branch of an `if`/`else` statement.
         public static func buildEither(
-            first component: [(Key, Value)]
+            first component: consuming [(Key, Value)]
         ) -> [(Key, Value)] {
             component
         }
 
         /// Selects the object entries from the second branch of an `if`/`else` statement.
         public static func buildEither(
-            second component: [(Key, Value)]
+            second component: consuming [(Key, Value)]
         ) -> [(Key, Value)] {
             component
         }
 
         /// Supplies no object entries when an optional `if` statement has no value.
         public static func buildOptional(
-            _ component: [(Key, Value)]?
+            _ component: consuming [(Key, Value)]?
         ) -> [(Key, Value)] {
             component ?? []
         }
@@ -208,8 +208,8 @@ infix operator => : AdditionPrecedence
 /// An infix operator allowing key value assignment, for use with a ``JBirdCore/JSON/Builder``
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 public func => (
-    lhs: JSON.Key,
-    rhs: JSON.Value
+    lhs: consuming JSON.Key,
+    rhs: consuming JSON.Value
 ) -> (JSON.Key, JSON.Value) {
     (lhs, rhs)
 }
@@ -218,8 +218,8 @@ public func => (
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 @_disfavoredOverload
 public func => <Key, Value>(
-    lhs: Key,
-    rhs: Value
+    lhs: consuming Key,
+    rhs: consuming Value
 ) -> (Key, Value) where Key: JSONKeyConvertible, Value: JSONConvertible {
     (lhs, rhs)
 }
@@ -227,7 +227,7 @@ public func => <Key, Value>(
 /// An infix operator allowing key value assignment, for use with a ``JBirdCore/JSON/Builder``
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 public func => (
-    lhs: JSON.Key,
+    lhs: consuming JSON.Key,
     @JSON.Builder rhs: () -> JSON
 ) -> (JSON.Key, JSON.Value) {
     (lhs, rhs())
@@ -237,7 +237,7 @@ public func => (
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 @_disfavoredOverload
 public func => <Key>(
-    lhs: Key,
+    lhs: consuming Key,
     @JSON.Builder rhs: () -> JSON
 ) -> (Key, JSON.Value) where Key: JSONKeyConvertible {
     (lhs, rhs())

@@ -362,12 +362,12 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Returns: The JSON value at the specified subscript
     /// - Throws: An error if the JSON value does not contain a value for the provided subscript, or if the JSON value is incompatible with the provided subscript (e.g. the subscript is a  ``JSON/Subscript/key(_:)`` but the JSON value is an array)
     public func value(
-        forSubscript subscript: Subscript
+        forSubscript subscript: borrowing Subscript
     ) throws -> JSON {
         switch `subscript` {
         case let .key(key):
             guard case let .object(object) = self else {
-                throw OperationError.invalidSubscript(`subscript`)
+                throw OperationError.invalidSubscript(copy `subscript`)
             }
             guard object.keys.contains(key) else {
                 throw OperationError.keyNotFound(key)
@@ -375,7 +375,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
             return object[key].unsafelyUnwrapped
         case let .index(index):
             guard case let .array(array) = self else {
-                throw OperationError.invalidSubscript(`subscript`)
+                throw OperationError.invalidSubscript(copy `subscript`)
             }
             guard case array.indices = index else {
                 throw OperationError.indexOutOfBounds(index)
@@ -452,7 +452,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ///   - key: A string key to use for lookup
     /// - Throws: An error, if the JSON value is not an object.
     public mutating func setValue(
-        _ value: JSON,
+        _ value: consuming JSON,
         forKey key: String
     ) throws {
         try setValue(value, forSubscript: .key(key))
@@ -464,7 +464,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ///   - index: An integer index to use for lookup
     /// - Throws: An error, if the JSON object is not an array.
     public mutating func setValue(
-        _ value: JSON,
+        _ value: consuming JSON,
         atIndex index: Int
     ) throws {
         try setValue(value, forSubscript: .index(index))
@@ -476,7 +476,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ///   - subscript: A subscript to use for lookup
     /// - Throws: An error, if the JSON value is incompatible with the provided subscript (e.g. the subscript is a  ``JSON/Subscript/key(_:)`` but the JSON value is an array)
     public mutating func setValue(
-        _ value: JSON,
+        _ value: consuming JSON,
         forSubscript subscript: Subscript
     ) throws {
         switch (self, `subscript`) {
@@ -505,7 +505,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ///   - subscript: A subscript to use for lookup
     /// - Throws: An error, if the JSON value is incompatible with the provided subscript (e.g. the subscript is a  `String` but the JSON value is an array)
     public mutating func setValue(
-        _ value: JSON,
+        _ value: consuming JSON,
         forSubscript subscript: some JSONSubscriptConvertible
     ) throws {
         let `subscript` = Subscript(`subscript`)
@@ -536,7 +536,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Returns: The new array
     /// - Throws: An error, if the JSON value is not an array.
     public func appending(
-        _ json: JSON
+        _ json: consuming JSON
     ) throws -> JSON {
         try .array(arrayValue + CollectionOfOne(json))
     }
@@ -546,7 +546,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Returns: The new array
     /// - Throws: An error, if the JSON value is not an array, or if the provided value is not a JSON array.
     public func appending(
-        contentsOf jsonArray: JSON
+        contentsOf jsonArray: borrowing JSON
     ) throws -> JSON {
         try .array(arrayValue + jsonArray.arrayValue)
     }
@@ -565,7 +565,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameter json: The JSON value to append
     /// - Throws: An error, if the JSON value is not an array.
     public mutating func append(
-        _ json: JSON
+        _ json: consuming JSON
     ) throws {
         self = try appending(json)
     }
@@ -574,7 +574,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameter jsonArray: The JSON array to append
     /// - Throws: An error, if the JSON value is not an array, or if the provided value is not a JSON array
     public mutating func append(
-        contentsOf jsonArray: JSON
+        contentsOf jsonArray: borrowing JSON
     ) throws {
         self = try appending(contentsOf: jsonArray)
     }
@@ -801,7 +801,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ///   - index: The index to use to insert the value
     /// - Throws: An error, if the JSON value is not an array, or if the provided index is out of bounds.
     public mutating func insert(
-        _ value: JSON,
+        _ value: consuming JSON,
         at index: some BinaryInteger
     ) throws {
         let index = Int(index)
@@ -891,7 +891,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ///   - other: The JSON object to merge
     ///   - combine: A closure that takes the current and new JSON values for any duplicate keys. The closure returns the desired JSON value for the final JSON object.
     public mutating func merge(
-        _ other: JSON,
+        _ other: borrowing JSON,
         uniquingKeysWith combine: (JSON, JSON) throws -> JSON = { lhs, rhs in lhs }
     ) throws {
         self = try merging(other, uniquingKeysWith: combine)
@@ -903,7 +903,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ///   - combine: A closure that takes the current and new JSON values for any duplicate keys. The closure returns the desired JSON value for the final JSON object.
     /// - Returns: A new JSON object with the combined keys and values of this JSON object and other.
     public func merging(
-        _ other: JSON,
+        _ other: borrowing JSON,
         uniquingKeysWith combine: (JSON, JSON) throws -> JSON = { lhs, rhs in lhs }
     ) throws -> JSON {
         try .object(objectValue.merging(other.objectValue, uniquingKeysWith: combine))
@@ -1071,7 +1071,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ///
     /// - Parameter mergePatch: The merge patch document to apply.
     public mutating func apply(
-        mergePatch: JSON
+        mergePatch: consuming JSON
     ) {
         self = JSON.mergePatchApplied(
             to: self,
@@ -1090,7 +1090,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameter mergePatch: The merge patch document to apply.
     /// - Returns: A new JSON value with the merge patch applied.
     public func applying(
-        mergePatch: JSON
+        mergePatch: consuming JSON
     ) -> JSON {
         JSON.mergePatchApplied(
             to: self,
@@ -1121,7 +1121,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// - Parameter other: The value the returned merge patch transforms this value into.
     /// - Returns: A merge patch document describing the difference between this value and `other`.
     public func mergeDifference(
-        to other: JSON
+        to other: borrowing JSON
     ) -> JSON {
         JSON.mergePatchDifference(
             from: self,
@@ -1470,7 +1470,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
 
     private static func mergePatchApplied(
         to target: JSON?,
-        _ patch: JSON
+        _ patch: consuming JSON
     ) -> JSON {
         guard case let .object(patchObject) = patch else {
             return patch

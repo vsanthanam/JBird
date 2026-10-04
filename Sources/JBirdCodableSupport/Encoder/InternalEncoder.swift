@@ -70,7 +70,7 @@ final class InternalEncoder: Encoder {
         }
 
         func push(
-            container: JSON
+            container: consuming JSON
         ) -> Int {
             containers.append(container)
             return containers.index(before: containers.endIndex)
@@ -88,7 +88,7 @@ final class InternalEncoder: Encoder {
         }
 
         func replace(
-            container: JSON,
+            container: consuming JSON,
             at index: Int
         ) {
             containers[index] = container
@@ -132,22 +132,21 @@ final class InternalEncoder: Encoder {
 
     @discardableResult
     func pushContainer(
-        _ container: JSON
+        _ container: consuming JSON
     ) -> Int {
-        let index = storage.push(container: container)
         onValueChange?(container)
-        return index
+        return storage.push(container: container)
     }
 
     func store(
-        container: JSON,
+        container: consuming JSON,
         at index: Int
     ) {
+        onValueChange?(container)
         storage.replace(
             container: container,
             at: index
         )
-        onValueChange?(container)
     }
 
     func recordSingleValueWrite() {
