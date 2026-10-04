@@ -50,21 +50,12 @@ public enum JSONKeyComputationRule {
 ///
 /// When applied, this Swift code:
 ///
-/// ```swift
-/// @JSONRepresentable struct User {
-///
-///     let username: String
-///
-///     let age: Int
-///
-///     let tags: [String]
-/// }
-/// ```
+/// @Snippet(path: "JBird/Snippets/JBirdMacros/UsingMacros", slice: "json-representable")
 ///
 /// would be expanded to this Swift code:
 ///
 /// ```swift
-/// @JSONRepresentable struct User {
+/// struct User {
 ///
 ///     let username: String
 ///
@@ -73,7 +64,7 @@ public enum JSONKeyComputationRule {
 ///     let tags: [String]
 ///
 ///     @JSON.Builder
-///     public func encodeToJSON() -> JSON {
+///     public var jsonValue: JSON {
 ///         "username" => username
 ///         "age" => age
 ///         "tags" => tags
@@ -87,7 +78,9 @@ public enum JSONKeyComputationRule {
 ///
 /// }
 ///
-/// extension User: JSONRepresentable {}
+/// extension User: JSONConvertible {}
+///
+/// extension User: JSONInitializable {}
 /// ```
 ///
 /// You can further customize what keys are used to represent stored properties.
@@ -114,15 +107,7 @@ public macro JSONRepresentable() = #externalMacro(
 ///
 /// Example:
 ///
-/// ```swift
-/// @JSONRepresentable struct User {
-///
-///     @JSONKey(.snakeCase) let firstName: String
-///
-///     @JSONKey(.snakeCase) let lastName: String
-///
-/// }
-/// ```
+/// @Snippet(path: "JBird/Snippets/JBirdMacros/UsingMacros", slice: "snake-case-keys")
 ///
 /// In this example, the JSON object used to represent instances of `User` will store the `firstName` property using a key called `"first_name"`, and the last `lastName` property using a key called `"last_name"`.
 ///
@@ -142,12 +127,7 @@ public macro JSONKey(
 ///
 /// Example:
 ///
-/// ```swift
-/// @JSONRepresentable struct User {
-///
-///     @JSONKey("ldap") let name: String
-/// }
-/// ```
+/// @Snippet(path: "JBird/Snippets/JBirdMacros/UsingMacros", slice: "custom-key")
 ///
 /// In this example, the JSON object used to represent instances of `User` will store the `name` property using a key called `"ldap"`, rather than the default value of `"name"`.
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
@@ -165,15 +145,7 @@ public macro JSONKey(
 ///
 /// Example:
 ///
-/// ```swift
-/// @JSONRepresentable struct User {
-///
-///     let id: String
-///
-///     @OmitIfNil var nickname: String?
-///
-/// }
-/// ```
+/// @Snippet(path: "JBird/Snippets/JBirdMacros/UsingMacros", slice: "omit-if-nil")
 ///
 /// In this example, when encoding a `User` to JSON where `nickname` is nil,
 /// the resulting JSON will not contain the `nickname` key.
