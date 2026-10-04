@@ -41,12 +41,7 @@ extension JSON {
     /// You rarely reference `Builder` directly. Instead, apply it implicitly through ``JSON/init(builder:)``,
     /// where each statement in the trailing closure becomes an element of an array or a key-value pair of an object.
     ///
-    /// ```swift
-    /// let json = JSON {
-    ///     "name" => "Alice"
-    ///     "roles" => ["admin", "editor"]
-    /// }
-    /// ```
+    /// @Snippet(path: "JBird/Snippets/JBirdBuilders/BuildingJSON", slice: "builder")
     ///
     /// The builder accepts both `JSON` array elements and `key => value` object entries, along with
     /// `if`, `if`/`else`, `switch`, optional, and `for` control flow.

@@ -40,30 +40,14 @@ Given the following JSON:
 
 You could use the enumeration to model the same data like this:
 
-```swift
-let steve = JSON.object(
-    [
-        "first_name": .string("Steve"),
-        "last_name": .string("Jobs"),
-        "founded_apple": .bool(true),
-        "patent_count": .number(.int(317))
-    ]
-)
-```
+@Snippet(path: "JBird/Snippets/JSON/CreatingValues", slice: "cases")
 
 #### Swift Literal Expressions
 
 The enumeration is very explicit, but can lead to code that is both more cumbersome to write and more difficult to read when compared to standard JSON syntax.
 To avoid these issues, you can initialize `JSON` using Swift literals:
 
-```swift
-let steve: JSON = [
-    "first_name": "Steve",
-    "last_name": "Jobs",
-    "founded_apple": true,
-    "patent_count": 317
-]
-```
+@Snippet(path: "JBird/Snippets/JSON/CreatingValues", slice: "literals")
 
 ## Topics
 

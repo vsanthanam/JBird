@@ -1,0 +1,9 @@
+# Snippets are embedded in the documentation by DocC, which renders the first
+# contiguous comment block of a snippet as its description and treats
+# `// snippet.*` line comments as markers. Keep the license header out of these
+# files, and leave the marker comments alone.
+#
+# Snippets read as documentation, so they keep aligned trailing comments and
+# inline `try` expressions that the main sources would hoist.
+--header ignore
+--disable docComments, blankLinesBetweenScopes, consecutiveSpaces, hoistTry

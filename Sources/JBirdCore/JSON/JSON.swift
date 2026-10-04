@@ -104,15 +104,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// This property returns an integer describing the number of values in a JSON array or the number of key-value pairs in a JSON object
     /// It throws an error if the JSON value is not an array or an object.
     ///
-    /// ```swift
-    /// let object: JSON = ["foo": 1, "bar": 2]
-    /// let array: JSON = ["foo", "bar", "baz"]
-    /// let boolValue: JSON = false
-    ///
-    /// let first = try object.count // returns 2
-    /// let second = try array.count // returns 3
-    /// let result = try boolValue.count // throws an error
-    /// ```
+    /// @Snippet(path: "JBird/Snippets/JSON/InspectingCollections", slice: "count")
     public var count: Int {
         get throws {
             switch self {
@@ -132,19 +124,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// It returns `false` if the JSON is an array or object that contains other JSON values
     /// It throws an error if the JSON value is not an array or object
     ///
-    /// ```swift
-    /// let emptyArray: JSON = []
-    /// let array: JSON = [1, 2, "three"]
-    /// let emptyObject: JSON = [:]
-    /// let object: JSON = ["Foo": "Bar"]
-    /// let nonCollection: JSON = true
-    ///
-    /// let first = try emptyArray.isEmpty // true
-    /// let second = try array.isEmpty // false
-    /// let third = try emptyObject.isEmpty // true
-    /// let fourth = try object.isEmpty // false
-    /// let fifth = try nonCollection.isEmpty // throws
-    /// ```
+    /// @Snippet(path: "JBird/Snippets/JSON/InspectingCollections", slice: "is-empty")
     ///
     /// - Throws: An error, if the JSON value is not a JSON array or a JSON object
     public var isEmpty: Bool {
@@ -612,21 +592,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ///
     /// For example:
     ///
-    /// ```swift
-    /// let json: JSON = ["foo", "bar", "baz"]
-    /// let other: JSON = [24, 12, nil]
-    ///
-    /// let first = try json.allSatisfy { value in
-    ///     return value.isString
-    /// }
-    ///
-    /// let second = try other.allSatisfy { value in
-    ///     return value.isNumber
-    /// }
-    ///
-    /// #expect(first == true)
-    /// #expect(second == false)
-    /// ```
+    /// @Snippet(path: "JBird/Snippets/JSON/AllSatisfy", slice: "array")
     ///
     /// - Parameter predicate: A closure that takes an element of the JSON array as its argument and returns a Boolean value that indicates whether the passed element satisfies a condition.
     /// - Returns: `true` if the sequence contains only elements that satisfy `predicate`; otherwise, `false`.
@@ -641,21 +607,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ///
     /// For example:
     ///
-    /// ```swift
-    /// let json: JSON = ["foo": true, "bar": false, "qux": true]
-    /// let other: JSON = ["foo": 12, "bar": 24, "qux": nil]
-    ///
-    /// let first = try json.allSatisfy { key, value in
-    ///     return key.count == 3 && value.isBool
-    /// }
-    ///
-    /// let second = try other.allSatisfy { key, value in
-    ///     return key.count == 3 && value.isNumber
-    /// }
-    ///
-    /// #expect(first == true)
-    /// #expect(second == false)
-    /// ```
+    /// @Snippet(path: "JBird/Snippets/JSON/AllSatisfy", slice: "object")
     ///
     /// - Parameter predicate: A closure that takes a key-value pair of the JSON object as its argument and returns a Boolean value that indicates whether the passed element satisfies a condition.
     /// - Returns: `true` if the JSON object contains only key-value pairs that satisfy `predicate`; otherwise, `false`.
@@ -1151,10 +1103,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     /// The returned document is the merge patch describing the difference between this value and `other`.
     /// Applying it to this value reproduces `other`:
     ///
-    /// ```swift
-    /// let patch = source.mergeDifference(to: target)
-    /// source.applying(mergePatch: patch) == target // true (see the limitation below)
-    /// ```
+    /// @Snippet(path: "JBird/Snippets/Patch/ComputingDifferences", slice: "merge-difference")
     ///
     /// When both values are objects they are compared key by key (a key present only in the receiver
     /// becomes a `null` member to delete it, a key present only in `other` is added, and a key present in
@@ -1269,9 +1218,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ///
     /// Do not call this initializer directly. It is used by the compiler when you use a Boolean literal. Instead, create a new `JSON` instance by using one of the Boolean literals `true` or `false`. For example:
     ///
-    /// ```swift
-    /// let myJSON: JSON = true
-    /// ```
+    /// @Snippet(path: "JBird/Snippets/JSON/LiteralExpressions", slice: "boolean")
     ///
     /// In this example, the assignment to the `myJSON` constant calls this Boolean literal initializer behind the scenes.
     ///
@@ -1291,9 +1238,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ///
     /// Do not call this initializer directly. It is used by the compiler when you use an integer literal. Instead, create a new `JSON` instance by using an integer literal. For example:
     ///
-    /// ```swift
-    /// let myJSON: JSON = 42
-    /// ```
+    /// @Snippet(path: "JBird/Snippets/JSON/LiteralExpressions", slice: "integer")
     ///
     /// In this example, the assignment to the `myJSON` constant calls this integer literal initializer behind the scenes.
     ///
@@ -1313,9 +1258,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ///
     /// Do not call this initializer directly. It is used by the compiler when you use a floating-point literal. Instead, create a new `JSON` instance by using a floating-point literal. For example:
     ///
-    /// ```swift
-    /// let myJSON: JSON = 4.2
-    /// ```
+    /// @Snippet(path: "JBird/Snippets/JSON/LiteralExpressions", slice: "float")
     ///
     /// In this example, the assignment to the `myJSON` constant calls this floating-point literal initializer behind the scenes.
     ///
@@ -1335,9 +1278,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ///
     /// Do not call this initializer directly. It is used by the compiler when you use a string literal. Instead, create a new `JSON` instance by using a string literal. For example:
     ///
-    /// ```swift
-    /// let myJSON: JSON = "Hello, world!"
-    /// ```
+    /// @Snippet(path: "JBird/Snippets/JSON/LiteralExpressions", slice: "string")
     ///
     /// In this example, the assignment to the `myJSON` constant calls this string literal initializer behind the scenes.
     ///
@@ -1357,9 +1298,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ///
     /// Do not call this initializer directly. It is used by the compiler when you use an array literal. Instead, create a new `JSON` instance by using an array literal. For example:
     ///
-    /// ```swift
-    /// let myJSON: JSON = ["foo", "bar", "baz"]
-    /// ```
+    /// @Snippet(path: "JBird/Snippets/JSON/LiteralExpressions", slice: "array")
     ///
     /// - Parameter elements: The elements of the new instance
     public init(
@@ -1380,9 +1319,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ///
     /// Do not call this initializer directly. It is used by the compiler when you use a dictionary literal. Instead, create a new `JSON` instance by using a dictionary literal. For example:
     ///
-    /// ```swift
-    /// let myJSON: JSON = ["key": "value"]
-    /// ```
+    /// @Snippet(path: "JBird/Snippets/JSON/LiteralExpressions", slice: "dictionary")
     ///
     /// - Parameter elements: The key-value pairs of the new instance
     public init(
@@ -1401,9 +1338,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
     ///
     /// Do not call this initializer directly. It is used by the compiler when you use a nil literal. Instead, create a new `JSON` instance by using a nil literal. For example:
     ///
-    /// ```swift
-    /// let myJSON: JSON = nil
-    /// ```
+    /// @Snippet(path: "JBird/Snippets/JSON/LiteralExpressions", slice: "nil")
     ///
     /// In this example, the assignment to the `myJSON` constant calls this nil literal initializer behind the scenes.
     ///

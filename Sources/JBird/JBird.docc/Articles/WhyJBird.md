@@ -16,15 +16,7 @@ Apple's Foundation framework provides `JSONSerialization` for working with unstr
 
 Foundation's `JSONSerialization` returns ambiguous `Any` types that require extensive type checking and casting:
 
-```swift
-// Foundation approach
-if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-   let name = json["name"] as? String,
-   let age = json["age"] as? Int,
-   let isActive = json["isActive"] as? Bool {
-   // Finally use the values
-}
-```
+@Snippet(path: "JBird/Snippets/WhyJBird/FoundationApproach", slice: "casting")
 
 This leads to verbose, error-prone code with numerous conditionals and/or casts.
 
@@ -36,15 +28,7 @@ Working with nested JSON structures using Foundation requires multiple levels of
 
 Modifying JSON with Foundation is difficult - you need to recreate entire structures to change a single value:
 
-```swift
-// Complex modification with Foundation
-var jsonDict = json as? [String: Any] ?? [:]
-if var user = jsonDict["user"] as? [String: Any] {
-    user["status"] = "active"
-    jsonDict["user"] = user
-}
-// Convert back to Data...
-```
+@Snippet(path: "JBird/Snippets/WhyJBird/FoundationApproach", slice: "mutation")
 
 #### Degraded performance on older versions of iOS
 
@@ -58,14 +42,7 @@ JBird addresses these issues with a modern, Swift-first approach:
 
 JBird provides a fully typed `JSON` enum that accurately represents JSON's data model:
 
-```swift
-// JBird approach
-let json = try JSON(data)
-let name = try json["user"]["name"].convert(into: String.self)
-let age = try json["user"]["age"].convert(into: Int.self)
-let isActive = try json["user"]["isActive"].convert(into: Bool.self)
-let user = try json["user"].convert(into: User.self)
-```
+@Snippet(path: "JBird/Snippets/WhyJBird/JBirdApproach", slice: "type-safe")
 
 Type safety is enforced at compile-time, with clear error handling for runtime issues.
 
@@ -73,20 +50,13 @@ Type safety is enforced at compile-time, with clear error handling for runtime i
 
 Access nested values with straightforward, chainable syntax:
 
-```swift
-// Accessing nested values
-let nestedValue: Theme = try json["user"]["settings"]["theme"].convert()
-```
+@Snippet(path: "JBird/Snippets/WhyJBird/JBirdApproach", slice: "subscripting")
 
 #### Simpler Introspection and Mutation
 
 JBird makes modifying JSON simple and intuitive:
 
-```swift
-// Simple modification with JBird
-var json = try JSON(data)
-try json.setValue(true, forKey: "isVerified")
-```
+@Snippet(path: "JBird/Snippets/WhyJBird/JBirdApproach", slice: "mutation")
 
 The ``/JBirdCore/JSON`` type also features many collection-like APIs, such as ``/JBirdCore/JSON/filter(_:)-((JSON)->Bool)``, ``/JBirdCore/JSON/map(_:)-((JSON)->T)``, ``/JBirdCore/JSON/isEmpty``, etc., though it is not a true Swift `Collection` due to variadic, unstructured nature of JSON payloads.
 

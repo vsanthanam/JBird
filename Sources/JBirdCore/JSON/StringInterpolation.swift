@@ -30,11 +30,7 @@ extension String.StringInterpolation {
     ///
     /// Use this interpolation to embed the JSON text of any ``JSONConvertible`` value directly in a string:
     ///
-    /// ```swift
-    /// let user: JSON = ["name": "Ada", "id": 42]
-    /// let message = "payload: \(json: user)"
-    /// // "payload: {\"id\":42,\"name\":\"Ada\"}"
-    /// ```
+    /// @Snippet(path: "JBird/Snippets/StringInterpolation/InterpolatingJSON", slice: "interpolation")
     ///
     /// The value is serialized as a JSON fragment, so scalars produce their bare JSON form (`42`, `true`,
     /// `null`) and strings are quoted (`"Ada"`). Non-conforming floating-point values are permitted and
@@ -57,10 +53,7 @@ extension String.StringInterpolation {
     /// Use this interpolation when you need to customize how the value is serialized — for example, to
     /// pretty-print it:
     ///
-    /// ```swift
-    /// let user: JSON = ["name": "Ada", "id": 42]
-    /// let message = try "payload: \(json: user, options: [.prettyPrinted, .fragmentsAllowed])"
-    /// ```
+    /// @Snippet(path: "JBird/Snippets/StringInterpolation/InterpolatingJSON", slice: "interpolation-options")
     ///
     /// Unlike ``appendInterpolation(json:)``, this overload throws rather than allowing non-conforming
     /// floating-point values by default, so the containing string literal must be evaluated with `try`.

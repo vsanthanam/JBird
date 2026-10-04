@@ -39,20 +39,13 @@ extension JSON {
         /// {
         ///     "foo": "bar",
         ///     "baz": null,
-        ///     "qux": [true, null]
+        ///     "qux": [true, null, false]
         /// }
         /// ```
         ///
         /// Enabling this option would cause it to be deserialized like this:
         ///
-        /// ```swift
-        /// let data = Data( ... )
-        /// let json = try JSON.value(for: data)
-        /// #expect(json == [
-        ///     "foo": "bar",
-        ///     "qux": [true, nil, false]
-        /// ]) // Key "baz" is omitted because it has a null value
-        /// ```
+        /// @Snippet(path: "JBird/Snippets/Deserialization/OmittingNulls", slice: "omit-null-keys")
         public static let omitNullKeys = DeserializationOptions(rawValue: 1 << 0)
 
         /// Whether or not `null` values should be omitted when parsing
@@ -71,14 +64,7 @@ extension JSON {
         ///
         /// Enabling this option would cause it to be deserialized like this:
         ///
-        /// ```swift
-        /// let data = Data( ... )
-        /// let json = try JSON.value(for: data)
-        /// #expect(json == [
-        ///     "foo": "bar",
-        ///     "qux": [true, false]
-        /// ]) // Key "baz" is omitted because it has a null value, null values stripped from array in key "qux".
-        /// ```
+        /// @Snippet(path: "JBird/Snippets/Deserialization/OmittingNulls", slice: "omit-null-values")
         public static let omitNullValues = DeserializationOptions(rawValue: 1 << 1)
 
         /// Whether or not the root value is allowed to be a fragment

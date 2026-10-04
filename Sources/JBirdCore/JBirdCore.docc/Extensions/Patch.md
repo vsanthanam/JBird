@@ -11,24 +11,7 @@ appended.
 
 You can apply a patch to a JSON value using ``JSON/apply(_:)``
 
-```swift
-var json: JSON = [
-    "foo": [["a", "b"]],
-    "bar": true,
-    "baz": 24
-]
-let patch = try JSON.Patch()
-    .add(["x", "y"], to: "/foo/-")
-    .remove(at: "/bar")
-    .replace(at: "/baz", with: 42)
-try json.apply(patch)
-
-// JSON value has been updated to the following:
-// {
-//   "foo": [["a", "b"], ["x", "y"],
-//   "baz": 42
-// }
-```
+@Snippet(path: "JBird/Snippets/Patch/ApplyingAPatch", slice: "apply")
  
 ## Topics
 

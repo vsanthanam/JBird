@@ -62,10 +62,7 @@ extension JSON {
     /// This is the difference between the receiver and `other`, expressed as a ``JSON/Patch``. Applying
     /// the result to the receiver reproduces `other`:
     ///
-    /// ```swift
-    /// let patch = source.difference(to: target)
-    /// try source.applying(patch) == target // true
-    /// ```
+    /// @Snippet(path: "JBird/Snippets/Patch/ComputingDifferences", slice: "difference")
     ///
     /// See ``JSON/Patch/init(from:to:)`` for the details of how the patch is computed.
     ///
@@ -100,10 +97,7 @@ extension JSON {
         /// The returned patch describes the difference between `source` and `target` as a sequence of
         /// operations. Applying it to `source` reproduces `target`:
         ///
-        /// ```swift
-        /// let patch = JSON.Patch(from: source, to: target)
-        /// try source.applying(patch) == target // true
-        /// ```
+        /// @Snippet(path: "JBird/Snippets/Patch/ComputingDifferences", slice: "init-from-to")
         ///
         /// The patch is computed structurally and deterministically:
         ///

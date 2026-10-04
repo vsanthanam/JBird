@@ -75,13 +75,7 @@ extension JSON {
     ///
     /// You can use this method to set a custom recursion depth limit:
     ///
-    /// ```swift
-    /// let data = Data( ... )
-    /// let json = try JSON.withRecursionDepthLimit(1000) {
-    ///     // All JSON operations performed within this closure will use a recursion depth limit of 1000
-    ///     try JSON(data)
-    /// }
-    /// ```
+    /// @Snippet(path: "JBird/Snippets/Deserialization/DeserializationLimits", slice: "recursion-depth")
     ///
     /// To remove the recursion depth limit entirely, use `0`
     ///
@@ -112,13 +106,7 @@ extension JSON {
             ///
             /// You can use this method to set a custom recursion depth limit:
             ///
-            /// ```swift
-            /// let data = Data( ... )
-            /// let json = try await JSON.withRecursionDepthLimit(1000) {
-            ///     // All JSON operations performed within this closure will use a recursion depth limit of 1000
-            ///     try await JSON.deserialize(data)
-            /// }
-            /// ```
+            /// @Snippet(path: "JBird/Snippets/Deserialization/DeserializationLimits", slice: "recursion-depth-async")
             ///
             /// To remove the recursion depth limit entirely, use `0`
             ///
@@ -147,13 +135,7 @@ extension JSON {
             ///
             /// You can use this method to set a custom recursion depth limit:
             ///
-            /// ```swift
-            /// let data = Data( ... )
-            /// let json = try await JSON.withRecursionDepthLimit(1000) {
-            ///     // All JSON operations performed within this closure will use a recursion depth limit of 1000
-            ///     try await JSON.deserialize(data)
-            /// }
-            /// ```
+            /// @Snippet(path: "JBird/Snippets/Deserialization/DeserializationLimits", slice: "recursion-depth-async")
             ///
             /// To remove the recursion depth limit entirely, use `0`
             ///
@@ -183,13 +165,7 @@ extension JSON {
         ///
         /// You can use this method to set a custom recursion depth limit:
         ///
-        /// ```swift
-        /// let data = Data( ... )
-        /// let json = try await JSON.withRecursionDepthLimit(1000) {
-        ///     // All JSON operations performed within this closure will use a recursion depth limit of 1000
-        ///     try await JSON.deserialize(data)
-        /// }
-        /// ```
+        /// @Snippet(path: "JBird/Snippets/Deserialization/DeserializationLimits", slice: "recursion-depth-async")
         ///
         /// To remove the recursion depth limit entirely, use `0`
         ///
@@ -222,13 +198,7 @@ extension JSON {
     ///
     /// You can use this method to set a custom input size limit:
     ///
-    /// ```swift
-    /// let data = Data( ... )
-    /// let json = try JSON.withInputSizeLimit(1024 * 1024) {
-    ///    // All JSON operations performed within this closure will use an input size limit of 1 MB
-    ///    try JSON(data)
-    /// }
-    /// ```
+    /// @Snippet(path: "JBird/Snippets/Deserialization/DeserializationLimits", slice: "input-size")
     ///
     /// To remove the input size limit entirely, use `0`
     ///
@@ -259,13 +229,7 @@ extension JSON {
             ///
             /// You can use this method to set a custom input size limit:
             ///
-            /// ```swift
-            /// let data = Data( ... )
-            /// let json = try await JSON.withInputSizeLimit(1024 * 1024) {
-            ///    // All JSON operations performed within this closure will use an input size limit of 1 MB
-            ///    try await JSON.deserialize(data)
-            /// }
-            /// ```
+            /// @Snippet(path: "JBird/Snippets/Deserialization/DeserializationLimits", slice: "input-size-async")
             ///
             /// To remove the input size limit entirely, use `0`
             ///
@@ -294,13 +258,7 @@ extension JSON {
             ///
             /// You can use this method to set a custom input size limit:
             ///
-            /// ```swift
-            /// let data = Data( ... )
-            /// let json = try await JSON.withInputSizeLimit(1024 * 1024) {
-            ///    // All JSON operations performed within this closure will use an input size limit of 1 MB
-            ///    try await JSON.deserialize(data)
-            /// }
-            /// ```
+            /// @Snippet(path: "JBird/Snippets/Deserialization/DeserializationLimits", slice: "input-size-async")
             ///
             /// To remove the input size limit entirely, use `0`
             ///
@@ -330,13 +288,7 @@ extension JSON {
         ///
         /// You can use this method to set a custom input size limit:
         ///
-        /// ```swift
-        /// let data = Data( ... )
-        /// let json = try await JSON.withInputSizeLimit(1024 * 1024) {
-        ///    // All JSON operations performed within this closure will use an input size limit of 1 MB
-        ///    try await JSON.deserialize(data)
-        /// }
-        /// ```
+        /// @Snippet(path: "JBird/Snippets/Deserialization/DeserializationLimits", slice: "input-size-async")
         ///
         /// To remove the input size limit entirely, use `0`
         ///
