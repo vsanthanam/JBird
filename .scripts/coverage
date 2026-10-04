@@ -9,7 +9,9 @@ LLVM_COV_BIN="${LLVM_COV_BIN:-llvm-cov}"
 LLVM_PROFDATA_BIN="${LLVM_PROFDATA_BIN:-llvm-profdata}"
 
 # IMPORTANT: no surrounding quotes inside the value.
-IGNORE_REGEX="${IGNORE_REGEX:-(^|/)(Tests|\\.build|Carthage|Packages)(/|$)}"
+# Snippets are built as instrumented executables alongside the tests but are
+# only exercised by DocC, so they would otherwise report as 0% covered.
+IGNORE_REGEX="${IGNORE_REGEX:-(^|/)(Tests|Snippets|\\.build|Carthage|Packages)(/|$)}"
 
 # Optional path rewrite for mismatched build vs checkout roots:
 # Example (GitHub mac runner):
