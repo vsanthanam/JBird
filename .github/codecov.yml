@@ -1,0 +1,4 @@
+# Snippets under Snippets/ are compiled and embedded in the DocC documentation,
+# not executed by the test suite. Keep them out of the coverage totals.
+ignore:
+  - "Snippets/**"
