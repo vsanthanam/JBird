@@ -133,7 +133,7 @@ extension JSON {
     private enum SynchronousSerialization {
 
         static func start(
-            from json: borrowing JSON,
+            from json: JSON,
             options: SerializationOptions
         ) throws -> Data {
             if !options.contains(.fragmentsAllowed) {
@@ -161,7 +161,7 @@ extension JSON {
         }
 
         private static func serializeValue(
-            json: borrowing JSON,
+            json: JSON,
             into bytes: inout [UInt8],
             level: Int?,
             options: SerializationOptions
@@ -316,7 +316,7 @@ extension JSON {
 
         #if hasFeature(NonisolatedNonsendingByDefault)
             static func start(
-                from json: borrowing JSON,
+                from json: JSON,
                 options: SerializationOptions
             ) async throws -> Data {
                 if !options.contains(.fragmentsAllowed) {
@@ -344,7 +344,7 @@ extension JSON {
             }
         #else
             nonisolated(nonsending) static func start(
-                from json: borrowing JSON,
+                from json: JSON,
                 options: SerializationOptions
             ) async throws -> Data {
                 if !options.contains(.fragmentsAllowed) {
@@ -374,7 +374,7 @@ extension JSON {
 
         #if hasFeature(NonisolatedNonsendingByDefault)
             private static func serializeValue(
-                json: borrowing JSON,
+                json: JSON,
                 into bytes: inout [UInt8],
                 level: Int?,
                 options: SerializationOptions
@@ -526,7 +526,7 @@ extension JSON {
             }
         #else
             private nonisolated(nonsending) static func serializeValue(
-                json: borrowing JSON,
+                json: JSON,
                 into bytes: inout [UInt8],
                 level: Int?,
                 options: SerializationOptions
@@ -774,7 +774,7 @@ extension JSON {
 
     @inline(__always)
     private static func serializeNumber(
-        _ number: borrowing Number,
+        _ number: Number,
         options: SerializationOptions,
         into bytes: inout [UInt8]
     ) throws {
@@ -843,7 +843,7 @@ extension JSON {
 
     @inline(__always)
     private static func serializeString(
-        _ string: borrowing String,
+        _ string: String,
         options: SerializationOptions,
         into bytes: inout [UInt8]
     ) {

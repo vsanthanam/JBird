@@ -34,7 +34,7 @@ extension JSON {
     /// - Throws: An ``OperationError`` if any operation cannot be applied, or a ``PatchError`` if a
     ///   `test`, `move`, or `remove` operation fails its preconditions.
     public mutating func apply(
-        _ patch: borrowing Patch
+        _ patch: Patch
     ) throws {
         self = try applying(patch)
     }
@@ -48,7 +48,7 @@ extension JSON {
     /// - Throws: An ``OperationError`` if any operation cannot be applied, or a ``PatchError`` if a
     ///   `test`, `move`, or `remove` operation fails its preconditions.
     public func applying(
-        _ patch: borrowing Patch
+        _ patch: Patch
     ) throws -> JSON {
         var result = self
         for operation in patch.operations {
@@ -150,8 +150,8 @@ extension JSON {
         ///   - pointer: The location to add the value.
         /// - Returns: A new patch containing this patch's operations followed by the new operation.
         public func add(
-            _ value: consuming some JSONConvertible,
-            to pointer: consuming JSON.Pointer
+            _ value: some JSONConvertible,
+            to pointer: JSON.Pointer
         ) -> Patch {
             appending(
                 .add(
@@ -171,8 +171,8 @@ extension JSON {
         /// - Returns: A new patch containing this patch's operations followed by the new operation.
         /// - Throws: A ``JSON/PointerError`` if `pointer` is not a valid JSON Pointer string.
         public func add(
-            _ value: consuming some JSONConvertible,
-            to pointer: consuming String
+            _ value: some JSONConvertible,
+            to pointer: String
         ) throws -> Patch {
             let pointer = try JSON.Pointer(pointer)
             return add(
@@ -188,7 +188,7 @@ extension JSON {
         /// - Parameter pointer: The location of the value to remove.
         /// - Returns: A new patch containing this patch's operations followed by the new operation.
         public func remove(
-            at pointer: consuming JSON.Pointer
+            at pointer: JSON.Pointer
         ) -> Patch {
             appending(
                 .remove(
@@ -206,7 +206,7 @@ extension JSON {
         /// - Throws: A ``JSON/PointerError`` if `pointer` is not a valid JSON Pointer string.
         @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
         public func remove(
-            at pointer: consuming String
+            at pointer: String
         ) throws -> Patch {
             let path = try JSON.Pointer(pointer)
             return remove(at: path)
@@ -221,8 +221,8 @@ extension JSON {
         ///   - value: The replacement value.
         /// - Returns: A new patch containing this patch's operations followed by the new operation.
         public func replace(
-            at pointer: consuming JSON.Pointer,
-            with value: consuming some JSONConvertible
+            at pointer: JSON.Pointer,
+            with value: some JSONConvertible
         ) -> Patch {
             appending(
                 .replace(
@@ -242,8 +242,8 @@ extension JSON {
         /// - Returns: A new patch containing this patch's operations followed by the new operation.
         /// - Throws: A ``JSON/PointerError`` if `pointer` is not a valid JSON Pointer string.
         public func replace(
-            at pointer: consuming String,
-            with value: consuming some JSONConvertible
+            at pointer: String,
+            with value: some JSONConvertible
         ) throws -> Patch {
             let pointer = try JSON.Pointer(pointer)
             return replace(
@@ -260,8 +260,8 @@ extension JSON {
         ///   - destination: The location to move the value to.
         /// - Returns: A new patch containing this patch's operations followed by the new operation.
         public func move(
-            from origin: consuming JSON.Pointer,
-            to destination: consuming JSON.Pointer
+            from origin: JSON.Pointer,
+            to destination: JSON.Pointer
         ) -> Patch {
             appending(
                 .move(
@@ -281,8 +281,8 @@ extension JSON {
         /// - Returns: A new patch containing this patch's operations followed by the new operation.
         /// - Throws: A ``JSON/PointerError`` if either `origin` or `destination` is not a valid JSON Pointer string.
         public func move(
-            from origin: consuming String,
-            to destination: consuming String
+            from origin: String,
+            to destination: String
         ) throws -> Patch {
             let from = try JSON.Pointer(origin)
             let path = try JSON.Pointer(destination)
@@ -300,8 +300,8 @@ extension JSON {
         ///   - destination: The location to copy the value to.
         /// - Returns: A new patch containing this patch's operations followed by the new operation.
         public func copy(
-            from origin: consuming JSON.Pointer,
-            to destination: consuming JSON.Pointer
+            from origin: JSON.Pointer,
+            to destination: JSON.Pointer
         ) -> Patch {
             appending(
                 .copy(
@@ -321,8 +321,8 @@ extension JSON {
         /// - Returns: A new patch containing this patch's operations followed by the new operation.
         /// - Throws: A ``JSON/PointerError`` if either `origin` or `destination` is not a valid JSON Pointer string.
         public func copy(
-            from origin: consuming String,
-            to destination: consuming String
+            from origin: String,
+            to destination: String
         ) throws -> Patch {
             let from = try JSON.Pointer(origin)
             let path = try JSON.Pointer(destination)
@@ -340,8 +340,8 @@ extension JSON {
         ///   - pointer: The location of the value to test.
         /// - Returns: A new patch containing this patch's operations followed by the new operation.
         public func test(
-            for value: consuming some JSONConvertible,
-            at pointer: consuming JSON.Pointer
+            for value: some JSONConvertible,
+            at pointer: JSON.Pointer
         ) -> Patch {
             appending(
                 .test(
@@ -361,8 +361,8 @@ extension JSON {
         /// - Returns: A new patch containing this patch's operations followed by the new operation.
         /// - Throws: A ``JSON/PointerError`` if `pointer` is not a valid JSON Pointer string.
         public func test(
-            for value: consuming some JSONConvertible,
-            at pointer: consuming String
+            for value: some JSONConvertible,
+            at pointer: String
         ) throws -> Patch {
             let path = try JSON.Pointer(pointer)
             return test(
@@ -414,7 +414,7 @@ extension JSON {
         /// - Parameter patch: The patch whose operations to append.
         /// - Returns: A new patch containing this patch's operations followed by `patch`'s operations.
         public func appending(
-            contentsOf patch: borrowing Patch
+            contentsOf patch: Patch
         ) -> Patch {
             appending(contentsOf: patch.operations)
         }
@@ -423,7 +423,7 @@ extension JSON {
         ///
         /// - Parameter patch: The patch whose operations to append.
         public mutating func append(
-            contentsOf patch: borrowing Patch
+            contentsOf patch: Patch
         ) {
             self = appending(contentsOf: patch)
         }
@@ -689,7 +689,7 @@ extension JSON {
     }
 
     private mutating func apply(
-        _ operation: borrowing Patch.Operation
+        _ operation: Patch.Operation
     ) throws {
         switch operation {
         case let .add(path, value):
@@ -771,8 +771,8 @@ extension JSON {
     }
 
     private mutating func addValue(
-        _ json: consuming JSON,
-        atPointer pointer: borrowing JSON.Pointer
+        _ json: JSON,
+        atPointer pointer: JSON.Pointer
     ) throws {
         try addValue(
             json,
@@ -781,7 +781,7 @@ extension JSON {
     }
 
     private mutating func addValue(
-        _ json: consuming JSON,
+        _ json: JSON,
         tokens: some Collection<JSON.Pointer.Token>
     ) throws {
         guard let token = tokens.first else {
@@ -805,7 +805,6 @@ extension JSON {
                 throw OperationError.invalidSubscript(.key(token))
             }
         } else {
-            let json = json
             try mutatingChild(at: token) { child in
                 try child.addValue(
                     json,
