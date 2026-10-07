@@ -1,0 +1,67 @@
+Building for production...
+[Computing dependencies]
+[8 / 34] JBirdCore
+[11 / 36] JBirdMacrosCompilerPlugin
+[14 / 33] JBirdCore
+[18 / 39] JBirdBuilders
+[21 / 41] JBirdBuilders
+[24 / 42] JBirdMacros
+[26 / 43] JBirdMacros
+[29 / 39] JBirdCodableSupport
+[32 / 40] JBird
+[34 / 41] JBird
+Build complete! (5.80 sec)
+􀟈  Test run started.
+􀄵  Testing Library Version: 1902
+􀄵  Target Platform: arm64e-apple-macos14.0
+􁁛  Test run with 0 tests in 0 suites passed after 0.001 seconds.
+􀟈  Test run started.
+􀄵  Testing Library Version: 1902
+􀄵  Target Platform: arm64e-apple-macos14.0
+􁁛  Test run with 0 tests in 0 suites passed after 0.001 seconds.
+􀟈  Test run started.
+􀄵  Testing Library Version: 1902
+􀄵  Target Platform: arm64e-apple-macos14.0
+􁁛  Test run with 0 tests in 0 suites passed after 0.001 seconds.
+􀟈  Test run started.
+􀄵  Testing Library Version: 1902
+􀄵  Target Platform: arm64e-apple-macos14.0
+􁁛  Test run with 0 tests in 0 suites passed after 0.001 seconds.
+􀟈  Test run started.
+􀄵  Testing Library Version: 1902
+􀄵  Target Platform: arm64e-apple-macos14.0
+􁁛  Test run with 0 tests in 0 suites passed after 0.001 seconds.
+􀟈  Test run started.
+􀄵  Testing Library Version: 1902
+􀄵  Target Platform: arm64e-apple-macos14.0
+􀟈  Suite "ZZ Leak Probe" started.
+􀟈  Test probes() started.
+PROBE OK   JBird JSON.Encoder userInfo
+PROBE OK   JBird JSON.Decoder custom strategy closure
+PROBE OK   generic deinitialize [current code shape]
+PROBE OK   generic move [proposed fix shape]
+PROBE LEAK unspecialized deinitialize
+PROBE OK   unspecialized move
+PROBE OK   unspecialized raw-pointer move [exact fix shape]
+PROBE LEAK unspecialized deinitialize V=[Obj]
+PROBE OK   unspecialized move V=[Obj]
+PROBE OK   unspecialized move V=[String: Obj]
+PROBE OK   concrete deinitialize
+PROBE OK   concrete move
+PROBE OK   unspecialized local Mutex
+PROBE OK   unspecialized ~Copyable struct field
+PROBE OK   unspecialized class stored property
+PROBE OK   unspecialized plain struct deinitialize [control]
+PROBE Mutex<MutexProbeObj> flags=0x1000007 isNonPOD=false isNonBitwiseTakable=false
+PROBE _Cell<MutexProbeObj> flags=0x1820007 isNonPOD=false isNonBitwiseTakable=false
+PROBE Plain<MutexProbeObj> flags=0x10007 isNonPOD=true isNonBitwiseTakable=false
+PROBE Mutex<Int> flags=0x1000007 isNonPOD=false isNonBitwiseTakable=false
+PROBE _Cell<Int> flags=0x1820007 isNonPOD=false isNonBitwiseTakable=false
+PROBE Plain<Int> flags=0x7 isNonPOD=false isNonBitwiseTakable=false
+􁁛  Test probes() passed after 0.001 seconds.
+􁁛  Suite "ZZ Leak Probe" passed after 0.001 seconds.
+􁁛  Test run with 1 test in 1 suite passed after 0.001 seconds.
+􀟈  Test run started.
+􀄵  Testing Library Version: 1902
+􀄵  Target Platform: arm64e-apple-macos14.0
+􁁛  Test run with 0 tests in 0 suites passed after 0.001 seconds.
