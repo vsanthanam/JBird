@@ -98,7 +98,35 @@ struct CompatibilityMutex<Value>: ~Copyable where Value: ~Copyable {
     deinit {
         if usesMutex, #available(macOS 15.0, macCatalyst 18.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *) {
             let pointer = storage.assumingMemoryBound(to: Mutex<Value>.self)
-            pointer.deinitialize(count: 1)
+            // Some Synchronization runtimes mark `Mutex` as trivially destructible, even when its value is not.
+            // `deinitialize(count:)` trusts that and skips destroying the value, so on those runtimes, move the mutex out and let it drop instead.
+            // On Apple platforms this follows the OS the process runs on, and is fixed in the 27.0 releases.
+            // On Windows the runtime ships with the toolchain, and is fixed in Swift 6.4.
+            // Linux, WebAssembly, and Android runtimes never had this bug.
+            // See https://github.com/vsanthanam/JBird/issues/467
+            #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS) || os(visionOS)
+                #if compiler(>=6.4)
+                    if #available(anyAppleOS 27.0, *) {
+                        pointer.deinitialize(count: 1)
+                    } else {
+                        _ = pointer.move()
+                    }
+                #else
+                    if #available(macOS 27.0, macCatalyst 27.0, iOS 27.0, watchOS 27.0, tvOS 27.0, visionOS 27.0, *) {
+                        pointer.deinitialize(count: 1)
+                    } else {
+                        _ = pointer.move()
+                    }
+                #endif
+            #elseif os(Windows)
+                #if compiler(>=6.4)
+                    pointer.deinitialize(count: 1)
+                #else
+                    _ = pointer.move()
+                #endif
+            #else
+                pointer.deinitialize(count: 1)
+            #endif
             pointer.deallocate()
         } else {
             let pointer = storage.assumingMemoryBound(to: LockBox.self)
