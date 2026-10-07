@@ -6,7 +6,7 @@ Building for debugging...
 [21 / 45] JBirdCodableSupport
 [29 / 45] JBird
 [35 / 36] JBirdTests-product
-Build complete! (1.52 sec)
+Build complete! (1.54 sec)
 􀟈  Test run started.
 􀄵  Testing Library Version: 1902
 􀄵  Target Platform: arm64e-apple-macos14.0

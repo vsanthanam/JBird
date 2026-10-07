@@ -29,7 +29,7 @@ jobs:
         run: |
           if [ "${{ matrix.xcode }}" = "latest" ]; then
             ls -d /Applications/Xcode*.app
-            X=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
+            X=$(ls -d /Applications/Xcode_26*.app | sort -V | tail -1); echo "using $X"
             sudo xcode-select --switch "$X"
           else
             ./.scripts/xcode-select ${{ matrix.xcode }}
@@ -135,7 +135,9 @@ jobs:
           swift sdk install https://download.swift.org/swift-6.4.0-release/wasm-sdk/swift-6.4.0-RELEASE/swift-6.4.0-RELEASE_wasm.artifactbundle.tar.gz \
             --checksum f07b7be3c586d92d7a07051fc6d303b87ebea67eadc40640ba59d5a8b79aa86d
       - name: JBird probe
-        run: Probes/run-spm.sh "wasm 6.4.0" --swift-sdk swift-6.4.0-RELEASE_wasm --disable-experimental-prebuilts
+        env:
+          PROBE_PREBUILD: "1"
+        run: Probes/run-spm.sh "wasm 6.4.0" --swift-sdk swift-6.4.0-RELEASE_wasm --disable-experimental-prebuilts --build-path .build
 
   android:
     name: Android (Swift ${{ matrix.toolchain }}, ${{ matrix.variant }}, ${{ matrix.config }})
@@ -151,8 +153,10 @@ jobs:
       - name: Apply fix
         if: ${{ matrix.variant == 'fixed' }}
         run: |
-          perl -0pi -e 's/(Mutex<Value>\.self\)\n(\s*))pointer\.deinitialize\(count: 1\)/$1_ = pointer.move()/' Sources/JBirdCodableSupport/CompatibilityMutex.swift
+          perl -0pi -e 's/(Mutex<Value>\.self\)\r?\n(\s*))pointer\.deinitialize\(count: 1\)/$1_ = pointer.move()/' Sources/JBirdCodableSupport/CompatibilityMutex.swift
           git diff
+      - name: Drop exit tests (unavailable on Android)
+        run: grep -rl processExitsWith Tests | xargs rm -v
       - name: Enable KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules

@@ -11,8 +11,9 @@ Building for production...
 [35 / 43] JBird
 [37 / 44] JBird
 [41 / 41] JBirdTests-product
+[43 / 44] JBirdCoreTests-product
 [45 / 47] JBirdCodableSupportTests-product
-Build complete! (6.28 sec)
+Build complete! (6.32 sec)
 􀟈  Test run started.
 􀄵  Testing Library Version: 1902
 􀄵  Target Platform: arm64e-apple-macos14.0

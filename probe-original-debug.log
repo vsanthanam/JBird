@@ -1,10 +1,13 @@
 Building for debugging...
 [Computing dependencies]
 [8 / 73] JBirdMacrosCompilerPlugin
-[16 / 64] JBirdBuilders
-[27 / 51] JBirdMacros
-[34 / 49] JBird
-Build complete! (1.27 sec)
+[14 / 62] JBirdBuilders
+[19 / 58] JBirdMacros
+[21 / 45] JBirdCodableSupport
+[27 / 49] JBird
+[29 / 46] JBirdCodableSupport
+[33 / 35] JBirdTests-product
+Build complete! (3.50 sec)
 􀟈  Test run started.
 􀄵  Testing Library Version: 1902
 􀄵  Target Platform: arm64e-apple-macos14.0
