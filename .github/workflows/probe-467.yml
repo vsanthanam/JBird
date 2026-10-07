@@ -137,7 +137,8 @@ jobs:
       - name: JBird probe
         env:
           PROBE_PREBUILD: "1"
-        run: Probes/run-spm.sh "wasm 6.4.0" --swift-sdk swift-6.4.0-RELEASE_wasm --disable-experimental-prebuilts --build-path .build
+          PROBE_NOFILTER: "1"
+        run: Probes/run-spm.sh "wasm 6.4.0" --swift-sdk swift-6.4.0-RELEASE_wasm --disable-experimental-prebuilts --build-path .build -Xswiftc -enable-testing
 
   android:
     name: Android (Swift ${{ matrix.toolchain }}, ${{ matrix.variant }}, ${{ matrix.config }})
@@ -155,8 +156,10 @@ jobs:
         run: |
           perl -0pi -e 's/(Mutex<Value>\.self\)\r?\n(\s*))pointer\.deinitialize\(count: 1\)/$1_ = pointer.move()/' Sources/JBirdCodableSupport/CompatibilityMutex.swift
           git diff
-      - name: Drop exit tests (unavailable on Android)
-        run: grep -rl processExitsWith Tests | xargs rm -v
+      - name: Keep only JBirdCodableSupportTests, drop exit tests (unavailable on Android)
+        run: |
+          python3 Probes/strip-test-targets.py
+          grep -rl processExitsWith Tests | xargs rm -v
       - name: Enable KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules

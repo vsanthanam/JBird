@@ -10,7 +10,8 @@ run() {
   local log="probe-$variant-$config.log"
   if [ -n "${PROBE_PREBUILD:-}" ]; then
     swift build -c "$config" --build-tests "$@" > "$log.build" 2>&1 || { echo "RESULT [$LABEL | $variant | $config] BUILD FAILED"; tail -40 "$log.build"; status=1; return; }
-    swift test -c "$config" --skip-build --filter ZZLeakProbe "$@" > "$log" 2>&1
+    local filter=(--filter ZZLeakProbe); [ -n "${PROBE_NOFILTER:-}" ] && filter=()
+    swift test -c "$config" --skip-build "${filter[@]}" "$@" > "$log" 2>&1
   else
     swift test -c "$config" --filter ZZLeakProbe "$@" > "$log" 2>&1
   fi

@@ -70,7 +70,6 @@ enum MutexProbes {
     @_semantics("optimize.sil.specialize.generic.never") @inline(never)
     static func flags<V>(_: V.Type) -> [String] {
         ["Mutex<\(V.self)> \(mutexProbeFlags(Mutex<V>.self))",
-         "_Cell<\(V.self)> \(mutexProbeFlags(_Cell<V>.self))",
          "Plain<\(V.self)> \(mutexProbeFlags(MutexProbePlain<V>.self))"]
     }
 }
