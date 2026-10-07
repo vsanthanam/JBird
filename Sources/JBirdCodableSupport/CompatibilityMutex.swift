@@ -98,7 +98,10 @@ struct CompatibilityMutex<Value>: ~Copyable where Value: ~Copyable {
     deinit {
         if usesMutex, #available(macOS 15.0, macCatalyst 18.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *) {
             let pointer = storage.assumingMemoryBound(to: Mutex<Value>.self)
-            pointer.deinitialize(count: 1)
+            // Some Synchronization runtimes (Apple OS releases before 27.0, and Swift 6.2 and 6.3 on Windows) mark `Mutex` as trivially destructible.
+            // `deinitialize(count:)` trusts that flag and skips destroying the value, leaking it, so move the mutex out and let it drop instead.
+            // See https://github.com/vsanthanam/JBird/issues/467
+            _ = pointer.move()
             pointer.deallocate()
         } else {
             let pointer = storage.assumingMemoryBound(to: LockBox.self)
