@@ -388,6 +388,146 @@ struct JSONRepresentableMacroTests {
         #endif
     }
 
+    @Test("Omit If Nil Module Qualified Optional")
+    func omitIfNilModuleQualifiedOptional() {
+        #if canImport(JBirdMacrosCompilerPlugin)
+            #if compiler(>=6.3)
+                assertMacroExpansion(
+                    """
+                    @JSONRepresentable
+                    struct Foo {
+
+                        let name: Swift.Optional<String>
+
+                    }
+                    """,
+                    expandedSource: """
+                    struct Foo {
+
+                        let name: Swift.Optional<String>
+
+                        @JBirdCore::JSON.Builder
+                        public var jsonValue: JBirdCore::JSON {
+                            if let name {
+                            "name" => name
+                            }
+                        }
+
+                        public init(json: JBirdCore::JSON) throws {
+                            if let name = try? json["name"] {
+                            self.name = try name.convert()
+                            } else {
+                            self.name = nil
+                            }
+                        }
+
+                    }
+
+                    extension Foo: JBirdCore::JSONConvertible {
+                    }
+
+                    extension Foo: JBirdCore::JSONInitializable {
+                    }
+                    """,
+                    macroSpecs: macroSpecs
+                ) { failure in
+                    Issue.record("\(failure.message)")
+                }
+            #else
+                assertMacroExpansion(
+                    """
+                    @JSONRepresentable
+                    struct Foo {
+
+                        let name: Swift.Optional<String>
+
+                    }
+                    """,
+                    expandedSource: """
+                    struct Foo {
+
+                        let name: Swift.Optional<String>
+
+                        @JBirdCore.JSON.Builder
+                        public var jsonValue: JBirdCore.JSON {
+                            if let name {
+                            "name" => name
+                            }
+                        }
+
+                        public init(json: JBirdCore.JSON) throws {
+                            if let name = try? json["name"] {
+                            self.name = try name.convert()
+                            } else {
+                            self.name = nil
+                            }
+                        }
+
+                    }
+
+                    extension Foo: JBirdCore.JSONConvertible {
+                    }
+
+                    extension Foo: JBirdCore.JSONInitializable {
+                    }
+                    """,
+                    macroSpecs: macroSpecs
+                ) { failure in
+                    Issue.record("\(failure.message)")
+                }
+            #endif
+        #else
+            Issue.record("macros are only supported when running tests for the host platform")
+        #endif
+    }
+
+    @Test("Omit If Nil Module Selector Optional")
+    func omitIfNilModuleSelectorOptional() {
+        #if canImport(JBirdMacrosCompilerPlugin) && compiler(>=6.3)
+            assertMacroExpansion(
+                """
+                @JSONRepresentable
+                struct Foo {
+
+                    let name: Swift::Optional<String>
+
+                }
+                """,
+                expandedSource: """
+                struct Foo {
+
+                    let name: Swift::Optional<String>
+
+                    @JBirdCore::JSON.Builder
+                    public var jsonValue: JBirdCore::JSON {
+                        if let name {
+                        "name" => name
+                        }
+                    }
+
+                    public init(json: JBirdCore::JSON) throws {
+                        if let name = try? json["name"] {
+                        self.name = try name.convert()
+                        } else {
+                        self.name = nil
+                        }
+                    }
+
+                }
+
+                extension Foo: JBirdCore::JSONConvertible {
+                }
+
+                extension Foo: JBirdCore::JSONInitializable {
+                }
+                """,
+                macroSpecs: macroSpecs
+            ) { failure in
+                Issue.record("\(failure.message)")
+            }
+        #endif
+    }
+
     @Test("Omit If Nil With Annotation")
     func omitIfNilWithAnnotation() {
         #if canImport(JBirdMacrosCompilerPlugin)

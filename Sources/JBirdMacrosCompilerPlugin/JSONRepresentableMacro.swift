@@ -515,7 +515,7 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
                 )
 
                 let fnName = "convert_case_\(element.name.text)"
-                #if compiler(>=6.3)
+                #if compiler(>=6.3) && canImport(SwiftSyntax603)
                     let fn = """
                     func \(fnName)() throws -> Self {
                         let raw = try json.convert(into: Swift::String.self)
@@ -546,7 +546,7 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
             }
         }
 
-        #if compiler(>=6.3)
+        #if compiler(>=6.3) && canImport(SwiftSyntax603)
             let convertible = DeclSyntax(
                 """
                 public var jsonValue: JBirdCore::JSON {
@@ -577,13 +577,13 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
         if !convertAttemptsBody.isEmpty {
             convertBodySections.append(convertAttemptsBody)
         }
-        #if compiler(>=6.3)
+        #if compiler(>=6.3) && canImport(SwiftSyntax603)
             convertBodySections.append("throw JBirdMacros::JSONMacroDecodingError(\"Enum case decoding failure\")")
         #else
             convertBodySections.append("throw JBirdMacros.JSONMacroDecodingError(\"Enum case decoding failure\")")
         #endif
 
-        #if compiler(>=6.3)
+        #if compiler(>=6.3) && canImport(SwiftSyntax603)
             let initializable = DeclSyntax(
                 """
                 public init(json: JBirdCore::JSON) throws {
@@ -711,24 +711,66 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
 
     // MARK: - Private
 
-    private static func isOptionalType(_ type: TypeSyntax?) -> Bool {
+    private static func isOptionalType(
+        _ type: TypeSyntax?
+    ) -> Bool {
         guard let type else { return false }
-
-        if let identifierType = type.as(IdentifierTypeSyntax.self),
-           identifierType.name.text == "Optional" {
+        if type.is(OptionalTypeSyntax.self) || type.is(ImplicitlyUnwrappedOptionalTypeSyntax.self) {
             return true
+        } else if let identifier = type.as(IdentifierTypeSyntax.self) {
+            return identifier.name.text == "Optional" && isSwiftQualified(identifier)
+        } else if let member = type.as(MemberTypeSyntax.self),
+                  let base = member.baseType.as(IdentifierTypeSyntax.self) {
+            return member.name.text == "Optional"
+                && isUnqualified(member)
+                && base.name.text == "Swift"
+                && isUnqualified(base)
+                && base.genericArgumentClause == nil
+        } else {
+            return false
         }
-
-        if type.is(OptionalTypeSyntax.self) {
-            return true
-        }
-
-        if type.is(ImplicitlyUnwrappedOptionalTypeSyntax.self) {
-            return true
-        }
-
-        return false
     }
+
+    #if compiler(>=6.3) && canImport(SwiftSyntax603)
+        private static func isSwiftQualified(
+            _ identifier: IdentifierTypeSyntax
+        ) -> Bool {
+            guard let selector = identifier.moduleSelector else {
+                return true
+            }
+            return selector.moduleName.text == "Swift"
+        }
+
+        private static func isUnqualified(
+            _ identifier: IdentifierTypeSyntax
+        ) -> Bool {
+            identifier.moduleSelector == nil
+        }
+
+        private static func isUnqualified(
+            _ member: MemberTypeSyntax
+        ) -> Bool {
+            member.moduleSelector == nil
+        }
+    #else
+        private static func isSwiftQualified(
+            _ identifier: IdentifierTypeSyntax
+        ) -> Bool {
+            true
+        }
+
+        private static func isUnqualified(
+            _ identifier: IdentifierTypeSyntax
+        ) -> Bool {
+            true
+        }
+
+        private static func isUnqualified(
+            _ member: MemberTypeSyntax
+        ) -> Bool {
+            true
+        }
+    #endif
 
     private static func snakeCase(
         _ name: String
