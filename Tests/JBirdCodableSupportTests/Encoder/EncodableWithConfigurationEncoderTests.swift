@@ -454,7 +454,7 @@ struct EncodableWithConfigurationEncoderTests {
     @Suite("Super Encoder Single Value Cleanup")
     struct SuperEncoderCleanupTests {
 
-        #if !os(WASI)
+        #if !os(WASI) && !os(Android)
             @Test("Unkeyed superEncoder with singleValueContainer does not crash")
             func unkeyedSuperEncoderSingleValue() async throws {
                 await #expect(processExitsWith: .success) {
@@ -482,7 +482,7 @@ struct EncodableWithConfigurationEncoderTests {
             }
         #endif
 
-        #if !os(WASI)
+        #if !os(WASI) && !os(Android)
             @Test("Keyed superEncoder with singleValueContainer does not crash")
             func keyedSuperEncoderSingleValue() async throws {
                 await #expect(processExitsWith: .success) {
@@ -522,7 +522,7 @@ struct EncodableWithConfigurationEncoderTests {
             }
         #endif
 
-        #if !os(WASI)
+        #if !os(WASI) && !os(Android)
             @Test("Unkeyed superEncoder with singleValueContainer matches Foundation")
             func unkeyedSuperEncoderSingleValueParity() async throws {
                 await #expect(processExitsWith: .success) {

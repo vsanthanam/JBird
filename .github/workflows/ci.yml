@@ -422,29 +422,65 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.2", "6.3", "6.4"]
+        swift: ["6.3", "6.4"]
         include:
-          - swift: "6.2"
-            toolchain: "6.2.3"
           - swift: "6.3"
             toolchain: "6.3.3"
+            sdk: "swift-6.3.3-RELEASE_android"
+            url: "https://download.swift.org/swift-6.3.3-release/android-sdk/swift-6.3.3-RELEASE/swift-6.3.3-RELEASE_android.artifactbundle.tar.gz"
+            checksum: "d160cc3206dd1886dae3fef2337af5e25ec034692cd0ec225721c56cc69da7f5"
+            # The 6.3.3 Android SDK only defines triples for API 28 and later.
+            android-api: "28"
           - swift: "6.4"
             toolchain: "6.4.1"
+            sdk: "swift-6.4.1-RELEASE_android"
+            url: "https://download.swift.org/swift-6.4.1-release/android-sdk/swift-6.4.1-RELEASE/swift-6.4.1-RELEASE_android.artifactbundle.tar.gz"
+            checksum: "a356b79f8f1daa6ae3a66f4c556966ca20c0208b3659805cf30a83a0a31d6772"
+            android-api: "23"
+            # Test binaries are only built (and run, see test-android-spm) on 6.4. Prebuilt
+            # swift-syntax is disabled so that it is compiled from source for the Android target,
+            # matching build-wasm-spm.
+            extra-flags: "--build-tests --disable-experimental-prebuilts"
     runs-on: ubuntu-latest
-    outputs:
-      artifact-name: android-build-${{ matrix.swift }}
+    container:
+      image: swift:${{ matrix.toolchain }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Build JBird
-        uses: skiptools/swift-android-action@v2
-        with:
-          swift-version: ${{ matrix.toolchain }}
-          build-package: true
-          build-tests: false
-          run-tests: false
+      - name: Setup Swift Android (${{ matrix.swift }})
+        run: |
+          swift sdk install ${{ matrix.url }} \
+            --checksum ${{ matrix.checksum }}
+          swift sdk list
+      - name: Install `curl` and `unzip`
+        run: apt-get update && apt-get install -y curl unzip
+      - name: Install Android NDK
+        run: curl -fSL -o ndk.zip https://dl.google.com/android/repository/android-ndk-r30-linux.zip
+      - name: Unzip Android NDK
+        run: unzip -qo ndk.zip
+      - name: Set ANDROID_NDK_HOME
+        run: echo "ANDROID_NDK_HOME=$PWD/android-ndk-r30" >> "$GITHUB_ENV"
+      - name: Link NDK into Swift SDK
+        # The bundle's `ndk-sysroot` is a placeholder until this script points it at a real NDK.
+        # SwiftPM installs SDKs under the passwd home directory, not `$HOME` (which Actions overrides
+        # inside containers), so ask it where the bundle actually is.
+        run: |
+          SDK_DIR=$(swift sdk configure --show-configuration ${{ matrix.sdk }} x86_64-unknown-linux-android${{ matrix.android-api }} | sed -n 's/^sdkRootPath: //p' | xargs dirname)
+          echo "SWIFT_ANDROID_SDK_DIR=$SDK_DIR" >> "$GITHUB_ENV"
+          bash "$SDK_DIR/scripts/setup-android-sdk.sh"
+      - name: Build JBird (${{ matrix.swift }})
+        # Select the SDK by target triple rather than bundle ID. The bundle defines one SDK per
+        # architecture and API level under a single ID, and SwiftPM 6.3 picks the first (aarch64)
+        # when given the ID; `--triple` only disambiguates on 6.4 and later.
+        run: swift build -v --swift-sdk x86_64-unknown-linux-android${{ matrix.android-api }} --build-path .build ${{ matrix.extra-flags }}
+      - name: Stage Swift Runtime
+        # The test binaries link the Swift runtime dynamically. Ship the SDK's runtime libraries in
+        # the artifact so test-android-spm can push them to the emulator without installing the SDK.
+        run: |
+          mkdir -p .build/android-runtime
+          cp "$SWIFT_ANDROID_SDK_DIR/swift-resources/usr/lib/swift-x86_64/android/"*.so .build/android-runtime/
       - name: Install `zip`
-        run: sudo apt-get update && sudo apt-get install -y zip
+        run: apt-get update && apt-get install -y zip
       - name: Compress Build
         run: zip -r build.zip .build
       - name: Upload Build
@@ -452,6 +488,97 @@ jobs:
         with:
           name: android-build-${{ matrix.swift }}
           path: build.zip
+
+  test-android-spm:
+    name: Test JBird (Android)
+    strategy:
+      fail-fast: false
+      matrix:
+        swift: ["6.4"]
+        include:
+          - swift: "6.4"
+            # Emulator system image. Must be at least the `android-api` the build targeted, and at
+            # least 24 so that `adb shell` propagates exit codes.
+            emulator-api: "34"
+    needs: build-android-spm
+    runs-on: ubuntu-latest
+    env:
+      REMOTE_DIR: /data/local/tmp/jbird-tests
+    steps:
+      - name: Download Build
+        uses: actions/download-artifact@v8
+        with:
+          name: android-build-${{ matrix.swift }}
+          path: .
+      - name: Decompress Build
+        run: unzip -q build.zip
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Install Android Emulator (API ${{ matrix.emulator-api }})
+        run: |
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKMANAGER" --licenses > /dev/null || true
+          "$SDKMANAGER" --install "emulator" "platform-tools" "system-images;android-${{ matrix.emulator-api }};default;x86_64"
+          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          echo "$ANDROID_HOME/emulator" >> "$GITHUB_PATH"
+          echo "$ANDROID_HOME/platform-tools" >> "$GITHUB_PATH"
+          # Pin the AVD directory so `avdmanager` and `emulator` agree on where AVDs live.
+          mkdir -p "$HOME/.android/avd"
+          echo "ANDROID_AVD_HOME=$HOME/.android/avd" >> "$GITHUB_ENV"
+      - name: Create Emulator
+        run: |
+          echo no | avdmanager create avd --force --name jbird --package "system-images;android-${{ matrix.emulator-api }};default;x86_64"
+          emulator -list-avds
+      - name: Boot Emulator
+        run: |
+          ls -l /dev/kvm
+          emulator -accel-check
+          emulator -avd jbird -no-window -no-audio -no-boot-anim -no-snapshot -no-metrics -gpu swiftshader_indirect -accel on > emulator.log 2>&1 &
+          EMULATOR_PID=$!
+          for _ in $(seq 1 60); do
+            if ! kill -0 "$EMULATOR_PID" 2> /dev/null; then
+              echo "::error::Emulator exited before boot completed"
+              cat emulator.log
+              exit 1
+            fi
+            if [ "$(adb shell getprop sys.boot_completed 2> /dev/null | tr -d '\r')" = "1" ]; then
+              adb shell getprop ro.build.version.release
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::error::Emulator did not finish booting within 5 minutes"
+          tail -n 100 emulator.log
+          exit 1
+      - name: Push Tests
+        # Each `<Target>-test-runner` loads its `<Target>.so` from `$ORIGIN`, so everything lives in
+        # one flat directory alongside the Swift runtime and the NDK's libc++.
+        run: |
+          mkdir stage
+          cp -R .build/debug/*-test-runner .build/debug/*.so .build/debug/*.bundle .build/android-runtime/*.so stage/
+          cp "$ANDROID_NDK_LATEST_HOME/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/x86_64-linux-android/libc++_shared.so" stage/
+          adb push stage "$REMOTE_DIR"
+          adb shell "chmod +x $REMOTE_DIR/*-test-runner"
+      - name: Test JBird (${{ matrix.swift }})
+        run: |
+          for runner in .build/debug/*-test-runner; do
+            name=$(basename "$runner")
+            echo "::group::$name"
+            adb shell "cd $REMOTE_DIR && LD_LIBRARY_PATH=. ./$name --testing-library swift-testing"
+            echo "::endgroup::"
+          done
+      - name: Print Emulator Log
+        if: failure()
+        run: tail -n 200 emulator.log || true
+      - name: Upload Emulator Log
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: android-emulator-log-${{ matrix.swift }}
+          path: emulator.log
 
   lint:
     name: Lint
@@ -579,6 +706,7 @@ jobs:
       - build-wasm-spm
       - test-wasm-spm
       - build-android-spm
+      - test-android-spm
       - build-xcframework
       - lint
       - lint-docc
@@ -602,6 +730,7 @@ jobs:
             [[ "${{ needs.build-wasm-spm.result }}" == "failure" ]] || \
             [[ "${{ needs.test-wasm-spm.result }}" == "failure" ]] || \
             [[ "${{ needs.build-android-spm.result }}" == "failure" ]] || \
+            [[ "${{ needs.test-android-spm.result }}" == "failure" ]] || \
             [[ "${{ needs.build-xcframework.result }}" == "failure" ]] || \
             [[ "${{ needs.lint.result }}" == "failure" ]] || \
             [[ "${{ needs.lint-docc.result }}" == "failure" ]] || \

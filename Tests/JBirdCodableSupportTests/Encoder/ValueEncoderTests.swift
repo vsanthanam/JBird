@@ -284,8 +284,8 @@ struct ValueEncoderTests {
         #expect(String(decoding: data, as: UTF8.self) == "42")
     }
 
-    // Exit tests are unavailable on WebAssembly, so trap tests are skipped there.
-    #if !os(WASI)
+    // Exit tests are unavailable on WebAssembly and Android, so trap tests are skipped there.
+    #if !os(WASI) && !os(Android)
         @Test("Writing twice through reused single value containers traps")
         func doubleSingleValueWriteTraps() async {
             await #expect(processExitsWith: .failure) {

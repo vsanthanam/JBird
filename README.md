@@ -223,7 +223,7 @@ JBird has been tested to work with the following platforms and Swift toolchains:
 | Linux (Ubuntu) | ✅ Supported & Tested | ✅ Supported & Tested | ✅ Supported & Tested|
 | Windows | ✅ Supported & Tested | ✅ Supported & Tested | ✅ Supported & Tested|
 | WebAssembly | ⚠️ Supported (No Tests) | ⚠️ Supported (No Tests) | ✅ Supported & Tested|
-| Android | ⚠️ Supported (No Tests) | ⚠️ Supported (No Tests) | ⚠️ Supported (No Tests) |
+| Android |  ❌ Unsupported | ⚠️ Supported (No Tests) | ✅ Supported & Tested |
 
 All supported platforms undergo continuous integration testing to ensure compatibility across different environments. Other platforms such as FreeBSD may also work, but are not validated in the built-in GitHub Actions powered CI environment.
 

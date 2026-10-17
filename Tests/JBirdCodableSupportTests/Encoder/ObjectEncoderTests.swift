@@ -145,8 +145,8 @@ struct ObjectEncoderTests {
         #expect(decoded == value)
     }
 
-    // Exit tests are unavailable on WebAssembly, so trap tests are skipped there.
-    #if !os(WASI)
+    // Exit tests are unavailable on WebAssembly and Android, so trap tests are skipped there.
+    #if !os(WASI) && !os(Android)
         @Test("Requesting an unkeyed container after a keyed one traps")
         func mismatchedContainerKindsTrap() async {
             await #expect(processExitsWith: .failure) {

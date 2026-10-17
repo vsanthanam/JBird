@@ -60,11 +60,11 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/swiftlang/swift-syntax.git",
-            exact: "604.0.0"
+            from: "604.0.0"
         ),
         .package(
             url: "https://github.com/swiftlang/swift-docc-plugin.git",
-            exact: "1.5.0"
+            from: "1.5.0"
         )
     ],
     targets: [

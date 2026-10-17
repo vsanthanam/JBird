@@ -60,8 +60,8 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/swiftlang/swift-syntax.git",
-            exact: "602.0.0"
-        ),
+            from: "602.0.0"
+        )
     ],
     targets: [
         .target(
