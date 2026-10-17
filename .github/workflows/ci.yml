@@ -563,13 +563,36 @@ jobs:
           adb push stage "$REMOTE_DIR"
           adb shell "chmod +x $REMOTE_DIR/*-test-runner"
       - name: Test JBird (${{ matrix.swift }})
+        # Every runner is executed even if an earlier one fails, so the summary table is complete.
         run: |
+          {
+            echo "### Android $(adb shell getprop ro.build.version.release | tr -d '\r') (API $(adb shell getprop ro.build.version.sdk | tr -d '\r')), x86_64"
+            echo ""
+            echo "| Target | Result | Tests | Duration |"
+            echo "|---|---|---|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+          status=0
           for runner in .build/debug/*-test-runner; do
             name=$(basename "$runner")
-            echo "::group::$name"
-            adb shell "cd $REMOTE_DIR && LD_LIBRARY_PATH=. ./$name --testing-library swift-testing"
+            target=${name%-test-runner}
+            echo "::group::$target"
+            set +e
+            adb shell "cd $REMOTE_DIR && LD_LIBRARY_PATH=. ./$name --testing-library swift-testing" | tee "$target.log"
+            rc=${PIPESTATUS[0]}
+            set -e
             echo "::endgroup::"
+            summary=$(grep -E 'Test run with' "$target.log" | tail -n 1)
+            tests=$(echo "$summary" | sed -nE 's/.*Test run with ([0-9]+ tests?( in [0-9]+ suites?)?).*/\1/p')
+            duration=$(echo "$summary" | sed -nE 's/.*after ([0-9.]+) seconds.*/\1 s/p')
+            if [ "$rc" -eq 0 ]; then
+              result="Passed"
+            else
+              result="**Failed**"
+              status=1
+            fi
+            echo "| $target | $result | ${tests:-–} | ${duration:-–} |" >> "$GITHUB_STEP_SUMMARY"
           done
+          exit $status
       - name: Print Emulator Log
         if: failure()
         run: tail -n 200 emulator.log || true
@@ -685,8 +708,24 @@ jobs:
             -configuration Debug \
             -destination 'platform=macOS' \
             -derivedDataPath "$DERIVED_DATA" \
-            clean analyze
+            clean analyze | tee analyzer.log
           rm -rf "$DERIVED_DATA"
+      - name: Summarize Findings
+        # `xcodebuild analyze` exits 0 even when the analyzer reports something, so surface the
+        # findings where they will be seen.
+        run: |
+          findings=$(grep -E '^/.*: warning: ' analyzer.log | sort -u | sed -E "s|^$PWD/||" || true)
+          {
+            echo "### Static Analyzer (JBirdParser)"
+            echo ""
+            if [ -z "$findings" ]; then
+              echo "No findings."
+            else
+              echo "| Location | Finding |"
+              echo "|---|---|"
+              echo "$findings" | awk -F': warning: ' '{ printf "| `%s` | %s |\n", $1, $2 }'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
 
   validate-pr:
     name: Validate Pull Request
