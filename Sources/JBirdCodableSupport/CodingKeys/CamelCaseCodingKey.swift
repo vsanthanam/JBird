@@ -33,13 +33,9 @@ struct CamelCaseCodingKey: CodingKey {
         func convertFromSnakeCase(
             _ stringKey: String
         ) -> String {
-            guard !stringKey.isEmpty else {
-                return stringKey
-            }
-
-            guard let firstNonUnderscore = stringKey.firstIndex(where: { $0 != "_" }),
-                  let lastNonUnderscore = stringKey.lastIndex(where: { $0 != "_" })
-            else {
+            guard !stringKey.isEmpty,
+                  let firstNonUnderscore = stringKey.firstIndex(where: { $0 != "_" }),
+                  let lastNonUnderscore = stringKey.lastIndex(where: { $0 != "_" }) else {
                 return stringKey
             }
 

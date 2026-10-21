@@ -327,10 +327,8 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
                 if memberName.name.text == name {
                     return attr
                 }
-            } else if let identifierName = attr.attributeName.as(IdentifierTypeSyntax.self) {
-                if identifierName.name.text == name {
-                    return attr
-                }
+            } else if let identifierName = attr.attributeName.as(IdentifierTypeSyntax.self), identifierName.name.text == name {
+                return attr
             }
         }
         return nil
@@ -627,7 +625,7 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
             return candidate.isEmpty ? "value" : candidate
         }
 
-        /// Build a deterministic base name from a type by removing optional wrappers and flattening generics.
+        // Build a deterministic base name from a type by removing optional wrappers and flattening generics.
         func typeBaseName(_ type: TypeSyntax) -> String {
             if let opt = type.as(OptionalTypeSyntax.self) {
                 return typeBaseName(opt.wrappedType)

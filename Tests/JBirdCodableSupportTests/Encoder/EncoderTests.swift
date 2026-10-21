@@ -170,10 +170,7 @@ struct EncoderTests {
             #expect {
                 _ = try encoder.encode(value)
             } throws: { error in
-                guard let error = error as? EncodingError else {
-                    return false
-                }
-                guard case let .invalidValue(raw, context) = error else {
+                guard let error = error as? EncodingError, case let .invalidValue(raw, context) = error else {
                     return false
                 }
                 let date = try #require(raw as? Date)
@@ -195,10 +192,7 @@ struct EncoderTests {
             #expect {
                 _ = try encoder.encode(value)
             } throws: { error in
-                guard let error = error as? EncodingError else {
-                    return false
-                }
-                guard case let .invalidValue(raw, context) = error else {
+                guard let error = error as? EncodingError, case let .invalidValue(raw, context) = error else {
                     return false
                 }
                 let str = try #require(raw as? String)
@@ -323,10 +317,7 @@ struct EncoderTests {
             #expect {
                 _ = try encoder.encode(value)
             } throws: { error in
-                guard let error = error as? EncodingError else {
-                    return false
-                }
-                guard case let .invalidValue(raw, context) = error else {
+                guard let error = error as? EncodingError, case let .invalidValue(raw, context) = error else {
                     return false
                 }
                 let data = try #require(raw as? Data)
@@ -348,10 +339,8 @@ struct EncoderTests {
             #expect {
                 _ = try encoder.encode(value)
             } throws: { error in
-                guard let error = error as? EncodingError else {
-                    return false
-                }
-                guard case let .invalidValue(raw, context) = error else {
+                guard let error = error as? EncodingError,
+                      case let .invalidValue(raw, context) = error else {
                     return false
                 }
                 let str = try #require(raw as? String)
