@@ -77,10 +77,9 @@ struct SnakeCaseCodingKey: CodingKey {
                         out.append("_")
                     }
 
-                    if index == 1 {
-                        if out.last != "_" {
-                            out.append("_")
-                        }
+                    if index == 1,
+                       out.last != "_" {
+                        out.append("_")
                     }
                 }
 
