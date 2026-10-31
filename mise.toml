@@ -3,6 +3,10 @@ clang-format = "18.1.8"
 swiftformat = "0.64.0"
 xcbeautify = "3.2.1"
 
+[tasks."format:mise"]
+description = "Format the mise.toml file"
+run = "mise fmt"
+
 [tasks."format:swift"]
 description = "Format Swift sources with SwiftFormat"
 run = "swiftformat ."
@@ -14,6 +18,10 @@ run = 'find Sources Fuzzer -type f \( -name "*.c" -o -name "*.h" \) -exec clang-
 [tasks.format]
 description = "Format all sources"
 depends = ["format:*"]
+
+[tasks."lint:mise"]
+description = "Check mise.toml formatting"
+run = "mise fmt --check"
 
 [tasks."lint:swift"]
 description = "Check Swift formatting with SwiftFormat"
