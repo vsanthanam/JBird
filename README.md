@@ -4,7 +4,7 @@
 [![GitHub Release](https://img.shields.io/github/v/release/vsanthanam/JBird?include_prereleases)](https://github.com/vsanthanam/JBird/releases)
 [![Build Status](https://img.shields.io/github/check-runs/vsanthanam/JBird/main)](https://github.com/vsanthanam/JBird/actions)
 [![Swift Version](https://img.shields.io/badge/swift-%206.2%20%7C%206.3%20%7C%206.4-F05138)](https://swift.org)
-[![Xcode](https://img.shields.io/badge/xcode-27.1-blue)](https://developer.apple.com/xcode/)
+[![Xcode](https://img.shields.io/badge/xcode-27.2-blue)](https://developer.apple.com/xcode/)
 [![Documentation](https://img.shields.io/badge/documentation-GitHub-teal)](https://usejbird.com/docs/documentation/jbird)
 [![Test Coverage](https://codecov.io/gh/vsanthanam/JBird/graph/badge.svg?token=11GDRKPRLF)](https://codecov.io/gh/vsanthanam/JBird)
 
