@@ -1,0 +1,192 @@
+#!/bin/bash
+#
+# Run the benchmark suite in Benchmarks.
+#
+# The suite parses every fixture in Benchmarks/JBirdBenchmark with one JSON
+# library, chosen with BENCHMARK_TARGET, linking the JBird chosen with
+# JBIRD_SOURCE (see Benchmarks/Package.swift). This script wraps the three ways
+# the suite is used:
+#
+#   run      Run the suite once with the local checkout and print the results.
+#            For a quick look at the numbers, for one library or one fixture.
+#   compare  Benchmark the local checkout against main or the pinned release,
+#            and write the comparison to Benchmarks/results.txt. For checking a
+#            change for regressions before opening a pull request.
+#   record   Benchmark the local checkout and every other library, and write the
+#            results to Benchmarks/Results. These are checked in, and the
+#            website's benchmark pages are generated from Results/results.json
+#            (see .scripts/setup-benchmarks).
+#
+# Usage:
+#   mise run benchmark [--library <library>] [<options>]
+#   mise run benchmark:compare [main|release] [<options>]
+#   mise run benchmark:record
+#
+# <library> is one of jbird (the default), foundation, freddy, or swiftyjson.
+# <options> are passed to `swift package benchmark`. The useful ones are
+# --filter <regex> and --skip <regex>, which select fixtures by name, for
+# example `--filter canada` or `--filter 'pretty'`. Run
+# `swift package benchmark --help` in Benchmarks for the full list.
+#
+# Switching JBIRD_SOURCE changes the package graph, so compare resets the
+# package and rebuilds everything when it switches between the reference and the
+# local checkout. The baselines it records are kept in
+# Benchmarks/.benchmarkBaselines, which is not checked in.
+
+set -euo pipefail
+
+scripts_dir="$(cd "$(dirname "$0")" && pwd)"
+script="$scripts_dir/$(basename "$0")"
+cd "$scripts_dir/../Benchmarks"
+
+libraries="jbird foundation freddy swiftyjson"
+
+usage() {
+    sed -n '/^# Usage:/,/^#$/p' "$script" | sed 's/^# \{0,1\}//'
+}
+
+# Select the JBird the suite links against. SwiftPM pins remote JBird sources in
+# Package.resolved and caches their checkouts, so changing the source needs a
+# clean resolution.
+use_source() {
+    export JBIRD_SOURCE="$1"
+    rm -f Package.resolved
+    swift package reset
+}
+
+# Like use_source local, but skips the reset when the package already resolves
+# JBird to the local checkout. Local packages are not pinned in Package.resolved,
+# so a pinned JBird means a remote source was used last.
+use_local() {
+    if grep -q 'vsanthanam/JBird' Package.resolved 2>/dev/null; then
+        use_source local
+    else
+        export JBIRD_SOURCE=local
+    fi
+}
+
+record_baseline() {
+    local library="$1"
+    local baseline="$2"
+    shift 2
+    echo "📏 Benchmarking $library ($JBIRD_SOURCE) into baseline '$baseline'…"
+    BENCHMARK_TARGET="$library" swift package --allow-writing-to-package-directory \
+        benchmark baseline update "$baseline" "$@"
+}
+
+cmd_run() {
+    local library=jbird
+    local args=()
+    while [ $# -gt 0 ]; do
+        case "$1" in
+        --library)
+            library="$2"
+            shift 2
+            ;;
+        --library=*)
+            library="${1#*=}"
+            shift
+            ;;
+        -h | --help)
+            usage
+            exit 0
+            ;;
+        *)
+            args+=("$1")
+            shift
+            ;;
+        esac
+    done
+
+    case " $libraries " in
+    *" $library "*) ;;
+    *)
+        echo "error: unknown library '$library'. Expected one of: ${libraries// /, }." >&2
+        exit 1
+        ;;
+    esac
+
+    use_local
+    BENCHMARK_TARGET="$library" swift package benchmark run ${args[@]+"${args[@]}"}
+}
+
+cmd_compare() {
+    local reference=main
+    case "${1:-}" in
+    main | release)
+        reference="$1"
+        shift
+        ;;
+    -h | --help)
+        usage
+        exit 0
+        ;;
+    -* | "") ;;
+    *)
+        echo "error: unknown reference '$1'. Expected main or release." >&2
+        exit 1
+        ;;
+    esac
+
+    use_source "$reference"
+    record_baseline jbird "$reference" "$@"
+
+    use_source local
+    record_baseline jbird local "$@"
+
+    swift package benchmark baseline compare "$reference" local > results.txt
+    echo "✅ Wrote Benchmarks/results.txt comparing the local checkout against $reference."
+}
+
+cmd_record() {
+    if [ $# -gt 0 ]; then
+        echo "error: record takes no arguments; it always benchmarks every fixture with every library." >&2
+        exit 1
+    fi
+
+    use_local
+    for library in $libraries; do
+        record_baseline "$library" "$library"
+    done
+
+    rm -rf Results
+    mkdir Results
+    for library in $libraries; do
+        if [ "$library" != jbird ]; then
+            swift package benchmark baseline compare "$library" jbird --format markdown > "Results/$library.md"
+        fi
+    done
+
+    local jmh_dir
+    jmh_dir="$(mktemp -d)"
+    # Expand the path now: the trap runs after this function returns, when the
+    # local variable is out of scope.
+    trap "rm -rf '$jmh_dir'" EXIT
+    # shellcheck disable=SC2086
+    swift package --allow-writing-to-directory "$jmh_dir" \
+        benchmark baseline read $libraries --format jmh --path "$jmh_dir"
+    # shellcheck disable=SC2086
+    "$scripts_dir/export-benchmarks" "$jmh_dir" $libraries > Results/results.json
+
+    echo "✅ Wrote Benchmarks/Results. Commit it to update the website's benchmark pages."
+}
+
+case "${1:-}" in
+run | compare | record)
+    command="$1"
+    shift
+    "cmd_$command" "$@"
+    ;;
+-h | --help)
+    usage
+    ;;
+"")
+    usage >&2
+    exit 1
+    ;;
+*)
+    echo "error: unknown command '$1'. Expected run, compare, or record." >&2
+    usage >&2
+    exit 1
+    ;;
+esac

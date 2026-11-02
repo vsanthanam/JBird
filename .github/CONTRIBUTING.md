@@ -17,7 +17,7 @@ JBird is built on these foundational principles:
 
 - Contributions that reduce performance will only be accepted if they fix a critical bug or security vulnerability.
 - Performance-sensitive changes must include benchmark results showing the impact.
-- The benchmark suite in the `/Benchmarks` directory should be used to validate changes.
+- Validate changes with `$ mise run benchmark:compare`, which benchmarks your checkout against `main` and writes the comparison to `Benchmarks/results.txt`. Run `$ mise run benchmark` for a quick look at the numbers, and see `.scripts/benchmark` for the options.
 - Memory efficiency is equally important - contributions should not significantly increase memory usage.
 
 ## API Design Guidelines
@@ -66,7 +66,7 @@ JBird maintains 100% test coverage for its codebase:
 ## Code Style
 
 - Formatters are managed with [mise](https://mise.jdx.dev). Run `$ mise install` once to get the pinned tool versions.
-- Format everything with `$ mise run format`, or check without modifying files with `$ mise run lint`. Use `format:swift`, `format:c`, `lint:swift`, or `lint:c` to run a single formatter, and `$ mise run check-docc` to build the documentation and fail on warnings.
+- Format everything with `$ mise run format`, or check without modifying files with `$ mise run lint`. Use `format:swift`, `format:c`, `lint:swift`, or `lint:c` to run a single formatter, and `$ mise run lint:docc` to build the documentation and fail on warnings. `$ mise run lint:all` runs every check.
 - Maintain C11 compliance for the parser core.
 - Internal facing APIs should be self-documenting, and should rarely use documentation unless it's absolutely necessary.
 - Similarly, code comments are usually not helpful. You should add them only when the decision you're making is not obvious or requires extra justification.

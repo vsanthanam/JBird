@@ -5,14 +5,14 @@ import PackageDescription
 
 enum Source: String {
     case release
-    case remote
+    case main
     case local
 }
 
 let source: Source? = if Context.environment["JBIRD_SOURCE"] == "release" {
     .release
-} else if Context.environment["JBIRD_SOURCE"] == "remote" {
-    .remote
+} else if Context.environment["JBIRD_SOURCE"] == "main" {
+    .main
 } else if Context.environment["JBIRD_SOURCE"] == "local" {
     .local
 } else {
@@ -31,7 +31,7 @@ case .release:
         url: "https://github.com/vsanthanam/JBird.git",
         exact: "3.0.4"
     )
-case .remote:
+case .main:
     .package(
         url: "https://github.com/vsanthanam/JBird.git",
         branch: "main"
@@ -51,7 +51,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/ordo-one/benchmark",
-            exact: "1.36.2"
+            exact: "1.38.1"
         ),
         jbird,
         .package(
