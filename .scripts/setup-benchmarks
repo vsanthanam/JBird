@@ -2,8 +2,8 @@
 #
 # Create the website's benchmark pages from Benchmarks/Results/results.json.
 #
-# results.json is written by Benchmarks/instrument (see Benchmarks/export). This
-# script writes:
+# results.json is written by `mise run benchmark:record` (see .scripts/benchmark
+# and .scripts/export-benchmarks). This script writes:
 #
 #   * benchmarks/index.md: JBird's median parse time and speedup over each
 #     library for every input, with links to each input's page.
@@ -137,7 +137,8 @@ def index_page(data, libraries, names):
         "## Running the Benchmarks",
         "",
         "The benchmarks are in the [`Benchmarks`](https://github.com/vsanthanam/JBird/tree/main/Benchmarks) "
-        "directory of the repository. To run them and regenerate these results, run `./instrument` from that directory.",
+        "directory of the repository. To run them and regenerate these results, run `mise run benchmark:record` "
+        "from the root of the repository.",
         "",
     ]
     return "\n".join(lines)
@@ -208,7 +209,7 @@ def input_page(data, libraries, names, index):
 
 def main():
     if not os.path.exists(RESULTS):
-        sys.exit(f"error: {RESULTS} not found. Run Benchmarks/instrument to create it.")
+        sys.exit(f"error: {RESULTS} not found. Run `mise run benchmark:record` to create it.")
     with open(RESULTS, encoding="utf-8") as file:
         data = json.load(file)
 

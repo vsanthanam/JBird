@@ -3,6 +3,10 @@ clang-format = "18.1.8"
 swiftformat = "0.64.0"
 xcbeautify = "3.2.1"
 
+[tasks.format]
+description = "Format all sources"
+depends = ["format:*"]
+
 [tasks."format:mise"]
 description = "Format the mise.toml file"
 run = "mise fmt"
@@ -15,9 +19,9 @@ run = "swiftformat ."
 description = "Format C sources with clang-format"
 run = 'find Sources Fuzzer -type f \( -name "*.c" -o -name "*.h" \) -exec clang-format -i "{}" +'
 
-[tasks.format]
-description = "Format all sources"
-depends = ["format:*"]
+[tasks.lint]
+description = "Check formatting of all sources"
+depends = ["lint:mise", "lint:swift", "lint:c"]
 
 [tasks."lint:mise"]
 description = "Check mise.toml formatting"
@@ -31,13 +35,25 @@ run = "swiftformat . --lint"
 description = "Check C formatting with clang-format"
 run = 'find Sources Fuzzer -type f \( -name "*.c" -o -name "*.h" \) -exec clang-format --style=file --dry-run --Werror "{}" +'
 
-[tasks."check-docc"]
+[tasks."lint:docc"]
 description = "Build documentation and fail on warnings"
 run = "./.scripts/lint-docc"
 
-[tasks.lint]
-description = "Check formatting of all sources"
+[tasks."lint:all"]
+description = "Check formatting of all sources and build documentation, failing on warnings"
 depends = ["lint:*"]
+
+[tasks.benchmark]
+description = "Run the benchmark suite with the local checkout (usage: mise run benchmark [--library jbird|foundation|freddy|swiftyjson] [--filter <regex>])"
+run = "./.scripts/benchmark run"
+
+[tasks."benchmark:compare"]
+description = "Benchmark the local checkout against main or the pinned release, writing Benchmarks/results.txt (usage: mise run benchmark:compare [main|release] [--filter <regex>])"
+run = "./.scripts/benchmark compare"
+
+[tasks."benchmark:record"]
+description = "Benchmark the local checkout and every other library, regenerating Benchmarks/Results for the website"
+run = "./.scripts/benchmark record"
 
 [tasks.build-xcframework]
 description = "Build an XCFramework (usage: mise run build-xcframework <target> [--static] [--platforms p1,p2,...])"

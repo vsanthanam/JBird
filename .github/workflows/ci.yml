@@ -605,7 +605,7 @@ jobs:
       - name: Select Xcode Version
         run: ./.scripts/xcode-select
       - name: Validate Documentation
-        run: mise run check-docc
+        run: mise run lint:docc
 
   build-xcframework:
     name: Build XCFrameworks

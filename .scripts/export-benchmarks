@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 #
-# Usage: ./export <jmh-directory> <baseline> [<baseline> ...] > Results/results.json
+# Usage: ./.scripts/export-benchmarks <jmh-directory> <baseline> [<baseline> ...] > Results/results.json
 #
 # Combines the JMH exports of the given baselines (written by
 # `swift package benchmark baseline read <baseline> --format jmh`) into one
 # compact JSON file with every metric's percentiles, mean, and sample count.
+# It is run from the Benchmarks directory by `mise run benchmark:record` (see
+# .scripts/benchmark), and the website's benchmark pages are generated from its
+# output by .scripts/setup-benchmarks.
 #
 # The values come straight from the recorded histograms, so unlike the markdown
 # comparisons they are not rounded or rescaled. The raw samples in the JMH
@@ -69,7 +72,7 @@ def machine(baseline):
 
 def main():
     if len(sys.argv) < 3:
-        sys.exit("usage: ./export <jmh-directory> <baseline> [<baseline> ...]")
+        sys.exit("usage: ./.scripts/export-benchmarks <jmh-directory> <baseline> [<baseline> ...]")
 
     directory, baselines = sys.argv[1], sys.argv[2:]
     export = {
