@@ -25,10 +25,14 @@
 
 import Foundation
 import RegexBuilder
-import SwiftCompilerPlugin
-import SwiftSyntax
 import SwiftSyntaxBuilder
-import SwiftSyntaxMacros
+#if hasFeature(InternalImportsByDefault)
+    public import SwiftSyntax
+    public import SwiftSyntaxMacros
+#else
+    import SwiftSyntax
+    import SwiftSyntaxMacros
+#endif
 
 public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
 

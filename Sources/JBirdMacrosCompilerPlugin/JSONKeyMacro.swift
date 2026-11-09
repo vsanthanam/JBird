@@ -23,10 +23,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import SwiftCompilerPlugin
-import SwiftSyntax
-import SwiftSyntaxBuilder
-import SwiftSyntaxMacros
+#if hasFeature(InternalImportsByDefault)
+    public import SwiftSyntax
+    public import SwiftSyntaxMacros
+#else
+    import SwiftSyntax
+    import SwiftSyntaxMacros
+#endif
 
 @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
 public struct JSONKeyMacro: PeerMacro {
