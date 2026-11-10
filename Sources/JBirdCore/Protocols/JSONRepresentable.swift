@@ -23,7 +23,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Foundation
+#if hasFeature(InternalImportsByDefault)
+    public import Foundation
+#else
+    import Foundation
+#endif
 
 /// A type that can convert itself into and out of an external `JSON` representation.
 ///

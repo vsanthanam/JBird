@@ -81,7 +81,7 @@ You are welcome to use AI tools (Claude, Copilot, Cursor, ChatGPT, etc.) to help
 - Review comments must be answered by you. Do not paste maintainer questions into a tool and paste the response back.
 - Do not submit code you have not run, tests you have not seen pass, or benchmark results you did not produce.
 
-**AI slop is not accepted.** Before submitting, go through the list above and strip out everything that matches. Your PR description should describe *why* the change is needed and *how* you verified it, not what the diff contains.
+**AI slop is not accepted.** Before submitting, go through the list below and strip out everything that matches. Your PR description should describe *why* the change is needed and *how* you verified it, not what the diff contains.
 
 **Keep the scope tight.** Keep pull requests focused on one change. A small, clean PR will be reviewed and merged far faster than a large one that requires the reviewer to separate the signal from the noise.
 
