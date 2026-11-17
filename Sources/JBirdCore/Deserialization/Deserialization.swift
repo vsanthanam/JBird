@@ -488,19 +488,19 @@ extension JSON {
         ) throws -> JSON {
             switch json_get_type(value) {
             case JSON_NULL:
-                return .null
+                .null
             case JSON_BOOLEAN:
-                return .bool(json_get_boolean(value))
+                .bool(json_get_boolean(value))
             case JSON_NUMBER_INT:
-                return .number(JSON.Number(json_get_int(value)))
+                .number(JSON.Number(json_get_int(value)))
             case JSON_NUMBER_DOUBLE:
-                return .number(JSON.Number(json_get_double(value)))
+                .number(JSON.Number(json_get_double(value)))
             case JSON_STRING:
-                return .string(String(parserBytes: json_get_string(value).unsafelyUnwrapped, count: json_get_string_length(value)))
+                .string(String(parserBytes: json_get_string(value).unsafelyUnwrapped, count: json_get_string_length(value)))
             case JSON_ARRAY:
-                return try .array(materializeArray(value))
+                try .array(materializeArray(value))
             case JSON_OBJECT:
-                return try .object(materializeObject(value))
+                try .object(materializeObject(value))
             default:
                 throw DeserializationError.unknown
             }

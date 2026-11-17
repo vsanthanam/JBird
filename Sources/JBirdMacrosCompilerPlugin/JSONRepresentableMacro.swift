@@ -96,11 +96,11 @@ public struct JSONRepresentableMacro: ExtensionMacro, MemberMacro {
         in context: some MacroExpansionContext
     ) throws -> [DeclSyntax] {
         if let structDecl = declaration.as(StructDeclSyntax.self) {
-            return try buildStructMembers(from: structDecl)
+            try buildStructMembers(from: structDecl)
         } else if let classDecl = declaration.as(ClassDeclSyntax.self) {
-            return try buildClassMembers(from: classDecl)
+            try buildClassMembers(from: classDecl)
         } else if let enumDecl = declaration.as(EnumDeclSyntax.self) {
-            return try buildEnumMembers(from: enumDecl)
+            try buildEnumMembers(from: enumDecl)
         } else {
             throw MacroExpansionErrorMessage("@JSONRepresentable macro can only be applied to structs, enums or classes.")
         }
