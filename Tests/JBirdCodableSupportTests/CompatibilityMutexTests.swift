@@ -129,25 +129,25 @@ private var runtimeMisreportsMutexAsTrivial: Bool {
     #if os(macOS) || os(iOS) || os(watchOS) || os(tvOS) || os(visionOS)
         #if compiler(>=6.4)
             if #available(anyAppleOS 27.0, *) {
-                return false
+                false
             } else {
-                return true
+                true
             }
         #else
             if #available(macOS 27.0, macCatalyst 27.0, iOS 27.0, watchOS 27.0, tvOS 27.0, visionOS 27.0, *) {
-                return false
+                false
             } else {
-                return true
+                true
             }
         #endif
     #elseif os(Windows)
         #if compiler(>=6.4)
-            return false
+            false
         #else
-            return true
+            true
         #endif
     #else
-        return false
+        false
     #endif
 }
 

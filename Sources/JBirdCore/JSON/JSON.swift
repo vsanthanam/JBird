@@ -142,7 +142,7 @@ public enum JSON: Equatable, Hashable, Sendable, ExpressibleByBooleanLiteral, Ex
         get throws {
             switch self {
             case let .bool(bool):
-                return bool
+                bool
             case .null, .array, .number, .object, .string:
                 throw OperationError.illegalBoolConversion
             }

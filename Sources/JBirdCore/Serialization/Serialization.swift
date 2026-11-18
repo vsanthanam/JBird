@@ -202,16 +202,14 @@ extension JSON {
                         } else {
                             try serializeValue(json: value, into: &bytes, level: level, options: options)
                         }
+                    } else if let level {
+                        serializeIndentation(level: level + 1, into: &bytes)
+                        try serializeValue(json: value, into: &bytes, level: level + 1, options: options)
+                        serializeComma(into: &bytes)
+                        serializeNewLine(into: &bytes)
                     } else {
-                        if let level {
-                            serializeIndentation(level: level + 1, into: &bytes)
-                            try serializeValue(json: value, into: &bytes, level: level + 1, options: options)
-                            serializeComma(into: &bytes)
-                            serializeNewLine(into: &bytes)
-                        } else {
-                            try serializeValue(json: value, into: &bytes, level: level, options: options)
-                            serializeComma(into: &bytes)
-                        }
+                        try serializeValue(json: value, into: &bytes, level: level, options: options)
+                        serializeComma(into: &bytes)
                     }
                 }
 
@@ -268,22 +266,20 @@ extension JSON {
                             serializeColon(into: &bytes)
                             try serializeValue(json: value, into: &bytes, level: nil, options: options)
                         }
+                    } else if let level {
+                        serializeIndentation(level: level + 1, into: &bytes)
+                        serializeString(key, options: options, into: &bytes)
+                        serializeSpace(into: &bytes)
+                        serializeColon(into: &bytes)
+                        serializeSpace(into: &bytes)
+                        try serializeValue(json: value, into: &bytes, level: level + 1, options: options)
+                        serializeComma(into: &bytes)
+                        serializeNewLine(into: &bytes)
                     } else {
-                        if let level {
-                            serializeIndentation(level: level + 1, into: &bytes)
-                            serializeString(key, options: options, into: &bytes)
-                            serializeSpace(into: &bytes)
-                            serializeColon(into: &bytes)
-                            serializeSpace(into: &bytes)
-                            try serializeValue(json: value, into: &bytes, level: level + 1, options: options)
-                            serializeComma(into: &bytes)
-                            serializeNewLine(into: &bytes)
-                        } else {
-                            serializeString(key, options: options, into: &bytes)
-                            serializeColon(into: &bytes)
-                            try serializeValue(json: value, into: &bytes, level: level, options: options)
-                            serializeComma(into: &bytes)
-                        }
+                        serializeString(key, options: options, into: &bytes)
+                        serializeColon(into: &bytes)
+                        try serializeValue(json: value, into: &bytes, level: level, options: options)
+                        serializeComma(into: &bytes)
                     }
                 }
 
@@ -415,16 +411,14 @@ extension JSON {
                             } else {
                                 try await serializeValue(json: value, into: &bytes, level: level, options: options)
                             }
+                        } else if let level {
+                            serializeIndentation(level: level + 1, into: &bytes)
+                            try await serializeValue(json: value, into: &bytes, level: level + 1, options: options)
+                            serializeComma(into: &bytes)
+                            serializeNewLine(into: &bytes)
                         } else {
-                            if let level {
-                                serializeIndentation(level: level + 1, into: &bytes)
-                                try await serializeValue(json: value, into: &bytes, level: level + 1, options: options)
-                                serializeComma(into: &bytes)
-                                serializeNewLine(into: &bytes)
-                            } else {
-                                try await serializeValue(json: value, into: &bytes, level: level, options: options)
-                                serializeComma(into: &bytes)
-                            }
+                            try await serializeValue(json: value, into: &bytes, level: level, options: options)
+                            serializeComma(into: &bytes)
                         }
                     }
 
@@ -481,22 +475,20 @@ extension JSON {
                                 serializeColon(into: &bytes)
                                 try await serializeValue(json: value, into: &bytes, level: nil, options: options)
                             }
+                        } else if let level {
+                            serializeIndentation(level: level + 1, into: &bytes)
+                            serializeString(key, options: options, into: &bytes)
+                            serializeSpace(into: &bytes)
+                            serializeColon(into: &bytes)
+                            serializeSpace(into: &bytes)
+                            try await serializeValue(json: value, into: &bytes, level: level + 1, options: options)
+                            serializeComma(into: &bytes)
+                            serializeNewLine(into: &bytes)
                         } else {
-                            if let level {
-                                serializeIndentation(level: level + 1, into: &bytes)
-                                serializeString(key, options: options, into: &bytes)
-                                serializeSpace(into: &bytes)
-                                serializeColon(into: &bytes)
-                                serializeSpace(into: &bytes)
-                                try await serializeValue(json: value, into: &bytes, level: level + 1, options: options)
-                                serializeComma(into: &bytes)
-                                serializeNewLine(into: &bytes)
-                            } else {
-                                serializeString(key, options: options, into: &bytes)
-                                serializeColon(into: &bytes)
-                                try await serializeValue(json: value, into: &bytes, level: level, options: options)
-                                serializeComma(into: &bytes)
-                            }
+                            serializeString(key, options: options, into: &bytes)
+                            serializeColon(into: &bytes)
+                            try await serializeValue(json: value, into: &bytes, level: level, options: options)
+                            serializeComma(into: &bytes)
                         }
                     }
 
@@ -567,16 +559,14 @@ extension JSON {
                             } else {
                                 try await serializeValue(json: value, into: &bytes, level: level, options: options)
                             }
+                        } else if let level {
+                            serializeIndentation(level: level + 1, into: &bytes)
+                            try await serializeValue(json: value, into: &bytes, level: level + 1, options: options)
+                            serializeComma(into: &bytes)
+                            serializeNewLine(into: &bytes)
                         } else {
-                            if let level {
-                                serializeIndentation(level: level + 1, into: &bytes)
-                                try await serializeValue(json: value, into: &bytes, level: level + 1, options: options)
-                                serializeComma(into: &bytes)
-                                serializeNewLine(into: &bytes)
-                            } else {
-                                try await serializeValue(json: value, into: &bytes, level: level, options: options)
-                                serializeComma(into: &bytes)
-                            }
+                            try await serializeValue(json: value, into: &bytes, level: level, options: options)
+                            serializeComma(into: &bytes)
                         }
                     }
 
@@ -633,22 +623,20 @@ extension JSON {
                                 serializeColon(into: &bytes)
                                 try await serializeValue(json: value, into: &bytes, level: nil, options: options)
                             }
+                        } else if let level {
+                            serializeIndentation(level: level + 1, into: &bytes)
+                            serializeString(key, options: options, into: &bytes)
+                            serializeSpace(into: &bytes)
+                            serializeColon(into: &bytes)
+                            serializeSpace(into: &bytes)
+                            try await serializeValue(json: value, into: &bytes, level: level + 1, options: options)
+                            serializeComma(into: &bytes)
+                            serializeNewLine(into: &bytes)
                         } else {
-                            if let level {
-                                serializeIndentation(level: level + 1, into: &bytes)
-                                serializeString(key, options: options, into: &bytes)
-                                serializeSpace(into: &bytes)
-                                serializeColon(into: &bytes)
-                                serializeSpace(into: &bytes)
-                                try await serializeValue(json: value, into: &bytes, level: level + 1, options: options)
-                                serializeComma(into: &bytes)
-                                serializeNewLine(into: &bytes)
-                            } else {
-                                serializeString(key, options: options, into: &bytes)
-                                serializeColon(into: &bytes)
-                                try await serializeValue(json: value, into: &bytes, level: level, options: options)
-                                serializeComma(into: &bytes)
-                            }
+                            serializeString(key, options: options, into: &bytes)
+                            serializeColon(into: &bytes)
+                            try await serializeValue(json: value, into: &bytes, level: level, options: options)
+                            serializeComma(into: &bytes)
                         }
                     }
 

@@ -60,7 +60,7 @@ extension Optional {
     ) throws -> Wrapped {
         switch self {
         case let .some(value):
-            return value
+            value
         case .none:
             throw MacroExpansionErrorMessage(message())
         }
