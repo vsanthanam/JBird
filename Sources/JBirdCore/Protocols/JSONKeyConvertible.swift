@@ -24,7 +24,7 @@
 // SOFTWARE.
 
 /// A type that can convert itself into a `JSON.Key`
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 public protocol JSONKeyConvertible {
 
     /// The `JSON.Key` value representing this instance.
@@ -32,7 +32,7 @@ public protocol JSONKeyConvertible {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension JSONKeyConvertible where Self: RawRepresentable, RawValue: JSONKeyConvertible {
 
     public var jsonKey: JSON.Key {
@@ -41,7 +41,7 @@ extension JSONKeyConvertible where Self: RawRepresentable, RawValue: JSONKeyConv
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension JSON.Key {
 
     @_disfavoredOverload

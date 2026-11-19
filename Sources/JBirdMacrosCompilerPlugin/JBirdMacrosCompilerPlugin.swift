@@ -43,7 +43,7 @@ struct JBirdMacrosCompilerPlugin: CompilerPlugin {
 
     // MARK: - Private
 
-    @available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+    @available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
     private var macros: [any Macro.Type] = [
         JSONRepresentableMacro.self,
         JSONKeyMacro.self,
@@ -52,7 +52,7 @@ struct JBirdMacrosCompilerPlugin: CompilerPlugin {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension Optional {
 
     func mustExist(

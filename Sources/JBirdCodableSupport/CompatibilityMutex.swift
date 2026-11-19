@@ -26,13 +26,13 @@
 import Foundation
 import Synchronization
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 struct CompatibilityMutex<Value>: ~Copyable where Value: ~Copyable {
 
     init(
         _ initialValue: consuming sending Value
     ) {
-        if #available(macOS 15.0, macCatalyst 18.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *) {
+        if #available(macOS 15.0, macCatalyst 18.0, iOS 18.0, watchOS 11.0, tvOS 18.0, *) {
             let pointer = UnsafeMutablePointer<Mutex<Value>>.allocate(capacity: 1)
             pointer.initialize(to: Mutex(initialValue))
             storage = UnsafeMutableRawPointer(pointer)
@@ -53,7 +53,7 @@ struct CompatibilityMutex<Value>: ~Copyable where Value: ~Copyable {
         borrowing func withLock<Result, Failure>(
             _ body: (inout sending Value) throws(Failure) -> sending Result
         ) throws(Failure) -> sending Result where Result: ~Copyable, Failure: Error {
-            if usesMutex, #available(macOS 15.0, macCatalyst 18.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *) {
+            if usesMutex, #available(macOS 15.0, macCatalyst 18.0, iOS 18.0, watchOS 11.0, tvOS 18.0, *) {
                 let pointer = storage.assumingMemoryBound(to: Mutex<Value>.self)
                 return try pointer.pointee.withLock { (value: inout sending Value) throws(Failure) -> sending Result in
                     try body(&value)
@@ -71,7 +71,7 @@ struct CompatibilityMutex<Value>: ~Copyable where Value: ~Copyable {
         borrowing func withLock<Result, Failure>(
             _ body: (inout Value) throws(Failure) -> sending Result
         ) throws(Failure) -> sending Result where Result: ~Copyable, Failure: Error {
-            if usesMutex, #available(macOS 15.0, macCatalyst 18.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *) {
+            if usesMutex, #available(macOS 15.0, macCatalyst 18.0, iOS 18.0, watchOS 11.0, tvOS 18.0, *) {
                 let pointer = storage.assumingMemoryBound(to: Mutex<Value>.self)
                 return try pointer.pointee.withLock { (value: inout sending Value) throws(Failure) -> sending Result in
                     try body(&value)
@@ -96,7 +96,7 @@ struct CompatibilityMutex<Value>: ~Copyable where Value: ~Copyable {
     private let usesMutex: Bool
 
     deinit {
-        if usesMutex, #available(macOS 15.0, macCatalyst 18.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *) {
+        if usesMutex, #available(macOS 15.0, macCatalyst 18.0, iOS 18.0, watchOS 11.0, tvOS 18.0, *) {
             let pointer = storage.assumingMemoryBound(to: Mutex<Value>.self)
             // Some Synchronization runtimes mark `Mutex` as trivially destructible, even when its value is not.
             // `deinitialize(count:)` trusts that and skips destroying the value, so on those runtimes, move the mutex out and let it drop instead.
@@ -137,5 +137,5 @@ struct CompatibilityMutex<Value>: ~Copyable where Value: ~Copyable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension CompatibilityMutex: @unchecked Sendable where Value: ~Copyable {}
