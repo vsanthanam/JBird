@@ -29,10 +29,10 @@ import Foundation
 ///
 /// `JSONNumberRepresentable` is a typealias for the ``JSONNumberConvertible`` and ``JSONNumberInitializable`` protocols.
 /// When you use `JSONRepresentable` as a type or a generic constraint, it matches any type that conforms to both protocols.
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 public typealias JSONNumberRepresentable = JSONNumberConvertible & JSONNumberInitializable
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension JSON.Number: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {
@@ -45,7 +45,7 @@ extension JSON.Number: JSONNumberRepresentable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension Int: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {
@@ -68,7 +68,7 @@ extension Int: JSONNumberRepresentable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension Double: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {
@@ -86,7 +86,7 @@ extension Double: JSONNumberRepresentable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension UInt: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {
@@ -100,7 +100,7 @@ extension UInt: JSONNumberRepresentable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension UInt8: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {
@@ -114,7 +114,7 @@ extension UInt8: JSONNumberRepresentable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension UInt16: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {
@@ -128,7 +128,7 @@ extension UInt16: JSONNumberRepresentable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension UInt32: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {
@@ -142,7 +142,7 @@ extension UInt32: JSONNumberRepresentable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension UInt64: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {
@@ -156,7 +156,7 @@ extension UInt64: JSONNumberRepresentable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension Int8: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {
@@ -170,7 +170,7 @@ extension Int8: JSONNumberRepresentable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension Int16: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {
@@ -184,7 +184,7 @@ extension Int16: JSONNumberRepresentable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension Int32: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {
@@ -198,7 +198,7 @@ extension Int32: JSONNumberRepresentable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension Int64: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {
@@ -212,7 +212,7 @@ extension Int64: JSONNumberRepresentable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension Float: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {
@@ -232,7 +232,7 @@ extension Float: JSONNumberRepresentable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension Decimal: JSONNumberRepresentable {
 
     public var jsonNumber: JSON.Number {

@@ -27,10 +27,10 @@
 ///
 /// `JSONKeyRepresentable` is a typealias for the ``JSONKeyConvertible`` and ``JSONKeyInitializable`` protocols.
 /// When you use `JSONRepresentable` as a type or a generic constraint, it matches any type that conforms to both protocols.
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 public typealias JSONKeyRepresentable = JSONKeyConvertible & JSONKeyInitializable
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension String: JSONKeyRepresentable {
 
     public var jsonKey: JSON.Key {
@@ -43,7 +43,7 @@ extension String: JSONKeyRepresentable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension Substring: JSONKeyRepresentable {
 
     public var jsonKey: JSON.Key {
@@ -56,7 +56,7 @@ extension Substring: JSONKeyRepresentable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension String.UTF8View: JSONKeyRepresentable {
 
     public var jsonKey: JSON.Key {
@@ -69,7 +69,7 @@ extension String.UTF8View: JSONKeyRepresentable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension String.UTF16View: JSONKeyRepresentable {
 
     public var jsonKey: JSON.Key {

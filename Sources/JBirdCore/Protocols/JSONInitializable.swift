@@ -24,7 +24,7 @@
 // SOFTWARE.
 
 /// A type that can be initialized from an external typed `JSON` value.
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 public protocol JSONInitializable {
 
     /// Create an instance of the type from an external typed `JSON` value.,
@@ -33,7 +33,7 @@ public protocol JSONInitializable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension JSONInitializable where Self: JSONNumberInitializable {
 
     public init(json: JSON) throws {
@@ -43,7 +43,7 @@ extension JSONInitializable where Self: JSONNumberInitializable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension Array: JSONInitializable where Element: JSONInitializable {
 
     public init(json: JSON) throws {
@@ -71,7 +71,7 @@ extension InlineArray: JSONInitializable where Element: JSONInitializable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension Dictionary: JSONInitializable where Key: JSONKeyInitializable, Value: JSONInitializable {
 
     public init(json: JSON) throws {
@@ -83,7 +83,7 @@ extension Dictionary: JSONInitializable where Key: JSONKeyInitializable, Value: 
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension JSONInitializable where Self: RawRepresentable, RawValue: JSONInitializable {
 
     public init(json: JSON) throws {
@@ -96,7 +96,7 @@ extension JSONInitializable where Self: RawRepresentable, RawValue: JSONInitiali
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension Optional: JSONInitializable where Wrapped: JSONInitializable {
 
     public init(json: JSON) throws {
@@ -109,7 +109,7 @@ extension Optional: JSONInitializable where Wrapped: JSONInitializable {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension Set: JSONInitializable where Element: JSONInitializable {
 
     public init(json: JSON) throws {

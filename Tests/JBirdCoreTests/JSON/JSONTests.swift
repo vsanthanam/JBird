@@ -606,7 +606,7 @@ struct JSONTests {
 
             let testURL = FileManager.default.temporaryDirectory.appending(path: "test.json", directoryHint: .notDirectory)
 
-            @available(macOS 13.0, macCatalyst 16.0, *)
+            @available(macOS 14.0, macCatalyst 17.0, *)
             @Test("Write to disk without previous content")
             func writeToDiskWithoutPreviousContent() async throws {
                 let json: JSON = [
@@ -623,7 +623,7 @@ struct JSONTests {
                 #expect(diskContent == expected)
             }
 
-            @available(macOS 13.0, macCatalyst 16.0, *)
+            @available(macOS 14.0, macCatalyst 17.0, *)
             @Test("Write to disk with previous content")
             func writeToDiskWithPreviousContent() async throws {
                 let junk = try #require("junk".data(using: .utf8))

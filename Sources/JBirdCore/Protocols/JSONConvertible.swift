@@ -24,7 +24,7 @@
 // SOFTWARE.
 
 /// A type that can convert itself into a typed `JSON` instance.
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 public protocol JSONConvertible {
 
     /// The `JSON` value representing this instance.
@@ -32,7 +32,7 @@ public protocol JSONConvertible {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension JSONConvertible where Self: JSONNumberConvertible {
 
     public var jsonValue: JSON {
@@ -42,7 +42,7 @@ extension JSONConvertible where Self: JSONNumberConvertible {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension Array: JSONConvertible where Element: JSONConvertible {
 
     public var jsonValue: JSON {
@@ -60,7 +60,7 @@ extension InlineArray: JSONConvertible where Element: JSONConvertible {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension Dictionary: JSONConvertible where Key: JSONKeyConvertible, Value: JSONConvertible {
 
     public var jsonValue: JSON {
@@ -73,7 +73,7 @@ extension Dictionary: JSONConvertible where Key: JSONKeyConvertible, Value: JSON
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension JSONConvertible where Self: RawRepresentable, RawValue: JSONConvertible {
 
     public var jsonValue: JSON {
@@ -82,7 +82,7 @@ extension JSONConvertible where Self: RawRepresentable, RawValue: JSONConvertibl
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension Optional: JSONConvertible where Wrapped: JSONConvertible {
 
     public var jsonValue: JSON {
@@ -96,7 +96,7 @@ extension Optional: JSONConvertible where Wrapped: JSONConvertible {
 
 }
 
-@available(macOS 13.0, macCatalyst 16.0, iOS 16.0, watchOS 9.0, tvOS 16.0, visionOS 1.0, *)
+@available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension Set: JSONConvertible where Element: JSONConvertible {
 
     public var jsonValue: JSON {
