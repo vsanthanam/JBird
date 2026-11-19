@@ -23,8 +23,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Foundation
-import JBirdCore
+#if hasFeature(InternalImportsByDefault)
+    public import Foundation
+    public import JBirdCore
+#else
+    import Foundation
+    import JBirdCore
+#endif
 
 @available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension JSON {
