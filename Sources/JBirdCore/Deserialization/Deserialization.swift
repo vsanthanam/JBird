@@ -23,7 +23,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Foundation
+#if hasFeature(InternalImportsByDefault)
+    public import Foundation
+#else
+    import Foundation
+#endif
 #if BUILD_XCFRAMEWORK
     @_implementationOnly import JBirdParser
 #else
@@ -56,7 +60,7 @@ extension JSON {
     /// You can alter this behavior in two ways:
     /// - By calling ``JSON/withRecursionDepthLimit(_:operation:)-8riei`` to set a custom limit for the current task
     /// - By providing the ``JSON/DeserializationOptions/ignoreRecursionDepthLimit`` option when deserializing JSON
-    public static let defaultRecursionDepthLimit: size_t = calculateMaxDepth()
+    public static let defaultRecursionDepthLimit: Int = calculateMaxDepth()
 
     /// The default input size limit
     ///
@@ -66,7 +70,7 @@ extension JSON {
     /// You can alter this behavior in two ways:
     /// - By calling ``JSON/withInputSizeLimit(_:operation:)-2sm2h`` to set a custom limit for the current task
     /// - By providing the ``JSON/DeserializationOptions/ignoreInputSizeLimit`` option when deserializing JSON
-    public static let defaultInputSizeLimit: size_t = calculateMaxInputSize()
+    public static let defaultInputSizeLimit: Int = calculateMaxInputSize()
 
     /// Perform the provided operation with a custom recursion depth limit
     ///
@@ -84,7 +88,7 @@ extension JSON {
     ///   - operation: The operation to perform
     /// - Returns: The return value of the operation
     public static func withRecursionDepthLimit<T>(
-        _ limit: size_t,
+        _ limit: Int,
         operation: () throws -> T
     ) rethrows -> T {
         assert(
@@ -115,7 +119,7 @@ extension JSON {
             ///   - operation: The operation to perform
             /// - Returns: The return value of the operation
             public static func withRecursionDepthLimit<T>(
-                _ limit: size_t,
+                _ limit: Int,
                 operation: () async throws -> T
             ) async rethrows -> T {
                 assert(
@@ -144,7 +148,7 @@ extension JSON {
             ///   - operation: The operation to perform
             /// - Returns: The return value of the operation
             public nonisolated(nonsending) static func withRecursionDepthLimit<T>(
-                _ limit: size_t,
+                _ limit: Int,
                 operation: () async throws -> T
             ) async rethrows -> T {
                 assert(
@@ -175,7 +179,7 @@ extension JSON {
         ///   - operation: The operation to perform
         /// - Returns: The return value of the operation
         public static func withRecursionDepthLimit<T>(
-            _ limit: size_t,
+            _ limit: Int,
             isolation: isolated (any Actor)? = #isolation,
             operation: () async throws -> T
         ) async rethrows -> T {
@@ -412,10 +416,10 @@ extension JSON {
     #endif
 
     @TaskLocal
-    private static var recursionDepthLimit: size_t = defaultRecursionDepthLimit
+    private static var recursionDepthLimit: Int = defaultRecursionDepthLimit
 
     @TaskLocal
-    private static var inputSizeLimit: size_t = defaultInputSizeLimit
+    private static var inputSizeLimit: Int = defaultInputSizeLimit
 
     private enum SynchronousDeserialization {
 
@@ -850,39 +854,39 @@ extension JSON {
 
     #if os(Windows)
         @inline(__always)
-        private static func calculateMaxDepth() -> size_t {
+        private static func calculateMaxDepth() -> Int {
             var low: ULONG_PTR = 0
             var high: ULONG_PTR = 0
             GetCurrentThreadStackLimits(&low, &high)
 
-            let stackBytes = size_t(high &- low)
+            let stackBytes = Int(high &- low)
             return min(1024, max(16, stackBytes / 512))
         }
 
     #elseif os(WASI) || arch(wasm32)
         @inline(__always)
-        private static func calculateMaxDepth() -> size_t {
+        private static func calculateMaxDepth() -> Int {
             // There is no way to do this on Web Assembly. Makes sense.
             256
         }
     #else
         @inline(__always)
-        private static func calculateMaxDepth() -> size_t {
+        private static func calculateMaxDepth() -> Int {
             var attr = pthread_attr_t()
             pthread_attr_init(&attr)
             defer {
                 pthread_attr_destroy(&attr)
             }
 
-            var size: size_t = 0
+            var size = 0
             pthread_attr_getstacksize(&attr, &size)
             return min(1024, max(16, size / 512))
         }
     #endif
 
-    private static func calculateMaxInputSize() -> size_t {
+    private static func calculateMaxInputSize() -> Int {
         let physicalMemory = Double(ProcessInfo.processInfo.physicalMemory)
-        let cap = size_t(physicalMemory * 0.01)
+        let cap = Int(physicalMemory * 0.01)
         return min(max(cap, 1 * 1024 * 1024), 50 * 1024 * 1024)
     }
 

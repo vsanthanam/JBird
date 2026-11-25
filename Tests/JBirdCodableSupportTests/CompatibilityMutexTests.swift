@@ -152,7 +152,7 @@ private var runtimeMisreportsMutexAsTrivial: Bool {
 }
 
 /// Never specialized, so `deinitialize(count:)` goes through the runtime even in optimized builds.
-/// This lets if the runtime bug has changed when we run tests.
+/// This lets us know if the runtime bug has changed when we run tests.
 @_semantics("optimize.sil.specialize.generic.never")
 @inline(never)
 @available(macOS 15.0, macCatalyst 18.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)

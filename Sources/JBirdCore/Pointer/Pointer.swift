@@ -23,7 +23,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Foundation
+#if hasFeature(InternalImportsByDefault)
+    public import Foundation
+#else
+    import Foundation
+#endif
 
 @available(macOS 14.0, macCatalyst 17.0, iOS 17.0, watchOS 10.0, tvOS 17.0, visionOS 2.0, *)
 extension JSON {
